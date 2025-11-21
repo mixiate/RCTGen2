@@ -1,0 +1,57 @@
+#[derive(Debug, serde::Deserialize)]
+struct SceneModel {
+    mesh_index: i32,
+    position: Vec<[f32; 3]>,
+    orientation: Vec<[f32; 3]>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct SceneItem {
+    name: String,
+    rotations: i32,
+    frames: i32,
+    model: SceneModel,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum LightType {
+    Diffuse,
+    Specular,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct SceneLight {
+    r#type: LightType,
+    shadow: bool,
+    direction: [f32; 3],
+    strength: f32,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct SceneDesc {
+    meshes: Vec<String>,
+    items: Vec<SceneItem>,
+    lights: Vec<SceneLight>,
+}
+
+fn main() -> anyhow::Result<()> {
+    use anyhow::Context;
+    let args: Vec<String> = std::env::args().collect();
+    let scene_description_path = std::path::PathBuf::from(args.get(1).context("No description file path argument.")?);
+    let scene_description_path = scene_description_path
+        .canonicalize()
+        .context(format!("Invalid file path {}", scene_description_path.display()))?;
+
+    let scene = {
+        let json = std::fs::read_to_string(&scene_description_path)
+            .context(format!("Could not read file {}", scene_description_path.display()))?;
+        serde_json::from_str::<SceneDesc>(&json).context(format!(
+            "Could not parse json in file {}",
+            scene_description_path.display()
+        ))?
+    };
+    println!("{scene:?}");
+
+    Ok(())
+}
