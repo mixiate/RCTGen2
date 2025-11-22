@@ -6,11 +6,8 @@ pub fn add_model(
 ) -> anyhow::Result<()> {
     let transform = glam::Mat4::from_translation(*translation) * glam::Mat4::from_quat(*rotation);
 
-    let positions: Vec<(f32, f32, f32)> = model
-        .positions
-        .iter()
-        .map(|x| transform.transform_point3(glam::Vec3::new(x.0, x.1, x.2)).into())
-        .collect();
+    let positions: Vec<(f32, f32, f32)> =
+        model.positions.iter().map(|x| transform.transform_point3(*x).into()).collect();
 
     let tri_mesh = embree4_rs::geometry::TriangleMeshGeometry::try_new(&scene.device, &positions, &model.indices)?;
     scene.attach_geometry(&tri_mesh)?;

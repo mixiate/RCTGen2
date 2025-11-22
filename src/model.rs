@@ -7,9 +7,9 @@ struct Vertex {
 
 #[derive(Debug)]
 pub struct Model {
-    pub positions: Vec<(f32, f32, f32)>,
-    pub uvs: Vec<(f32, f32)>,
-    pub normals: Vec<(f32, f32, f32)>,
+    pub positions: Vec<glam::Vec3>,
+    pub uvs: Vec<glam::Vec2>,
+    pub normals: Vec<glam::Vec3>,
     pub indices: Vec<(u32, u32, u32)>,
 }
 
@@ -76,16 +76,12 @@ impl Model {
             }
         }
 
-        let positions: Vec<(f32, f32, f32)> = vertices.iter().map(|x| x.position.into()).collect();
-        let uvs: Vec<(f32, f32)> = vertices.iter().map(|x| x.uv.into()).collect();
-        let normals: Vec<(f32, f32, f32)> = vertices.iter().map(|x| x.normal.into()).collect();
-
         obj.load_mtls()?;
 
         Ok(Model {
-            positions,
-            uvs,
-            normals,
+            positions: vertices.iter().map(|x| x.position.into()).collect(),
+            uvs: vertices.iter().map(|x| x.uv.into()).collect(),
+            normals: vertices.iter().map(|x| x.normal.into()).collect(),
             indices,
         })
     }
