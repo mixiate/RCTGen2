@@ -1,3 +1,5 @@
+mod model;
+
 #[derive(Debug, serde::Deserialize)]
 struct SceneModel {
     mesh_index: i32,
@@ -42,6 +44,10 @@ fn main() -> anyhow::Result<()> {
     let scene_description_path = scene_description_path
         .canonicalize()
         .context(format!("Invalid file path {}", scene_description_path.display()))?;
+    let base_directory = scene_description_path.parent().context(format!(
+        "Could not get parent directory of {}",
+        scene_description_path.display()
+    ))?;
 
     let scene = {
         let json = std::fs::read_to_string(&scene_description_path)
@@ -52,6 +58,17 @@ fn main() -> anyhow::Result<()> {
         ))?
     };
     println!("{scene:?}");
+
+    let models = scene
+        .meshes
+        .iter()
+        .map(|x| {
+            let x = std::path::PathBuf::from(x);
+            let file_path = if x.is_absolute() { x } else { base_directory.join(x) };
+            model::Model::load(&file_path)
+        })
+        .collect::<anyhow::Result<Vec<model::Model>>>()?;
+    println!("{models:?}");
 
     Ok(())
 }
