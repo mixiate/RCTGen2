@@ -58,9 +58,8 @@ fn main() -> anyhow::Result<()> {
             scene_description_path.display()
         ))?
     };
-    println!("{scene:?}");
 
-    let models = scene
+    let models = &scene
         .meshes
         .iter()
         .map(|x| {
@@ -69,16 +68,27 @@ fn main() -> anyhow::Result<()> {
             model::Model::load(&file_path)
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
-    println!("{models:?}");
 
-    let embree_device = embree4_rs::Device::try_new(None)?;
-    let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
+    for item in &scene.items {
+        let embree_device = embree4_rs::Device::try_new(None)?;
+        let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
 
-    for model in models {
-        raytrace::add_model(&embree_scene, &model)?;
+        if let Some(model) = models.get(usize::try_from(item.model.mesh_index)?) {
+            raytrace::add_model(&embree_scene, model)?;
+        } else {
+            anyhow::bail!("Invalid mesh index in item");
+        }
+
+        let embree_scene = embree_scene.commit()?;
+
+        for y in 0..120 {
+            for x in 0..120 {
+                let origin = [(3.3 / 120.0) * x as f32, 5.0, ((3.3 / 120.0) * y as f32) - (3.3 / 2.0)];
+                let hit = raytrace::trace_ray(&embree_scene, &origin, &[0.0, -1.0, 0.0]);
+                print!("{}", if hit { "x" } else { " " });
+            }
+        }
     }
-
-    let _embree_scene = embree_scene.commit();
 
     Ok(())
 }

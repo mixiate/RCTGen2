@@ -288,6 +288,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "embree4-rs",
+ "embree4-sys",
  "obj",
  "serde",
  "serde_json",
