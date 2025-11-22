@@ -69,6 +69,9 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
 
+    let camera_matrix = glam::Mat4::from_euler(glam::EulerRot::XYZ, -60.0_f32.to_radians(), 45.0_f32.to_radians(), 0.0);
+    let camera_matrix = camera_matrix.inverse();
+
     for (item_index, item) in scene.items.iter().enumerate() {
         let frame_count: usize = item
             .frames
@@ -106,13 +109,20 @@ fn main() -> anyhow::Result<()> {
 
             let embree_scene = embree_scene.commit()?;
 
-            for y in 0..120 {
-                for x in 0..120 {
-                    let origin =
-                        glam::Vec3::new((3.3 / 120.0) * x as f32, 5.0, ((3.3 / 120.0) * y as f32) - (3.3 / 2.0));
-                    let direction = glam::Vec3::new(0.0, -1.0, 0.0);
-                    let hit = raytrace::trace_ray(&embree_scene, &origin, &direction);
-                    print!("{}", if hit { "x" } else { " " });
+            for rotation_index in 0..item.rotations {
+                let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
+                let camera_matrix = view_rotation * camera_matrix;
+
+                for y in 0..120 {
+                    for x in 0..120 {
+                        let origin =
+                            glam::Vec3::new((3.3 / 120.0) * x as f32, 5.0, ((3.3 / 120.0) * y as f32) - (3.3 / 2.0));
+                        let origin = camera_matrix.transform_point3(origin);
+                        let direction = glam::Vec3::new(0.0, -1.0, 0.0);
+                        let direction = camera_matrix.transform_vector3(direction);
+                        let hit = raytrace::trace_ray(&embree_scene, &origin, &direction);
+                        print!("{}", if hit { "x" } else { " " });
+                    }
                 }
             }
         }
