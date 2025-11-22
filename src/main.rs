@@ -69,23 +69,51 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
 
-    for item in &scene.items {
-        let embree_device = embree4_rs::Device::try_new(None)?;
-        let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
+    for (item_index, item) in scene.items.iter().enumerate() {
+        let frame_count: usize = item
+            .frames
+            .try_into()
+            .context(format!("Invalid frame count {} in item {item_index}", item.frames))?;
+        for frame_index in 0..frame_count {
+            let embree_device = embree4_rs::Device::try_new(None)?;
+            let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
 
-        if let Some(model) = models.get(usize::try_from(item.model.mesh_index)?) {
-            raytrace::add_model(&embree_scene, model)?;
-        } else {
-            anyhow::bail!("Invalid mesh index in item");
-        }
+            let model = usize::try_from(item.model.mesh_index).ok().and_then(|x| models.get(x)).context(format!(
+                "Invalid mesh index {} in item {item_index}",
+                item.model.mesh_index
+            ))?;
 
-        let embree_scene = embree_scene.commit()?;
+            let translation = item
+                .model
+                .position
+                .get(frame_index)
+                .context(format!("Frame {frame_index} not in item {item_index} positions"))?;
+            let translation: glam::Vec3 = (*translation).into();
 
-        for y in 0..120 {
-            for x in 0..120 {
-                let origin = [(3.3 / 120.0) * x as f32, 5.0, ((3.3 / 120.0) * y as f32) - (3.3 / 2.0)];
-                let hit = raytrace::trace_ray(&embree_scene, &origin, &[0.0, -1.0, 0.0]);
-                print!("{}", if hit { "x" } else { " " });
+            let rotation = item
+                .model
+                .orientation
+                .get(frame_index)
+                .context(format!("Frame {frame_index} not in item {item_index} orientations"))?;
+            let rotation = glam::Quat::from_euler(
+                glam::EulerRot::XYZ,
+                rotation[0].to_radians(),
+                rotation[1].to_radians(),
+                rotation[2].to_radians(),
+            );
+
+            raytrace::add_model(&embree_scene, model, &translation, &rotation)?;
+
+            let embree_scene = embree_scene.commit()?;
+
+            for y in 0..120 {
+                for x in 0..120 {
+                    let origin =
+                        glam::Vec3::new((3.3 / 120.0) * x as f32, 5.0, ((3.3 / 120.0) * y as f32) - (3.3 / 2.0));
+                    let direction = glam::Vec3::new(0.0, -1.0, 0.0);
+                    let hit = raytrace::trace_ray(&embree_scene, &origin, &direction);
+                    print!("{}", if hit { "x" } else { " " });
+                }
             }
         }
     }
