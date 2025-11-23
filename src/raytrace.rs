@@ -29,3 +29,39 @@ pub fn trace_ray(scene: &embree4_rs::CommittedScene, origin: &glam::Vec3, direct
     };
     scene.intersect_1(ray, None).unwrap_or_default().is_some()
 }
+
+pub fn get_scene_screen_bounds(scene: &embree4_rs::CommittedScene, camera: &glam::Mat4) -> anyhow::Result<[i32; 4]> {
+    let scene_bounds = scene.bounds()?;
+    let scene_bounds = [
+        glam::Vec3::new(scene_bounds.lower_x, scene_bounds.lower_y, scene_bounds.lower_z),
+        glam::Vec3::new(scene_bounds.upper_x, scene_bounds.lower_y, scene_bounds.lower_z),
+        glam::Vec3::new(scene_bounds.lower_x, scene_bounds.upper_y, scene_bounds.lower_z),
+        glam::Vec3::new(scene_bounds.upper_x, scene_bounds.upper_y, scene_bounds.lower_z),
+        glam::Vec3::new(scene_bounds.lower_x, scene_bounds.lower_y, scene_bounds.upper_z),
+        glam::Vec3::new(scene_bounds.upper_x, scene_bounds.lower_y, scene_bounds.upper_z),
+        glam::Vec3::new(scene_bounds.lower_x, scene_bounds.upper_y, scene_bounds.upper_z),
+        glam::Vec3::new(scene_bounds.upper_x, scene_bounds.upper_y, scene_bounds.upper_z),
+    ];
+
+    let mut screen_bounds = {
+        let screen_bound = camera.transform_point3(scene_bounds[0]);
+        [
+            screen_bound.x.floor() as i32,
+            screen_bound.y.floor() as i32,
+            screen_bound.x.ceil() as i32,
+            screen_bound.y.ceil() as i32,
+        ]
+    };
+
+    for scene_bound in &scene_bounds[1..] {
+        let screen_bound = camera.transform_point3(*scene_bound);
+        screen_bounds = [
+            screen_bounds[0].min(screen_bound.x.floor() as i32),
+            screen_bounds[1].min(screen_bound.y.floor() as i32),
+            screen_bounds[2].max(screen_bound.x.ceil() as i32),
+            screen_bounds[3].max(screen_bound.y.ceil() as i32),
+        ];
+    }
+
+    Ok(screen_bounds)
+}

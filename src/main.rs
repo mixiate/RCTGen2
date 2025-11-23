@@ -69,8 +69,8 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
 
-    let camera_matrix = glam::Mat4::from_euler(glam::EulerRot::XYZ, -60.0_f32.to_radians(), 45.0_f32.to_radians(), 0.0);
-    let camera_matrix = camera_matrix.inverse();
+    let camera_matrix = glam::Mat4::from_euler(glam::EulerRot::XYZ, -30.0f32.to_radians(), -45.0f32.to_radians(), 0.0);
+    let camera_matrix = camera_matrix * glam::Mat4::from_scale([13.713586; 3].into()); // what?
 
     for (item_index, item) in scene.items.iter().enumerate() {
         let frame_count: usize = item
@@ -111,24 +111,25 @@ fn main() -> anyhow::Result<()> {
 
             for rotation_index in 0..item.rotations {
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
-                let camera_matrix = view_rotation * camera_matrix;
+                let camera_matrix = camera_matrix * view_rotation;
 
-                const WIDTH: usize = 120;
-                const HEIGHT: usize = 120;
-                let mut pixels = Box::new([0u8; WIDTH * HEIGHT]);
+                let bounds = raytrace::get_scene_screen_bounds(&embree_scene, &camera_matrix)?;
+                let offset = glam::Vec3::new(bounds[0] as f32 - 0.5, bounds[1] as f32, 0.0);
 
-                for y in 0..HEIGHT {
-                    for x in 0..WIDTH {
-                        let origin = glam::Vec3::new(
-                            ((6.0 / 120.0) * x as f32) - (6.0 / 2.0),
-                            5.0,
-                            ((6.0 / 120.0) * y as f32) - (6.0 / 2.0),
-                        );
-                        let origin = camera_matrix.transform_point3(origin);
-                        let direction = glam::Vec3::new(0.0, -1.0, 0.0);
-                        let direction = camera_matrix.transform_vector3(direction);
+                let camera_inverse = camera_matrix.inverse();
+
+                let width = (bounds[2] - bounds[0]) as usize + 1;
+                let height = (bounds[3] - bounds[1]) as usize;
+                let mut pixels = vec![0; width * height];
+
+                for y in 0..height {
+                    for x in 0..width {
+                        let origin = glam::Vec3::new(x as f32, (height - 1 - y) as f32, -512.0) + offset;
+                        let origin = camera_inverse.transform_point3(origin);
+                        let direction = glam::Vec3::new(0.0, 0.0, 1.0);
+                        let direction = camera_inverse.transform_vector3(direction);
                         let hit = raytrace::trace_ray(&embree_scene, &origin, &direction);
-                        pixels[y * WIDTH + x] = if hit { 0 } else { 255 };
+                        pixels[y * width + x] = if hit { 0 } else { 255 };
                     }
                 }
 
@@ -137,12 +138,12 @@ fn main() -> anyhow::Result<()> {
                 let image_file = std::fs::File::create(image_path)?;
                 let w = std::io::BufWriter::new(image_file);
 
-                let mut encoder = png::Encoder::new(w, WIDTH.try_into()?, HEIGHT.try_into()?);
+                let mut encoder = png::Encoder::new(w, width.try_into()?, height.try_into()?);
                 encoder.set_color(png::ColorType::Grayscale);
                 encoder.set_depth(png::BitDepth::Eight);
 
                 let mut writer = encoder.write_header()?;
-                writer.write_image_data(&*pixels)?;
+                writer.write_image_data(&pixels)?;
             }
         }
     }
