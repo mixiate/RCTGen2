@@ -1,9 +1,14 @@
-pub fn add_model(
+pub struct SceneModel<'a> {
+    pub model: &'a crate::model::Model,
+    pub normals: Vec<glam::Vec3>,
+}
+
+pub fn add_model<'a>(
     scene: &embree4_rs::Scene,
-    model: &crate::model::Model,
+    model: &'a crate::model::Model,
     translation: &glam::Vec3,
     rotation: &glam::Quat,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<SceneModel<'a>> {
     let transform = glam::Mat4::from_translation(*translation) * glam::Mat4::from_quat(*rotation);
 
     let positions: Vec<(f32, f32, f32)> =
@@ -12,10 +17,17 @@ pub fn add_model(
     let tri_mesh = embree4_rs::geometry::TriangleMeshGeometry::try_new(&scene.device, &positions, &model.indices)?;
     scene.attach_geometry(&tri_mesh)?;
 
-    Ok(())
+    Ok(SceneModel {
+        model,
+        normals: model.normals.iter().map(|x| transform.transform_vector3(*x)).collect(),
+    })
 }
 
-pub fn trace_ray(scene: &embree4_rs::CommittedScene, origin: &glam::Vec3, direction: &glam::Vec3) -> bool {
+pub fn trace_ray(
+    scene: &embree4_rs::CommittedScene,
+    origin: &glam::Vec3,
+    direction: &glam::Vec3,
+) -> Option<embree4_sys::RTCRayHit> {
     let ray = embree4_sys::RTCRay {
         org_x: origin.x,
         org_y: origin.y,
@@ -27,7 +39,7 @@ pub fn trace_ray(scene: &embree4_rs::CommittedScene, origin: &glam::Vec3, direct
         tfar: f32::INFINITY,
         ..Default::default()
     };
-    scene.intersect_1(ray, None).unwrap_or_default().is_some()
+    scene.intersect_1(ray, None).unwrap_or_default()
 }
 
 pub fn get_scene_screen_bounds(scene: &embree4_rs::CommittedScene, camera: &glam::Mat4) -> anyhow::Result<[i32; 4]> {

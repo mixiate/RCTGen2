@@ -16,7 +16,7 @@ struct SceneItem {
     model: SceneModel,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 enum LightType {
     Diffuse,
@@ -105,13 +105,24 @@ fn main() -> anyhow::Result<()> {
                 rotation[2].to_radians(),
             );
 
-            raytrace::add_model(&embree_scene, model, &translation, &rotation)?;
+            let scene_models = [raytrace::add_model(&embree_scene, model, &translation, &rotation)?];
 
             let embree_scene = embree_scene.commit()?;
 
             for rotation_index in 0..item.rotations {
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
                 let camera_matrix = camera_matrix * view_rotation;
+
+                let view_rotation_inverse = view_rotation.inverse();
+                let lights: Vec<_> = scene
+                    .lights
+                    .iter()
+                    .filter(|x| x.r#type == LightType::Diffuse)
+                    .map(|x| {
+                        let direction = glam::Vec3::new(x.direction[0], x.direction[1], x.direction[2]).normalize();
+                        (view_rotation_inverse.transform_vector3(direction), x.strength)
+                    })
+                    .collect();
 
                 let bounds = raytrace::get_scene_screen_bounds(&embree_scene, &camera_matrix)?;
                 let offset = glam::Vec3::new(bounds[0] as f32 - 0.5, bounds[1] as f32, 0.0);
@@ -120,7 +131,7 @@ fn main() -> anyhow::Result<()> {
 
                 let width = (bounds[2] - bounds[0]) as usize + 1;
                 let height = (bounds[3] - bounds[1]) as usize;
-                let mut pixels = vec![0; width * height];
+                let mut pixels = vec![255; width * height];
 
                 for y in 0..height {
                     for x in 0..width {
@@ -128,8 +139,31 @@ fn main() -> anyhow::Result<()> {
                         let origin = camera_inverse.transform_point3(origin);
                         let direction = glam::Vec3::new(0.0, 0.0, 1.0);
                         let direction = camera_inverse.transform_vector3(direction);
-                        let hit = raytrace::trace_ray(&embree_scene, &origin, &direction);
-                        pixels[y * width + x] = if hit { 0 } else { 255 };
+
+                        if let Some(hit) = raytrace::trace_ray(&embree_scene, &origin, &direction) {
+                            let model_index = usize::try_from(hit.hit.geomID).unwrap();
+                            let scene_model = scene_models.get(model_index).unwrap();
+
+                            let face_index = usize::try_from(hit.hit.primID).unwrap();
+                            let indices = scene_model.model.indices.get(face_index).unwrap();
+
+                            let w = 1.0 - hit.hit.u - hit.hit.v;
+                            let normals = [
+                                scene_model.normals[usize::try_from(indices.0).unwrap()] * w,
+                                scene_model.normals[usize::try_from(indices.1).unwrap()] * hit.hit.u,
+                                scene_model.normals[usize::try_from(indices.2).unwrap()] * hit.hit.v,
+                            ];
+                            let normal: glam::Vec3 = normals.iter().sum::<glam::Vec3>().normalize();
+
+                            let mut pixel: u8 = 0;
+                            for light in &lights {
+                                let light = normal.dot(light.0).max(0.0) * light.1;
+                                const MATERIAL_DIFFUSE: f32 = 0.5;
+                                pixel = pixel.saturating_add((255.0 * light * MATERIAL_DIFFUSE) as u8);
+                            }
+
+                            pixels[y * width + x] = pixel;
+                        }
                     }
                 }
 
