@@ -1,4 +1,5 @@
 mod model;
+mod raytrace;
 
 #[derive(Debug, serde::Deserialize)]
 struct SceneModel {
@@ -69,6 +70,15 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
     println!("{models:?}");
+
+    let embree_device = embree4_rs::Device::try_new(None)?;
+    let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
+
+    for model in models {
+        raytrace::add_model(&embree_scene, &model)?;
+    }
+
+    let _embree_scene = embree_scene.commit();
 
     Ok(())
 }
