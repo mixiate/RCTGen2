@@ -50,7 +50,7 @@ fn main() -> anyhow::Result<()> {
         scene_description_path.display()
     ))?;
 
-    let scene = {
+    let scene_desc = {
         let json = std::fs::read_to_string(&scene_description_path)
             .context(format!("Could not read file {}", scene_description_path.display()))?;
         serde_json::from_str::<SceneDesc>(&json).context(format!(
@@ -59,7 +59,7 @@ fn main() -> anyhow::Result<()> {
         ))?
     };
 
-    let models = &scene
+    let models = &scene_desc
         .meshes
         .iter()
         .map(|x| {
@@ -72,15 +72,12 @@ fn main() -> anyhow::Result<()> {
     let camera_matrix = glam::Mat4::from_euler(glam::EulerRot::XYZ, -30.0f32.to_radians(), -45.0f32.to_radians(), 0.0);
     let camera_matrix = camera_matrix * glam::Mat4::from_scale([13.713586; 3].into()); // what?
 
-    for (item_index, item) in scene.items.iter().enumerate() {
+    for (item_index, item) in scene_desc.items.iter().enumerate() {
         let frame_count: usize = item
             .frames
             .try_into()
             .context(format!("Invalid frame count {} in item {item_index}", item.frames))?;
         for frame_index in 0..frame_count {
-            let embree_device = embree4_rs::Device::try_new(None)?;
-            let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
-
             let model = usize::try_from(item.model.mesh_index).ok().and_then(|x| models.get(x)).context(format!(
                 "Invalid mesh index {} in item {item_index}",
                 item.model.mesh_index
@@ -105,16 +102,14 @@ fn main() -> anyhow::Result<()> {
                 rotation[2].to_radians(),
             );
 
-            let scene_models = [raytrace::add_model(&embree_scene, model, &translation, &rotation)?];
-
-            let embree_scene = embree_scene.commit()?;
+            let scene = raytrace::Scene::new(vec![model.transform(&translation, &rotation)])?;
 
             for rotation_index in 0..item.rotations {
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
                 let camera_matrix = camera_matrix * view_rotation;
 
                 let view_rotation_inverse = view_rotation.inverse();
-                let lights: Vec<_> = scene
+                let lights: Vec<_> = scene_desc
                     .lights
                     .iter()
                     .filter(|x| x.r#type == LightType::Diffuse)
@@ -124,7 +119,7 @@ fn main() -> anyhow::Result<()> {
                     })
                     .collect();
 
-                let bounds = raytrace::get_scene_screen_bounds(&embree_scene, &camera_matrix)?;
+                let bounds = scene.get_scene_screen_bounds(&camera_matrix)?;
                 let offset = glam::Vec3::new(bounds[0] as f32 - 0.5, bounds[1] as f32, 0.0);
 
                 let camera_inverse = camera_matrix.inverse();
@@ -140,28 +135,13 @@ fn main() -> anyhow::Result<()> {
                         let direction = glam::Vec3::new(0.0, 0.0, 1.0);
                         let direction = camera_inverse.transform_vector3(direction);
 
-                        if let Some(hit) = raytrace::trace_ray(&embree_scene, &origin, &direction) {
-                            let model_index = usize::try_from(hit.hit.geomID).unwrap();
-                            let scene_model = scene_models.get(model_index).unwrap();
-
-                            let face_index = usize::try_from(hit.hit.primID).unwrap();
-                            let indices = scene_model.model.indices.get(face_index).unwrap();
-
-                            let w = 1.0 - hit.hit.u - hit.hit.v;
-                            let normals = [
-                                scene_model.normals[usize::try_from(indices.0).unwrap()] * w,
-                                scene_model.normals[usize::try_from(indices.1).unwrap()] * hit.hit.u,
-                                scene_model.normals[usize::try_from(indices.2).unwrap()] * hit.hit.v,
-                            ];
-                            let normal: glam::Vec3 = normals.iter().sum::<glam::Vec3>().normalize();
-
+                        if let Some(hit) = scene.trace_ray(&origin, &direction) {
                             let mut pixel: u8 = 0;
                             for light in &lights {
-                                let light = normal.dot(light.0).max(0.0) * light.1;
+                                let light = hit.normal.dot(light.0).max(0.0) * light.1;
                                 const MATERIAL_DIFFUSE: f32 = 0.5;
                                 pixel = pixel.saturating_add((255.0 * light * MATERIAL_DIFFUSE) as u8);
                             }
-
                             pixels[y * width + x] = pixel;
                         }
                     }

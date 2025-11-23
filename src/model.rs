@@ -13,6 +13,12 @@ pub struct Model {
     pub indices: Vec<(u32, u32, u32)>,
 }
 
+pub struct TransformedModel<'a> {
+    pub model: &'a Model,
+    pub positions: Vec<(f32, f32, f32)>,
+    pub normals: Vec<glam::Vec3>,
+}
+
 impl Model {
     pub fn load(path: &std::path::Path) -> anyhow::Result<Model> {
         use anyhow::Context;
@@ -84,5 +90,14 @@ impl Model {
             normals: vertices.iter().map(|x| x.normal.into()).collect(),
             indices,
         })
+    }
+
+    pub fn transform(&'_ self, translation: &glam::Vec3, rotation: &glam::Quat) -> TransformedModel<'_> {
+        let transform = glam::Mat4::from_translation(*translation) * glam::Mat4::from_quat(*rotation);
+        TransformedModel {
+            model: self,
+            positions: self.positions.iter().map(|x| transform.transform_point3(*x).into()).collect(),
+            normals: self.normals.iter().map(|x| transform.transform_vector3(*x)).collect(),
+        }
     }
 }
