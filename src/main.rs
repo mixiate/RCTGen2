@@ -113,17 +113,36 @@ fn main() -> anyhow::Result<()> {
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
                 let camera_matrix = view_rotation * camera_matrix;
 
-                for y in 0..120 {
-                    for x in 0..120 {
-                        let origin =
-                            glam::Vec3::new((3.3 / 120.0) * x as f32, 5.0, ((3.3 / 120.0) * y as f32) - (3.3 / 2.0));
+                const WIDTH: usize = 120;
+                const HEIGHT: usize = 120;
+                let mut pixels = Box::new([0u8; WIDTH * HEIGHT]);
+
+                for y in 0..HEIGHT {
+                    for x in 0..WIDTH {
+                        let origin = glam::Vec3::new(
+                            ((6.0 / 120.0) * x as f32) - (6.0 / 2.0),
+                            5.0,
+                            ((6.0 / 120.0) * y as f32) - (6.0 / 2.0),
+                        );
                         let origin = camera_matrix.transform_point3(origin);
                         let direction = glam::Vec3::new(0.0, -1.0, 0.0);
                         let direction = camera_matrix.transform_vector3(direction);
                         let hit = raytrace::trace_ray(&embree_scene, &origin, &direction);
-                        print!("{}", if hit { "x" } else { " " });
+                        pixels[y * WIDTH + x] = if hit { 0 } else { 255 };
                     }
                 }
+
+                let image_path =
+                    base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
+                let image_file = std::fs::File::create(image_path)?;
+                let w = std::io::BufWriter::new(image_file);
+
+                let mut encoder = png::Encoder::new(w, WIDTH.try_into()?, HEIGHT.try_into()?);
+                encoder.set_color(png::ColorType::Grayscale);
+                encoder.set_depth(png::BitDepth::Eight);
+
+                let mut writer = encoder.write_header()?;
+                writer.write_image_data(&*pixels)?;
             }
         }
     }
