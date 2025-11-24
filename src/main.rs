@@ -43,6 +43,7 @@ struct Light {
     specular: bool,
     direction: glam::Vec3,
     strength: f32,
+    shadow: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -126,6 +127,7 @@ fn main() -> anyhow::Result<()> {
                         specular: x.r#type == LightType::Specular,
                         direction: view_rotation_inverse.transform_vector3(x.direction.into()).normalize(),
                         strength: x.strength,
+                        shadow: x.shadow,
                     })
                     .collect();
 
@@ -148,6 +150,9 @@ fn main() -> anyhow::Result<()> {
                         if let Some(hit) = scene.trace_ray(&origin, &direction) {
                             let mut pixel: u8 = 0;
                             for light in &lights {
+                                if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
+                                    continue;
+                                }
                                 if light.diffuse {
                                     const DIFFUSE: f32 = 0.5;
 

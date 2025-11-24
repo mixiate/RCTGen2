@@ -123,16 +123,63 @@ impl CommittedScene<'_> {
 
         unsafe { embree4_sys::rtcIntersect1(self.scene.handle, &mut ray_hit, std::ptr::null_mut()) }
 
+        if ray_hit.hit.geomID == embree4_sys::RTC_INVALID_GEOMETRY_ID {
+            return None;
+        }
+
+        let mut position = [0.0f32; 3];
+        let interpolate_arguments = embree4_sys::RTCInterpolateArguments {
+            geometry: unsafe { embree4_sys::rtcGetGeometry(self.scene.handle, ray_hit.hit.geomID) },
+            primID: ray_hit.hit.primID,
+            u: ray_hit.hit.u,
+            v: ray_hit.hit.v,
+            bufferType: embree4_sys::RTCBufferType::VERTEX,
+            bufferSlot: 0,
+            P: &mut position as *mut _,
+            dPdu: std::ptr::null_mut(),
+            dPdv: std::ptr::null_mut(),
+            ddPdudu: std::ptr::null_mut(),
+            ddPdvdv: std::ptr::null_mut(),
+            ddPdudv: std::ptr::null_mut(),
+            valueCount: 3,
+        };
+        unsafe { embree4_sys::rtcInterpolate(&interpolate_arguments) }
+
         if ray_hit.hit.geomID != embree4_sys::RTC_INVALID_GEOMETRY_ID {
             Some(RayHit {
                 geometry_id: ray_hit.hit.geomID,
                 primitive_id: ray_hit.hit.primID,
+                position,
                 u: ray_hit.hit.u,
                 v: ray_hit.hit.v,
             })
         } else {
             None
         }
+    }
+
+    pub fn occluded_1(&self, origin: &(f32, f32, f32), direction: &(f32, f32, f32)) -> bool {
+        let mut arguments = embree4_sys::RTCOccludedArguments {
+            flags: embree4_sys::RTCRayQueryFlags::INCOHERENT,
+            feature_mask: embree4_sys::RTCFeatureFlags::RTC_FEATURE_FLAG_ALL,
+            context: std::ptr::null_mut(),
+            filter: None,
+            occluded: None,
+        };
+
+        let mut ray = embree4_sys::RTCRay {
+            org_x: origin.0,
+            org_y: origin.1,
+            org_z: origin.2,
+            dir_x: direction.0,
+            dir_y: direction.1,
+            dir_z: direction.2,
+            tnear: 1e-5,
+            tfar: f32::INFINITY,
+            ..Default::default()
+        };
+        unsafe { embree4_sys::rtcOccluded1(self.scene.handle, &mut ray, &mut arguments) }
+        ray.tfar <= 0.0
     }
 
     pub fn bounds(&self) -> Bounds {
@@ -188,6 +235,7 @@ impl Drop for Geometry<'_> {
 pub struct RayHit {
     pub geometry_id: u32,
     pub primitive_id: u32,
+    pub position: [f32; 3],
     pub u: f32,
     pub v: f32,
 }

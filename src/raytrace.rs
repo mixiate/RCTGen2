@@ -9,6 +9,7 @@ pub struct Scene<'a> {
 }
 
 pub struct RayHit {
+    pub position: glam::Vec3,
     pub normal: glam::Vec3,
 }
 
@@ -43,7 +44,14 @@ impl Scene<'_> {
         ];
         let normal: glam::Vec3 = normals.iter().sum::<glam::Vec3>().normalize();
 
-        Some(RayHit { normal })
+        Some(RayHit {
+            position: hit.position.into(),
+            normal,
+        })
+    }
+
+    pub fn trace_occlusion_ray(&self, origin: &glam::Vec3, direction: &glam::Vec3) -> bool {
+        self.embree_scene.occluded_1(&(*origin).into(), &(*direction).into())
     }
 
     pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4) -> anyhow::Result<[i32; 4]> {
