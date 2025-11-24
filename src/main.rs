@@ -38,6 +38,13 @@ struct SceneDesc {
     lights: Vec<SceneLight>,
 }
 
+struct Light {
+    diffuse: bool,
+    specular: bool,
+    direction: glam::Vec3,
+    strength: f32,
+}
+
 fn main() -> anyhow::Result<()> {
     use anyhow::Context;
     let args: Vec<String> = std::env::args().collect();
@@ -112,10 +119,11 @@ fn main() -> anyhow::Result<()> {
                 let lights: Vec<_> = scene_desc
                     .lights
                     .iter()
-                    .filter(|x| x.r#type == LightType::Diffuse)
-                    .map(|x| {
-                        let direction = glam::Vec3::new(x.direction[0], x.direction[1], x.direction[2]).normalize();
-                        (view_rotation_inverse.transform_vector3(direction), x.strength)
+                    .map(|x| Light {
+                        diffuse: x.r#type == LightType::Diffuse,
+                        specular: x.r#type == LightType::Specular,
+                        direction: view_rotation_inverse.transform_vector3(x.direction.into()).normalize(),
+                        strength: x.strength,
                     })
                     .collect();
 
@@ -133,14 +141,27 @@ fn main() -> anyhow::Result<()> {
                         let origin = glam::Vec3::new(x as f32, (height - 1 - y) as f32, -512.0) + offset;
                         let origin = camera_inverse.transform_point3(origin);
                         let direction = glam::Vec3::new(0.0, 0.0, 1.0);
-                        let direction = camera_inverse.transform_vector3(direction);
+                        let direction = camera_inverse.transform_vector3(direction).normalize();
 
                         if let Some(hit) = scene.trace_ray(&origin, &direction) {
                             let mut pixel: u8 = 0;
                             for light in &lights {
-                                let light = hit.normal.dot(light.0).max(0.0) * light.1;
-                                const MATERIAL_DIFFUSE: f32 = 0.5;
-                                pixel = pixel.saturating_add((255.0 * light * MATERIAL_DIFFUSE) as u8);
+                                if light.diffuse {
+                                    const DIFFUSE: f32 = 0.5;
+
+                                    let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
+                                    pixel = pixel.saturating_add((255.0 * light * DIFFUSE) as u8);
+                                }
+                                if light.specular {
+                                    const SPECULAR_EXPONENT: f32 = 10.0;
+                                    const SPECULAR: f32 = 1.0;
+
+                                    let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
+                                    let reflected_direction = reflected_direction - light.direction;
+                                    let angle = reflected_direction.dot(-direction).max(0.0);
+                                    let specular_factor = light.strength * angle.powf(SPECULAR_EXPONENT);
+                                    pixel = pixel.saturating_add((255.0 * specular_factor * SPECULAR) as u8);
+                                }
                             }
                             pixels[y * width + x] = pixel;
                         }
