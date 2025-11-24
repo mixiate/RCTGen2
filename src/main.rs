@@ -66,6 +66,8 @@ fn main() -> anyhow::Result<()> {
         ))?
     };
 
+    let embree_device = embree::Device::try_new().context("Could not create embree device")?;
+
     let models = &scene_desc
         .meshes
         .iter()
@@ -109,7 +111,7 @@ fn main() -> anyhow::Result<()> {
                 rotation[2].to_radians(),
             );
 
-            let scene = raytrace::Scene::new(vec![model.transform(&translation, &rotation)])?;
+            let scene = raytrace::Scene::new(&embree_device, vec![model.transform(&translation, &rotation)])?;
 
             for rotation_index in 0..item.rotations {
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);

@@ -1,0 +1,7 @@
+[package]
+name = "embree"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+embree4-sys = "0.0.12"

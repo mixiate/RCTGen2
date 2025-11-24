@@ -4,7 +4,7 @@ pub struct SceneModel<'a> {
 }
 
 pub struct Scene<'a> {
-    embree_scene: embree4_rs::CommittedScene,
+    embree_scene: embree::CommittedScene<'a>,
     models: Vec<SceneModel<'a>>,
 }
 
@@ -13,41 +13,33 @@ pub struct RayHit {
 }
 
 impl Scene<'_> {
-    pub fn new<'a>(models: Vec<crate::model::TransformedModel<'a>>) -> anyhow::Result<Scene<'a>> {
-        let embree_device = embree4_rs::Device::try_new(None)?;
-        let embree_scene = embree4_rs::Scene::try_new(embree_device, Default::default())?;
+    pub fn new<'a>(
+        embree_device: &'a embree::Device,
+        models: Vec<crate::model::TransformedModel<'a>>,
+    ) -> anyhow::Result<Scene<'a>> {
+        use anyhow::Context;
+        let embree_scene = embree::Scene::try_new(embree_device).context("Could not create embree scene")?;
 
         let models = models
             .into_iter()
             .map(|x| add_model(&embree_scene, x))
             .collect::<anyhow::Result<Vec<SceneModel>>>()?;
 
-        let embree_scene = embree_scene.commit()?;
+        let embree_scene = embree::commit_scene(embree_scene);
 
         Ok(Scene { embree_scene, models })
     }
 
     pub fn trace_ray(&self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit> {
-        let ray = embree4_sys::RTCRay {
-            org_x: origin.x,
-            org_y: origin.y,
-            org_z: origin.z,
-            dir_x: direction.x,
-            dir_y: direction.y,
-            dir_z: direction.z,
-            tnear: 0.0,
-            tfar: f32::INFINITY,
-            ..Default::default()
-        };
-        let hit = self.embree_scene.intersect_1(ray, None).ok()??;
+        let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into())?;
 
-        let scene_model = self.models.get(usize::try_from(hit.hit.geomID).unwrap()).unwrap();
-        let indices = scene_model.model.indices.get(usize::try_from(hit.hit.primID).unwrap()).unwrap();
+        let scene_model = self.models.get(usize::try_from(hit.geometry_id).unwrap()).unwrap();
+        let indices = scene_model.model.indices.get(usize::try_from(hit.primitive_id).unwrap()).unwrap();
 
         let normals = [
-            scene_model.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.hit.u - hit.hit.v),
-            scene_model.normals[usize::try_from(indices.1).unwrap()] * hit.hit.u,
-            scene_model.normals[usize::try_from(indices.2).unwrap()] * hit.hit.v,
+            scene_model.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),
+            scene_model.normals[usize::try_from(indices.1).unwrap()] * hit.u,
+            scene_model.normals[usize::try_from(indices.2).unwrap()] * hit.v,
         ];
         let normal: glam::Vec3 = normals.iter().sum::<glam::Vec3>().normalize();
 
@@ -55,7 +47,7 @@ impl Scene<'_> {
     }
 
     pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4) -> anyhow::Result<[i32; 4]> {
-        let scene_bounds = self.embree_scene.bounds()?;
+        let scene_bounds = self.embree_scene.bounds();
         let scene_bounds = [
             glam::Vec3::new(scene_bounds.lower_x, scene_bounds.lower_y, scene_bounds.lower_z),
             glam::Vec3::new(scene_bounds.upper_x, scene_bounds.lower_y, scene_bounds.lower_z),
@@ -91,13 +83,8 @@ impl Scene<'_> {
     }
 }
 
-fn add_model<'a>(
-    scene: &embree4_rs::Scene,
-    model: crate::model::TransformedModel<'a>,
-) -> anyhow::Result<SceneModel<'a>> {
-    let tri_mesh =
-        embree4_rs::geometry::TriangleMeshGeometry::try_new(&scene.device, &model.positions, &model.model.indices)?;
-    scene.attach_geometry(&tri_mesh)?;
+fn add_model<'a>(scene: &embree::Scene, model: crate::model::TransformedModel<'a>) -> anyhow::Result<SceneModel<'a>> {
+    scene.add_geometry(&model.positions, &model.model.indices)?;
 
     Ok(SceneModel {
         model: model.model,
