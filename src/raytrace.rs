@@ -66,7 +66,7 @@ impl Scene<'_> {
         self.embree_scene.occluded_1(&(*origin).into(), &(*direction).into())
     }
 
-    pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4) -> anyhow::Result<[i32; 4]> {
+    pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4) -> [i32; 4] {
         let scene_bounds = self.embree_scene.bounds();
         let scene_bounds = [
             glam::Vec3::new(scene_bounds.lower_x, scene_bounds.lower_y, scene_bounds.lower_z),
@@ -99,6 +99,6 @@ impl Scene<'_> {
             ];
         }
 
-        Ok(screen_bounds)
+        screen_bounds
     }
 }

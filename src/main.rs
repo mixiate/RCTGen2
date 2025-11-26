@@ -1,5 +1,6 @@
 mod model;
 mod raytrace;
+mod renderer;
 
 #[derive(Debug, serde::Deserialize)]
 struct SceneModel {
@@ -36,14 +37,6 @@ struct SceneDesc {
     meshes: Vec<String>,
     items: Vec<SceneItem>,
     lights: Vec<SceneLight>,
-}
-
-struct Light {
-    diffuse: bool,
-    specular: bool,
-    direction: glam::Vec3,
-    strength: f32,
-    shadow: bool,
 }
 
 fn linear_to_srgb(colour: f32) -> f32 {
@@ -91,8 +84,8 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
 
-    let camera_matrix = glam::Mat4::from_euler(glam::EulerRot::XYZ, -30.0f32.to_radians(), -45.0f32.to_radians(), 0.0);
-    let camera_matrix = camera_matrix * glam::Mat4::from_scale([13.713586; 3].into()); // what?
+    let camera = glam::Mat4::from_euler(glam::EulerRot::XYZ, -30.0f32.to_radians(), -45.0f32.to_radians(), 0.0);
+    let camera = camera * glam::Mat4::from_scale([13.713586; 3].into()); // what?
 
     for (item_index, item) in scene_desc.items.iter().enumerate() {
         for frame_index in 0..item.frames {
@@ -132,13 +125,13 @@ fn main() -> anyhow::Result<()> {
                     ))
                 };
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
-                let camera_matrix = camera_matrix * view_rotation * view_translation;
+                let camera = camera * view_rotation * view_translation;
 
                 let view_rotation_inverse = view_rotation.inverse();
                 let lights: Vec<_> = scene_desc
                     .lights
                     .iter()
-                    .map(|x| Light {
+                    .map(|x| renderer::Light {
                         diffuse: x.r#type == LightType::Diffuse,
                         specular: x.r#type == LightType::Specular,
                         direction: view_rotation_inverse.transform_vector3(x.direction.into()).normalize(),
@@ -147,54 +140,21 @@ fn main() -> anyhow::Result<()> {
                     })
                     .collect();
 
-                let bounds = scene.get_scene_screen_bounds(&camera_matrix)?;
-                let offset = glam::Vec3::new(bounds[0] as f32 - 0.5, bounds[1] as f32, 0.0);
+                let framebuffer = renderer::render_scene(&scene, &camera, &lights);
 
-                let camera_inverse = camera_matrix.inverse();
-
-                let width = (bounds[2] - bounds[0]) as usize + 1;
-                let height = (bounds[3] - bounds[1]) as usize;
-                let mut framebuffer = vec![[1.0; 3]; width * height];
-
-                for y in 0..height {
-                    for x in 0..width {
-                        let origin = glam::Vec3::new(x as f32, (height - 1 - y) as f32, -512.0) + offset;
-                        let origin = camera_inverse.transform_point3(origin);
-                        let direction = glam::Vec3::new(0.0, 0.0, 1.0);
-                        let direction = camera_inverse.transform_vector3(direction).normalize();
-
-                        if let Some(hit) = scene.trace_ray(&origin, &direction) {
-                            let mut sample = glam::Vec3::new(0.0, 0.0, 0.0);
-                            for light in &lights {
-                                if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
-                                    continue;
-                                }
-                                if light.diffuse {
-                                    let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
-                                    sample += light * hit.material.diffuse;
-                                }
-                                if light.specular {
-                                    let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
-                                    let reflected_direction = reflected_direction - light.direction;
-                                    let angle = reflected_direction.dot(-direction).max(0.0);
-                                    let specular_factor = light.strength * angle.powf(hit.material.specular_exponent);
-                                    sample += specular_factor * hit.material.specular;
-                                }
-                            }
-                            framebuffer[y * width + x] = sample.into();
-                        }
-                    }
-                }
-
-                let pixels =
-                    framebuffer.iter().flatten().map(|x| (255.0 * linear_to_srgb(*x)) as u8).collect::<Vec<u8>>();
+                let pixels = framebuffer
+                    .buffer
+                    .iter()
+                    .flatten()
+                    .map(|x| (255.0 * linear_to_srgb(*x)) as u8)
+                    .collect::<Vec<u8>>();
 
                 let image_path =
                     base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
                 let image_file = std::fs::File::create(image_path)?;
                 let w = std::io::BufWriter::new(image_file);
 
-                let mut encoder = png::Encoder::new(w, width.try_into()?, height.try_into()?);
+                let mut encoder = png::Encoder::new(w, framebuffer.width.try_into()?, framebuffer.height.try_into()?);
                 encoder.set_color(png::ColorType::Rgb);
                 encoder.set_depth(png::BitDepth::Eight);
 
