@@ -5,10 +5,17 @@ struct Vertex {
     normal: [f32; 3],
 }
 
+pub struct Material {
+    pub diffuse: [f32; 3],
+    pub specular: [f32; 3],
+    pub specular_exponent: f32,
+}
+
 pub struct Mesh {
     pub positions: Vec<glam::Vec3>,
     pub normals: Vec<glam::Vec3>,
     pub indices: Vec<(u32, u32, u32)>,
+    pub material: Material,
 }
 
 pub struct Model {
@@ -42,6 +49,25 @@ impl Model {
                 anyhow::bail!("Obj does not have any groups {}", path.display());
             }
             for group in &object.groups {
+                let material = group.material.as_ref().context(format!(
+                    "No material found for object {} in {} ",
+                    object.name,
+                    path.display(),
+                ))?;
+                let material = if let obj::ObjMaterial::Mtl(mtl) = material {
+                    Material {
+                        diffuse: mtl.kd.unwrap_or_default(),
+                        specular: mtl.ks.unwrap_or_default(),
+                        specular_exponent: mtl.ns.unwrap_or_default(),
+                    }
+                } else {
+                    anyhow::bail!(format!(
+                        "No material found for object {} in {} ",
+                        object.name,
+                        path.display(),
+                    ))
+                };
+
                 let mut vertices: Vec<Vertex> = Vec::new();
                 let mut indices: Vec<(u32, u32, u32)> = Vec::new();
 
@@ -93,6 +119,7 @@ impl Model {
                     positions: vertices.iter().map(|x| x.position.into()).collect(),
                     normals: vertices.iter().map(|x| x.normal.into()).collect(),
                     indices,
+                    material,
                 });
             }
         }

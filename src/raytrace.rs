@@ -8,9 +8,10 @@ pub struct Scene<'a> {
     meshes: Vec<SceneMesh<'a>>,
 }
 
-pub struct RayHit {
+pub struct RayHit<'a> {
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
+    pub material: &'a crate::model::Material,
 }
 
 impl Scene<'_> {
@@ -34,7 +35,7 @@ impl Scene<'_> {
         Ok(Scene { embree_scene, meshes })
     }
 
-    pub fn trace_ray(&self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit> {
+    pub fn trace_ray(&'_ self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit<'_>> {
         let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into())?;
 
         let scene_mesh = self.meshes.get(usize::try_from(hit.geometry_id).unwrap()).unwrap();
@@ -50,6 +51,7 @@ impl Scene<'_> {
         Some(RayHit {
             position: hit.position.into(),
             normal,
+            material: &scene_mesh.mesh.material,
         })
     }
 

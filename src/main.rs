@@ -154,20 +154,15 @@ fn main() -> anyhow::Result<()> {
                                     continue;
                                 }
                                 if light.diffuse {
-                                    const DIFFUSE: f32 = 0.5;
-
                                     let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
-                                    sample += light * DIFFUSE;
+                                    sample += light * hit.material.diffuse[0];
                                 }
                                 if light.specular {
-                                    const SPECULAR_EXPONENT: f32 = 10.0;
-                                    const SPECULAR: f32 = 1.0;
-
                                     let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
                                     let reflected_direction = reflected_direction - light.direction;
                                     let angle = reflected_direction.dot(-direction).max(0.0);
-                                    let specular_factor = light.strength * angle.powf(SPECULAR_EXPONENT);
-                                    sample += specular_factor * SPECULAR;
+                                    let specular_factor = light.strength * angle.powf(hit.material.specular_exponent);
+                                    sample += specular_factor * hit.material.specular[0];
                                 }
                             }
                             framebuffer[y * width + x] = sample;
