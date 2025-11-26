@@ -3,7 +3,7 @@ mod raytrace;
 
 #[derive(Debug, serde::Deserialize)]
 struct SceneModel {
-    mesh_index: i32,
+    mesh_index: usize,
     position: Vec<[f32; 3]>,
     orientation: Vec<[f32; 3]>,
 }
@@ -11,8 +11,8 @@ struct SceneModel {
 #[derive(Debug, serde::Deserialize)]
 struct SceneItem {
     name: String,
-    rotations: i32,
-    frames: i32,
+    rotations: usize,
+    frames: usize,
     model: SceneModel,
 }
 
@@ -95,12 +95,8 @@ fn main() -> anyhow::Result<()> {
     let camera_matrix = camera_matrix * glam::Mat4::from_scale([13.713586; 3].into()); // what?
 
     for (item_index, item) in scene_desc.items.iter().enumerate() {
-        let frame_count: usize = item
-            .frames
-            .try_into()
-            .context(format!("Invalid frame count {} in item {item_index}", item.frames))?;
-        for frame_index in 0..frame_count {
-            let model = usize::try_from(item.model.mesh_index).ok().and_then(|x| models.get(x)).context(format!(
+        for frame_index in 0..item.frames {
+            let model = models.get(item.model.mesh_index).context(format!(
                 "Invalid mesh index {} in item {item_index}",
                 item.model.mesh_index
             ))?;
@@ -126,8 +122,7 @@ fn main() -> anyhow::Result<()> {
 
             let scene = raytrace::Scene::new(&embree_device, vec![model.transform(&translation, &rotation)])?;
 
-            let rotation_count = usize::try_from(item.rotations).context("Invalid rotation count")?;
-            for rotation_index in 0..rotation_count {
+            for rotation_index in 0..item.rotations {
                 let view_translation = {
                     let offsets = [0.0, -1.0, 0.0, -1.5, 0.0, -1.0, 0.0, -1.5];
                     glam::Mat4::from_translation(glam::Vec3::new(
