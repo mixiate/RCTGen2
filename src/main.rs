@@ -138,7 +138,7 @@ fn main() -> anyhow::Result<()> {
 
                 let width = (bounds[2] - bounds[0]) as usize + 1;
                 let height = (bounds[3] - bounds[1]) as usize;
-                let mut pixels = vec![255; width * height];
+                let mut framebuffer = vec![1.0; width * height];
 
                 for y in 0..height {
                     for x in 0..width {
@@ -148,7 +148,7 @@ fn main() -> anyhow::Result<()> {
                         let direction = camera_inverse.transform_vector3(direction).normalize();
 
                         if let Some(hit) = scene.trace_ray(&origin, &direction) {
-                            let mut pixel: u8 = 0;
+                            let mut sample = 0.0;
                             for light in &lights {
                                 if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
                                     continue;
@@ -157,7 +157,7 @@ fn main() -> anyhow::Result<()> {
                                     const DIFFUSE: f32 = 0.5;
 
                                     let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
-                                    pixel = pixel.saturating_add((255.0 * light * DIFFUSE) as u8);
+                                    sample += light * DIFFUSE;
                                 }
                                 if light.specular {
                                     const SPECULAR_EXPONENT: f32 = 10.0;
@@ -167,13 +167,15 @@ fn main() -> anyhow::Result<()> {
                                     let reflected_direction = reflected_direction - light.direction;
                                     let angle = reflected_direction.dot(-direction).max(0.0);
                                     let specular_factor = light.strength * angle.powf(SPECULAR_EXPONENT);
-                                    pixel = pixel.saturating_add((255.0 * specular_factor * SPECULAR) as u8);
+                                    sample += specular_factor * SPECULAR;
                                 }
                             }
-                            pixels[y * width + x] = pixel;
+                            framebuffer[y * width + x] = sample;
                         }
                     }
                 }
+
+                let pixels = framebuffer.iter().map(|x| (255.0 * x.clamp(0.0, 1.0)) as u8).collect::<Vec<u8>>();
 
                 let image_path =
                     base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
