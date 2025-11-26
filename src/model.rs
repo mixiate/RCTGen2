@@ -5,18 +5,24 @@ struct Vertex {
     normal: [f32; 3],
 }
 
-#[derive(Debug)]
-pub struct Model {
+pub struct Mesh {
     pub positions: Vec<glam::Vec3>,
-    pub uvs: Vec<glam::Vec2>,
     pub normals: Vec<glam::Vec3>,
     pub indices: Vec<(u32, u32, u32)>,
 }
 
-pub struct TransformedModel<'a> {
-    pub model: &'a Model,
+pub struct Model {
+    pub meshes: Vec<Mesh>,
+}
+
+pub struct TransformedMesh<'a> {
+    pub mesh: &'a Mesh,
     pub positions: Vec<(f32, f32, f32)>,
     pub normals: Vec<glam::Vec3>,
+}
+
+pub struct TransformedModel<'a> {
+    pub meshes: Vec<TransformedMesh<'a>>,
 }
 
 impl Model {
@@ -24,9 +30,9 @@ impl Model {
         use anyhow::Context;
 
         let mut obj = obj::Obj::load(path)?;
+        obj.load_mtls()?;
 
-        let mut vertices: Vec<Vertex> = Vec::new();
-        let mut indices: Vec<(u32, u32, u32)> = Vec::new();
+        let mut meshes: Vec<Mesh> = Vec::new();
 
         if obj.data.objects.is_empty() {
             anyhow::bail!("Obj does not have any objects {}", path.display());
@@ -36,6 +42,9 @@ impl Model {
                 anyhow::bail!("Obj does not have any groups {}", path.display());
             }
             for group in &object.groups {
+                let mut vertices: Vec<Vertex> = Vec::new();
+                let mut indices: Vec<(u32, u32, u32)> = Vec::new();
+
                 for poly in &group.polys {
                     if poly.0.len() != 3 {
                         anyhow::bail!("Obj meshes are not triangulated {}", path.display());
@@ -79,25 +88,29 @@ impl Model {
 
                     indices.push(new_indices.into());
                 }
+
+                meshes.push(Mesh {
+                    positions: vertices.iter().map(|x| x.position.into()).collect(),
+                    normals: vertices.iter().map(|x| x.normal.into()).collect(),
+                    indices,
+                });
             }
         }
 
-        obj.load_mtls()?;
-
-        Ok(Model {
-            positions: vertices.iter().map(|x| x.position.into()).collect(),
-            uvs: vertices.iter().map(|x| x.uv.into()).collect(),
-            normals: vertices.iter().map(|x| x.normal.into()).collect(),
-            indices,
-        })
+        Ok(Model { meshes })
     }
 
     pub fn transform(&'_ self, translation: &glam::Vec3, rotation: &glam::Quat) -> TransformedModel<'_> {
         let transform = glam::Mat4::from_translation(*translation) * glam::Mat4::from_quat(*rotation);
-        TransformedModel {
-            model: self,
-            positions: self.positions.iter().map(|x| transform.transform_point3(*x).into()).collect(),
-            normals: self.normals.iter().map(|x| transform.transform_vector3(*x)).collect(),
-        }
+        let meshes = self
+            .meshes
+            .iter()
+            .map(|x| TransformedMesh {
+                mesh: x,
+                positions: x.positions.iter().map(|x| transform.transform_point3(*x).into()).collect(),
+                normals: x.normals.iter().map(|x| transform.transform_vector3(*x)).collect(),
+            })
+            .collect();
+        TransformedModel { meshes }
     }
 }

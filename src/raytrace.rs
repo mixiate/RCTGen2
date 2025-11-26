@@ -1,11 +1,11 @@
-pub struct SceneModel<'a> {
-    pub model: &'a crate::model::Model,
-    pub normals: Vec<glam::Vec3>,
+struct SceneMesh<'a> {
+    mesh: &'a crate::model::Mesh,
+    normals: Vec<glam::Vec3>,
 }
 
 pub struct Scene<'a> {
     embree_scene: embree::CommittedScene<'a>,
-    models: Vec<SceneModel<'a>>,
+    meshes: Vec<SceneMesh<'a>>,
 }
 
 pub struct RayHit {
@@ -21,26 +21,29 @@ impl Scene<'_> {
         use anyhow::Context;
         let embree_scene = embree::Scene::try_new(embree_device).context("Could not create embree scene")?;
 
-        let models = models
-            .into_iter()
-            .map(|x| add_model(&embree_scene, x))
-            .collect::<anyhow::Result<Vec<SceneModel>>>()?;
+        let meshes = {
+            let mut meshes: Vec<SceneMesh> = Vec::new();
+            for model in models {
+                meshes.extend(add_model(&embree_scene, model)?);
+            }
+            meshes
+        };
 
         let embree_scene = embree::commit_scene(embree_scene);
 
-        Ok(Scene { embree_scene, models })
+        Ok(Scene { embree_scene, meshes })
     }
 
     pub fn trace_ray(&self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit> {
         let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into())?;
 
-        let scene_model = self.models.get(usize::try_from(hit.geometry_id).unwrap()).unwrap();
-        let indices = scene_model.model.indices.get(usize::try_from(hit.primitive_id).unwrap()).unwrap();
+        let scene_mesh = self.meshes.get(usize::try_from(hit.geometry_id).unwrap()).unwrap();
+        let indices = scene_mesh.mesh.indices.get(usize::try_from(hit.primitive_id).unwrap()).unwrap();
 
         let normals = [
-            scene_model.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),
-            scene_model.normals[usize::try_from(indices.1).unwrap()] * hit.u,
-            scene_model.normals[usize::try_from(indices.2).unwrap()] * hit.v,
+            scene_mesh.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),
+            scene_mesh.normals[usize::try_from(indices.1).unwrap()] * hit.u,
+            scene_mesh.normals[usize::try_from(indices.2).unwrap()] * hit.v,
         ];
         let normal: glam::Vec3 = normals.iter().sum::<glam::Vec3>().normalize();
 
@@ -91,11 +94,20 @@ impl Scene<'_> {
     }
 }
 
-fn add_model<'a>(scene: &embree::Scene, model: crate::model::TransformedModel<'a>) -> anyhow::Result<SceneModel<'a>> {
-    scene.add_geometry(&model.positions, &model.model.indices)?;
+fn add_model<'a>(
+    scene: &embree::Scene,
+    model: crate::model::TransformedModel<'a>,
+) -> anyhow::Result<Vec<SceneMesh<'a>>> {
+    model
+        .meshes
+        .into_iter()
+        .map(|x| {
+            scene.add_geometry(&x.positions, &x.mesh.indices)?;
 
-    Ok(SceneModel {
-        model: model.model,
-        normals: model.normals,
-    })
+            Ok(SceneMesh {
+                mesh: x.mesh,
+                normals: x.normals,
+            })
+        })
+        .collect()
 }
