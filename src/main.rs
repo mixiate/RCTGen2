@@ -54,6 +54,10 @@ fn linear_to_srgb(colour: f32) -> f32 {
     }
 }
 
+const SQRT_6: f32 = 2.449_489_8;
+const TILE_SIZE: f32 = 3.3;
+const CLEARANCE_HEIGHT: f32 = 0.5 * TILE_SIZE / SQRT_6;
+
 fn main() -> anyhow::Result<()> {
     use anyhow::Context;
     let args: Vec<String> = std::env::args().collect();
@@ -122,9 +126,18 @@ fn main() -> anyhow::Result<()> {
 
             let scene = raytrace::Scene::new(&embree_device, vec![model.transform(&translation, &rotation)])?;
 
-            for rotation_index in 0..item.rotations {
+            let rotation_count = usize::try_from(item.rotations).context("Invalid rotation count")?;
+            for rotation_index in 0..rotation_count {
+                let view_translation = {
+                    let offsets = [0.0, -1.0, 0.0, -1.5, 0.0, -1.0, 0.0, -1.5];
+                    glam::Mat4::from_translation(glam::Vec3::new(
+                        CLEARANCE_HEIGHT * offsets[2 * rotation_index] / 8.0,
+                        CLEARANCE_HEIGHT * offsets[2 * rotation_index + 1] / 8.0,
+                        0.0,
+                    ))
+                };
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
-                let camera_matrix = camera_matrix * view_rotation;
+                let camera_matrix = camera_matrix * view_rotation * view_translation;
 
                 let view_rotation_inverse = view_rotation.inverse();
                 let lights: Vec<_> = scene_desc
