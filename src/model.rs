@@ -6,8 +6,8 @@ struct Vertex {
 }
 
 pub struct Material {
-    pub diffuse: [f32; 3],
-    pub specular: [f32; 3],
+    pub diffuse: glam::Vec3,
+    pub specular: glam::Vec3,
     pub specular_exponent: f32,
 }
 
@@ -56,8 +56,8 @@ impl Model {
                 ))?;
                 let material = if let obj::ObjMaterial::Mtl(mtl) = material {
                     Material {
-                        diffuse: mtl.kd.unwrap_or_default(),
-                        specular: mtl.ks.unwrap_or_default(),
+                        diffuse: mtl.kd.unwrap_or_default().into(),
+                        specular: mtl.ks.unwrap_or_default().into(),
                         specular_exponent: mtl.ns.unwrap_or_default(),
                     }
                 } else {

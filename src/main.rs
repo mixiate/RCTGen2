@@ -46,6 +46,14 @@ struct Light {
     shadow: bool,
 }
 
+fn linear_to_srgb(colour: f32) -> f32 {
+    if colour <= 0.00031308 {
+        12.92 * colour
+    } else {
+        1.055 * colour.powf(1.0 / 2.4) - 0.055
+    }
+}
+
 fn main() -> anyhow::Result<()> {
     use anyhow::Context;
     let args: Vec<String> = std::env::args().collect();
@@ -138,7 +146,7 @@ fn main() -> anyhow::Result<()> {
 
                 let width = (bounds[2] - bounds[0]) as usize + 1;
                 let height = (bounds[3] - bounds[1]) as usize;
-                let mut framebuffer = vec![1.0; width * height];
+                let mut framebuffer = vec![[1.0; 3]; width * height];
 
                 for y in 0..height {
                     for x in 0..width {
@@ -148,29 +156,30 @@ fn main() -> anyhow::Result<()> {
                         let direction = camera_inverse.transform_vector3(direction).normalize();
 
                         if let Some(hit) = scene.trace_ray(&origin, &direction) {
-                            let mut sample = 0.0;
+                            let mut sample = glam::Vec3::new(0.0, 0.0, 0.0);
                             for light in &lights {
                                 if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
                                     continue;
                                 }
                                 if light.diffuse {
                                     let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
-                                    sample += light * hit.material.diffuse[0];
+                                    sample += light * hit.material.diffuse;
                                 }
                                 if light.specular {
                                     let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
                                     let reflected_direction = reflected_direction - light.direction;
                                     let angle = reflected_direction.dot(-direction).max(0.0);
                                     let specular_factor = light.strength * angle.powf(hit.material.specular_exponent);
-                                    sample += specular_factor * hit.material.specular[0];
+                                    sample += specular_factor * hit.material.specular;
                                 }
                             }
-                            framebuffer[y * width + x] = sample;
+                            framebuffer[y * width + x] = sample.into();
                         }
                     }
                 }
 
-                let pixels = framebuffer.iter().map(|x| (255.0 * x.clamp(0.0, 1.0)) as u8).collect::<Vec<u8>>();
+                let pixels =
+                    framebuffer.iter().flatten().map(|x| (255.0 * linear_to_srgb(*x)) as u8).collect::<Vec<u8>>();
 
                 let image_path =
                     base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
@@ -178,7 +187,7 @@ fn main() -> anyhow::Result<()> {
                 let w = std::io::BufWriter::new(image_file);
 
                 let mut encoder = png::Encoder::new(w, width.try_into()?, height.try_into()?);
-                encoder.set_color(png::ColorType::Grayscale);
+                encoder.set_color(png::ColorType::Rgb);
                 encoder.set_depth(png::BitDepth::Eight);
 
                 let mut writer = encoder.write_header()?;
