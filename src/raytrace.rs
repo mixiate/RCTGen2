@@ -25,7 +25,14 @@ impl Scene<'_> {
         let meshes = {
             let mut meshes: Vec<SceneMesh> = Vec::new();
             for model in models {
-                meshes.extend(add_model(&embree_scene, model)?);
+                for mesh in model.meshes {
+                    embree_scene.add_geometry(&mesh.positions, &mesh.mesh.indices)?;
+
+                    meshes.push(SceneMesh {
+                        mesh: mesh.mesh,
+                        normals: mesh.normals,
+                    })
+                }
             }
             meshes
         };
@@ -94,22 +101,4 @@ impl Scene<'_> {
 
         Ok(screen_bounds)
     }
-}
-
-fn add_model<'a>(
-    scene: &embree::Scene,
-    model: crate::model::TransformedModel<'a>,
-) -> anyhow::Result<Vec<SceneMesh<'a>>> {
-    model
-        .meshes
-        .into_iter()
-        .map(|x| {
-            scene.add_geometry(&x.positions, &x.mesh.indices)?;
-
-            Ok(SceneMesh {
-                mesh: x.mesh,
-                normals: x.normals,
-            })
-        })
-        .collect()
 }
