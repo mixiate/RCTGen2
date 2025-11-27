@@ -12,7 +12,13 @@ pub struct Framebuffer {
     pub height: usize,
 }
 
-pub fn render_scene(scene: &crate::raytrace::Scene, camera: &glam::Mat4, lights: &[Light]) -> Framebuffer {
+pub fn render_scene(
+    scene: &crate::raytrace::Scene,
+    camera: &glam::Mat4,
+    lights: &[Light],
+    multi_samples_x: usize,
+    multi_samples_y: usize,
+) -> Framebuffer {
     let scene_bounds = scene.get_scene_screen_bounds(camera);
     let offset = glam::Vec3::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32, 0.0);
 
@@ -22,33 +28,59 @@ pub fn render_scene(scene: &crate::raytrace::Scene, camera: &glam::Mat4, lights:
     let height = (scene_bounds[3] - scene_bounds[1]) as usize;
     let mut buffer = vec![[1.0; 3]; width * height];
 
+    let multi_sample_count = multi_samples_x * multi_samples_y;
+
     for y in 0..height {
         for x in 0..width {
             let origin = glam::Vec3::new(x as f32, (height - 1 - y) as f32, -512.0) + offset;
-            let origin = camera_inverse.transform_point3(origin);
             let direction = glam::Vec3::new(0.0, 0.0, 1.0);
             let direction = camera_inverse.transform_vector3(direction).normalize();
 
-            if let Some(hit) = scene.trace_ray(&origin, &direction) {
-                let mut sample = glam::Vec3::new(0.0, 0.0, 0.0);
-                for light in lights {
-                    if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
-                        continue;
-                    }
-                    if light.diffuse {
-                        let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
-                        sample += light * hit.material.diffuse;
-                    }
-                    if light.specular {
-                        let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
-                        let reflected_direction = reflected_direction - light.direction;
-                        let angle = reflected_direction.dot(-direction).max(0.0);
-                        let specular_factor = light.strength * angle.powf(hit.material.specular_exponent);
-                        sample += specular_factor * hit.material.specular;
+            {
+                let origin = camera_inverse.transform_point3(origin);
+                if scene.trace_ray(&origin, &direction).is_none() {
+                    continue;
+                }
+            }
+
+            let mut sub_samples = vec![None; multi_sample_count];
+
+            for sub_y in 0..multi_samples_y {
+                for sub_x in 0..multi_samples_x {
+                    let origin = origin
+                        + glam::Vec3::new(
+                            (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
+                            (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
+                            0.0,
+                        );
+                    let origin = camera_inverse.transform_point3(origin);
+
+                    if let Some(hit) = scene.trace_ray(&origin, &direction) {
+                        let mut sample = None;
+                        for light in lights {
+                            if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
+                                continue;
+                            }
+                            if light.diffuse {
+                                let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
+                                *sample.get_or_insert_default() += light * hit.material.diffuse;
+                            }
+                            if light.specular {
+                                let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
+                                let reflected_direction = reflected_direction - light.direction;
+                                let angle = reflected_direction.dot(-direction).max(0.0);
+                                let specular_factor = light.strength * angle.powf(hit.material.specular_exponent);
+                                *sample.get_or_insert_default() += specular_factor * hit.material.specular;
+                            }
+                        }
+                        sub_samples[sub_y * multi_samples_x + sub_x] = sample;
                     }
                 }
-                buffer[y * width + x] = sample.into();
             }
+
+            let sample = sub_samples.iter().flatten().sum::<glam::Vec3>();
+            let sub_sample_count = sub_samples.iter().flatten().count();
+            buffer[y * width + x] = (sample / sub_sample_count as f32).into();
         }
     }
 

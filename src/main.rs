@@ -140,7 +140,7 @@ fn main() -> anyhow::Result<()> {
                     })
                     .collect();
 
-                let framebuffer = renderer::render_scene(&scene, &camera, &lights);
+                let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4);
 
                 let pixels = framebuffer
                     .buffer
