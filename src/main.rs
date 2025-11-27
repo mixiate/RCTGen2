@@ -1,4 +1,5 @@
 mod model;
+mod palette;
 mod raytrace;
 mod renderer;
 
@@ -37,14 +38,6 @@ struct SceneDesc {
     meshes: Vec<String>,
     items: Vec<SceneItem>,
     lights: Vec<SceneLight>,
-}
-
-fn linear_to_srgb(colour: f32) -> f32 {
-    if colour <= 0.00031308 {
-        12.92 * colour
-    } else {
-        1.055 * colour.powf(1.0 / 2.4) - 0.055
-    }
 }
 
 const SQRT_6: f32 = 2.449_489_8;
@@ -141,25 +134,21 @@ fn main() -> anyhow::Result<()> {
                     .collect();
 
                 let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4);
-
-                let pixels = framebuffer
-                    .buffer
-                    .iter()
-                    .flatten()
-                    .map(|x| (255.0 * linear_to_srgb(*x)) as u8)
-                    .collect::<Vec<u8>>();
+                let image = framebuffer.into_indexed_image();
 
                 let image_path =
                     base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
                 let image_file = std::fs::File::create(image_path)?;
                 let w = std::io::BufWriter::new(image_file);
 
-                let mut encoder = png::Encoder::new(w, framebuffer.width.try_into()?, framebuffer.height.try_into()?);
-                encoder.set_color(png::ColorType::Rgb);
+                let mut encoder = png::Encoder::new(w, image.width.try_into()?, image.height.try_into()?);
+                encoder.set_color(png::ColorType::Indexed);
                 encoder.set_depth(png::BitDepth::Eight);
+                encoder.set_palette(&palette::PALETTE_FLAT);
+                encoder.set_trns(&[0]);
 
                 let mut writer = encoder.write_header()?;
-                writer.write_image_data(&pixels)?;
+                writer.write_image_data(&image.pixels)?;
             }
         }
     }

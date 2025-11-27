@@ -7,7 +7,29 @@ pub struct Light {
 }
 
 pub struct Framebuffer {
-    pub buffer: Vec<[f32; 3]>,
+    pub buffer: Vec<Option<glam::Vec3>>,
+    pub width: usize,
+    pub height: usize,
+}
+
+impl Framebuffer {
+    pub fn into_indexed_image(self) -> IndexedImage {
+        let pixels = self
+            .buffer
+            .iter()
+            .map(|x| x.map_or(0, |x| crate::palette::get_nearest_colour(&x).index))
+            .collect::<Vec<u8>>();
+
+        IndexedImage {
+            pixels,
+            width: self.width,
+            height: self.height,
+        }
+    }
+}
+
+pub struct IndexedImage {
+    pub pixels: Vec<u8>,
     pub width: usize,
     pub height: usize,
 }
@@ -26,7 +48,7 @@ pub fn render_scene(
 
     let width = (scene_bounds[2] - scene_bounds[0]) as usize + 1;
     let height = (scene_bounds[3] - scene_bounds[1]) as usize;
-    let mut buffer = vec![[1.0; 3]; width * height];
+    let mut buffer = vec![None; width * height];
 
     let multi_sample_count = multi_samples_x * multi_samples_y;
 
@@ -80,7 +102,7 @@ pub fn render_scene(
 
             let sample = sub_samples.iter().flatten().sum::<glam::Vec3>();
             let sub_sample_count = sub_samples.iter().flatten().count();
-            buffer[y * width + x] = (sample / sub_sample_count as f32).into();
+            buffer[y * width + x] = Some(sample / sub_sample_count as f32);
         }
     }
 
