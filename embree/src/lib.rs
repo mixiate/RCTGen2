@@ -84,6 +84,8 @@ impl Scene<'_> {
             unsafe { std::slice::from_raw_parts_mut(index_buffer as *mut (u32, u32, u32), indices.len()) };
         index_buffer.copy_from_slice(indices);
 
+        unsafe { embree4_sys::rtcSetGeometryOccludedFilterFunction(geometry.handle, Some(occlusion_filter)) };
+
         unsafe {
             embree4_sys::rtcCommitGeometry(geometry.handle);
             embree4_sys::rtcAttachGeometry(self.handle, geometry.handle);
@@ -247,4 +249,16 @@ pub struct Bounds {
     pub upper_x: f32,
     pub upper_y: f32,
     pub upper_z: f32,
+}
+
+unsafe extern "C" fn occlusion_filter(args: *const embree4_sys::RTCFilterFunctionNArguments) {
+    if unsafe { (*args).N } != 1 {
+        return;
+    }
+
+    let ray = unsafe { *((*args).ray as *const embree4_sys::RTCRay) };
+    let hit = unsafe { *((*args).hit as *const embree4_sys::RTCHit) };
+    if hit.Ng_x * ray.dir_x + hit.Ng_y * ray.dir_y + hit.Ng_z * ray.dir_z > 0.0 {
+        unsafe { *(*args).valid = 0 };
+    }
 }
