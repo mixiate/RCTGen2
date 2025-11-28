@@ -91,7 +91,7 @@ pub fn render_scene(
 
     for y in 0..height {
         for x in 0..width {
-            let origin = glam::Vec3::new(x as f32, (height - 1 - y) as f32, -512.0) + offset;
+            let origin = glam::Vec3::new(x as f32, y as f32, -512.0) + offset;
             let direction = glam::Vec3::new(0.0, 0.0, 1.0);
             let direction = camera_inverse.transform_vector3(direction).normalize();
 

@@ -77,8 +77,18 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<model::Model>>>()?;
 
-    let camera = glam::Mat4::from_euler(glam::EulerRot::XYZ, -30.0f32.to_radians(), -45.0f32.to_radians(), 0.0);
-    let camera = camera * glam::Mat4::from_scale([13.713586; 3].into()); // what?
+    let camera = glam::Mat4::from_mat3(
+        glam::Mat3::from_cols(
+            glam::Vec3::new(32.0 / TILE_SIZE, 0.0, -32.0 / TILE_SIZE),
+            glam::Vec3::new(-16.0 / TILE_SIZE, -16.0 * 6.0f32.sqrt() / TILE_SIZE, -16.0 / TILE_SIZE),
+            glam::Vec3::new(
+                16.0 * 3.0f32.sqrt() / TILE_SIZE,
+                -16.0 * 2.0f32.sqrt() / TILE_SIZE,
+                16.0 * 3.0f32.sqrt() / TILE_SIZE,
+            ),
+        )
+        .transpose(),
+    );
 
     for (item_index, item) in scene_desc.items.iter().enumerate() {
         for frame_index in 0..item.frames {
