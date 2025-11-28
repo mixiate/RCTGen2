@@ -3,7 +3,41 @@ pub struct NearestColour {
     pub _error: glam::Vec3,
 }
 
+fn linear_to_srgb(x: f32) -> f32 {
+    if x <= 0.00031308 {
+        12.92 * x
+    } else {
+        1.055 * x.powf(1.0 / 2.4) - 0.055
+    }
+}
+
+fn srgb_to_linear(x: f32) -> f32 {
+    if x <= 0.04045 {
+        x / 12.92
+    } else {
+        ((x + 0.055) / 1.055).powf(2.4)
+    }
+}
+
+fn vec_to_colour(colour: &glam::Vec3) -> [u8; 3] {
+    [
+        (linear_to_srgb(colour.x).clamp(0.0, 1.0) * 255.0 + 0.4999).floor() as u8,
+        (linear_to_srgb(colour.y).clamp(0.0, 1.0) * 255.0 + 0.4999).floor() as u8,
+        (linear_to_srgb(colour.z).clamp(0.0, 1.0) * 255.0 + 0.4999).floor() as u8,
+    ]
+}
+
+fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
+    glam::Vec3::new(
+        srgb_to_linear(colour[0] as f32 / 255.0),
+        srgb_to_linear(colour[1] as f32 / 255.0),
+        srgb_to_linear(colour[2] as f32 / 255.0),
+    )
+}
+
 pub fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
+    let colour = colour_to_vec(&vec_to_colour(colour)); // necessary to match original but not sure if it's good or bad
+
     let mut index = 0;
     let mut minimum_error = f32::INFINITY;
 
