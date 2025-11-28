@@ -134,7 +134,7 @@ fn main() -> anyhow::Result<()> {
                     .collect();
 
                 let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4);
-                let image = framebuffer.into_indexed_image();
+                let image = framebuffer.to_cropped_indexed_image();
 
                 let image_path =
                     base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");

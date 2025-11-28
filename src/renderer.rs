@@ -13,7 +13,8 @@ pub struct Framebuffer {
 }
 
 impl Framebuffer {
-    pub fn into_indexed_image(self) -> IndexedImage {
+    #[allow(dead_code)]
+    pub fn to_indexed_image(&self) -> IndexedImage {
         let pixels = self
             .buffer
             .iter()
@@ -24,6 +25,42 @@ impl Framebuffer {
             pixels,
             width: self.width,
             height: self.height,
+        }
+    }
+
+    pub fn to_cropped_indexed_image(&self) -> IndexedImage {
+        let (min_x, min_y, max_x, max_y) = {
+            let mut min_x = self.width;
+            let mut min_y = self.height;
+            let mut max_x = 0;
+            let mut max_y = 0;
+            for y in 0..self.height {
+                for x in 0..self.width {
+                    if self.buffer[y * self.width + x].is_some() {
+                        min_x = std::cmp::min(min_x, x);
+                        min_y = std::cmp::min(min_y, y);
+                        max_x = std::cmp::max(max_x, x + 1);
+                        max_y = std::cmp::max(max_y, y + 1);
+                    }
+                }
+            }
+            (min_x, min_y, max_x, max_y)
+        };
+        let cropped_width = max_x - min_x;
+        let cropped_height = max_y - min_y;
+
+        let mut pixels = Vec::with_capacity(cropped_width * cropped_height);
+        for y in min_y..max_y {
+            for x in min_x..max_x {
+                let sample = &self.buffer[y * self.width + x];
+                pixels.push(sample.map_or(0, |x| crate::palette::get_nearest_colour(&x).index));
+            }
+        }
+
+        IndexedImage {
+            pixels,
+            width: cropped_width,
+            height: cropped_height,
         }
     }
 }
