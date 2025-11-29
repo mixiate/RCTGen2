@@ -1,18 +1,6 @@
 [workspace]
-members = ["embree", "renderer"]
+members = ["embree", "renderer", "test-render"]
+resolver = "3"
 
-[package]
-name = "rctgen2"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-anyhow = "1.0.100"
-glam = "0.30.9"
-png = "0.18.0"
-renderer = { path = "renderer" }
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.145"
-
-[lints.rust]
-unsafe_code = "forbid"
+[workspace.lints.rust]
+unsafe_code = "deny"

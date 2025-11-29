@@ -1,3 +1,5 @@
+#![allow(unsafe_code)]
+
 #[derive(Debug)]
 pub struct Error;
 

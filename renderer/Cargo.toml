@@ -9,5 +9,5 @@ embree = { path = "../embree" }
 glam = "0.30.9"
 obj = "0.10.2"
 
-[lints.rust]
-unsafe_code = "forbid"
+[lints]
+workspace = true
