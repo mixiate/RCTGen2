@@ -45,8 +45,8 @@ impl Scene<'_> {
     pub fn trace_ray(&'_ self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit<'_>> {
         let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into())?;
 
-        let scene_mesh = self.meshes.get(usize::try_from(hit.geometry_id).unwrap()).unwrap();
-        let indices = scene_mesh.mesh.indices.get(usize::try_from(hit.primitive_id).unwrap()).unwrap();
+        let scene_mesh = &self.meshes[usize::try_from(hit.geometry_id).unwrap()];
+        let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
 
         let normals = [
             scene_mesh.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),

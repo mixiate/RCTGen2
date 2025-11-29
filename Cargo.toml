@@ -6,5 +6,6 @@ resolver = "3"
 unsafe_code = "deny"
 
 [workspace.lints.clippy]
+get_unwrap = "warn"
 unseparated_literal_suffix = "warn"
 unused_trait_names = "warn"
