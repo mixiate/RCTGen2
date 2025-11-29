@@ -75,7 +75,7 @@ impl Model {
                     if poly.0.len() != 3 {
                         anyhow::bail!("Obj meshes are not triangulated {}", path.display());
                     }
-                    let mut new_indices = [0u32; 3];
+                    let mut new_indices = [0_u32; 3];
                     for (indices, new_index) in poly.0.iter().zip(new_indices.iter_mut()) {
                         let position = *obj
                             .data

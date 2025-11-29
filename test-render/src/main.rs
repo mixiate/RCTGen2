@@ -75,11 +75,11 @@ fn main() -> anyhow::Result<()> {
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
             glam::Vec3::new(32.0 / TILE_SIZE, 0.0, -32.0 / TILE_SIZE),
-            glam::Vec3::new(-16.0 / TILE_SIZE, -16.0 * 6.0f32.sqrt() / TILE_SIZE, -16.0 / TILE_SIZE),
+            glam::Vec3::new(-16.0 / TILE_SIZE, -16.0 * 6.0_f32.sqrt() / TILE_SIZE, -16.0 / TILE_SIZE),
             glam::Vec3::new(
-                16.0 * 3.0f32.sqrt() / TILE_SIZE,
-                -16.0 * 2.0f32.sqrt() / TILE_SIZE,
-                16.0 * 3.0f32.sqrt() / TILE_SIZE,
+                16.0 * 3.0_f32.sqrt() / TILE_SIZE,
+                -16.0 * 2.0_f32.sqrt() / TILE_SIZE,
+                16.0 * 3.0_f32.sqrt() / TILE_SIZE,
             ),
         )
         .transpose(),

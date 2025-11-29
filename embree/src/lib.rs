@@ -131,7 +131,7 @@ impl CommittedScene<'_> {
             return None;
         }
 
-        let mut position = [0.0f32; 3];
+        let mut position = [0.0_f32; 3];
         let interpolate_arguments = embree4_sys::RTCInterpolateArguments {
             geometry: unsafe { embree4_sys::rtcGetGeometry(self.scene.handle, ray_hit.hit.geomID) },
             primID: ray_hit.hit.primID,
