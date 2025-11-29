@@ -333,6 +333,7 @@ dependencies = [
  "embree",
  "glam",
  "obj",
+ "png",
 ]
 
 [[package]]
@@ -432,7 +433,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "glam",
- "png",
  "renderer",
  "serde",
  "serde_json",

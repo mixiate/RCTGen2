@@ -13,21 +13,21 @@ pub struct Framebuffer {
 
 impl Framebuffer {
     #[allow(dead_code)]
-    pub fn to_indexed_image(&self) -> IndexedImage {
+    pub fn to_indexed_image(&self) -> crate::image::IndexedImage {
         let pixels = self
             .buffer
             .iter()
             .map(|x| x.map_or(0, |x| crate::palette::get_nearest_colour(&x).index))
             .collect::<Vec<u8>>();
 
-        IndexedImage {
+        crate::image::IndexedImage {
             pixels,
             width: self.width,
             height: self.height,
         }
     }
 
-    pub fn to_cropped_indexed_image(&self) -> IndexedImage {
+    pub fn to_cropped_indexed_image(&self) -> crate::image::IndexedImage {
         let (min_x, min_y, max_x, max_y) = {
             let mut min_x = self.width;
             let mut min_y = self.height;
@@ -56,18 +56,12 @@ impl Framebuffer {
             }
         }
 
-        IndexedImage {
+        crate::image::IndexedImage {
             pixels,
             width: cropped_width,
             height: cropped_height,
         }
     }
-}
-
-pub struct IndexedImage {
-    pub pixels: Vec<u8>,
-    pub width: usize,
-    pub height: usize,
 }
 
 pub fn render_scene(

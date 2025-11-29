@@ -8,6 +8,7 @@ anyhow = "1.0.100"
 embree = { path = "../embree" }
 glam = "0.30.9"
 obj = "0.10.2"
+png = "0.18.0"
 
 [lints]
 workspace = true

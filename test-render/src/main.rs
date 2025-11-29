@@ -150,17 +150,7 @@ fn main() -> anyhow::Result<()> {
 
                 let image_path =
                     base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
-                let image_file = std::fs::File::create(image_path)?;
-                let w = std::io::BufWriter::new(image_file);
-
-                let mut encoder = png::Encoder::new(w, image.width.try_into()?, image.height.try_into()?);
-                encoder.set_color(png::ColorType::Indexed);
-                encoder.set_depth(png::BitDepth::Eight);
-                encoder.set_palette(&renderer::palette::PALETTE_FLAT);
-                encoder.set_trns(&[0]);
-
-                let mut writer = encoder.write_header()?;
-                writer.write_image_data(&image.pixels)?;
+                image.save(&image_path)?;
             }
         }
     }
