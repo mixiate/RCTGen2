@@ -83,8 +83,8 @@ pub fn render_scene(
 
     let camera_inverse = camera.inverse();
 
-    let width = (scene_bounds[2] - scene_bounds[0]) as usize + 1;
-    let height = (scene_bounds[3] - scene_bounds[1]) as usize;
+    let width = usize::try_from(scene_bounds[2] - scene_bounds[0]).unwrap() + 1;
+    let height = usize::try_from(scene_bounds[3] - scene_bounds[1]).unwrap();
     let mut buffer = vec![None; width * height];
 
     let multi_sample_count = multi_samples_x * multi_samples_y;
