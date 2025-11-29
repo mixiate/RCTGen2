@@ -65,7 +65,7 @@ impl Scene<'_> {
         }
 
         let vertex_buffer =
-            unsafe { std::slice::from_raw_parts_mut(vertex_buffer as *mut (f32, f32, f32), positions.len()) };
+            unsafe { std::slice::from_raw_parts_mut(vertex_buffer.cast::<(f32, f32, f32)>(), positions.len()) };
         vertex_buffer.copy_from_slice(positions);
 
         let index_buffer = unsafe {
@@ -83,7 +83,7 @@ impl Scene<'_> {
         }
 
         let index_buffer =
-            unsafe { std::slice::from_raw_parts_mut(index_buffer as *mut (u32, u32, u32), indices.len()) };
+            unsafe { std::slice::from_raw_parts_mut(index_buffer.cast::<(u32, u32, u32)>(), indices.len()) };
         index_buffer.copy_from_slice(indices);
 
         unsafe { embree4_sys::rtcSetGeometryOccludedFilterFunction(geometry.handle, Some(occlusion_filter)) };

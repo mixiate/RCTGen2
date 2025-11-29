@@ -7,6 +7,7 @@ unsafe_code = "deny"
 
 [workspace.lints.clippy]
 get_unwrap = "warn"
+ptr_as_ptr = "warn"
 redundant_type_annotations = "warn"
 unseparated_literal_suffix = "warn"
 unused_trait_names = "warn"
