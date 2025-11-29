@@ -149,7 +149,9 @@ impl CommittedScene<'_> {
         };
         unsafe { embree4_sys::rtcInterpolate(&raw const interpolate_arguments) }
 
-        if ray_hit.hit.geomID != embree4_sys::RTC_INVALID_GEOMETRY_ID {
+        if ray_hit.hit.geomID == embree4_sys::RTC_INVALID_GEOMETRY_ID {
+            None
+        } else {
             Some(RayHit {
                 geometry_id: ray_hit.hit.geomID,
                 primitive_id: ray_hit.hit.primID,
@@ -157,8 +159,6 @@ impl CommittedScene<'_> {
                 u: ray_hit.hit.u,
                 v: ray_hit.hit.v,
             })
-        } else {
-            None
         }
     }
 
