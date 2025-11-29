@@ -125,7 +125,7 @@ impl CommittedScene<'_> {
             hit: Default::default(),
         };
 
-        unsafe { embree4_sys::rtcIntersect1(self.scene.handle, &mut ray_hit, std::ptr::null_mut()) }
+        unsafe { embree4_sys::rtcIntersect1(self.scene.handle, &raw mut ray_hit, std::ptr::null_mut()) }
 
         if ray_hit.hit.geomID == embree4_sys::RTC_INVALID_GEOMETRY_ID {
             return None;
@@ -139,7 +139,7 @@ impl CommittedScene<'_> {
             v: ray_hit.hit.v,
             bufferType: embree4_sys::RTCBufferType::VERTEX,
             bufferSlot: 0,
-            P: &mut position as *mut _,
+            P: (&raw mut position).cast(),
             dPdu: std::ptr::null_mut(),
             dPdv: std::ptr::null_mut(),
             ddPdudu: std::ptr::null_mut(),
@@ -147,7 +147,7 @@ impl CommittedScene<'_> {
             ddPdudv: std::ptr::null_mut(),
             valueCount: 3,
         };
-        unsafe { embree4_sys::rtcInterpolate(&interpolate_arguments) }
+        unsafe { embree4_sys::rtcInterpolate(&raw const interpolate_arguments) }
 
         if ray_hit.hit.geomID != embree4_sys::RTC_INVALID_GEOMETRY_ID {
             Some(RayHit {
@@ -182,13 +182,13 @@ impl CommittedScene<'_> {
             tfar: f32::INFINITY,
             ..Default::default()
         };
-        unsafe { embree4_sys::rtcOccluded1(self.scene.handle, &mut ray, &mut arguments) }
+        unsafe { embree4_sys::rtcOccluded1(self.scene.handle, &raw mut ray, &raw mut arguments) }
         ray.tfar <= 0.0
     }
 
     pub fn bounds(&self) -> Bounds {
         let mut bounds = embree4_sys::RTCBounds::default();
-        unsafe { embree4_sys::rtcGetSceneBounds(self.scene.handle, &mut bounds) }
+        unsafe { embree4_sys::rtcGetSceneBounds(self.scene.handle, &raw mut bounds) }
         Bounds {
             lower_x: bounds.lower_x,
             lower_y: bounds.lower_y,

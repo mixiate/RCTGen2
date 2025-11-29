@@ -6,6 +6,7 @@ resolver = "3"
 unsafe_code = "deny"
 
 [workspace.lints.clippy]
+borrow_as_ptr = "warn"
 cast_lossless = "warn"
 elidable_lifetime_names = "warn"
 get_unwrap = "warn"
