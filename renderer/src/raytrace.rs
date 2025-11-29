@@ -31,7 +31,7 @@ impl Scene<'_> {
                     meshes.push(SceneMesh {
                         mesh: mesh.mesh,
                         normals: mesh.normals,
-                    })
+                    });
                 }
             }
             meshes
