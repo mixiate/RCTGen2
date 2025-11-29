@@ -12,7 +12,20 @@ pub struct Framebuffer {
 }
 
 impl Framebuffer {
-    #[allow(dead_code)]
+    pub fn to_image(&self) -> crate::image::Image {
+        let pixels = self
+            .buffer
+            .iter()
+            .flat_map(|x| x.map_or([0; 3], |x| crate::palette::vec_to_colour(&x)))
+            .collect::<Vec<u8>>();
+
+        crate::image::Image {
+            pixels,
+            width: self.width,
+            height: self.height,
+        }
+    }
+
     pub fn to_indexed_image(&self) -> crate::image::IndexedImage {
         let pixels = self
             .buffer

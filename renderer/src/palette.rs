@@ -19,7 +19,7 @@ fn srgb_to_linear(x: f32) -> f32 {
     }
 }
 
-fn vec_to_colour(colour: &glam::Vec3) -> [u8; 3] {
+pub(crate) fn vec_to_colour(colour: &glam::Vec3) -> [u8; 3] {
     [
         (linear_to_srgb(colour.x).clamp(0.0, 1.0) * 255.0 + 0.4999).floor() as u8,
         (linear_to_srgb(colour.y).clamp(0.0, 1.0) * 255.0 + 0.4999).floor() as u8,

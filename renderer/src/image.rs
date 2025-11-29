@@ -1,3 +1,24 @@
+pub struct Image {
+    pub pixels: Vec<u8>,
+    pub width: usize,
+    pub height: usize,
+}
+
+impl Image {
+    pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
+        let image_file = std::fs::File::create(path)?;
+        let w = std::io::BufWriter::new(image_file);
+
+        let mut encoder = png::Encoder::new(w, self.width.try_into()?, self.height.try_into()?);
+        encoder.set_color(png::ColorType::Rgb);
+        encoder.set_depth(png::BitDepth::Eight);
+
+        let mut writer = encoder.write_header()?;
+        writer.write_image_data(&self.pixels)?;
+
+        Ok(())
+    }
+}
 pub struct IndexedImage {
     pub pixels: Vec<u8>,
     pub width: usize,
