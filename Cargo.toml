@@ -6,6 +6,7 @@ resolver = "3"
 unsafe_code = "deny"
 
 [workspace.lints.clippy]
+cast_lossless = "warn"
 get_unwrap = "warn"
 ptr_as_ptr = "warn"
 redundant_type_annotations = "warn"

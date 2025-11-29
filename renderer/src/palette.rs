@@ -29,9 +29,9 @@ fn vec_to_colour(colour: &glam::Vec3) -> [u8; 3] {
 
 fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
     glam::Vec3::new(
-        srgb_to_linear(colour[0] as f32 / 255.0),
-        srgb_to_linear(colour[1] as f32 / 255.0),
-        srgb_to_linear(colour[2] as f32 / 255.0),
+        srgb_to_linear(f32::from(colour[0]) / 255.0),
+        srgb_to_linear(f32::from(colour[1]) / 255.0),
+        srgb_to_linear(f32::from(colour[2]) / 255.0),
     )
 }
 
