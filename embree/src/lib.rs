@@ -38,7 +38,7 @@ pub struct Scene<'a> {
 }
 
 impl Scene<'_> {
-    pub fn try_new<'a>(device: &'a Device) -> Result<Scene<'a>, Error> {
+    pub fn try_new(device: &Device) -> Result<Scene<'_>, Error> {
         let handle = unsafe { embree4_sys::rtcNewScene(device.handle) };
         if handle.is_null() {
             Err(Error)
@@ -217,7 +217,7 @@ struct Geometry<'a> {
 }
 
 impl Geometry<'_> {
-    pub fn try_new<'a>(device: &'a Device, geometry_type: embree4_sys::RTCGeometryType) -> Result<Geometry<'a>, Error> {
+    pub fn try_new(device: &Device, geometry_type: embree4_sys::RTCGeometryType) -> Result<Geometry<'_>, Error> {
         let handle = unsafe { embree4_sys::rtcNewGeometry(device.handle, geometry_type) };
         if handle.is_null() {
             Err(Error)
