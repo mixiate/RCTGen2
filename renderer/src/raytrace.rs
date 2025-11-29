@@ -53,7 +53,7 @@ impl Scene<'_> {
             scene_mesh.normals[usize::try_from(indices.1).unwrap()] * hit.u,
             scene_mesh.normals[usize::try_from(indices.2).unwrap()] * hit.v,
         ];
-        let normal: glam::Vec3 = normals.iter().sum::<glam::Vec3>().normalize();
+        let normal = normals.iter().sum::<glam::Vec3>().normalize();
 
         Some(RayHit {
             position: hit.position.into(),
