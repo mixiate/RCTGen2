@@ -1,16 +1,16 @@
 #[derive(Debug, serde::Deserialize)]
-struct SceneModel {
+struct ModelDesc {
     mesh_index: usize,
     position: Vec<[f32; 3]>,
     orientation: Vec<[f32; 3]>,
 }
 
 #[derive(Debug, serde::Deserialize)]
-struct SceneItem {
+struct ItemDesc {
     name: String,
     rotations: usize,
     frames: usize,
-    model: SceneModel,
+    model: ModelDesc,
 }
 
 #[derive(Debug, serde::Deserialize, PartialEq)]
@@ -21,7 +21,7 @@ enum LightType {
 }
 
 #[derive(Debug, serde::Deserialize)]
-struct SceneLight {
+struct LightDesc {
     r#type: LightType,
     shadow: bool,
     direction: [f32; 3],
@@ -29,10 +29,10 @@ struct SceneLight {
 }
 
 #[derive(Debug, serde::Deserialize)]
-struct SceneDesc {
+struct TestDesc {
     meshes: Vec<String>,
-    items: Vec<SceneItem>,
-    lights: Vec<SceneLight>,
+    items: Vec<ItemDesc>,
+    lights: Vec<LightDesc>,
 }
 
 const SQRT_6: f32 = 2.449_489_8;
@@ -51,10 +51,10 @@ fn main() -> anyhow::Result<()> {
         scene_description_path.display()
     ))?;
 
-    let scene_desc = {
+    let test_desc = {
         let json = std::fs::read_to_string(&scene_description_path)
             .context(format!("Could not read file {}", scene_description_path.display()))?;
-        serde_json::from_str::<SceneDesc>(&json).context(format!(
+        serde_json::from_str::<TestDesc>(&json).context(format!(
             "Could not parse json in file {}",
             scene_description_path.display()
         ))?
@@ -62,7 +62,7 @@ fn main() -> anyhow::Result<()> {
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
 
-    let models = &scene_desc
+    let models = &test_desc
         .meshes
         .iter()
         .map(|x| {
@@ -85,7 +85,7 @@ fn main() -> anyhow::Result<()> {
         .transpose(),
     );
 
-    for (item_index, item) in scene_desc.items.iter().enumerate() {
+    for (item_index, item) in test_desc.items.iter().enumerate() {
         for frame_index in 0..item.frames {
             let model = models.get(item.model.mesh_index).context(format!(
                 "Invalid mesh index {} in item {item_index}",
@@ -126,7 +126,7 @@ fn main() -> anyhow::Result<()> {
                 let camera = camera * view_rotation * view_translation;
 
                 let view_rotation_inverse = view_rotation.inverse();
-                let lights: Vec<_> = scene_desc
+                let lights: Vec<_> = test_desc
                     .lights
                     .iter()
                     .map(|x| renderer::Light {
