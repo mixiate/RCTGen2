@@ -1,4 +1,4 @@
-pub struct NearestColour {
+pub(crate) struct NearestColour {
     pub index: u8,
     pub _error: glam::Vec3,
 }
@@ -35,7 +35,7 @@ fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
     )
 }
 
-pub fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
+pub(crate) fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
     let colour = colour_to_vec(&vec_to_colour(colour)); // necessary to match original but not sure if it's good or bad
 
     let mut index = 0;
@@ -59,7 +59,7 @@ pub fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
     }
 }
 
-pub const PALETTE_RANGES: [std::ops::Range<usize>; 3] = [(10..202), (214..227), (240..243)];
+const PALETTE_RANGES: [std::ops::Range<usize>; 3] = [(10..202), (214..227), (240..243)];
 
 pub const PALETTE: [[u8; 3]; 256] = [
     [0, 0, 0],
@@ -332,7 +332,7 @@ pub const PALETTE_FLAT: [u8; 256 * 3] = const {
     palette_flat
 };
 
-pub const PALETTE_LINEAR: [glam::Vec3; 256] = [
+const PALETTE_LINEAR: [glam::Vec3; 256] = [
     glam::Vec3::new(0.0, 0.0, 0.0),
     glam::Vec3::new(0.000303527, 0.000303527, 0.000303527),
     glam::Vec3::new(0.000607054, 0.000607054, 0.000607054),

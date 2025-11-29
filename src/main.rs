@@ -1,8 +1,3 @@
-mod model;
-mod palette;
-mod raytrace;
-mod renderer;
-
 #[derive(Debug, serde::Deserialize)]
 struct SceneModel {
     mesh_index: usize,
@@ -65,7 +60,7 @@ fn main() -> anyhow::Result<()> {
         ))?
     };
 
-    let embree_device = embree::Device::try_new().context("Could not create embree device")?;
+    let render_device = renderer::Device::try_new().context("Could not create render device")?;
 
     let models = &scene_desc
         .meshes
@@ -73,9 +68,9 @@ fn main() -> anyhow::Result<()> {
         .map(|x| {
             let x = std::path::PathBuf::from(x);
             let file_path = if x.is_absolute() { x } else { base_directory.join(x) };
-            model::Model::load(&file_path)
+            renderer::model::Model::load(&file_path)
         })
-        .collect::<anyhow::Result<Vec<model::Model>>>()?;
+        .collect::<anyhow::Result<Vec<renderer::model::Model>>>()?;
 
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
@@ -116,7 +111,7 @@ fn main() -> anyhow::Result<()> {
                 rotation[2].to_radians(),
             );
 
-            let scene = raytrace::Scene::new(&embree_device, vec![model.transform(&translation, &rotation)])?;
+            let scene = renderer::Scene::new(&render_device, vec![model.transform(&translation, &rotation)])?;
 
             for rotation_index in 0..item.rotations {
                 let view_translation = {
@@ -154,7 +149,7 @@ fn main() -> anyhow::Result<()> {
                 let mut encoder = png::Encoder::new(w, image.width.try_into()?, image.height.try_into()?);
                 encoder.set_color(png::ColorType::Indexed);
                 encoder.set_depth(png::BitDepth::Eight);
-                encoder.set_palette(&palette::PALETTE_FLAT);
+                encoder.set_palette(&renderer::palette::PALETTE_FLAT);
                 encoder.set_trns(&[0]);
 
                 let mut writer = encoder.write_header()?;

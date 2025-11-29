@@ -1,5 +1,5 @@
 [workspace]
-members = ["embree"]
+members = ["embree", "renderer"]
 
 [package]
 name = "rctgen2"
@@ -8,10 +8,9 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-embree = { path = "embree" }
 glam = "0.30.9"
-obj = "0.10.2"
 png = "0.18.0"
+renderer = { path = "renderer" }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 

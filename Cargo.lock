@@ -301,10 +301,9 @@ name = "rctgen2"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "embree",
  "glam",
- "obj",
  "png",
+ "renderer",
  "serde",
  "serde_json",
 ]
@@ -337,6 +336,16 @@ name = "regex-syntax"
 version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a2d987857b319362043e95f5353c0535c1f58eec5336fdfcf626430af7def58"
+
+[[package]]
+name = "renderer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "embree",
+ "glam",
+ "obj",
+]
 
 [[package]]
 name = "rustc-hash"
