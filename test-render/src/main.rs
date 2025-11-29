@@ -40,7 +40,7 @@ const TILE_SIZE: f32 = 3.3;
 const CLEARANCE_HEIGHT: f32 = 0.5 * TILE_SIZE / SQRT_6;
 
 fn main() -> anyhow::Result<()> {
-    use anyhow::Context;
+    use anyhow::Context as _;
     let args: Vec<String> = std::env::args().collect();
     let scene_description_path = std::path::PathBuf::from(args.get(1).context("No description file path argument.")?);
     let scene_description_path = scene_description_path

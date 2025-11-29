@@ -7,3 +7,4 @@ unsafe_code = "deny"
 
 [workspace.lints.clippy]
 unseparated_literal_suffix = "warn"
+unused_trait_names = "warn"

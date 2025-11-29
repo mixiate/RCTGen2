@@ -19,7 +19,7 @@ impl Scene<'_> {
         embree_device: &'a embree::Device,
         models: Vec<crate::model::TransformedModel<'a>>,
     ) -> anyhow::Result<Scene<'a>> {
-        use anyhow::Context;
+        use anyhow::Context as _;
         let embree_scene = embree::Scene::try_new(embree_device).context("Could not create embree scene")?;
 
         let meshes = {

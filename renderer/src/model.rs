@@ -34,7 +34,7 @@ pub struct TransformedModel<'a> {
 
 impl Model {
     pub fn load(path: &std::path::Path) -> anyhow::Result<Model> {
-        use anyhow::Context;
+        use anyhow::Context as _;
 
         let mut obj = obj::Obj::load(path)?;
         obj.load_mtls()?;
