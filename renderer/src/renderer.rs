@@ -124,6 +124,7 @@ pub fn render_scene(
                         let mut sample = None;
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
+                                sample.get_or_insert(glam::Vec3::new(0.0, 0.0, 0.0));
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
