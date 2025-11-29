@@ -1,8 +1,7 @@
 pub struct Light {
-    pub diffuse: bool,
-    pub specular: bool,
+    pub diffuse_strength: f32,
+    pub specular_strength: f32,
     pub direction: glam::Vec3,
-    pub strength: f32,
     pub shadow: bool,
 }
 
@@ -120,15 +119,16 @@ pub fn render_scene(
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
                                 continue;
                             }
-                            if light.diffuse {
-                                let light = hit.normal.dot(light.direction).max(0.0) * light.strength;
+                            if light.diffuse_strength > 0.0 {
+                                let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
                                 *sample.get_or_insert_default() += light * hit.material.diffuse;
                             }
-                            if light.specular {
+                            if light.specular_strength > 0.0 {
                                 let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
                                 let reflected_direction = reflected_direction - light.direction;
                                 let angle = reflected_direction.dot(-direction).max(0.0);
-                                let specular_factor = light.strength * angle.powf(hit.material.specular_exponent);
+                                let specular_factor =
+                                    light.specular_strength * angle.powf(hit.material.specular_exponent);
                                 *sample.get_or_insert_default() += specular_factor * hit.material.specular;
                             }
                         }

@@ -130,10 +130,17 @@ fn main() -> anyhow::Result<()> {
                     .lights
                     .iter()
                     .map(|x| renderer::Light {
-                        diffuse: x.r#type == LightType::Diffuse,
-                        specular: x.r#type == LightType::Specular,
+                        diffuse_strength: if x.r#type == LightType::Diffuse {
+                            x.strength
+                        } else {
+                            0.0
+                        },
+                        specular_strength: if x.r#type == LightType::Specular {
+                            x.strength
+                        } else {
+                            0.0
+                        },
                         direction: view_rotation_inverse.transform_vector3(x.direction.into()).normalize(),
-                        strength: x.strength,
                         shadow: x.shadow,
                     })
                     .collect();
