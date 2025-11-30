@@ -82,20 +82,20 @@ impl Scene<'_> {
         let mut screen_bounds = {
             let screen_bound = camera.transform_point3(scene_bounds[0]);
             [
-                screen_bound.x.floor() as i32,
-                screen_bound.y.floor() as i32,
-                screen_bound.x.ceil() as i32,
-                screen_bound.y.ceil() as i32,
+                screen_bound.x.floor() as i32 - 1,
+                screen_bound.y.floor() as i32 - 1,
+                screen_bound.x.ceil() as i32 + 1,
+                screen_bound.y.ceil() as i32 + 1,
             ]
         };
 
         for scene_bound in &scene_bounds[1..] {
             let screen_bound = camera.transform_point3(*scene_bound);
             screen_bounds = [
-                screen_bounds[0].min(screen_bound.x.floor() as i32),
-                screen_bounds[1].min(screen_bound.y.floor() as i32),
-                screen_bounds[2].max(screen_bound.x.ceil() as i32),
-                screen_bounds[3].max(screen_bound.y.ceil() as i32),
+                screen_bounds[0].min(screen_bound.x.floor() as i32 - 1),
+                screen_bounds[1].min(screen_bound.y.floor() as i32 - 1),
+                screen_bounds[2].max(screen_bound.x.ceil() as i32 + 1),
+                screen_bounds[3].max(screen_bound.y.ceil() as i32 + 1),
             ];
         }
 
