@@ -1,6 +1,6 @@
 pub(crate) struct NearestColour {
     pub index: u8,
-    pub _error: glam::Vec3,
+    pub error: glam::Vec3,
 }
 
 fn linear_to_srgb(x: f32) -> f32 {
@@ -27,7 +27,7 @@ pub(crate) fn vec_to_colour(colour: &glam::Vec3) -> [u8; 3] {
     ]
 }
 
-fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
+pub(crate) fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
     glam::Vec3::new(
         srgb_to_linear(f32::from(colour[0]) / 255.0),
         srgb_to_linear(f32::from(colour[1]) / 255.0),
@@ -36,8 +36,6 @@ fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
 }
 
 pub(crate) fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
-    let colour = colour_to_vec(&vec_to_colour(colour)); // necessary to match original but not sure if it's good or bad
-
     let mut index = 0;
     let mut minimum_error = f32::INFINITY;
 
@@ -55,7 +53,7 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
 
     NearestColour {
         index: index.try_into().unwrap(),
-        _error: colour - PALETTE_LINEAR[index],
+        error: colour - PALETTE_LINEAR[index],
     }
 }
 
