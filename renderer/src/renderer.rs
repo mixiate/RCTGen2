@@ -12,6 +12,24 @@ pub struct Framebuffer {
 }
 
 impl Framebuffer {
+    fn bounds(&self) -> [usize; 4] {
+        let mut min_x = self.width;
+        let mut min_y = self.height;
+        let mut max_x = 0;
+        let mut max_y = 0;
+        for y in 0..self.height {
+            for x in 0..self.width {
+                if self.buffer[y * self.width + x].is_some() {
+                    min_x = std::cmp::min(min_x, x);
+                    min_y = std::cmp::min(min_y, y);
+                    max_x = std::cmp::max(max_x, x + 1);
+                    max_y = std::cmp::max(max_y, y + 1);
+                }
+            }
+        }
+        [min_x, min_y, max_x, max_y]
+    }
+
     pub fn to_image(&self) -> crate::image::Image {
         let pixels = self
             .buffer
@@ -41,23 +59,7 @@ impl Framebuffer {
     }
 
     pub fn to_cropped_indexed_image(&self) -> crate::image::IndexedImage {
-        let (min_x, min_y, max_x, max_y) = {
-            let mut min_x = self.width;
-            let mut min_y = self.height;
-            let mut max_x = 0;
-            let mut max_y = 0;
-            for y in 0..self.height {
-                for x in 0..self.width {
-                    if self.buffer[y * self.width + x].is_some() {
-                        min_x = std::cmp::min(min_x, x);
-                        min_y = std::cmp::min(min_y, y);
-                        max_x = std::cmp::max(max_x, x + 1);
-                        max_y = std::cmp::max(max_y, y + 1);
-                    }
-                }
-            }
-            (min_x, min_y, max_x, max_y)
-        };
+        let [min_x, min_y, max_x, max_y] = self.bounds();
         let cropped_width = max_x - min_x;
         let cropped_height = max_y - min_y;
 
