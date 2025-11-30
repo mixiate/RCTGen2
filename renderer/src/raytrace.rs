@@ -79,18 +79,10 @@ impl Scene<'_> {
             glam::Vec3::new(scene_bounds.upper_x, scene_bounds.upper_y, scene_bounds.upper_z),
         ];
 
-        let mut screen_bounds = {
-            let screen_bound = camera.transform_point3(scene_bounds[0]);
-            [
-                screen_bound.x.floor() as i32 - 1,
-                screen_bound.y.floor() as i32 - 1,
-                screen_bound.x.ceil() as i32 + 1,
-                screen_bound.y.ceil() as i32 + 1,
-            ]
-        };
+        let mut screen_bounds = [i32::MAX, i32::MAX, i32::MIN, i32::MIN];
 
-        for scene_bound in &scene_bounds[1..] {
-            let screen_bound = camera.transform_point3(*scene_bound);
+        for scene_bound in scene_bounds {
+            let screen_bound = camera.transform_point3(scene_bound);
             screen_bounds = [
                 screen_bounds[0].min(screen_bound.x.floor() as i32 - 1),
                 screen_bounds[1].min(screen_bound.y.floor() as i32 - 1),
