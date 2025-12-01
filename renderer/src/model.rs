@@ -9,6 +9,7 @@ pub struct Material {
     pub diffuse: glam::Vec3,
     pub specular: glam::Vec3,
     pub specular_exponent: f32,
+    pub(crate) palette_region_type: crate::palette::RegionType,
 }
 
 pub struct Mesh {
@@ -55,10 +56,25 @@ impl Model {
                     path.display(),
                 ))?;
                 let material = if let obj::ObjMaterial::Mtl(mtl) = material {
+                    let palette_region_type = if mtl.name.contains("Remap1") {
+                        crate::palette::RegionType::Remap1
+                    } else if mtl.name.contains("Remap2") {
+                        crate::palette::RegionType::Remap2
+                    } else if mtl.name.contains("Remap3") {
+                        crate::palette::RegionType::Remap3
+                    } else if mtl.name.contains("Greyscale") {
+                        crate::palette::RegionType::Greyscale
+                    } else if mtl.name.contains("Peep") {
+                        crate::palette::RegionType::Peep
+                    } else {
+                        crate::palette::RegionType::NoRemaps
+                    };
+
                     Material {
                         diffuse: mtl.kd.unwrap_or_default().into(),
                         specular: mtl.ks.unwrap_or_default().into(),
                         specular_exponent: mtl.ns.unwrap_or_default(),
+                        palette_region_type,
                     }
                 } else {
                     anyhow::bail!(format!(

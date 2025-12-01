@@ -1,3 +1,25 @@
+#[derive(Clone, Copy, Default)]
+pub(crate) enum RegionType {
+    #[default]
+    NoRemaps,
+    Remap1,
+    Remap2,
+    Remap3,
+    Greyscale,
+    Peep,
+}
+
+impl RegionType {
+    pub(crate) fn is_diffuse_greyscale(self) -> bool {
+        matches!(self, RegionType::Remap1 | RegionType::Remap2 | RegionType::Remap3)
+    }
+}
+
+struct Region {
+    ranges: [Option<std::ops::Range<usize>>; 3],
+    remap: bool,
+}
+
 pub(crate) struct NearestColour {
     pub index: u8,
     pub error: glam::Vec3,
@@ -35,13 +57,23 @@ pub(crate) fn colour_to_vec(colour: &[u8; 3]) -> glam::Vec3 {
     )
 }
 
-pub(crate) fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
+fn colour_to_luma(colour: &glam::Vec3) -> f32 {
+    0.299 * colour.x + 0.587 * colour.y + 0.114 * colour.z
+}
+
+pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -> NearestColour {
     let mut index = 0;
     let mut minimum_error = f32::INFINITY;
 
-    for range in PALETTE_RANGES {
-        for i in range {
-            let error = colour - PALETTE_LINEAR[i];
+    let region = &PALETTE_REGION_RANGES[region_type as usize];
+    for range in region.ranges.iter().flatten() {
+        for i in range.clone() {
+            let palette_colour = if region.remap {
+                PALETTE_REMAP_LINEAR[i - range.start]
+            } else {
+                PALETTE_LINEAR[i]
+            };
+            let error = colour - palette_colour;
             let error = error.dot(error).sqrt();
 
             if error < minimum_error {
@@ -51,13 +83,49 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3) -> NearestColour {
         }
     }
 
+    let error = if region.remap {
+        // single channel luma produces bad results?
+        let colour_luma = colour_to_luma(colour);
+        let colour = glam::Vec3::new(colour_luma, 0.0, 0.0);
+        let palette_colour_luma = colour_to_luma(&PALETTE_LINEAR[index]);
+        let palette_colour = glam::Vec3::new(palette_colour_luma, 0.0, 0.0);
+        colour - palette_colour
+    } else {
+        colour - PALETTE_LINEAR[index]
+    };
+
     NearestColour {
         index: index.try_into().unwrap(),
-        error: colour - PALETTE_LINEAR[index],
+        error,
     }
 }
 
-const PALETTE_RANGES: [std::ops::Range<usize>; 3] = [(10..202), (214..227), (240..243)];
+const PALETTE_REGION_RANGES: [Region; 6] = [
+    Region {
+        ranges: [Some(10..202), Some(214..227), Some(240..243)],
+        remap: false,
+    },
+    Region {
+        ranges: [Some(243..255), None, None],
+        remap: true,
+    },
+    Region {
+        ranges: [Some(202..214), None, None],
+        remap: true,
+    },
+    Region {
+        ranges: [Some(46..58), None, None],
+        remap: true,
+    },
+    Region {
+        ranges: [Some(10..22), Some(226..227), Some(240..243)],
+        remap: false,
+    },
+    Region {
+        ranges: [Some(10..11), Some(106..118), None],
+        remap: false,
+    },
+];
 
 pub const PALETTE: [[u8; 3]; 256] = [
     [0, 0, 0],
@@ -587,4 +655,19 @@ const PALETTE_LINEAR: [glam::Vec3; 256] = [
     glam::Vec3::new(1.0, 0.47353154, 0.049706563),
     glam::Vec3::new(1.0, 0.62396044, 0.07036011),
     glam::Vec3::new(1.0, 1.0, 1.0),
+];
+
+const PALETTE_REMAP_LINEAR: [glam::Vec3; 12] = [
+    glam::Vec3::new(0.008568125, 0.016807375, 0.016807375),
+    glam::Vec3::new(0.016807375, 0.033104762, 0.033104762),
+    glam::Vec3::new(0.028426038, 0.056128494, 0.056128494),
+    glam::Vec3::new(0.049706563, 0.086500466, 0.086500466),
+    glam::Vec3::new(0.07036011, 0.12477184, 0.12477184),
+    glam::Vec3::new(0.10461649, 0.1714411, 0.1714411),
+    glam::Vec3::new(0.15896086, 0.22696589, 0.22696589),
+    glam::Vec3::new(0.22696589, 0.30946895, 0.30946895),
+    glam::Vec3::new(0.3467041, 0.42869055, 0.42869055),
+    glam::Vec3::new(0.47353154, 0.5457246, 0.5457246),
+    glam::Vec3::new(0.6514057, 0.70837593, 0.70837593),
+    glam::Vec3::new(0.8631573, 0.8962694, 0.8962694),
 ];

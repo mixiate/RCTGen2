@@ -1,6 +1,7 @@
 #[derive(Clone, Copy, Default)]
 pub(crate) struct Fragment {
-    pub colour: glam::Vec3,
+    pub(crate) colour: glam::Vec3,
+    pub(crate) palette_region_type: crate::palette::RegionType,
 }
 
 pub struct Framebuffer {
@@ -50,23 +51,23 @@ impl Framebuffer {
 
         for y in min_y..max_y {
             for x in (min_x..max_x).rev() {
-                let fragment = &mut self.buffer[y * self.width + x];
-                *fragment = fragment.as_ref().map(|x| Fragment {
-                    colour: crate::palette::colour_to_vec(&crate::palette::vec_to_colour(&x.colour)),
-                });
+                if let Some(fragment) = &mut self.buffer[y * self.width + x] {
+                    // not sure about this
+                    fragment.colour = crate::palette::colour_to_vec(&crate::palette::vec_to_colour(&fragment.colour));
 
-                let image_index = (x - min_x) + (y - min_y) * width;
-                pixels[image_index] = fragment.map_or(0, |x| crate::palette::get_nearest_colour(&x.colour).index);
+                    let nearest_colour =
+                        crate::palette::get_nearest_colour(&fragment.colour, fragment.palette_region_type);
 
-                if dither && let Some(fragment) = &mut self.buffer[y * self.width + x] {
-                    let nearest_colour = crate::palette::get_nearest_colour(&fragment.colour);
+                    pixels[(x - min_x) + (y - min_y) * width] = nearest_colour.index;
 
-                    let points = [[x - 1, y], [x + 1, y + 1], [x, y + 1], [x - 1, y + 1]];
-                    let weights: [f32; 4] = [7.0 / 16.0, 3.0 / 16.0, 5.0 / 16.0, 1.0 / 16.0];
+                    if dither {
+                        let points = [[x - 1, y], [x + 1, y + 1], [x, y + 1], [x - 1, y + 1]];
+                        let weights: [f32; 4] = [7.0 / 16.0, 3.0 / 16.0, 5.0 / 16.0, 1.0 / 16.0];
 
-                    for (point, weight) in points.iter().zip(weights) {
-                        if let Some(point_fragment) = &mut self.buffer[point[1] * self.width + point[0]] {
-                            point_fragment.colour += nearest_colour.error * (0.3 * weight);
+                        for (point, weight) in points.iter().zip(weights) {
+                            if let Some(point_fragment) = &mut self.buffer[point[1] * self.width + point[0]] {
+                                point_fragment.colour += nearest_colour.error * (0.3 * weight);
+                            }
                         }
                     }
                 }

@@ -29,12 +29,14 @@ pub fn render_scene(
             let direction = glam::Vec3::new(0.0, 0.0, 1.0);
             let direction = camera_inverse.transform_vector3(direction).normalize();
 
-            {
+            let palette_region_type = {
                 let origin = camera_inverse.transform_point3(origin);
-                if scene.trace_ray(&origin, &direction).is_none() {
+                if let Some(hit) = scene.trace_ray(&origin, &direction) {
+                    hit.material.palette_region_type
+                } else {
                     continue;
                 }
-            }
+            };
 
             let mut samples = vec![None; multi_sample_count];
 
@@ -56,8 +58,15 @@ pub fn render_scene(
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
+                                let diffuse = hit.material.diffuse;
+                                let diffuse = if hit.material.palette_region_type.is_diffuse_greyscale() {
+                                    let max = diffuse.x.max(diffuse.y.max(diffuse.z));
+                                    glam::Vec3::new(max, max, max)
+                                } else {
+                                    diffuse
+                                };
                                 let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
-                                fragment.get_or_insert_default().colour += light * hit.material.diffuse;
+                                fragment.get_or_insert_default().colour += light * diffuse;
                             }
                             if light.specular_strength > 0.0 {
                                 let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
@@ -77,6 +86,7 @@ pub fn render_scene(
             let sample_count = samples.iter().flatten().count();
             buffer[y * width + x] = Some(crate::framebuffer::Fragment {
                 colour: colour / sample_count as f32,
+                palette_region_type,
             });
         }
     }
