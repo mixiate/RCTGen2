@@ -36,7 +36,7 @@ pub fn render_scene(
                 }
             }
 
-            let mut sub_samples = vec![None; multi_sample_count];
+            let mut samples = vec![None; multi_sample_count];
 
             for sub_y in 0..multi_samples_y {
                 for sub_x in 0..multi_samples_x {
@@ -49,15 +49,15 @@ pub fn render_scene(
                     let origin = camera_inverse.transform_point3(origin);
 
                     if let Some(hit) = scene.trace_ray(&origin, &direction) {
-                        let mut sample = None;
+                        let mut fragment: Option<crate::framebuffer::Fragment> = None;
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
-                                sample.get_or_insert(glam::Vec3::new(0.0, 0.0, 0.0));
+                                fragment.get_or_insert_default();
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
                                 let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
-                                *sample.get_or_insert_default() += light * hit.material.diffuse;
+                                fragment.get_or_insert_default().colour += light * hit.material.diffuse;
                             }
                             if light.specular_strength > 0.0 {
                                 let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
@@ -65,17 +65,19 @@ pub fn render_scene(
                                 let angle = reflected_direction.dot(-direction).max(0.0);
                                 let specular_factor =
                                     light.specular_strength * angle.powf(hit.material.specular_exponent);
-                                *sample.get_or_insert_default() += specular_factor * hit.material.specular;
+                                fragment.get_or_insert_default().colour += specular_factor * hit.material.specular;
                             }
                         }
-                        sub_samples[sub_y * multi_samples_x + sub_x] = sample;
+                        samples[sub_y * multi_samples_x + sub_x] = fragment;
                     }
                 }
             }
 
-            let sample = sub_samples.iter().flatten().sum::<glam::Vec3>();
-            let sub_sample_count = sub_samples.iter().flatten().count();
-            buffer[y * width + x] = Some(sample / sub_sample_count as f32);
+            let colour = samples.iter().flatten().map(|x| x.colour).sum::<glam::Vec3>();
+            let sample_count = samples.iter().flatten().count();
+            buffer[y * width + x] = Some(crate::framebuffer::Fragment {
+                colour: colour / sample_count as f32,
+            });
         }
     }
 
