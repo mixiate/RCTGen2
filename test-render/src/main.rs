@@ -92,38 +92,42 @@ fn main() -> anyhow::Result<()> {
                 item.model.mesh_index
             ))?;
 
-            let translation = item
+            let model_translation = item
                 .model
                 .position
                 .get(frame_index)
                 .context(format!("Frame {frame_index} not in item {item_index} positions"))?;
-            let translation: glam::Vec3 = (*translation).into();
+            let model_translation: glam::Vec3 = (*model_translation).into();
 
-            let rotation = item
+            let model_rotation = item
                 .model
                 .orientation
                 .get(frame_index)
                 .context(format!("Frame {frame_index} not in item {item_index} orientations"))?;
-            let rotation = glam::Quat::from_euler(
+            let model_rotation = glam::Quat::from_euler(
                 glam::EulerRot::XYZ,
-                rotation[0].to_radians(),
-                rotation[1].to_radians(),
-                rotation[2].to_radians(),
+                model_rotation[0].to_radians(),
+                model_rotation[1].to_radians(),
+                model_rotation[2].to_radians(),
             );
 
-            let scene = renderer::Scene::new(&render_device, vec![model.transform(&translation, &rotation)])?;
-
             for rotation_index in 0..item.rotations {
-                let view_translation = {
+                let model_translation = {
                     let offsets = [0.0, -1.0, 0.0, -1.5, 0.0, -1.0, 0.0, -1.5];
-                    glam::Mat4::from_translation(glam::Vec3::new(
+                    let offset = glam::Vec3::new(
                         CLEARANCE_HEIGHT * offsets[2 * rotation_index] / 8.0,
                         CLEARANCE_HEIGHT * offsets[2 * rotation_index + 1] / 8.0,
                         0.0,
-                    ))
+                    );
+                    model_translation + offset
                 };
+                let scene = renderer::Scene::new(
+                    &render_device,
+                    vec![model.transform(&model_translation, &model_rotation)],
+                )?;
+
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
-                let camera = camera * view_rotation * view_translation;
+                let camera = camera * view_rotation;
 
                 let view_rotation_inverse = view_rotation.inverse();
                 let lights: Vec<_> = test_desc
