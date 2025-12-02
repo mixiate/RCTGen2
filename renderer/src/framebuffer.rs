@@ -51,12 +51,10 @@ impl Framebuffer {
 
         for y in min_y..max_y {
             for x in (min_x..max_x).rev() {
-                if let Some(fragment) = &mut self.buffer[y * self.width + x] {
+                if let Some(fragment) = &self.buffer[y * self.width + x] {
                     // not sure about this
-                    fragment.colour = crate::palette::colour_to_vec(&crate::palette::vec_to_colour(&fragment.colour));
-
-                    let nearest_colour =
-                        crate::palette::get_nearest_colour(&fragment.colour, fragment.palette_region_type);
+                    let colour = crate::palette::colour_to_vec(&crate::palette::vec_to_colour(&fragment.colour));
+                    let nearest_colour = crate::palette::get_nearest_colour(&colour, fragment.palette_region_type);
 
                     pixels[(x - min_x) + (y - min_y) * width] = nearest_colour.index;
 
