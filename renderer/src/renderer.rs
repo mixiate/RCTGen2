@@ -30,7 +30,7 @@ pub fn render_scene(
             let direction = camera_inverse.transform_vector3(direction).normalize();
 
             let palette_region_type = {
-                let origin = camera_inverse.transform_point3(origin);
+                let origin = camera_inverse.transform_vector3(origin);
                 if let Some(hit) = scene.trace_ray(&origin, &direction) {
                     hit.material.palette_region_type
                 } else {
@@ -40,15 +40,14 @@ pub fn render_scene(
 
             let mut samples = vec![None; multi_sample_count];
 
-            for sub_y in 0..multi_samples_y {
-                for sub_x in 0..multi_samples_x {
-                    let origin = origin
-                        + glam::Vec3::new(
-                            (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
-                            (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
-                            0.0,
-                        );
-                    let origin = camera_inverse.transform_point3(origin);
+            for sub_x in 0..multi_samples_x {
+                for sub_y in 0..multi_samples_y {
+                    let origin = glam::Vec3::new(
+                        (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
+                        (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
+                        0.0,
+                    ) + origin;
+                    let origin = camera_inverse.transform_vector3(origin);
 
                     if let Some(hit) = scene.trace_ray(&origin, &direction) {
                         let mut fragment: Option<crate::framebuffer::Fragment> = None;
