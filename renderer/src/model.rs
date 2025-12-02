@@ -151,7 +151,7 @@ impl Model {
             .map(|x| TransformedMesh {
                 mesh: x,
                 positions: x.positions.iter().map(|x| transform.transform_point3(*x).into()).collect(),
-                normals: x.normals.iter().map(|x| transform.transform_vector3(*x)).collect(),
+                normals: x.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
             })
             .collect();
         TransformedModel { meshes }
