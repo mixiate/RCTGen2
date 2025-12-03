@@ -12,6 +12,31 @@ pub struct Material {
     pub(crate) palette_region_type: crate::palette::RegionType,
 }
 
+impl Material {
+    pub fn new(mtl: &obj::Material) -> anyhow::Result<Self> {
+        let palette_region_type = if mtl.name.contains("Remap1") {
+            crate::palette::RegionType::Remap1
+        } else if mtl.name.contains("Remap2") {
+            crate::palette::RegionType::Remap2
+        } else if mtl.name.contains("Remap3") {
+            crate::palette::RegionType::Remap3
+        } else if mtl.name.contains("Greyscale") {
+            crate::palette::RegionType::Greyscale
+        } else if mtl.name.contains("Peep") {
+            crate::palette::RegionType::Peep
+        } else {
+            crate::palette::RegionType::NoRemaps
+        };
+
+        Ok(Material {
+            diffuse: mtl.kd.unwrap_or_default().into(),
+            specular: mtl.ks.unwrap_or_default().into(),
+            specular_exponent: mtl.ns.unwrap_or_default(),
+            palette_region_type,
+        })
+    }
+}
+
 pub struct Mesh {
     pub positions: Vec<glam::Vec3>,
     pub normals: Vec<glam::Vec3>,
@@ -50,39 +75,22 @@ impl Model {
                 anyhow::bail!("Obj does not have any groups {}", path.display());
             }
             for group in &object.groups {
-                let material = group.material.as_ref().context(format!(
-                    "No material found for object {} in {} ",
-                    object.name,
-                    path.display(),
-                ))?;
-                let material = if let obj::ObjMaterial::Mtl(mtl) = material {
-                    let palette_region_type = if mtl.name.contains("Remap1") {
-                        crate::palette::RegionType::Remap1
-                    } else if mtl.name.contains("Remap2") {
-                        crate::palette::RegionType::Remap2
-                    } else if mtl.name.contains("Remap3") {
-                        crate::palette::RegionType::Remap3
-                    } else if mtl.name.contains("Greyscale") {
-                        crate::palette::RegionType::Greyscale
-                    } else if mtl.name.contains("Peep") {
-                        crate::palette::RegionType::Peep
-                    } else {
-                        crate::palette::RegionType::NoRemaps
-                    };
-
-                    Material {
-                        diffuse: mtl.kd.unwrap_or_default().into(),
-                        specular: mtl.ks.unwrap_or_default().into(),
-                        specular_exponent: mtl.ns.unwrap_or_default(),
-                        palette_region_type,
-                    }
-                } else {
-                    anyhow::bail!(format!(
+                let material = group
+                    .material
+                    .as_ref()
+                    .and_then(|x| {
+                        if let obj::ObjMaterial::Mtl(mtl) = x {
+                            Some(mtl)
+                        } else {
+                            None
+                        }
+                    })
+                    .context(format!(
                         "No material found for object {} in {} ",
                         object.name,
                         path.display(),
-                    ))
-                };
+                    ))?;
+                let material = Material::new(material)?;
 
                 let mut vertices: Vec<Vertex> = Vec::new();
                 let mut indices: Vec<(u32, u32, u32)> = Vec::new();
