@@ -15,7 +15,6 @@ pub struct RayHit<'a> {
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
     pub indices: &'a (u32, u32, u32),
-    pub material: &'a crate::model::Material,
 }
 
 impl Scene<'_> {
@@ -66,7 +65,6 @@ impl Scene<'_> {
             position: hit.position.into(),
             normal,
             indices,
-            material: &scene_mesh.mesh.material,
         })
     }
 

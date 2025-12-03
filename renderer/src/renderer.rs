@@ -31,7 +31,7 @@ pub fn render_scene(
             let palette_region_type = {
                 let ray_origin = camera_inverse.transform_vector3(ray_origin);
                 if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
-                    hit.material.palette_region_type
+                    hit.mesh.material.palette_region_type
                 } else {
                     continue;
                 }
@@ -50,13 +50,14 @@ pub fn render_scene(
 
                     if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
                         let mut fragment: Option<crate::framebuffer::Fragment> = None;
+                        let material = &hit.mesh.material;
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
                                 fragment.get_or_insert_default();
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
-                                let diffuse = match &hit.material.diffuse {
+                                let diffuse = match &material.diffuse {
                                     crate::model::MaterialColour::Colour(colour) => *colour,
                                     crate::model::MaterialColour::Texture(texture) => {
                                         let uvs = [
@@ -70,7 +71,7 @@ pub fn render_scene(
                                         texture.sample_wrapped(uv)
                                     }
                                 };
-                                let diffuse = if hit.material.palette_region_type.is_diffuse_greyscale() {
+                                let diffuse = if material.palette_region_type.is_diffuse_greyscale() {
                                     let max = diffuse.x.max(diffuse.y.max(diffuse.z));
                                     glam::Vec3::new(max, max, max)
                                 } else {
@@ -83,9 +84,8 @@ pub fn render_scene(
                                 let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
                                 let reflected_direction = reflected_direction - light.direction;
                                 let angle = reflected_direction.dot(-ray_direction).max(0.0);
-                                let specular_factor =
-                                    light.specular_strength * angle.powf(hit.material.specular_exponent);
-                                fragment.get_or_insert_default().colour += specular_factor * hit.material.specular;
+                                let specular_factor = light.specular_strength * angle.powf(material.specular_exponent);
+                                fragment.get_or_insert_default().colour += specular_factor * material.specular;
                             }
                         }
                         samples[sub_y * multi_samples_x + sub_x] = fragment;
