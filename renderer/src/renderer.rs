@@ -51,32 +51,33 @@ pub fn render_scene(
                     if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
                         let mut fragment: Option<crate::framebuffer::Fragment> = None;
                         let material = &hit.mesh.material;
+
+                        let diffuse = match &material.diffuse {
+                            crate::model::MaterialColour::Colour(colour) => *colour,
+                            crate::model::MaterialColour::Texture(texture) => {
+                                let uvs = [
+                                    hit.mesh.uvs[hit.indices.0 as usize] * (1.0 - hit.u - hit.v),
+                                    hit.mesh.uvs[hit.indices.1 as usize] * hit.u,
+                                    hit.mesh.uvs[hit.indices.2 as usize] * hit.v,
+                                ];
+                                let uv = uvs.iter().sum::<glam::Vec2>();
+                                texture.sample_wrapped(uv)
+                            }
+                        };
+                        // move this to material/texture load?
+                        let diffuse = if material.palette_region_type.is_diffuse_greyscale() {
+                            let max = diffuse.x.max(diffuse.y.max(diffuse.z));
+                            glam::Vec3::new(max, max, max)
+                        } else {
+                            diffuse
+                        };
+
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
                                 fragment.get_or_insert_default();
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
-                                let diffuse = match &material.diffuse {
-                                    crate::model::MaterialColour::Colour(colour) => *colour,
-                                    crate::model::MaterialColour::Texture(texture) => {
-                                        let uvs = [
-                                            hit.mesh.uvs[usize::try_from(hit.indices.0).unwrap()]
-                                                * (1.0 - hit.u - hit.v),
-                                            hit.mesh.uvs[usize::try_from(hit.indices.1).unwrap()] * hit.u,
-                                            hit.mesh.uvs[usize::try_from(hit.indices.2).unwrap()] * hit.v,
-                                        ];
-                                        let uv = uvs.iter().sum::<glam::Vec2>();
-
-                                        texture.sample_wrapped(uv)
-                                    }
-                                };
-                                let diffuse = if material.palette_region_type.is_diffuse_greyscale() {
-                                    let max = diffuse.x.max(diffuse.y.max(diffuse.z));
-                                    glam::Vec3::new(max, max, max)
-                                } else {
-                                    diffuse
-                                };
                                 let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
                                 fragment.get_or_insert_default().colour += light * diffuse;
                             }
