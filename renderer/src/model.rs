@@ -62,8 +62,8 @@ impl Model {
     pub fn load(path: &std::path::Path) -> anyhow::Result<Model> {
         use anyhow::Context as _;
 
-        let mut obj = obj::Obj::load(path)?;
-        obj.load_mtls()?;
+        let mut obj = obj::Obj::load(path).context(format!("Could not load obj file {}", path.display()))?;
+        obj.load_mtls().context(format!("Could not load mtl file referenced by {}", path.display()))?;
 
         let mut meshes: Vec<Mesh> = Vec::new();
 
