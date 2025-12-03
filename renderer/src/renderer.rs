@@ -16,6 +16,7 @@ pub fn render_scene(
     let offset = glam::Vec3::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32, 0.0);
 
     let camera_inverse = camera.inverse();
+    let ray_direction = camera_inverse.transform_vector3(glam::Vec3::new(0.0, 0.0, 1.0)).normalize();
 
     let width = usize::try_from(scene_bounds[2] - scene_bounds[0]).unwrap() + 1;
     let height = usize::try_from(scene_bounds[3] - scene_bounds[1]).unwrap();
@@ -26,12 +27,10 @@ pub fn render_scene(
     for y in 0..height {
         for x in 0..width {
             let origin = glam::Vec3::new(x as f32, y as f32, -512.0) + offset;
-            let direction = glam::Vec3::new(0.0, 0.0, 1.0);
-            let direction = camera_inverse.transform_vector3(direction).normalize();
 
             let palette_region_type = {
                 let origin = camera_inverse.transform_vector3(origin);
-                if let Some(hit) = scene.trace_ray(&origin, &direction) {
+                if let Some(hit) = scene.trace_ray(&origin, &ray_direction) {
                     hit.material.palette_region_type
                 } else {
                     continue;
@@ -49,7 +48,7 @@ pub fn render_scene(
                     ) + origin;
                     let origin = camera_inverse.transform_vector3(origin);
 
-                    if let Some(hit) = scene.trace_ray(&origin, &direction) {
+                    if let Some(hit) = scene.trace_ray(&origin, &ray_direction) {
                         let mut fragment: Option<crate::framebuffer::Fragment> = None;
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
@@ -83,7 +82,7 @@ pub fn render_scene(
                             if light.specular_strength > 0.0 {
                                 let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
                                 let reflected_direction = reflected_direction - light.direction;
-                                let angle = reflected_direction.dot(-direction).max(0.0);
+                                let angle = reflected_direction.dot(-ray_direction).max(0.0);
                                 let specular_factor =
                                     light.specular_strength * angle.powf(hit.material.specular_exponent);
                                 fragment.get_or_insert_default().colour += specular_factor * hit.material.specular;
