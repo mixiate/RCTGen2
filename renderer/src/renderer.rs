@@ -13,7 +13,7 @@ pub fn render_scene(
     multi_samples_y: usize,
 ) -> crate::Framebuffer {
     let scene_bounds = scene.get_scene_screen_bounds(camera);
-    let offset = glam::Vec3::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32, 0.0);
+    let ray_origin_offset = glam::Vec3::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32, 0.0);
 
     let camera_inverse = camera.inverse();
     let ray_direction = camera_inverse.transform_vector3(glam::Vec3::new(0.0, 0.0, 1.0)).normalize();
@@ -26,11 +26,11 @@ pub fn render_scene(
 
     for y in 0..height {
         for x in 0..width {
-            let origin = glam::Vec3::new(x as f32, y as f32, -512.0) + offset;
+            let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
             let palette_region_type = {
-                let origin = camera_inverse.transform_vector3(origin);
-                if let Some(hit) = scene.trace_ray(&origin, &ray_direction) {
+                let ray_origin = camera_inverse.transform_vector3(ray_origin);
+                if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
                     hit.material.palette_region_type
                 } else {
                     continue;
@@ -41,14 +41,14 @@ pub fn render_scene(
 
             for sub_x in 0..multi_samples_x {
                 for sub_y in 0..multi_samples_y {
-                    let origin = glam::Vec3::new(
+                    let ray_origin = glam::Vec3::new(
                         (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
                         (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
                         0.0,
-                    ) + origin;
-                    let origin = camera_inverse.transform_vector3(origin);
+                    ) + ray_origin;
+                    let ray_origin = camera_inverse.transform_vector3(ray_origin);
 
-                    if let Some(hit) = scene.trace_ray(&origin, &ray_direction) {
+                    if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
                         let mut fragment: Option<crate::framebuffer::Fragment> = None;
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
