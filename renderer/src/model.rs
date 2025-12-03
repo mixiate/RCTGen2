@@ -5,15 +5,28 @@ struct Vertex {
     normal: [f32; 3],
 }
 
+pub(crate) enum MaterialColour {
+    Colour(glam::Vec3),
+    Texture(crate::texture::Texture),
+}
+
 pub struct Material {
-    pub diffuse: glam::Vec3,
+    pub(crate) diffuse: MaterialColour,
     pub specular: glam::Vec3,
     pub specular_exponent: f32,
     pub(crate) palette_region_type: crate::palette::RegionType,
 }
 
 impl Material {
-    pub fn new(mtl: &obj::Material) -> anyhow::Result<Self> {
+    pub fn new(mtl: &obj::Material, mtl_file_directory: &std::path::Path) -> anyhow::Result<Self> {
+        let diffuse = if let Some(file_path) = &mtl.map_kd {
+            let file_path = mtl_file_directory.join(file_path);
+            let texture = crate::texture::Texture::load(&file_path)?;
+            MaterialColour::Texture(texture)
+        } else {
+            MaterialColour::Colour(mtl.kd.unwrap_or_default().into())
+        };
+
         let palette_region_type = if mtl.name.contains("Remap1") {
             crate::palette::RegionType::Remap1
         } else if mtl.name.contains("Remap2") {
@@ -29,7 +42,7 @@ impl Material {
         };
 
         Ok(Material {
-            diffuse: mtl.kd.unwrap_or_default().into(),
+            diffuse,
             specular: mtl.ks.unwrap_or_default().into(),
             specular_exponent: mtl.ns.unwrap_or_default(),
             palette_region_type,
@@ -40,6 +53,7 @@ impl Material {
 pub struct Mesh {
     pub positions: Vec<glam::Vec3>,
     pub normals: Vec<glam::Vec3>,
+    pub uvs: Vec<glam::Vec2>,
     pub indices: Vec<(u32, u32, u32)>,
     pub material: Material,
 }
@@ -64,6 +78,9 @@ impl Model {
 
         let mut obj = obj::Obj::load(path).context(format!("Could not load obj file {}", path.display()))?;
         obj.load_mtls().context(format!("Could not load mtl file referenced by {}", path.display()))?;
+
+        let parent_directory =
+            path.parent().context(format!("Could not get parent directory of {}", path.display()))?;
 
         let mut meshes: Vec<Mesh> = Vec::new();
 
@@ -90,7 +107,7 @@ impl Model {
                         object.name,
                         path.display(),
                     ))?;
-                let material = Material::new(material)?;
+                let material = Material::new(material, parent_directory)?;
 
                 let mut vertices: Vec<Vertex> = Vec::new();
                 let mut indices: Vec<(u32, u32, u32)> = Vec::new();
@@ -142,6 +159,7 @@ impl Model {
                 meshes.push(Mesh {
                     positions: vertices.iter().map(|x| x.position.into()).collect(),
                     normals: vertices.iter().map(|x| x.normal.into()).collect(),
+                    uvs: vertices.iter().map(|x| x.uv.into()).collect(),
                     indices,
                     material,
                 });

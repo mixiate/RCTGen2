@@ -4,6 +4,7 @@ pub mod model;
 pub mod palette;
 mod raytrace;
 mod renderer;
+mod texture;
 
 pub use embree::Device;
 pub use framebuffer::Framebuffer;

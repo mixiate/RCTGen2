@@ -9,8 +9,12 @@ pub struct Scene<'a> {
 }
 
 pub struct RayHit<'a> {
+    pub u: f32,
+    pub v: f32,
+    pub mesh: &'a crate::model::Mesh,
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
+    pub indices: &'a (u32, u32, u32),
     pub material: &'a crate::model::Material,
 }
 
@@ -56,8 +60,12 @@ impl Scene<'_> {
         let normal = normals.iter().sum::<glam::Vec3>().normalize();
 
         Some(RayHit {
+            u: hit.u,
+            v: hit.v,
+            mesh: scene_mesh.mesh,
             position: hit.position.into(),
             normal,
+            indices,
             material: &scene_mesh.mesh.material,
         })
     }

@@ -57,7 +57,20 @@ pub fn render_scene(
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
-                                let diffuse = hit.material.diffuse;
+                                let diffuse = match &hit.material.diffuse {
+                                    crate::model::MaterialColour::Colour(colour) => *colour,
+                                    crate::model::MaterialColour::Texture(texture) => {
+                                        let uvs = [
+                                            hit.mesh.uvs[usize::try_from(hit.indices.0).unwrap()]
+                                                * (1.0 - hit.u - hit.v),
+                                            hit.mesh.uvs[usize::try_from(hit.indices.1).unwrap()] * hit.u,
+                                            hit.mesh.uvs[usize::try_from(hit.indices.2).unwrap()] * hit.v,
+                                        ];
+                                        let uv = uvs.iter().sum::<glam::Vec2>();
+
+                                        texture.sample_wrapped(uv)
+                                    }
+                                };
                                 let diffuse = if hit.material.palette_region_type.is_diffuse_greyscale() {
                                     let max = diffuse.x.max(diffuse.y.max(diffuse.z));
                                     glam::Vec3::new(max, max, max)
