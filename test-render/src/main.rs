@@ -33,6 +33,7 @@ struct TestDesc {
     meshes: Vec<String>,
     items: Vec<ItemDesc>,
     lights: Vec<LightDesc>,
+    sprite_directory: std::path::PathBuf,
 }
 
 const SQRT_6: f32 = 2.449_489_8;
@@ -59,6 +60,14 @@ fn main() -> anyhow::Result<()> {
             scene_description_path.display()
         ))?
     };
+
+    let sprite_directory = if test_desc.sprite_directory.is_absolute() {
+        test_desc.sprite_directory
+    } else {
+        base_directory.join(test_desc.sprite_directory)
+    };
+    std::fs::create_dir_all(&sprite_directory)
+        .with_context(|| format!("Could not create directory {}", sprite_directory.display()))?;
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
 
@@ -153,12 +162,12 @@ fn main() -> anyhow::Result<()> {
 
                 let image = framebuffer.to_image();
                 let image_path =
-                    base_directory.join(format!("{}_{}_rgb", item.name, rotation_index + 1)).with_extension("png");
+                    sprite_directory.join(format!("{}_{}_rgb", item.name, rotation_index + 1)).with_extension("png");
                 image.save(&image_path)?;
 
                 let image = framebuffer.into_cropped_indexed_image(true);
                 let image_path =
-                    base_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
+                    sprite_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
                 image.save(&image_path)?;
             }
         }
