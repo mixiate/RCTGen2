@@ -132,7 +132,7 @@ fn main() -> anyhow::Result<()> {
                 };
                 let scene = renderer::Scene::new(
                     &render_device,
-                    vec![model.transform(&model_translation, &model_rotation)],
+                    vec![model.transform(&model_translation, &model_rotation, None)],
                 )?;
 
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);

@@ -1,6 +1,7 @@
 struct SceneMesh<'a> {
     mesh: &'a crate::model::Mesh,
     normals: Vec<glam::Vec3>,
+    is_mask: bool,
 }
 
 pub struct Scene<'a> {
@@ -34,6 +35,7 @@ impl Scene<'_> {
                     meshes.push(SceneMesh {
                         mesh: mesh.mesh,
                         normals: mesh.normals,
+                        is_mask: mesh.is_mask,
                     });
                 }
             }
@@ -49,6 +51,11 @@ impl Scene<'_> {
         let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into())?;
 
         let scene_mesh = &self.meshes[usize::try_from(hit.geometry_id).unwrap()];
+
+        if scene_mesh.is_mask {
+            return None;
+        }
+
         let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
 
         let normals = [
