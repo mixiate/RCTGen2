@@ -27,19 +27,17 @@ impl Material {
             MaterialColour::Colour(mtl.kd.unwrap_or_default().into())
         };
 
-        let palette_region_type = if mtl.name.contains("Remap1") {
-            crate::palette::RegionType::Remap1
-        } else if mtl.name.contains("Remap2") {
-            crate::palette::RegionType::Remap2
-        } else if mtl.name.contains("Remap3") {
-            crate::palette::RegionType::Remap3
-        } else if mtl.name.contains("Greyscale") {
-            crate::palette::RegionType::Greyscale
-        } else if mtl.name.contains("Peep") {
-            crate::palette::RegionType::Peep
-        } else {
-            crate::palette::RegionType::NoRemaps
-        };
+        let mut palette_region_type = crate::palette::RegionType::NoRemaps;
+        for segment in mtl.name.split('_') {
+            match segment {
+                "Remap1" => palette_region_type = crate::palette::RegionType::Remap1,
+                "Remap2" => palette_region_type = crate::palette::RegionType::Remap2,
+                "Remap3" => palette_region_type = crate::palette::RegionType::Remap3,
+                "Greyscale" => palette_region_type = crate::palette::RegionType::Greyscale,
+                "Peep" => palette_region_type = crate::palette::RegionType::Peep,
+                _ => {}
+            }
+        }
 
         Ok(Material {
             diffuse,
