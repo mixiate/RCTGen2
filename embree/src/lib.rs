@@ -108,7 +108,7 @@ pub struct CommittedScene<'a> {
 }
 
 impl CommittedScene<'_> {
-    pub fn intersect_1(&self, origin: &(f32, f32, f32), direction: &(f32, f32, f32)) -> Option<RayHit> {
+    pub fn intersect_1(&self, origin: &(f32, f32, f32), direction: &(f32, f32, f32), near: f32) -> Option<RayHit> {
         let ray = embree4_sys::RTCRay {
             org_x: origin.0,
             org_y: origin.1,
@@ -116,7 +116,7 @@ impl CommittedScene<'_> {
             dir_x: direction.0,
             dir_y: direction.1,
             dir_z: direction.2,
-            tnear: 0.0,
+            tnear: near,
             tfar: f32::INFINITY,
             ..Default::default()
         };
@@ -158,6 +158,7 @@ impl CommittedScene<'_> {
                 position,
                 u: ray_hit.hit.u,
                 v: ray_hit.hit.v,
+                distance: ray_hit.ray.tfar,
             })
         }
     }
@@ -242,6 +243,7 @@ pub struct RayHit {
     pub position: [f32; 3],
     pub u: f32,
     pub v: f32,
+    pub distance: f32,
 }
 
 pub struct Bounds {

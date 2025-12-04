@@ -2,6 +2,7 @@ struct SceneMesh<'a> {
     mesh: &'a crate::model::Mesh,
     normals: Vec<glam::Vec3>,
     is_mask: bool,
+    is_ghost: bool,
 }
 
 pub struct Scene<'a> {
@@ -36,6 +37,7 @@ impl Scene<'_> {
                         mesh: mesh.mesh,
                         normals: mesh.normals,
                         is_mask: mesh.is_mask,
+                        is_ghost: mesh.is_ghost,
                     });
                 }
             }
@@ -48,31 +50,39 @@ impl Scene<'_> {
     }
 
     pub fn trace_ray(&'_ self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit<'_>> {
-        let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into())?;
+        let mut near = 0.0;
+        loop {
+            let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into(), near)?;
 
-        let scene_mesh = &self.meshes[usize::try_from(hit.geometry_id).unwrap()];
+            let scene_mesh = &self.meshes[usize::try_from(hit.geometry_id).unwrap()];
 
-        if scene_mesh.is_mask {
-            return None;
+            if scene_mesh.is_ghost {
+                near = hit.distance + 0.0001;
+                continue;
+            }
+
+            if scene_mesh.is_mask {
+                return None;
+            }
+
+            let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
+
+            let normals = [
+                scene_mesh.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),
+                scene_mesh.normals[usize::try_from(indices.1).unwrap()] * hit.u,
+                scene_mesh.normals[usize::try_from(indices.2).unwrap()] * hit.v,
+            ];
+            let normal = normals.iter().sum::<glam::Vec3>().normalize();
+
+            return Some(RayHit {
+                u: hit.u,
+                v: hit.v,
+                mesh: scene_mesh.mesh,
+                position: hit.position.into(),
+                normal,
+                indices,
+            });
         }
-
-        let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
-
-        let normals = [
-            scene_mesh.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),
-            scene_mesh.normals[usize::try_from(indices.1).unwrap()] * hit.u,
-            scene_mesh.normals[usize::try_from(indices.2).unwrap()] * hit.v,
-        ];
-        let normal = normals.iter().sum::<glam::Vec3>().normalize();
-
-        Some(RayHit {
-            u: hit.u,
-            v: hit.v,
-            mesh: scene_mesh.mesh,
-            position: hit.position.into(),
-            normal,
-            indices,
-        })
     }
 
     pub fn trace_occlusion_ray(&self, origin: &glam::Vec3, direction: &glam::Vec3) -> bool {

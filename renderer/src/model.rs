@@ -55,6 +55,7 @@ pub struct Mesh {
     pub indices: Vec<(u32, u32, u32)>,
     pub material: Material,
     pub is_mask: bool,
+    pub is_ghost: bool,
 }
 
 pub struct Model {
@@ -66,6 +67,7 @@ pub struct TransformedMesh<'a> {
     pub positions: Vec<(f32, f32, f32)>,
     pub normals: Vec<glam::Vec3>,
     pub is_mask: bool,
+    pub is_ghost: bool,
 }
 
 pub struct TransformedModel<'a> {
@@ -108,6 +110,7 @@ impl Model {
                         path.display(),
                     ))?;
                 let is_mask = material.name.split("_").any(|x| x == "Mask");
+                let is_ghost = material.name.split("_").any(|x| x == "Ghost");
                 let material = Material::new(material, parent_directory)?;
 
                 let mut vertices: Vec<Vertex> = Vec::new();
@@ -164,6 +167,7 @@ impl Model {
                     indices,
                     material,
                     is_mask,
+                    is_ghost,
                 });
             }
         }
@@ -176,6 +180,7 @@ impl Model {
         translation: &glam::Vec3,
         rotation: &glam::Quat,
         is_mask: Option<bool>,
+        is_ghost: Option<bool>,
     ) -> TransformedModel<'_> {
         let transform = glam::Mat4::from_translation(*translation) * glam::Mat4::from_quat(*rotation);
         let meshes = self
@@ -186,6 +191,7 @@ impl Model {
                 positions: x.positions.iter().map(|x| transform.transform_point3(*x).into()).collect(),
                 normals: x.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
                 is_mask: is_mask.unwrap_or(x.is_mask),
+                is_ghost: is_ghost.unwrap_or(x.is_ghost),
             })
             .collect();
         TransformedModel { meshes }
