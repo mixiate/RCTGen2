@@ -24,12 +24,14 @@ fn read_png(file: &std::fs::File) -> anyhow::Result<Texture> {
     let pixels_buffer = &png_buffer[..info.buffer_size()];
 
     let pixels = match info.color_type {
-        png::ColorType::Rgb => {
-            pixels_buffer.chunks_exact(3).map(|x| crate::palette::colour_to_vec(&[x[0], x[1], x[2]])).collect()
-        }
-        png::ColorType::Rgba => {
-            pixels_buffer.chunks_exact(4).map(|x| crate::palette::colour_to_vec(&[x[0], x[1], x[2]])).collect()
-        }
+        png::ColorType::Rgb => pixels_buffer
+            .chunks_exact(3)
+            .map(|x| crate::palette::srgb_to_linear_rgb(&[x[0], x[1], x[2]]))
+            .collect(),
+        png::ColorType::Rgba => pixels_buffer
+            .chunks_exact(4)
+            .map(|x| crate::palette::srgb_to_linear_rgb(&[x[0], x[1], x[2]]))
+            .collect(),
         _ => {
             anyhow::bail!("Format is not RGB or RGBA");
         }

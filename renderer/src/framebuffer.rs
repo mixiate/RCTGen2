@@ -33,7 +33,7 @@ impl Framebuffer {
         let pixels = self
             .buffer
             .iter()
-            .flat_map(|x| x.map_or([0; 3], |x| crate::palette::vec_to_colour(&x.colour)))
+            .flat_map(|x| x.map_or([0; 3], |x| crate::palette::linear_to_srgb_rgb(&x.colour)))
             .collect::<Vec<u8>>();
 
         crate::image::Image {
@@ -53,7 +53,8 @@ impl Framebuffer {
             for x in (min_x..max_x).rev() {
                 if let Some(fragment) = &self.buffer[y * self.width + x] {
                     // not sure about this
-                    let colour = crate::palette::colour_to_vec(&crate::palette::vec_to_colour(&fragment.colour));
+                    let colour =
+                        crate::palette::srgb_to_linear_rgb(&crate::palette::linear_to_srgb_rgb(&fragment.colour));
                     let nearest_colour = crate::palette::get_nearest_colour(&colour, fragment.palette_region_type);
 
                     pixels[(x - min_x) + (y - min_y) * width] = nearest_colour.index;
