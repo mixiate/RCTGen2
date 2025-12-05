@@ -5,6 +5,47 @@ pub struct Light {
     pub shadow: bool,
 }
 
+fn calculate_ao_factor(
+    scene: &crate::raytrace::Scene,
+    position: &glam::Vec3,
+    normal: &glam::Vec3,
+    samples_x: u32,
+    samples_y: u32,
+    rng: &mut rand_pcg::Pcg32,
+) -> f32 {
+    use rand_pcg::rand_core::RngCore as _;
+
+    let tangent = if normal.x.abs() > normal.y.abs() {
+        glam::Vec3::new(normal.z, 0.0, -normal.x) * (1.0 / (normal.x * normal.x + normal.z * normal.z).sqrt())
+    } else {
+        glam::Vec3::new(0.0, -normal.z, normal.y) * (1.0 / (normal.y * normal.y + normal.z * normal.z).sqrt())
+    };
+    let bitangent = normal.cross(tangent);
+
+    let mut not_occluded_samples = 0;
+    for x in 0..samples_x {
+        for y in 0..samples_y {
+            let random_x = rng.next_u32() as f32 / u32::MAX as f32;
+            let random_y = rng.next_u32() as f32 / u32::MAX as f32;
+
+            let theta = 2.0 * std::f32::consts::PI * ((x as f32 + random_x) / samples_x as f32);
+            let phi = (1.0 - ((y as f32 + random_y) / samples_y as f32)).asin();
+
+            let phi_cos = phi.cos();
+            let local_sample_direction = glam::Vec3::new(phi_cos * theta.sin(), phi_cos * theta.cos(), phi.sin());
+            let sample_direction = (normal * local_sample_direction.z)
+                + (tangent * local_sample_direction.x)
+                + (bitangent * local_sample_direction.y);
+
+            if !scene.trace_occlusion_ray(position, &sample_direction) {
+                not_occluded_samples += 1;
+            }
+        }
+    }
+
+    not_occluded_samples as f32 / (samples_x * samples_y) as f32
+}
+
 pub fn render_scene(
     scene: &crate::raytrace::Scene,
     camera: &glam::Mat4,
@@ -12,6 +53,9 @@ pub fn render_scene(
     multi_samples_x: usize,
     multi_samples_y: usize,
 ) -> crate::Framebuffer {
+    use rand_pcg::rand_core::SeedableRng as _;
+    let mut rng = rand_pcg::Pcg32::seed_from_u64(1);
+
     let scene_bounds = scene.get_scene_screen_bounds(camera);
     let ray_origin_offset = glam::Vec3::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32, 0.0);
 
@@ -89,6 +133,13 @@ pub fn render_scene(
                                 fragment.get_or_insert_default().colour += specular_factor * material.specular;
                             }
                         }
+
+                        if material.use_ao
+                            && let Some(fragment) = &mut fragment
+                        {
+                            fragment.colour *= calculate_ao_factor(scene, &hit.position, &hit.normal, 8, 4, &mut rng);
+                        }
+
                         samples[sub_y * multi_samples_x + sub_x] = fragment;
                     }
                 }

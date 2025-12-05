@@ -10,6 +10,7 @@ enum-map = "2.7.3"
 glam = "0.30.9"
 obj = "0.10.2"
 png = "0.18.0"
+rand_pcg = "0.9.0"
 
 [lints]
 workspace = true
