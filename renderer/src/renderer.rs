@@ -64,7 +64,7 @@ pub fn render_scene(
 
     let width = usize::try_from(scene_bounds[2] - scene_bounds[0]).unwrap() + 1;
     let height = usize::try_from(scene_bounds[3] - scene_bounds[1]).unwrap();
-    let mut buffer = vec![None; width * height];
+    let mut buffer = vec![crate::framebuffer::Fragment::default(); width * height];
 
     let multi_sample_count = multi_samples_x * multi_samples_y;
 
@@ -81,7 +81,7 @@ pub fn render_scene(
                 }
             };
 
-            let mut samples = vec![None; multi_sample_count];
+            let mut samples = vec![crate::framebuffer::Fragment::default(); multi_sample_count];
 
             for sub_x in 0..multi_samples_x {
                 for sub_y in 0..multi_samples_y {
@@ -93,8 +93,10 @@ pub fn render_scene(
                     let ray_origin = camera_inverse.transform_vector3(ray_origin);
 
                     if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
-                        let mut fragment: Option<crate::framebuffer::Fragment> = None;
+                        let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
                         let material = &hit.mesh.material;
+
+                        fragment.palette_region_type = Some(material.palette_region_type);
 
                         let diffuse = match &material.diffuse {
                             crate::model::MaterialColour::Colour(colour) => *colour,
@@ -118,39 +120,35 @@ pub fn render_scene(
 
                         for light in lights {
                             if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
-                                fragment.get_or_insert_default();
                                 continue;
                             }
                             if light.diffuse_strength > 0.0 {
                                 let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
-                                fragment.get_or_insert_default().colour += light * diffuse;
+                                fragment.colour += light * diffuse;
                             }
                             if light.specular_strength > 0.0 {
                                 let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
                                 let reflected_direction = reflected_direction - light.direction;
                                 let angle = reflected_direction.dot(-ray_direction).max(0.0);
                                 let specular_factor = light.specular_strength * angle.powf(material.specular_exponent);
-                                fragment.get_or_insert_default().colour += specular_factor * material.specular;
+                                fragment.colour += specular_factor * material.specular;
                             }
                         }
 
-                        if material.use_ao
-                            && let Some(fragment) = &mut fragment
-                        {
+                        if material.use_ao {
                             fragment.colour *= calculate_ao_factor(scene, &hit.position, &hit.normal, 8, 4, &mut rng);
                         }
-
-                        samples[sub_y * multi_samples_x + sub_x] = fragment;
                     }
                 }
             }
 
-            let colour = samples.iter().flatten().map(|x| x.colour).sum::<glam::Vec3>();
-            let sample_count = samples.iter().flatten().count();
-            buffer[y * width + x] = Some(crate::framebuffer::Fragment {
-                colour: colour / sample_count as f32,
-                palette_region_type,
-            });
+            let colour =
+                samples.iter().filter(|x| x.palette_region_type.is_some()).map(|x| x.colour).sum::<glam::Vec3>();
+            let sample_count = samples.iter().filter(|x| x.palette_region_type.is_some()).count();
+
+            let fragment = &mut buffer[y * width + x];
+            fragment.colour = colour / sample_count as f32;
+            fragment.palette_region_type = Some(palette_region_type);
         }
     }
 
