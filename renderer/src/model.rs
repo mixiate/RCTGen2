@@ -14,6 +14,7 @@ pub struct Material {
     pub(crate) diffuse: MaterialColour,
     pub specular: glam::Vec3,
     pub specular_exponent: f32,
+    pub(crate) edge_type: Option<crate::renderer::EdgeType>,
     pub(crate) palette_region_type: crate::palette::RegionType,
     pub(crate) use_ao: bool,
 }
@@ -30,6 +31,7 @@ impl Material {
 
         let mut palette_region_type = crate::palette::RegionType::NoRemaps;
         let mut use_ao = true;
+        let mut edge_type = None;
         for segment in mtl.name.split('_') {
             match segment {
                 "Remap1" => palette_region_type = crate::palette::RegionType::Remap1,
@@ -38,6 +40,8 @@ impl Material {
                 "Greyscale" => palette_region_type = crate::palette::RegionType::Greyscale,
                 "Peep" => palette_region_type = crate::palette::RegionType::Peep,
                 "NoAO" => use_ao = false,
+                "Edge" => edge_type = Some(crate::renderer::EdgeType::Light),
+                "DarkEdge" => edge_type = Some(crate::renderer::EdgeType::Dark),
                 _ => {}
             }
         }
@@ -46,6 +50,7 @@ impl Material {
             diffuse,
             specular: mtl.ks.unwrap_or_default().into(),
             specular_exponent: mtl.ns.unwrap_or_default(),
+            edge_type,
             palette_region_type,
             use_ao,
         })

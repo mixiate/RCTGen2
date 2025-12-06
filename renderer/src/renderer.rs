@@ -5,6 +5,12 @@ pub struct Light {
     pub shadow: bool,
 }
 
+#[derive(Clone, Copy)]
+pub(crate) enum EdgeType {
+    Light,
+    Dark,
+}
+
 fn calculate_ao_factor(
     scene: &crate::raytrace::Scene,
     position: &glam::Vec3,
@@ -53,6 +59,8 @@ pub fn render_scene(
     multi_samples_x: usize,
     multi_samples_y: usize,
 ) -> crate::Framebuffer {
+    const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // what is this? scale of the camera?
+
     use rand_pcg::rand_core::SeedableRng as _;
     let mut rng = rand_pcg::Pcg32::seed_from_u64(1);
 
@@ -72,12 +80,16 @@ pub fn render_scene(
         for x in 0..width {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
-            let palette_region_type = {
+            let (depth, edge_type, palette_region_type) = {
                 let ray_origin = camera_inverse.transform_vector3(ray_origin);
                 if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
-                    hit.mesh.material.palette_region_type
+                    (
+                        hit.depth,
+                        hit.mesh.material.edge_type,
+                        Some(hit.mesh.material.palette_region_type),
+                    )
                 } else {
-                    continue;
+                    (f32::INFINITY, None, None)
                 }
             };
 
@@ -96,6 +108,8 @@ pub fn render_scene(
                         let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
                         let material = &hit.mesh.material;
 
+                        fragment.depth = hit.depth;
+                        fragment.edge_type = material.edge_type;
                         fragment.palette_region_type = Some(material.palette_region_type);
 
                         let diffuse = match &material.diffuse {
@@ -142,13 +156,74 @@ pub fn render_scene(
                 }
             }
 
-            let colour =
-                samples.iter().filter(|x| x.palette_region_type.is_some()).map(|x| x.colour).sum::<glam::Vec3>();
-            let sample_count = samples.iter().filter(|x| x.palette_region_type.is_some()).count();
+            let samples = samples;
 
-            let fragment = &mut buffer[y * width + x];
-            fragment.colour = colour / sample_count as f32;
-            fragment.palette_region_type = Some(palette_region_type);
+            let (closest_sample, min_depth) = {
+                let mut closest_sample = None;
+                let mut min_depth = f32::INFINITY;
+                for sample in samples.iter().filter(|x| x.edge_type.is_some()) {
+                    if sample.depth < min_depth {
+                        closest_sample = Some(sample);
+                        min_depth = sample.depth;
+                    }
+                }
+                (closest_sample, min_depth)
+            };
+
+            let (depth, edge_type, palette_region_type) = if let Some(closest_sample) = closest_sample
+                && min_depth < depth - EDGE_DISTANCE
+            {
+                let mut inside_count = 0;
+                for sample in samples.iter() {
+                    if !(sample.depth > min_depth + EDGE_DISTANCE || sample.palette_region_type.is_none()) {
+                        inside_count += 1;
+                    }
+                }
+                if inside_count > 3 {
+                    (min_depth, closest_sample.edge_type, closest_sample.palette_region_type)
+                } else {
+                    (depth, edge_type, palette_region_type)
+                }
+            } else {
+                (depth, edge_type, palette_region_type)
+            };
+
+            if palette_region_type.is_some() {
+                let fragment = &mut buffer[y * width + x];
+                fragment.palette_region_type = palette_region_type;
+
+                if let Some(edge_type) = edge_type {
+                    let sample_weight = 1.0 / (multi_samples_x as f32 * multi_samples_y as f32);
+                    let mut colour = glam::Vec3::new(0.0, 0.0, 0.0);
+                    let mut weight = 0.0;
+                    let mut total_weight = 0.0;
+                    for sample in samples {
+                        // sample.depth <= depth + EDGE_DISTANCE should be sample.ghost_depth
+                        if !(sample.depth <= depth + EDGE_DISTANCE && sample.depth > depth + EDGE_DISTANCE) {
+                            if !(sample.depth > depth + EDGE_DISTANCE || sample.palette_region_type.is_none()) {
+                                colour += sample.colour * sample_weight;
+                                weight += sample_weight;
+                            }
+                            total_weight += sample_weight;
+                        }
+                    }
+                    match edge_type {
+                        crate::renderer::EdgeType::Light => fragment.colour = colour,
+                        crate::renderer::EdgeType::Dark => {
+                            fragment.colour = colour * (0.5 + (0.5 * (weight / total_weight)));
+                        }
+                    }
+                } else {
+                    let colour = samples
+                        .iter()
+                        .filter(|x| x.palette_region_type.is_some())
+                        .map(|x| x.colour)
+                        .sum::<glam::Vec3>();
+                    let sample_count = samples.iter().filter(|x| x.palette_region_type.is_some()).count();
+
+                    fragment.colour = colour / sample_count as f32;
+                }
+            }
         }
     }
 

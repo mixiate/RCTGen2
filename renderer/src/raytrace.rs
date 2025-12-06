@@ -13,6 +13,7 @@ pub struct Scene<'a> {
 pub struct RayHit<'a> {
     pub u: f32,
     pub v: f32,
+    pub depth: f32,
     pub mesh: &'a crate::model::Mesh,
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
@@ -77,6 +78,7 @@ impl Scene<'_> {
             return Some(RayHit {
                 u: hit.u,
                 v: hit.v,
+                depth: hit.distance,
                 mesh: scene_mesh.mesh,
                 position: hit.position.into(),
                 normal,

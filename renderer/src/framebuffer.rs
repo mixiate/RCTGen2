@@ -1,7 +1,20 @@
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy)]
 pub(crate) struct Fragment {
     pub(crate) colour: glam::Vec3,
+    pub(crate) depth: f32,
+    pub(crate) edge_type: Option<crate::renderer::EdgeType>,
     pub(crate) palette_region_type: Option<crate::palette::RegionType>,
+}
+
+impl Default for Fragment {
+    fn default() -> Self {
+        Self {
+            colour: glam::Vec3::new(0.0, 0.0, 0.0),
+            depth: f32::INFINITY,
+            edge_type: None,
+            palette_region_type: None,
+        }
+    }
 }
 
 pub struct Framebuffer {
