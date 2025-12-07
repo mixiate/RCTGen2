@@ -57,8 +57,18 @@ pub(crate) fn srgb_to_linear_rgb(colour: &[u8; 3]) -> glam::Vec3 {
     )
 }
 
+// This is for srgb but is being used on linear rgb, fix?
 fn colour_to_luma(colour: &glam::Vec3) -> f32 {
     0.299 * colour.x + 0.587 * colour.y + 0.114 * colour.z
+}
+
+fn linear_rgb_to_luminence(colour: &glam::Vec3) -> f32 {
+    0.2126 * colour.x + 0.7152 * colour.y + 0.0722 * colour.z
+}
+
+pub(crate) fn linear_rgb_to_luminence_rgb(colour: &glam::Vec3) -> glam::Vec3 {
+    let luminence = linear_rgb_to_luminence(colour);
+    glam::Vec3::new(luminence, luminence, luminence)
 }
 
 pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -> NearestColour {

@@ -4,7 +4,7 @@ pub(crate) struct Texture {
     height: usize,
 }
 
-fn read_png(file: &std::fs::File) -> anyhow::Result<Texture> {
+fn read_png(file: &std::fs::File, greyscale: bool) -> anyhow::Result<Texture> {
     use anyhow::Context as _;
 
     let decoder = png::Decoder::new(std::io::BufReader::new(file));
@@ -23,7 +23,7 @@ fn read_png(file: &std::fs::File) -> anyhow::Result<Texture> {
 
     let pixels_buffer = &png_buffer[..info.buffer_size()];
 
-    let pixels = match info.color_type {
+    let mut pixels: Vec<glam::Vec3> = match info.color_type {
         png::ColorType::Rgb => {
             pixels_buffer.as_chunks::<3>().0.iter().map(crate::palette::srgb_to_linear_rgb).collect()
         }
@@ -38,6 +38,10 @@ fn read_png(file: &std::fs::File) -> anyhow::Result<Texture> {
         }
     };
 
+    if greyscale {
+        pixels.iter_mut().for_each(|x| *x = crate::palette::linear_rgb_to_luminence_rgb(x));
+    }
+
     Ok(Texture { pixels, width, height })
 }
 
@@ -46,11 +50,11 @@ fn wrap_coord(x: f32) -> f32 {
 }
 
 impl Texture {
-    pub(crate) fn load(path: &std::path::Path) -> anyhow::Result<Self> {
+    pub(crate) fn load(path: &std::path::Path, greyscale: bool) -> anyhow::Result<Self> {
         use anyhow::Context as _;
 
         let file = std::fs::File::open(path).with_context(|| format!("Could not open {}", path.display()))?;
-        read_png(&file).with_context(|| format!("Could not decode {}", path.display()))
+        read_png(&file, greyscale).with_context(|| format!("Could not decode {}", path.display()))
     }
 
     pub(crate) fn sample_wrapped(&self, uv: glam::Vec2) -> glam::Vec3 {

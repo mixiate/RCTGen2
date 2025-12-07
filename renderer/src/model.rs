@@ -21,14 +21,6 @@ pub struct Material {
 
 impl Material {
     pub fn new(mtl: &obj::Material, mtl_file_directory: &std::path::Path) -> anyhow::Result<Self> {
-        let diffuse = if let Some(file_path) = &mtl.map_kd {
-            let file_path = mtl_file_directory.join(file_path);
-            let texture = crate::texture::Texture::load(&file_path)?;
-            MaterialColour::Texture(texture)
-        } else {
-            MaterialColour::Colour(mtl.kd.unwrap_or_default().into())
-        };
-
         let mut palette_region_type = crate::palette::RegionType::NoRemaps;
         let mut use_ao = true;
         let mut edge_type = None;
@@ -45,6 +37,18 @@ impl Material {
                 _ => {}
             }
         }
+
+        let diffuse = if let Some(file_path) = &mtl.map_kd {
+            let file_path = mtl_file_directory.join(file_path);
+            let texture = crate::texture::Texture::load(&file_path, palette_region_type.is_diffuse_greyscale())?;
+            MaterialColour::Texture(texture)
+        } else {
+            let mut diffuse: glam::Vec3 = mtl.kd.unwrap_or_default().into();
+            if palette_region_type.is_diffuse_greyscale() {
+                diffuse = crate::palette::linear_rgb_to_luminence_rgb(&diffuse);
+            }
+            MaterialColour::Colour(diffuse)
+        };
 
         Ok(Material {
             diffuse,

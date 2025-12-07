@@ -131,13 +131,6 @@ pub fn render_scene(
                                     texture.sample_wrapped(uv)
                                 }
                             };
-                            // move this to material/texture load?
-                            let diffuse = if material.palette_region_type.is_diffuse_greyscale() {
-                                let max = diffuse.x.max(diffuse.y.max(diffuse.z));
-                                glam::Vec3::new(max, max, max)
-                            } else {
-                                diffuse
-                            };
 
                             for light in lights {
                                 if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
