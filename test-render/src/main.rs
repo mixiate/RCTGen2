@@ -169,6 +169,12 @@ fn main() -> anyhow::Result<()> {
                 let image_path =
                     sprite_directory.join(format!("{}_{}", item.name, rotation_index + 1)).with_extension("png");
                 image.save(&image_path)?;
+
+                println!(
+                    "{} {}",
+                    image_path.strip_prefix(base_directory).unwrap_or(&image_path).display(),
+                    image.offset
+                );
             }
         }
     }

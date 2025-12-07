@@ -25,6 +25,7 @@ pub struct Framebuffer {
     pub(crate) buffer: Vec<Fragment>,
     pub(crate) width: usize,
     pub(crate) height: usize,
+    pub(crate) offset: glam::Vec2,
 }
 
 impl Framebuffer {
@@ -46,6 +47,14 @@ impl Framebuffer {
         [min_x, min_y, max_x, max_y]
     }
 
+    fn get_offset(&self, x: usize, y: usize) -> glam::IVec2 {
+        // ORIGINAL COMMENT: y - 1 compensates for error not sure why it's needed TODO work out why it's needed
+        glam::IVec2::new(
+            x as i32 + self.offset.x.floor() as i32,
+            y as i32 + self.offset.y.floor() as i32 - 1,
+        )
+    }
+
     pub fn to_image(&self) -> crate::image::Image {
         let pixels = self
             .buffer
@@ -63,6 +72,7 @@ impl Framebuffer {
             pixels,
             width: self.width,
             height: self.height,
+            offset: self.get_offset(0, 0),
         }
     }
 
@@ -96,7 +106,12 @@ impl Framebuffer {
             }
         }
 
-        crate::image::IndexedImage { pixels, width, height }
+        crate::image::IndexedImage {
+            pixels,
+            width,
+            height,
+            offset: self.get_offset(min_x, min_y),
+        }
     }
 
     pub fn into_indexed_image(self, dither: bool) -> crate::image::IndexedImage {

@@ -65,7 +65,8 @@ pub fn render_scene(
     let mut rng = rand_pcg::Pcg32::seed_from_u64(1);
 
     let scene_bounds = scene.get_scene_screen_bounds(camera);
-    let ray_origin_offset = glam::Vec3::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32, 0.0);
+    let framebuffer_offset = glam::Vec2::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32);
+    let ray_origin_offset = framebuffer_offset.extend(0.0);
 
     let camera_inverse = camera.inverse();
     let ray_direction = camera_inverse.transform_vector3(glam::Vec3::new(0.0, 0.0, 1.0)).normalize();
@@ -235,5 +236,10 @@ pub fn render_scene(
         }
     }
 
-    crate::Framebuffer { buffer, width, height }
+    crate::Framebuffer {
+        buffer,
+        width,
+        height,
+        offset: framebuffer_offset,
+    }
 }
