@@ -2,6 +2,7 @@
 pub(crate) struct Fragment {
     pub(crate) colour: glam::Vec3,
     pub(crate) depth: f32,
+    pub(crate) ghost_depth: f32,
     pub(crate) edge_type: Option<crate::renderer::EdgeType>,
     pub(crate) palette_region_type: Option<crate::palette::RegionType>,
     pub(crate) is_mask: bool,
@@ -12,6 +13,7 @@ impl Default for Fragment {
         Self {
             colour: glam::Vec3::new(0.0, 0.0, 0.0),
             depth: f32::INFINITY,
+            ghost_depth: f32::INFINITY,
             edge_type: None,
             palette_region_type: None,
             is_mask: false,

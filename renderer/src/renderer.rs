@@ -80,17 +80,21 @@ pub fn render_scene(
         for x in 0..width {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
-            let (depth, edge_type, palette_region_type, is_mask) = {
+            let (depth, ghost_depth, edge_type, palette_region_type, is_mask) = {
                 let ray_origin = camera_inverse.transform_vector3(ray_origin);
                 match scene.trace_ray(&ray_origin, &ray_direction) {
                     Some(crate::raytrace::RayHit::Mesh(hit)) => (
                         hit.depth,
+                        hit.ghost_depth,
                         hit.mesh.material.edge_type,
                         Some(hit.mesh.material.palette_region_type),
                         false,
                     ),
-                    Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, None, None, true),
-                    _ => (f32::INFINITY, None, None, false),
+                    Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, f32::INFINITY, None, None, true),
+                    Some(crate::raytrace::RayHit::Ghost(ghost_depth)) => {
+                        (f32::INFINITY, ghost_depth, None, None, false)
+                    }
+                    _ => (f32::INFINITY, f32::INFINITY, None, None, false),
                 }
             };
 
@@ -111,6 +115,7 @@ pub fn render_scene(
                             let material = &hit.mesh.material;
 
                             fragment.depth = hit.depth;
+                            fragment.ghost_depth = hit.ghost_depth;
                             fragment.edge_type = material.edge_type;
                             fragment.palette_region_type = Some(material.palette_region_type);
 
@@ -181,7 +186,7 @@ pub fn render_scene(
             };
 
             let (depth, edge_type, palette_region_type) = if let Some(closest_sample) = closest_sample
-                && (min_depth < depth - EDGE_DISTANCE && !is_mask)
+                && (min_depth < ghost_depth - EDGE_DISTANCE && !is_mask)
             {
                 let mut inside_count = 0;
                 for sample in samples.iter().filter(|x| !x.is_mask) {
@@ -209,8 +214,7 @@ pub fn render_scene(
                     let mut weight = 0.0;
                     let mut total_weight = 0.0;
                     for sample in samples.iter().filter(|x| !x.is_mask) {
-                        // sample.depth <= depth + EDGE_DISTANCE should be sample.ghost_depth
-                        if !(sample.depth <= depth + EDGE_DISTANCE && sample.depth > depth + EDGE_DISTANCE) {
+                        if !(sample.ghost_depth <= depth + EDGE_DISTANCE && sample.depth > depth + EDGE_DISTANCE) {
                             if sample.depth <= depth + EDGE_DISTANCE && sample.palette_region_type.is_some() {
                                 colour += sample.colour * sample_weight;
                                 weight += sample_weight;
