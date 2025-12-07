@@ -80,16 +80,17 @@ pub fn render_scene(
         for x in 0..width {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
-            let (depth, edge_type, palette_region_type) = {
+            let (depth, edge_type, palette_region_type, is_mask) = {
                 let ray_origin = camera_inverse.transform_vector3(ray_origin);
-                if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
-                    (
+                match scene.trace_ray(&ray_origin, &ray_direction) {
+                    Some(crate::raytrace::RayHit::Mesh(hit)) => (
                         hit.depth,
                         hit.mesh.material.edge_type,
                         Some(hit.mesh.material.palette_region_type),
-                    )
-                } else {
-                    (f32::INFINITY, None, None)
+                        false,
+                    ),
+                    Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, None, None, true),
+                    _ => (f32::INFINITY, None, None, false),
                 }
             };
 
@@ -104,54 +105,63 @@ pub fn render_scene(
                     ) + ray_origin;
                     let ray_origin = camera_inverse.transform_vector3(ray_origin);
 
-                    if let Some(hit) = scene.trace_ray(&ray_origin, &ray_direction) {
-                        let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
-                        let material = &hit.mesh.material;
+                    match scene.trace_ray(&ray_origin, &ray_direction) {
+                        Some(crate::raytrace::RayHit::Mesh(hit)) => {
+                            let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
+                            let material = &hit.mesh.material;
 
-                        fragment.depth = hit.depth;
-                        fragment.edge_type = material.edge_type;
-                        fragment.palette_region_type = Some(material.palette_region_type);
+                            fragment.depth = hit.depth;
+                            fragment.edge_type = material.edge_type;
+                            fragment.palette_region_type = Some(material.palette_region_type);
 
-                        let diffuse = match &material.diffuse {
-                            crate::model::MaterialColour::Colour(colour) => *colour,
-                            crate::model::MaterialColour::Texture(texture) => {
-                                let uvs = [
-                                    hit.mesh.uvs[hit.indices.0 as usize] * (1.0 - hit.u - hit.v),
-                                    hit.mesh.uvs[hit.indices.1 as usize] * hit.u,
-                                    hit.mesh.uvs[hit.indices.2 as usize] * hit.v,
-                                ];
-                                let uv = uvs.iter().sum::<glam::Vec2>();
-                                texture.sample_wrapped(uv)
-                            }
-                        };
-                        // move this to material/texture load?
-                        let diffuse = if material.palette_region_type.is_diffuse_greyscale() {
-                            let max = diffuse.x.max(diffuse.y.max(diffuse.z));
-                            glam::Vec3::new(max, max, max)
-                        } else {
-                            diffuse
-                        };
+                            let diffuse = match &material.diffuse {
+                                crate::model::MaterialColour::Colour(colour) => *colour,
+                                crate::model::MaterialColour::Texture(texture) => {
+                                    let uvs = [
+                                        hit.mesh.uvs[hit.indices.0 as usize] * (1.0 - hit.u - hit.v),
+                                        hit.mesh.uvs[hit.indices.1 as usize] * hit.u,
+                                        hit.mesh.uvs[hit.indices.2 as usize] * hit.v,
+                                    ];
+                                    let uv = uvs.iter().sum::<glam::Vec2>();
+                                    texture.sample_wrapped(uv)
+                                }
+                            };
+                            // move this to material/texture load?
+                            let diffuse = if material.palette_region_type.is_diffuse_greyscale() {
+                                let max = diffuse.x.max(diffuse.y.max(diffuse.z));
+                                glam::Vec3::new(max, max, max)
+                            } else {
+                                diffuse
+                            };
 
-                        for light in lights {
-                            if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
-                                continue;
+                            for light in lights {
+                                if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
+                                    continue;
+                                }
+                                if light.diffuse_strength > 0.0 {
+                                    let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
+                                    fragment.colour += light * diffuse;
+                                }
+                                if light.specular_strength > 0.0 {
+                                    let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
+                                    let reflected_direction = reflected_direction - light.direction;
+                                    let angle = reflected_direction.dot(-ray_direction).max(0.0);
+                                    let specular_factor =
+                                        light.specular_strength * angle.powf(material.specular_exponent);
+                                    fragment.colour += specular_factor * material.specular;
+                                }
                             }
-                            if light.diffuse_strength > 0.0 {
-                                let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
-                                fragment.colour += light * diffuse;
-                            }
-                            if light.specular_strength > 0.0 {
-                                let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
-                                let reflected_direction = reflected_direction - light.direction;
-                                let angle = reflected_direction.dot(-ray_direction).max(0.0);
-                                let specular_factor = light.specular_strength * angle.powf(material.specular_exponent);
-                                fragment.colour += specular_factor * material.specular;
+
+                            if material.use_ao {
+                                fragment.colour *=
+                                    calculate_ao_factor(scene, &hit.position, &hit.normal, 8, 4, &mut rng);
                             }
                         }
-
-                        if material.use_ao {
-                            fragment.colour *= calculate_ao_factor(scene, &hit.position, &hit.normal, 8, 4, &mut rng);
+                        Some(crate::raytrace::RayHit::Mask) => {
+                            let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
+                            fragment.is_mask = true;
                         }
+                        _ => {}
                     }
                 }
             }
@@ -171,11 +181,11 @@ pub fn render_scene(
             };
 
             let (depth, edge_type, palette_region_type) = if let Some(closest_sample) = closest_sample
-                && min_depth < depth - EDGE_DISTANCE
+                && (min_depth < depth - EDGE_DISTANCE && !is_mask)
             {
                 let mut inside_count = 0;
-                for sample in samples.iter() {
-                    if !(sample.depth > min_depth + EDGE_DISTANCE || sample.palette_region_type.is_none()) {
+                for sample in samples.iter().filter(|x| !x.is_mask) {
+                    if sample.depth <= min_depth + EDGE_DISTANCE && sample.palette_region_type.is_some() {
                         inside_count += 1;
                     }
                 }
@@ -193,14 +203,15 @@ pub fn render_scene(
                 fragment.palette_region_type = palette_region_type;
 
                 if let Some(edge_type) = edge_type {
-                    let sample_weight = 1.0 / (multi_samples_x as f32 * multi_samples_y as f32);
+                    let sample_count = samples.iter().filter(|x| !x.is_mask).count();
+                    let sample_weight = 1.0 / sample_count as f32;
                     let mut colour = glam::Vec3::new(0.0, 0.0, 0.0);
                     let mut weight = 0.0;
                     let mut total_weight = 0.0;
-                    for sample in samples {
+                    for sample in samples.iter().filter(|x| !x.is_mask) {
                         // sample.depth <= depth + EDGE_DISTANCE should be sample.ghost_depth
                         if !(sample.depth <= depth + EDGE_DISTANCE && sample.depth > depth + EDGE_DISTANCE) {
-                            if !(sample.depth > depth + EDGE_DISTANCE || sample.palette_region_type.is_none()) {
+                            if sample.depth <= depth + EDGE_DISTANCE && sample.palette_region_type.is_some() {
                                 colour += sample.colour * sample_weight;
                                 weight += sample_weight;
                             }

@@ -10,7 +10,7 @@ pub struct Scene<'a> {
     meshes: Vec<SceneMesh<'a>>,
 }
 
-pub struct RayHit<'a> {
+pub struct RayHitMesh<'a> {
     pub u: f32,
     pub v: f32,
     pub depth: f32,
@@ -18,6 +18,11 @@ pub struct RayHit<'a> {
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
     pub indices: &'a (u32, u32, u32),
+}
+
+pub enum RayHit<'a> {
+    Mesh(RayHitMesh<'a>),
+    Mask,
 }
 
 impl Scene<'_> {
@@ -63,7 +68,7 @@ impl Scene<'_> {
             }
 
             if scene_mesh.is_mask {
-                return None;
+                return Some(RayHit::Mask);
             }
 
             let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
@@ -75,7 +80,7 @@ impl Scene<'_> {
             ];
             let normal = normals.iter().sum::<glam::Vec3>().normalize();
 
-            return Some(RayHit {
+            return Some(RayHit::Mesh(RayHitMesh {
                 u: hit.u,
                 v: hit.v,
                 depth: hit.distance,
@@ -83,7 +88,7 @@ impl Scene<'_> {
                 position: hit.position.into(),
                 normal,
                 indices,
-            });
+            }));
         }
     }
 

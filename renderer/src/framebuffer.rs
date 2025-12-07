@@ -4,6 +4,7 @@ pub(crate) struct Fragment {
     pub(crate) depth: f32,
     pub(crate) edge_type: Option<crate::renderer::EdgeType>,
     pub(crate) palette_region_type: Option<crate::palette::RegionType>,
+    pub(crate) is_mask: bool,
 }
 
 impl Default for Fragment {
@@ -13,6 +14,7 @@ impl Default for Fragment {
             depth: f32::INFINITY,
             edge_type: None,
             palette_region_type: None,
+            is_mask: false,
         }
     }
 }
