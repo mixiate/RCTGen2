@@ -78,7 +78,7 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -
             let palette_colour = if is_greyscale {
                 PALETTE_REMAP_LINEAR[i - range.start]
             } else {
-                PALETTE_LINEAR[i]
+                PALETTE_LINEAR_MODIFIED[i]
             };
             let error = colour - palette_colour;
             let error = error.dot(error).sqrt();
@@ -94,11 +94,11 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -
         // single channel luma produces bad results?
         let colour_luma = colour_to_luma(colour);
         let colour = glam::Vec3::new(colour_luma, 0.0, 0.0);
-        let palette_colour_luma = colour_to_luma(&PALETTE_LINEAR[index]);
+        let palette_colour_luma = colour_to_luma(&PALETTE_LINEAR_MODIFIED[index]);
         let palette_colour = glam::Vec3::new(palette_colour_luma, 0.0, 0.0);
         colour - palette_colour
     } else {
-        colour - PALETTE_LINEAR[index]
+        colour - PALETTE_LINEAR_MODIFIED[index]
     };
 
     NearestColour {
@@ -116,6 +116,7 @@ const PALETTE_REGION_RANGES: [[Option<std::ops::Range<usize>>; 3]; 6] = [
     [Some(10..11), Some(106..118), None],
 ];
 
+// This is the palette from a sprite exported by OpenRCT2
 pub const PALETTE: [[u8; 3]; 256] = [
     [0, 0, 0],
     [1, 1, 1],
@@ -387,17 +388,22 @@ pub const PALETTE_FLAT: [u8; 256 * 3] = const {
     palette_flat
 };
 
-const PALETTE_LINEAR: [glam::Vec3; 256] = [
+// This is from the original RCTGen. It's mostly PALETTE converted to linear rgb
+// It's different for unknown reasons
+// 1 to 9 are set to 0, 0, 0
+// The water colours are different
+// The first remap colours, 243 to 254 are different. This does cause differences in quantizing. Fix?
+const PALETTE_LINEAR_MODIFIED: [glam::Vec3; 256] = [
     glam::Vec3::new(0.0, 0.0, 0.0),
-    glam::Vec3::new(0.000303527, 0.000303527, 0.000303527),
-    glam::Vec3::new(0.000607054, 0.000607054, 0.000607054),
-    glam::Vec3::new(0.000910581, 0.000910581, 0.000910581),
-    glam::Vec3::new(0.001214108, 0.001214108, 0.001214108),
-    glam::Vec3::new(0.001517635, 0.001517635, 0.001517635),
-    glam::Vec3::new(0.001821162, 0.001821162, 0.001821162),
-    glam::Vec3::new(0.0021246888, 0.0021246888, 0.0021246888),
-    glam::Vec3::new(0.002428216, 0.002428216, 0.002428216),
-    glam::Vec3::new(0.002731743, 0.002731743, 0.002731743),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
+    glam::Vec3::new(0.0, 0.0, 0.0),
     glam::Vec3::new(0.008568125, 0.016807375, 0.016807375),
     glam::Vec3::new(0.016807375, 0.033104762, 0.033104762),
     glam::Vec3::new(0.028426038, 0.056128494, 0.056128494),
@@ -619,33 +625,34 @@ const PALETTE_LINEAR: [glam::Vec3; 256] = [
     glam::Vec3::new(1.0, 0.70837593, 0.0),
     glam::Vec3::new(1.0, 1.0, 0.0),
     glam::Vec3::new(0.020288562, 0.27467737, 0.2422812),
+    glam::Vec3::new(0.0021246888, 0.14702728, 0.12477184),
+    glam::Vec3::new(0.0021246888, 0.14702728, 0.12477184),
+    glam::Vec3::new(0.0021246888, 0.14702728, 0.12477184),
     glam::Vec3::new(0.010960094, 0.22696589, 0.1980693),
-    glam::Vec3::new(0.0021246888, 0.13563335, 0.11443538),
-    glam::Vec3::new(0.0, 0.11443538, 0.095307484),
-    glam::Vec3::new(0.0047769533, 0.18447499, 0.15896086),
-    glam::Vec3::new(0.5711249, 1.0, 1.0),
     glam::Vec3::new(0.32777813, 0.7681513, 0.7681513),
-    glam::Vec3::new(0.086500466, 0.42869055, 0.42869055),
-    glam::Vec3::new(0.033104762, 0.32777813, 0.30946895),
-    glam::Vec3::new(0.1980693, 0.5972019, 0.5972019),
+    glam::Vec3::new(0.038204364, 0.32777813, 0.30946895),
+    glam::Vec3::new(0.038204364, 0.32777813, 0.30946895),
+    glam::Vec3::new(0.038204364, 0.32777813, 0.30946895),
+    glam::Vec3::new(0.1714411, 0.5972019, 0.5972019),
     glam::Vec3::new(0.056128494, 0.10461649, 0.10461649),
     glam::Vec3::new(0.086500466, 0.14702728, 0.14702728),
     glam::Vec3::new(0.12477184, 0.1980693, 0.1980693),
-    glam::Vec3::new(0.15896086, 0.033104762, 0.028426038),
-    glam::Vec3::new(0.22696589, 0.038204364, 0.028426038),
-    glam::Vec3::new(0.30946895, 0.049706563, 0.033104762),
-    glam::Vec3::new(0.4072403, 0.056128494, 0.033104762),
-    glam::Vec3::new(0.5209957, 0.07036011, 0.028426038),
-    glam::Vec3::new(0.6514057, 0.07818743, 0.02415763),
-    glam::Vec3::new(0.79910284, 0.095307484, 0.016807375),
-    glam::Vec3::new(1.0, 0.11443538, 0.013702081),
-    glam::Vec3::new(1.0, 0.21223073, 0.020288562),
-    glam::Vec3::new(1.0, 0.32777813, 0.033104762),
-    glam::Vec3::new(1.0, 0.47353154, 0.049706563),
-    glam::Vec3::new(1.0, 0.62396044, 0.07036011),
-    glam::Vec3::new(1.0, 1.0, 1.0),
+    glam::Vec3::new(0.002428216, 0.056128494, 0.002428216),
+    glam::Vec3::new(0.005181517, 0.09084173, 0.005181517),
+    glam::Vec3::new(0.009134057, 0.13563335, 0.009134057),
+    glam::Vec3::new(0.014443844, 0.19120167, 0.014443844),
+    glam::Vec3::new(0.02121901, 0.2581829, 0.02121901),
+    glam::Vec3::new(0.029556833, 0.33716366, 0.029556833),
+    glam::Vec3::new(0.039546236, 0.42869055, 0.039546236),
+    glam::Vec3::new(0.051269468, 0.5332765, 0.051269468),
+    glam::Vec3::new(0.06480328, 0.6514057, 0.06480328),
+    glam::Vec3::new(0.08021983, 0.70837593, 0.08021983),
+    glam::Vec3::new(0.09758736, 0.8468733, 0.09758736),
+    glam::Vec3::new(0.10702311, 1.0, 0.10702311),
+    glam::Vec3::new(0.0, 0.0, 0.0),
 ];
 
+// This is PALETTE 10 to 21 converted to linear rgb
 const PALETTE_REMAP_LINEAR: [glam::Vec3; 12] = [
     glam::Vec3::new(0.008568125, 0.016807375, 0.016807375),
     glam::Vec3::new(0.016807375, 0.033104762, 0.033104762),
