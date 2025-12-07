@@ -11,13 +11,9 @@ pub(crate) enum RegionType {
 
 impl RegionType {
     pub(crate) fn is_diffuse_greyscale(self) -> bool {
+        // Should all regions be greyscale? Fix?
         matches!(self, RegionType::Remap1 | RegionType::Remap2 | RegionType::Remap3)
     }
-}
-
-struct Region {
-    ranges: [Option<std::ops::Range<usize>>; 3],
-    remap: bool,
 }
 
 pub(crate) struct NearestColour {
@@ -75,10 +71,11 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -
     let mut index = 0;
     let mut minimum_error = f32::INFINITY;
 
-    let region = &PALETTE_REGION_RANGES[region_type as usize];
-    for range in region.ranges.iter().flatten() {
+    let is_greyscale = region_type.is_diffuse_greyscale();
+
+    for range in PALETTE_REGION_RANGES[region_type as usize].iter().flatten() {
         for i in range.clone() {
-            let palette_colour = if region.remap {
+            let palette_colour = if is_greyscale {
                 PALETTE_REMAP_LINEAR[i - range.start]
             } else {
                 PALETTE_LINEAR[i]
@@ -93,7 +90,7 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -
         }
     }
 
-    let error = if region.remap {
+    let error = if is_greyscale {
         // single channel luma produces bad results?
         let colour_luma = colour_to_luma(colour);
         let colour = glam::Vec3::new(colour_luma, 0.0, 0.0);
@@ -110,31 +107,13 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -
     }
 }
 
-const PALETTE_REGION_RANGES: [Region; 6] = [
-    Region {
-        ranges: [Some(10..202), Some(214..227), Some(240..243)],
-        remap: false,
-    },
-    Region {
-        ranges: [Some(243..255), None, None],
-        remap: true,
-    },
-    Region {
-        ranges: [Some(202..214), None, None],
-        remap: true,
-    },
-    Region {
-        ranges: [Some(46..58), None, None],
-        remap: true,
-    },
-    Region {
-        ranges: [Some(10..22), Some(226..227), Some(240..243)],
-        remap: false,
-    },
-    Region {
-        ranges: [Some(10..11), Some(106..118), None],
-        remap: false,
-    },
+const PALETTE_REGION_RANGES: [[Option<std::ops::Range<usize>>; 3]; 6] = [
+    [Some(10..202), Some(214..227), Some(240..243)],
+    [Some(243..255), None, None],
+    [Some(202..214), None, None],
+    [Some(46..58), None, None],
+    [Some(10..22), Some(226..227), Some(240..243)],
+    [Some(10..11), Some(106..118), None],
 ];
 
 pub const PALETTE: [[u8; 3]; 256] = [
