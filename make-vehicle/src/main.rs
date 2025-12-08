@@ -283,19 +283,34 @@ struct RideDesc {
     lights: Vec<LightDesc>,
 }
 
-fn render_rotations(
-    scene: &renderer::Scene,
-    camera: &glam::Mat4,
-    lights: &[LightDesc],
+struct VehicleRotation {
     count: i32,
     pitch: f32,
     roll: f32,
     yaw: f32,
+}
+
+impl VehicleRotation {
+    fn new(count: i32, pitch: f32, roll: f32, yaw: f32) -> Self {
+        Self {
+            count,
+            pitch,
+            roll,
+            yaw,
+        }
+    }
+}
+
+fn render_rotations(
+    scene: &renderer::Scene,
+    camera: &glam::Mat4,
+    lights: &[LightDesc],
+    rotation: &VehicleRotation,
 ) -> Vec<renderer::image::IndexedImage> {
     let mut images = Vec::new();
-    for i in 0..count {
-        let yaw = yaw + ((2.0 * i as f32 * std::f32::consts::PI) / count as f32);
-        let view_rotation = glam::Mat4::from_euler(glam::EulerRot::XYZ, roll, yaw, pitch);
+    for i in 0..rotation.count {
+        let yaw = rotation.yaw + ((2.0 * i as f32 * std::f32::consts::PI) / rotation.count as f32);
+        let view_rotation = glam::Mat4::from_euler(glam::EulerRot::YZX, yaw, rotation.pitch, rotation.roll);
 
         let camera = camera * view_rotation;
 
@@ -325,6 +340,360 @@ fn render_rotations(
     images
 }
 
+fn corkscrew_right_pitch(angle: f32) -> f32 {
+    -(-angle.sin() / 2.0_f32.sqrt()).asin()
+}
+fn corkscrew_right_roll(angle: f32) -> f32 {
+    -(angle.sin() / 2.0_f32.sqrt()).atan2(angle.cos())
+}
+fn corkscrew_right_yaw(angle: f32) -> f32 {
+    (0.5 * (1.0 - angle.cos())).atan2(1.0 - 0.5 * (1.0 - angle.cos()))
+}
+fn corkscrew_left_pitch(angle: f32) -> f32 {
+    -corkscrew_right_pitch(-angle)
+}
+fn corkscrew_left_roll(angle: f32) -> f32 {
+    -corkscrew_right_roll(angle)
+}
+fn corkscrew_left_yaw(angle: f32) -> f32 {
+    -corkscrew_right_yaw(angle)
+}
+
+#[derive(Clone, Copy, Debug)]
+struct PitchRollYaw {
+    pitch: f32,
+    roll: f32,
+    yaw: f32,
+}
+
+struct VehicleAngles {
+    pitch_flat: f32,
+    pitch_gentle: f32,
+    pitch_steep: f32,
+    pitch_vertical: f32,
+    pitch_flat_to_gentle: f32,
+    pitch_gentle_to_steep: f32,
+    pitch_steep_to_vertical: f32,
+    pitch_gentle_diag: f32,
+    pitch_steep_diag: f32,
+    pitch_flat_to_gentle_diag: f32,
+    roll_bank: f32,
+    roll_flat_to_bank: f32,
+    corkscrew_right_up: [PitchRollYaw; 5],
+    corkscrew_right_down: [PitchRollYaw; 5],
+    corkscrew_left_up: [PitchRollYaw; 5],
+    corkscrew_left_down: [PitchRollYaw; 5],
+}
+
+impl VehicleAngles {
+    fn new() -> Self {
+        const FRAC_PI_12: f32 = std::f32::consts::PI / 12.0;
+        const SQRT_6: f32 = 2.449_489_8;
+        const TILE_SLOPE: f32 = 1.0 / SQRT_6;
+
+        const CORKSCREW_ANGLES: [f32; 5] = [
+            2.0 * FRAC_PI_12,
+            4.0 * FRAC_PI_12,
+            std::f32::consts::FRAC_PI_2,
+            8.0 * FRAC_PI_12,
+            10.0 * FRAC_PI_12,
+        ];
+
+        let pitch_gentle = TILE_SLOPE.atan();
+        let pitch_steep = (4.0 * TILE_SLOPE).atan();
+        let pitch_vertical = std::f32::consts::FRAC_PI_2;
+        let pitch_gentle_diag = (TILE_SLOPE * std::f32::consts::FRAC_1_SQRT_2).atan();
+
+        let roll_bank = std::f32::consts::FRAC_PI_4;
+
+        let corkscrew_right_up: [PitchRollYaw; 5] = CORKSCREW_ANGLES
+            .iter()
+            .map(|angle| PitchRollYaw {
+                pitch: corkscrew_right_pitch(*angle),
+                roll: corkscrew_right_roll(*angle),
+                yaw: corkscrew_right_yaw(*angle),
+            })
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+        let corkscrew_right_down: [PitchRollYaw; 5] = CORKSCREW_ANGLES
+            .iter()
+            .map(|angle| PitchRollYaw {
+                pitch: corkscrew_right_pitch(-*angle),
+                roll: corkscrew_right_roll(-*angle),
+                yaw: corkscrew_right_yaw(-*angle),
+            })
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+        let corkscrew_left_up: [PitchRollYaw; 5] = CORKSCREW_ANGLES
+            .iter()
+            .map(|angle| PitchRollYaw {
+                pitch: corkscrew_left_pitch(*angle),
+                roll: corkscrew_left_roll(*angle),
+                yaw: corkscrew_left_yaw(*angle),
+            })
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+        let corkscrew_left_down: [PitchRollYaw; 5] = CORKSCREW_ANGLES
+            .iter()
+            .map(|angle| PitchRollYaw {
+                pitch: corkscrew_left_pitch(-*angle),
+                roll: corkscrew_left_roll(-*angle),
+                yaw: corkscrew_left_yaw(-*angle),
+            })
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap();
+
+        Self {
+            pitch_flat: 0.0,
+            pitch_gentle,
+            pitch_steep,
+            pitch_vertical,
+            pitch_flat_to_gentle: pitch_gentle / 2.0,
+            pitch_gentle_to_steep: (pitch_gentle + pitch_steep) / 2.0,
+            pitch_steep_to_vertical: (pitch_steep + pitch_vertical) / 2.0,
+            pitch_gentle_diag,
+            pitch_steep_diag: (4.0 * TILE_SLOPE * std::f32::consts::FRAC_1_SQRT_2).atan(),
+            pitch_flat_to_gentle_diag: pitch_gentle_diag / 2.0,
+            roll_bank,
+            roll_flat_to_bank: roll_bank / 2.0,
+            corkscrew_right_up,
+            corkscrew_right_down,
+            corkscrew_left_up,
+            corkscrew_left_down,
+        }
+    }
+}
+
+fn render_vehicle(
+    scene: &renderer::Scene,
+    camera: &glam::Mat4,
+    lights: &[LightDesc],
+    sprite_groups: &std::collections::HashSet<SpriteGroup>,
+    angles: &VehicleAngles,
+) -> Vec<renderer::image::IndexedImage> {
+    use VehicleRotation as VR;
+    use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8, PI};
+
+    const FRAC_PI_12: f32 = PI / 12.0;
+
+    let VehicleAngles {
+        pitch_flat,
+        pitch_gentle,
+        pitch_steep,
+        pitch_vertical,
+        pitch_flat_to_gentle,
+        pitch_gentle_to_steep,
+        pitch_steep_to_vertical,
+        pitch_gentle_diag,
+        pitch_steep_diag,
+        pitch_flat_to_gentle_diag,
+        roll_bank,
+        roll_flat_to_bank,
+        corkscrew_right_up,
+        corkscrew_right_down,
+        corkscrew_left_up,
+        corkscrew_left_down,
+    } = *angles;
+
+    let mut rots = Vec::with_capacity(256);
+    if sprite_groups.contains(&SpriteGroup::Flat) {
+        rots.push(VR::new(32, pitch_flat, 0.0, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::GentleSlopes) {
+        rots.push(VR::new(4, pitch_flat_to_gentle, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_flat_to_gentle, 0.0, 0.0));
+        rots.push(VR::new(32, pitch_gentle, 0.0, 0.0));
+        rots.push(VR::new(32, -pitch_gentle, 0.0, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::SteepSlopes) {
+        rots.push(VR::new(8, pitch_gentle_to_steep, 0.0, 0.0));
+        rots.push(VR::new(8, -pitch_gentle_to_steep, 0.0, 0.0));
+        rots.push(VR::new(32, pitch_steep, 0.0, 0.0));
+        rots.push(VR::new(32, -pitch_steep, 0.0, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::VerticalSlopes) {
+        rots.push(VR::new(4, pitch_steep_to_vertical, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_steep_to_vertical, 0.0, 0.0));
+        rots.push(VR::new(32, pitch_vertical, 0.0, 0.0));
+        rots.push(VR::new(32, -pitch_vertical, 0.0, 0.0));
+        rots.push(VR::new(4, pitch_vertical + FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_vertical - FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, pitch_vertical + 2.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_vertical - 2.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, pitch_vertical + 3.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_vertical - 3.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, pitch_vertical + 4.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_vertical - 4.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, pitch_vertical + 5.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, -pitch_vertical - 5.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(4, PI, 0.0, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::Diagonals) {
+        rots.push(VR::new(4, pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_gentle_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_gentle_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_steep_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_steep_diag, 0.0, FRAC_PI_4));
+    }
+    if sprite_groups.contains(&SpriteGroup::BankedTurns) {
+        rots.push(VR::new(8, pitch_flat, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(8, pitch_flat, -roll_flat_to_bank, 0.0));
+        rots.push(VR::new(32, pitch_flat, roll_bank, 0.0));
+        rots.push(VR::new(32, pitch_flat, -roll_bank, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::InlineTwists) {
+        rots.push(VR::new(4, pitch_flat, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_flat, -3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_flat, FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, pitch_flat, -FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, pitch_flat, 5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_flat, -5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_flat, 3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(4, pitch_flat, -3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(4, pitch_flat, 7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_flat, -7.0 * FRAC_PI_8, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::SlopeBankTransition) {
+        rots.push(VR::new(32, pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(32, pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
+        rots.push(VR::new(32, -pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(32, -pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::DiagonalBankTransition) {
+        rots.push(VR::new(4, pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+    }
+    if sprite_groups.contains(&SpriteGroup::SlopedBankTransition) {
+        rots.push(VR::new(4, pitch_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(4, pitch_gentle, -roll_flat_to_bank, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, -roll_flat_to_bank, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::DiagonalSlopedBankTransition) {
+        rots.push(VR::new(4, pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, pitch_gentle_diag, -roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(4, -pitch_gentle_diag, -roll_bank, FRAC_PI_4));
+    }
+    if sprite_groups.contains(&SpriteGroup::BankedSlopedTurns) {
+        rots.push(VR::new(32, pitch_gentle, roll_bank, 0.0));
+        rots.push(VR::new(32, pitch_gentle, -roll_bank, 0.0));
+        rots.push(VR::new(32, -pitch_gentle, roll_bank, 0.0));
+        rots.push(VR::new(32, -pitch_gentle, -roll_bank, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::BankedSlopeTransition) {
+        rots.push(VR::new(4, pitch_flat_to_gentle, roll_bank, 0.0));
+        rots.push(VR::new(4, pitch_flat_to_gentle, -roll_bank, 0.0));
+        rots.push(VR::new(4, -pitch_flat_to_gentle, roll_bank, 0.0));
+        rots.push(VR::new(4, -pitch_flat_to_gentle, -roll_bank, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::ZeroGRolls) {
+        //Gentle bank 67.5
+        rots.push(VR::new(4, pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
+        //Gentle bank 90
+        rots.push(VR::new(4, pitch_gentle, FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, pitch_gentle, -FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, -FRAC_PI_2, 0.0));
+        //Gentle 112.5
+        rots.push(VR::new(4, pitch_gentle, 5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_gentle, -5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, 5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, -5.0 * FRAC_PI_8, 0.0));
+        //Gentle bank 135
+        rots.push(VR::new(4, pitch_gentle, 3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(4, pitch_gentle, -3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, 3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, -3.0 * FRAC_PI_4, 0.0));
+        //Gentle bank 157.5
+        rots.push(VR::new(4, pitch_gentle, 7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_gentle, -7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, 7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle, -7.0 * FRAC_PI_8, 0.0));
+        //Gentle-to-steep bank 22.5
+        rots.push(VR::new(4, pitch_gentle_to_steep, FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_gentle_to_steep, -FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, -FRAC_PI_8, 0.0));
+        //Gentle-to-steep bank 45
+        rots.push(VR::new(4, pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0));
+        //Gentle-to-steep bank 67.5
+        rots.push(VR::new(4, pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0));
+        //Gentle-to-steep bank 90
+        rots.push(VR::new(4, pitch_gentle_to_steep, FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, FRAC_PI_2, 0.0));
+        rots.push(VR::new(4, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
+        //Steep bank 22.5
+        let count = if sprite_groups.contains(&SpriteGroup::DiveLoops) {
+            4
+        } else {
+            8
+        };
+        rots.push(VR::new(count, pitch_steep, FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_steep, -FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_steep, FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_steep, -FRAC_PI_8, 0.0));
+    }
+    if sprite_groups.contains(&SpriteGroup::DiveLoops) {
+        //Steep bank 45
+        rots.push(VR::new(8, pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
+        rots.push(VR::new(8, pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
+        rots.push(VR::new(8, -pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
+        rots.push(VR::new(8, -pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
+        //Steep bank 67.5
+        rots.push(VR::new(8, pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8));
+        rots.push(VR::new(8, pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8));
+        rots.push(VR::new(8, -pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8));
+        rots.push(VR::new(8, -pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8));
+        //Diagonal steep bank 90
+        rots.push(VR::new(8, pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
+        rots.push(VR::new(8, pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
+        rots.push(VR::new(8, -pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
+        rots.push(VR::new(8, -pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
+    }
+    if sprite_groups.contains(&SpriteGroup::Corkscrews) {
+        for angles in corkscrew_right_up {
+            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+        }
+        for angles in corkscrew_right_down {
+            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+        }
+        for angles in corkscrew_left_up {
+            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+        }
+        for angles in corkscrew_left_down {
+            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+        }
+    }
+
+    rots.iter().flat_map(|x| render_rotations(scene, camera, lights, x)).collect()
+}
+
 fn render(
     output_directory: &std::path::Path,
     ride_desc: &RideDesc,
@@ -347,6 +716,8 @@ fn render(
         )
         .transpose(),
     );
+
+    let angles = VehicleAngles::new();
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
         let mut transformed_models = Vec::new();
@@ -374,11 +745,7 @@ fn render(
 
         let scene = renderer::Scene::new(&render_device, transformed_models)?;
 
-        let mut images = Vec::new();
-
-        if ride_desc.sprites.contains(&SpriteGroup::Flat) {
-            images.extend(render_rotations(&scene, &camera, &ride_desc.lights, 32, 0.0, 0.0, 0.0));
-        }
+        let images = render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles);
 
         let (image, _coords) = renderer::image::create_atlas(&images);
         let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
