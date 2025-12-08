@@ -358,9 +358,10 @@ fn render(
 
             let model_translation: glam::Vec3 = (model_desc.position).into();
 
-            let model_rotation = model_desc.orientation.first().context(format!(
-                "Frame 0 not in vehicle {vehicle_index} model {model_index} orientations"
-            ))?;
+            let model_rotation = model_desc
+                .orientation
+                .first()
+                .context(format!("Frame 0 not in vehicle {vehicle_index} model {model_index} orientations"))?;
             let model_rotation = glam::Quat::from_euler(
                 glam::EulerRot::XYZ,
                 model_rotation[0].to_radians(),
@@ -399,10 +400,9 @@ fn main() -> anyhow::Result<()> {
         .canonicalize()
         .context(format!("Invalid file path {}", ride_description_path.display()))?;
 
-    let base_directory = ride_description_path.parent().context(format!(
-        "Could not get parent directory of {}",
-        ride_description_path.display()
-    ))?;
+    let base_directory = ride_description_path
+        .parent()
+        .context(format!("Could not get parent directory of {}", ride_description_path.display()))?;
 
     let output_directory = base_directory.join("object");
     std::fs::create_dir_all(&output_directory)
@@ -412,10 +412,8 @@ fn main() -> anyhow::Result<()> {
         let json = std::fs::read_to_string(&ride_description_path)
             .context(format!("Could not read file {}", ride_description_path.display()))?;
 
-        serde_json::from_str::<RideDesc>(&json).context(format!(
-            "Could not parse json in file {}",
-            ride_description_path.display()
-        ))?
+        serde_json::from_str::<RideDesc>(&json)
+            .context(format!("Could not parse json in file {}", ride_description_path.display()))?
     };
 
     let models = ride_description
