@@ -326,9 +326,10 @@ fn render_rotations(
 }
 
 fn render(
+    output_directory: &std::path::Path,
     ride_desc: &RideDesc,
     models: &[renderer::model::Model],
-) -> anyhow::Result<Vec<renderer::image::IndexedImage>> {
+) -> anyhow::Result<()> {
     use anyhow::Context as _;
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
@@ -347,7 +348,6 @@ fn render(
         .transpose(),
     );
 
-    let mut images = Vec::new();
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
         let mut transformed_models = Vec::new();
         for (model_index, model_desc) in vehicle.model.iter().enumerate() {
@@ -373,12 +373,18 @@ fn render(
 
         let scene = renderer::Scene::new(&render_device, transformed_models)?;
 
+        let mut images = Vec::new();
+
         if ride_desc.sprites.contains(&SpriteGroup::Flat) {
             images.extend(render_rotations(&scene, &camera, &ride_desc.lights, 32, 0.0, 0.0, 0.0));
         }
+
+        let (image, _coords) = renderer::image::create_atlas(&images);
+        let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
+        image.save(&file_path)?;
     }
 
-    Ok(images)
+    Ok(())
 }
 
 fn main() -> anyhow::Result<()> {
@@ -397,6 +403,10 @@ fn main() -> anyhow::Result<()> {
         "Could not get parent directory of {}",
         ride_description_path.display()
     ))?;
+
+    let output_directory = base_directory.join("object");
+    std::fs::create_dir_all(&output_directory)
+        .with_context(|| format!("Could not create directory {}", output_directory.display()))?;
 
     let ride_description = {
         let json = std::fs::read_to_string(&ride_description_path)
@@ -418,12 +428,11 @@ fn main() -> anyhow::Result<()> {
         })
         .collect::<anyhow::Result<Vec<renderer::model::Model>>>()?;
 
-    let images = render(&ride_description, &models)?;
+    let images_directory = output_directory.join("images");
+    std::fs::create_dir_all(&images_directory)
+        .with_context(|| format!("Could not create directory {}", images_directory.display()))?;
 
-    for (i, image) in images.iter().enumerate() {
-        let file_path = base_directory.join("sprites").join(format!("{i}")).with_extension("png");
-        image.save(&file_path)?;
-    }
+    render(&images_directory, &ride_description, &models)?;
 
     println!("Time taken: {} milliseconds", start_time.elapsed().as_millis());
 
