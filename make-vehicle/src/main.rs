@@ -283,6 +283,104 @@ struct RideDesc {
     lights: Vec<LightDesc>,
 }
 
+fn render_rotations(
+    scene: &renderer::Scene,
+    camera: &glam::Mat4,
+    lights: &[LightDesc],
+    count: i32,
+    pitch: f32,
+    roll: f32,
+    yaw: f32,
+) -> Vec<renderer::image::IndexedImage> {
+    let mut images = Vec::new();
+    for i in 0..count {
+        let yaw = yaw + ((2.0 * i as f32 * std::f32::consts::PI) / count as f32);
+        let view_rotation = glam::Mat4::from_euler(glam::EulerRot::XYZ, roll, yaw, pitch);
+
+        let camera = camera * view_rotation;
+
+        let view_rotation_inverse = view_rotation.inverse();
+        let lights: Vec<_> = lights
+            .iter()
+            .map(|x| renderer::Light {
+                diffuse_strength: if x.r#type == LightType::Diffuse {
+                    x.strength
+                } else {
+                    0.0
+                },
+                specular_strength: if x.r#type == LightType::Specular {
+                    x.strength
+                } else {
+                    0.0
+                },
+                direction: view_rotation_inverse.transform_vector3(x.direction.into()).normalize(),
+                shadow: x.shadow,
+            })
+            .collect();
+
+        let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4);
+
+        images.push(framebuffer.into_cropped_indexed_image(true));
+    }
+    images
+}
+
+fn render(
+    ride_desc: &RideDesc,
+    models: &[renderer::model::Model],
+) -> anyhow::Result<Vec<renderer::image::IndexedImage>> {
+    use anyhow::Context as _;
+
+    let render_device = renderer::Device::try_new().context("Could not create render device")?;
+
+    const TILE_SIZE: f32 = 3.3;
+    let camera = glam::Mat4::from_mat3(
+        glam::Mat3::from_cols(
+            glam::Vec3::new(32.0 / TILE_SIZE, 0.0, -32.0 / TILE_SIZE),
+            glam::Vec3::new(-16.0 / TILE_SIZE, -16.0 * 6.0_f32.sqrt() / TILE_SIZE, -16.0 / TILE_SIZE),
+            glam::Vec3::new(
+                16.0 * 3.0_f32.sqrt() / TILE_SIZE,
+                -16.0 * 2.0_f32.sqrt() / TILE_SIZE,
+                16.0 * 3.0_f32.sqrt() / TILE_SIZE,
+            ),
+        )
+        .transpose(),
+    );
+
+    let mut images = Vec::new();
+    for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
+        let mut transformed_models = Vec::new();
+        for (model_index, model_desc) in vehicle.model.iter().enumerate() {
+            let model = models.get(model_desc.mesh_index).context(format!(
+                "Invalid mesh index {} in vehicle {vehicle_index} model {model_index}",
+                model_desc.mesh_index
+            ))?;
+
+            let model_translation: glam::Vec3 = (model_desc.position).into();
+
+            let model_rotation = model_desc.orientation.first().context(format!(
+                "Frame 0 not in vehicle {vehicle_index} model {model_index} orientations"
+            ))?;
+            let model_rotation = glam::Quat::from_euler(
+                glam::EulerRot::XYZ,
+                model_rotation[0].to_radians(),
+                model_rotation[1].to_radians(),
+                model_rotation[2].to_radians(),
+            );
+
+            transformed_models.push(model.transform(&model_translation, &model_rotation, None, None));
+        }
+
+        let scene = renderer::Scene::new(&render_device, transformed_models)?;
+
+        if ride_desc.sprites.contains(&SpriteGroup::Flat) {
+            images.extend(render_rotations(&scene, &camera, &ride_desc.lights, 32, 0.0, 0.0, 0.0));
+        }
+    }
+
+    Ok(images)
+}
+
 fn main() -> anyhow::Result<()> {
     use anyhow::Context as _;
 
@@ -295,6 +393,11 @@ fn main() -> anyhow::Result<()> {
         .canonicalize()
         .context(format!("Invalid file path {}", ride_description_path.display()))?;
 
+    let base_directory = ride_description_path.parent().context(format!(
+        "Could not get parent directory of {}",
+        ride_description_path.display()
+    ))?;
+
     let ride_description = {
         let json = std::fs::read_to_string(&ride_description_path)
             .context(format!("Could not read file {}", ride_description_path.display()))?;
@@ -305,7 +408,22 @@ fn main() -> anyhow::Result<()> {
         ))?
     };
 
-    println!("{ride_description:?}");
+    let models = ride_description
+        .meshes
+        .iter()
+        .map(|x| {
+            let x = std::path::PathBuf::from(x);
+            let file_path = if x.is_absolute() { x } else { base_directory.join(x) };
+            renderer::model::Model::load(&file_path)
+        })
+        .collect::<anyhow::Result<Vec<renderer::model::Model>>>()?;
+
+    let images = render(&ride_description, &models)?;
+
+    for (i, image) in images.iter().enumerate() {
+        let file_path = base_directory.join("sprites").join(format!("{i}")).with_extension("png");
+        image.save(&file_path)?;
+    }
 
     println!("Time taken: {} milliseconds", start_time.elapsed().as_millis());
 
