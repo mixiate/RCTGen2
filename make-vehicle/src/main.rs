@@ -931,29 +931,21 @@ impl RideObject {
             images,
         }
     }
-}
 
-fn write_object_json(
-    output_directory: &std::path::Path,
-    ride_desc: &RideDesc,
-    images: Vec<ObjectImage>,
-) -> anyhow::Result<()> {
-    use anyhow::Context as _;
-    use serde::Serialize as _;
+    fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
+        use anyhow::Context as _;
+        use serde::Serialize as _;
 
-    let object = RideObject::new(ride_desc, images);
+        let json_formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
+        let mut json_buffer = Vec::new();
+        let mut json_serializer = serde_json::Serializer::with_formatter(&mut json_buffer, json_formatter);
 
-    let json_formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
-    let mut json_buffer = Vec::new();
-    let mut json_serializer = serde_json::Serializer::with_formatter(&mut json_buffer, json_formatter);
+        self.serialize(&mut json_serializer).with_context(|| "Could not serialize object json")?;
 
-    object.serialize(&mut json_serializer).with_context(|| "Could not serialize object json")?;
+        std::fs::write(path, json_buffer).with_context(|| format!("Could not write object file {}", path.display()))?;
 
-    let object_json_file_path = output_directory.join("object").with_extension("json");
-    std::fs::write(&object_json_file_path, json_buffer)
-        .with_context(|| format!("Could not write object file {}", object_json_file_path.display()))?;
-
-    Ok(())
+        Ok(())
+    }
 }
 
 fn main() -> anyhow::Result<()> {
@@ -1024,7 +1016,9 @@ fn main() -> anyhow::Result<()> {
 
     let images = render(&images_directory, &ride_description, &models)?;
 
-    write_object_json(&output_directory, &ride_description, images)?;
+    let object = RideObject::new(&ride_description, images);
+    let object_json_file_path = output_directory.join("object").with_extension("json");
+    object.save(&object_json_file_path)?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 
