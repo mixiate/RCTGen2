@@ -857,6 +857,30 @@ fn main() -> anyhow::Result<()> {
     std::fs::create_dir_all(&images_directory)
         .with_context(|| format!("Could not create directory {}", images_directory.display()))?;
 
+    let preview_output_file_path = images_directory.join("preview").with_extension("png");
+    if let Some(ref preview_file_path) = ride_description.preview {
+        let preview_file_path = base_directory.join(preview_file_path);
+        if preview_file_path != preview_output_file_path {
+            std::fs::copy(&preview_file_path, &preview_output_file_path).with_context(|| {
+                format!(
+                    "Could not copy preview image {} to {}",
+                    preview_file_path.display(),
+                    preview_output_file_path.display()
+                )
+            })?;
+        }
+    } else {
+        let image = renderer::image::IndexedImage {
+            pixels: vec![0],
+            width: 1,
+            height: 1,
+            offset: glam::IVec2::new(0, 0),
+        };
+        image
+            .save(&preview_output_file_path)
+            .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
+    }
+
     render(&images_directory, &ride_description, &models)?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
