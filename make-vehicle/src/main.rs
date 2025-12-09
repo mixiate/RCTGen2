@@ -650,9 +650,9 @@ fn render_vehicle(
         rots.push(VR::new(4, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
         //Steep bank 22.5
         let count = if sprite_groups.contains(&SpriteGroup::DiveLoops) {
-            4
-        } else {
             8
+        } else {
+            4
         };
         rots.push(VR::new(count, pitch_steep, FRAC_PI_8, 0.0));
         rots.push(VR::new(count, pitch_steep, -FRAC_PI_8, 0.0));
