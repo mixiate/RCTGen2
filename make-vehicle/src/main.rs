@@ -815,6 +815,82 @@ fn render(
     Ok(())
 }
 
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+enum ObjectType {
+    Ride,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ObjectString {
+    #[serde(rename = "en-GB")]
+    en_gb: String,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ObjectStrings {
+    name: ObjectString,
+    description: ObjectString,
+    capacity: ObjectString,
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RideObject {
+    id: String,
+    version: String,
+    authors: Vec<String>,
+    object_type: ObjectType,
+    // properties
+    strings: ObjectStrings,
+    // images
+}
+
+impl RideObject {
+    fn new(ride_desc: &RideDesc) -> Self {
+        let strings = ObjectStrings {
+            name: ObjectString {
+                en_gb: ride_desc.name.clone(),
+            },
+            description: ObjectString {
+                en_gb: ride_desc.description.clone(),
+            },
+            capacity: ObjectString {
+                en_gb: ride_desc.capacity.clone(),
+            },
+        };
+
+        Self {
+            id: ride_desc.id.clone(),
+            version: ride_desc.version.clone().unwrap_or("1.0".to_string()),
+            authors: vec![ride_desc.author.clone()],
+            object_type: ObjectType::Ride,
+            strings,
+        }
+    }
+}
+
+fn write_object_json(output_directory: &std::path::Path, ride_desc: &RideDesc) -> anyhow::Result<()> {
+    use anyhow::Context as _;
+    use serde::Serialize as _;
+
+    let object = RideObject::new(ride_desc);
+
+    let json_formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
+    let mut json_buffer = Vec::new();
+    let mut json_serializer = serde_json::Serializer::with_formatter(&mut json_buffer, json_formatter);
+
+    object.serialize(&mut json_serializer).with_context(|| "Could not serialize object json")?;
+
+    let object_json_file_path = output_directory.join("object").with_extension("json");
+    std::fs::write(&object_json_file_path, json_buffer)
+        .with_context(|| format!("Could not write object file {}", object_json_file_path.display()))?;
+
+    Ok(())
+}
+
 fn main() -> anyhow::Result<()> {
     use anyhow::Context as _;
 
@@ -882,6 +958,8 @@ fn main() -> anyhow::Result<()> {
     }
 
     render(&images_directory, &ride_description, &models)?;
+
+    write_object_json(&output_directory, &ride_description)?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 
