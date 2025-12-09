@@ -1,100 +1,4 @@
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-enum RideType {
-    AirPoweredVerticalRc,
-    AlpineRc,
-    BoatHire,
-    BobsleighRc,
-    CarRide,
-    CashMachine,
-    Chairlift,
-    Circus,
-    ClassicMiniRc,
-    ClassicStandUpRc,
-    ClassicWoodenRc,
-    ClassicWoodenTwisterRc,
-    CompactInvertedRc,
-    CorkscrewRc,
-    CrookedHouse,
-    DinghySlide,
-    Dodgems,
-    DrinkStall,
-    Enterprise,
-    FerrisWheel,
-    FirstAid,
-    FlyingRc,
-    FlyingRcAlt,
-    FlyingSaucers,
-    FoodStall,
-    GhostTrain,
-    GigaRc,
-    GoKarts,
-    HauntedHouse,
-    HeartlineTwisterRc,
-    HybridRc,
-    Hypercoaster,
-    HyperTwister,
-    InformationKiosk,
-    InvertedHairpinRc,
-    InvertedImpulseRc,
-    InvertedRc,
-    JuniorRc,
-    LaunchedFreefall,
-    LayDownRc,
-    LayDownRcAlt,
-    Lift,
-    LimLaunchedRc,
-    LogFlume,
-    LoopingRc,
-    LsmRc,
-    MagicCarpet,
-    Maze,
-    MerryGoRound,
-    MineRide,
-    MineTrainRc,
-    MiniatureRailway,
-    MiniGolf,
-    MiniHelicopters,
-    MiniRc,
-    MiniSuspendedRc,
-    Monorail,
-    MonorailCycles,
-    MonsterTrucks,
-    MotionSimulator,
-    MultiDimensionRc,
-    MultiDimensionRcAlt,
-    ObservationTower,
-    ReverseFreefallRc,
-    ReverserRc,
-    RiverRafts,
-    RiverRapids,
-    RotoDrop,
-    Shop,
-    SideFrictionRc,
-    SingleRailRc,
-    SpaceRings,
-    SpinningWildMouse,
-    SpiralRc,
-    SpiralSlide,
-    SplashBoats,
-    StandUpRc,
-    SteelWildMouse,
-    Steeplechase,
-    SubmarineRide,
-    SuspendedMonorail,
-    SuspendedSwingingRc,
-    SwingingInverterShip,
-    SwingingShip,
-    Toilets,
-    TopSpin,
-    Twist,
-    TwisterRc,
-    VerticalDropRc,
-    VirginiaReel,
-    WaterCoaster,
-    WoodenRc,
-    WoodenWildMouse,
-}
+mod ride_object;
 
 #[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -124,7 +28,7 @@ enum SpriteGroup {
     DiveLoops,
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum RunningSound {
     WoodenOld = 1,
@@ -135,7 +39,7 @@ enum RunningSound {
     Engine = 21,
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 enum SecondarySound {
     Scream1 = 0,
@@ -150,67 +54,6 @@ struct Configuration {
     default: i32,
     front: Option<i32>,
     rear: Option<i32>,
-}
-
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-enum ColourType {
-    Black,
-    Grey,
-    White,
-    DarkPurple,
-    LightPurple,
-    BrightPurple,
-    DarkBlue,
-    LightBlue,
-    IcyBlue,
-    Teal,
-    Aquamarine,
-    SaturatedGreen,
-    DarkGreen,
-    MossGreen,
-    BrightGreen,
-    OliveGreen,
-    DarkOliveGreen,
-    BrightYellow,
-    Yellow,
-    DarkYellow,
-    LightOrange,
-    DarkOrange,
-    LightBrown,
-    SaturatedBrown,
-    DarkBrown,
-    SalmonPink,
-    BordeauxRed,
-    SaturatedRed,
-    BrightRed,
-    DarkPink,
-    BrightPink,
-    LightPink,
-    DarkOliveDark,
-    DarkOliveLight,
-    SaturatedBrownLight,
-    BordeauxRedDark,
-    BordeauxRedLight,
-    GrassGreenDark,
-    GrassGreenLight,
-    OliveDark,
-    OliveLight,
-    SaturatedGreenLight,
-    TanDark,
-    TanLight,
-    DullPurpleLight,
-    DullGreenDark,
-    DullGreenLight,
-    SaturatedPurpleDark,
-    SaturatedPurpleLight,
-    OrangeLight,
-    AquaDark,
-    MagentaLight,
-    DullBrownDark,
-    DullBrownLight,
-    Invisible,
-    Void,
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
@@ -265,7 +108,7 @@ struct RideDesc {
     author: String,
     version: Option<String>,
     preview: Option<std::path::PathBuf>,
-    ride_type: RideType,
+    ride_type: ride_object::RideType,
     flags: Option<std::collections::HashSet<RideFlag>>,
     sprites: std::collections::HashSet<SpriteGroup>,
     zero_cars: i32,
@@ -276,7 +119,7 @@ struct RideDesc {
     min_cars_per_train: i32,
     max_cars_per_train: i32,
     configuration: Configuration,
-    default_colors: Vec<[ColourType; 3]>,
+    default_colors: Vec<[ride_object::ColourType; 3]>,
     meshes: Vec<std::path::PathBuf>,
     vehicles: Vec<VehicleDesc>,
     lights: Vec<LightDesc>,
@@ -699,7 +542,7 @@ fn render(
     output_directory: &std::path::Path,
     ride_desc: &RideDesc,
     models: &[renderer::model::Model],
-) -> anyhow::Result<Vec<ObjectImage>> {
+) -> anyhow::Result<Vec<ride_object::Image>> {
     use anyhow::Context as _;
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
@@ -720,7 +563,7 @@ fn render(
     let angles = VehicleAngles::new();
 
     let mut object_images = vec![
-        ObjectImage {
+        ride_object::Image {
             path: "images/preview.png".to_string(),
             x: 0,
             y: 0,
@@ -728,8 +571,8 @@ fn render(
             src_y: None,
             src_width: None,
             src_height: None,
-            format: Some(ObjectImageFormat::Raw),
-            palette: ObjectImagePaletteType::Keep
+            format: Some(ride_object::ImageFormat::Raw),
+            palette: ride_object::ImagePaletteType::Keep
         };
         3
     ];
@@ -827,7 +670,7 @@ fn render(
         image.save(&file_path)?;
 
         for (image, coord) in images.iter().zip(coords.iter()) {
-            object_images.push(ObjectImage {
+            object_images.push(ride_object::Image {
                 path: format!("images/car_{vehicle_index}.png"),
                 x: image.offset.x,
                 y: image.offset.y,
@@ -836,388 +679,12 @@ fn render(
                 src_width: Some(image.width as i32),
                 src_height: Some(image.height as i32),
                 format: None,
-                palette: ObjectImagePaletteType::Keep,
+                palette: ride_object::ImagePaletteType::Keep,
             });
         }
     }
 
     Ok(object_images)
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-enum ObjectType {
-    Ride,
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-enum ObjectCategory {
-    #[expect(unused)]
-    Transport,
-    #[expect(unused)]
-    Gentle,
-    Rollercoaster,
-    #[expect(unused)]
-    Thrill,
-    #[expect(unused)]
-    Water,
-    #[expect(unused)]
-    Stall,
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ObjectSpriteGroups {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slope_flat: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes12: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes25: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes42: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes60: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes75: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes_loop: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slope_inverted: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes8: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes16: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes50: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    flat_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    flat_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    flat_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    flat_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    inline_twists: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes12_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes8_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes25_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes8_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes16_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes16_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes25_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes12_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes25_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes25_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes25_inline_twists: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes42_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes42_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes42_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes42_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes60_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes50_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes50_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    slopes50_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    corkscrews: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    restraint_animation: Option<i32>,
-}
-
-impl ObjectSpriteGroups {
-    fn new(ride_desc: &RideDesc, vehicle: &VehicleDesc) -> Self {
-        let restraint_animation =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&VehicleFlag::RestraintAnimation).then_some(4));
-
-        let slopes60_banked22 = if ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls) {
-            if ride_desc.sprites.contains(&SpriteGroup::DiveLoops) {
-                Some(8)
-            } else {
-                Some(4)
-            }
-        } else {
-            None
-        };
-
-        ObjectSpriteGroups {
-            slope_flat: ride_desc.sprites.contains(&SpriteGroup::Flat).then_some(32),
-            slopes12: ride_desc.sprites.contains(&SpriteGroup::GentleSlopes).then_some(4),
-            slopes25: ride_desc.sprites.contains(&SpriteGroup::GentleSlopes).then_some(32),
-            slopes42: ride_desc.sprites.contains(&SpriteGroup::SteepSlopes).then_some(8),
-            slopes60: ride_desc.sprites.contains(&SpriteGroup::SteepSlopes).then_some(32),
-            slopes75: ride_desc.sprites.contains(&SpriteGroup::VerticalSlopes).then_some(4),
-            slopes90: ride_desc.sprites.contains(&SpriteGroup::VerticalSlopes).then_some(32),
-            slopes_loop: ride_desc.sprites.contains(&SpriteGroup::VerticalSlopes).then_some(4),
-            slope_inverted: ride_desc.sprites.contains(&SpriteGroup::VerticalSlopes).then_some(4),
-            slopes8: ride_desc.sprites.contains(&SpriteGroup::Diagonals).then_some(4),
-            slopes16: ride_desc.sprites.contains(&SpriteGroup::Diagonals).then_some(4),
-            slopes50: ride_desc.sprites.contains(&SpriteGroup::Diagonals).then_some(4),
-            flat_banked22: ride_desc.sprites.contains(&SpriteGroup::BankedTurns).then_some(8),
-            flat_banked45: ride_desc.sprites.contains(&SpriteGroup::BankedTurns).then_some(32),
-            flat_banked67: ride_desc.sprites.contains(&SpriteGroup::InlineTwists).then_some(4),
-            flat_banked90: ride_desc.sprites.contains(&SpriteGroup::InlineTwists).then_some(4),
-            inline_twists: ride_desc.sprites.contains(&SpriteGroup::InlineTwists).then_some(4),
-            slopes12_banked22: ride_desc.sprites.contains(&SpriteGroup::SlopeBankTransition).then_some(32),
-            slopes8_banked22: ride_desc.sprites.contains(&SpriteGroup::DiagonalBankTransition).then_some(4),
-            slopes25_banked22: ride_desc.sprites.contains(&SpriteGroup::SlopedBankTransition).then_some(4),
-            slopes8_banked45: ride_desc.sprites.contains(&SpriteGroup::DiagonalSlopedBankTransition).then_some(4),
-            slopes16_banked22: ride_desc.sprites.contains(&SpriteGroup::DiagonalSlopedBankTransition).then_some(4),
-            slopes16_banked45: ride_desc.sprites.contains(&SpriteGroup::DiagonalSlopedBankTransition).then_some(4),
-            slopes25_banked45: ride_desc.sprites.contains(&SpriteGroup::BankedSlopedTurns).then_some(32),
-            slopes12_banked45: ride_desc.sprites.contains(&SpriteGroup::BankedSlopeTransition).then_some(4),
-            slopes25_banked67: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes25_banked90: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes25_inline_twists: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes42_banked22: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes42_banked45: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes42_banked67: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes42_banked90: ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls).then_some(4),
-            slopes60_banked22,
-            slopes50_banked45: ride_desc.sprites.contains(&SpriteGroup::DiveLoops).then_some(8),
-            slopes50_banked67: ride_desc.sprites.contains(&SpriteGroup::DiveLoops).then_some(8),
-            slopes50_banked90: ride_desc.sprites.contains(&SpriteGroup::DiveLoops).then_some(8),
-            corkscrews: ride_desc.sprites.contains(&SpriteGroup::Corkscrews).then_some(4),
-            restraint_animation,
-        }
-    }
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ObjectCar {
-    rotation_frame_mask: i32,
-    spacing: i32,
-    mass: i32,
-    num_seats: i32,
-    num_seat_rows: i32,
-    friction_sound_id: i32,
-    sound_range: i32,
-    draw_order: i32,
-    sprite_groups: ObjectSpriteGroups,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    has_additional_colour1: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    has_additional_colour2: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    has_screaming_riders: Option<bool>,
-    loading_positions: Vec<i32>,
-}
-
-impl ObjectCar {
-    fn new(ride_desc: &RideDesc, vehicle: &VehicleDesc) -> Self {
-        let num_seats = vehicle.capacity.unwrap_or(0);
-        let num_seat_rows = vehicle.riders.as_ref().map(|x| x.len() as i32).unwrap_or(0);
-
-        let has_additional_colour1 =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&VehicleFlag::SecondaryRemap).then_some(true));
-        let has_additional_colour2 =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&VehicleFlag::TertiaryRemap).then_some(true));
-        let has_screaming_riders =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&VehicleFlag::RidersScream).then_some(true));
-
-        let loading_positions = vehicle
-            .riders
-            .iter()
-            .flatten()
-            .flat_map(|rider| {
-                let position = (32.0 * rider.position[0] / TILE_SIZE).round() as i32;
-                if num_seats > 1 {
-                    vec![position - 1, position + 1]
-                } else {
-                    vec![position]
-                }
-            })
-            .collect();
-
-        ObjectCar {
-            rotation_frame_mask: 31,
-            spacing: ((vehicle.spacing * 278912.0) / TILE_SIZE) as i32,
-            mass: vehicle.mass,
-            num_seats,
-            num_seat_rows,
-            friction_sound_id: ride_desc.running_sound as i32,
-            sound_range: ride_desc.secondary_sound as i32,
-            draw_order: vehicle.draw_order,
-            sprite_groups: ObjectSpriteGroups::new(ride_desc, vehicle),
-            has_additional_colour1,
-            has_additional_colour2,
-            has_screaming_riders,
-            loading_positions,
-        }
-    }
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ObjectProperties {
-    #[serde(rename = "type")]
-    ride_type: RideType,
-    category: ObjectCategory,
-    min_cars_per_train: i32,
-    max_cars_per_train: i32,
-    num_empty_cars: i32,
-    tab_car: i32,
-    default_car: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    head_cars: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    tail_cars: Option<Vec<i32>>,
-    build_menu_priority: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    no_collision_crashes: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    rider_controls_speed: Option<bool>,
-    car_colors: Vec<Vec<[ColourType; 3]>>,
-    cars: Vec<ObjectCar>,
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ObjectString {
-    #[serde(rename = "en-GB")]
-    en_gb: String,
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ObjectStrings {
-    name: ObjectString,
-    description: ObjectString,
-    capacity: ObjectString,
-}
-
-#[derive(Clone, Copy, Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-enum ObjectImageFormat {
-    Raw,
-}
-
-#[derive(Clone, Copy, Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-enum ObjectImagePaletteType {
-    Keep,
-}
-
-#[derive(Clone, Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ObjectImage {
-    path: String,
-    x: i32,
-    y: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    src_x: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    src_y: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    src_width: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    src_height: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    format: Option<ObjectImageFormat>,
-    palette: ObjectImagePaletteType,
-}
-
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct RideObject {
-    id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    original_id: Option<String>,
-    version: String,
-    authors: Vec<String>,
-    object_type: ObjectType,
-    properties: ObjectProperties,
-    strings: ObjectStrings,
-    images: Vec<ObjectImage>,
-}
-
-impl RideObject {
-    fn new(ride_desc: &RideDesc, images: Vec<ObjectImage>) -> Self {
-        let no_collision_crashes =
-            ride_desc.flags.as_ref().and_then(|x| x.contains(&RideFlag::NoCollisionCrashes).then_some(true));
-        let rider_controls_speed =
-            ride_desc.flags.as_ref().and_then(|x| x.contains(&RideFlag::RiderControlsSpeed).then_some(true));
-
-        let cars = ride_desc.vehicles.iter().map(|vehicle| ObjectCar::new(ride_desc, vehicle)).collect();
-
-        let properties = ObjectProperties {
-            ride_type: ride_desc.ride_type,
-            category: ObjectCategory::Rollercoaster,
-            min_cars_per_train: ride_desc.min_cars_per_train,
-            max_cars_per_train: ride_desc.max_cars_per_train,
-            num_empty_cars: ride_desc.zero_cars,
-            tab_car: ride_desc.preview_tab_car,
-            default_car: ride_desc.configuration.default,
-            head_cars: ride_desc.configuration.front.map(|x| vec![x]),
-            tail_cars: ride_desc.configuration.rear.map(|x| vec![x]),
-            build_menu_priority: ride_desc.build_menu_priority,
-            no_collision_crashes,
-            rider_controls_speed,
-            car_colors: ride_desc.default_colors.iter().map(|x| vec![*x]).collect(),
-            cars,
-        };
-
-        let strings = ObjectStrings {
-            name: ObjectString {
-                en_gb: ride_desc.name.clone(),
-            },
-            description: ObjectString {
-                en_gb: ride_desc.description.clone(),
-            },
-            capacity: ObjectString {
-                en_gb: ride_desc.capacity.clone(),
-            },
-        };
-
-        Self {
-            id: ride_desc.id.clone(),
-            original_id: ride_desc.original_id.clone(),
-            version: ride_desc.version.clone().unwrap_or("1.0".to_string()),
-            authors: vec![ride_desc.author.clone()],
-            object_type: ObjectType::Ride,
-            properties,
-            strings,
-            images,
-        }
-    }
-
-    fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
-        use anyhow::Context as _;
-        use serde::Serialize as _;
-
-        let json_formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
-        let mut json_buffer = Vec::new();
-        let mut json_serializer = serde_json::Serializer::with_formatter(&mut json_buffer, json_formatter);
-
-        self.serialize(&mut json_serializer).with_context(|| "Could not serialize object json")?;
-
-        std::fs::write(path, json_buffer).with_context(|| format!("Could not write object file {}", path.display()))?;
-
-        Ok(())
-    }
 }
 
 fn main() -> anyhow::Result<()> {
@@ -1288,7 +755,7 @@ fn main() -> anyhow::Result<()> {
 
     let images = render(&images_directory, &ride_description, &models)?;
 
-    let object = RideObject::new(&ride_description, images);
+    let object = ride_object::RideObject::new(&ride_description, images);
     let object_json_file_path = output_directory.join("object").with_extension("json");
     object.save(&object_json_file_path)?;
 
