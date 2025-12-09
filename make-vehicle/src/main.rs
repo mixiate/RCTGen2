@@ -859,7 +859,7 @@ fn main() -> anyhow::Result<()> {
 
     render(&images_directory, &ride_description, &models)?;
 
-    println!("Time taken: {} milliseconds", start_time.elapsed().as_millis());
+    println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 
     Ok(())
 }
