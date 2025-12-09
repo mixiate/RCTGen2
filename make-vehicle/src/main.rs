@@ -831,10 +831,6 @@ fn main() -> anyhow::Result<()> {
         .parent()
         .context(format!("Could not get parent directory of {}", ride_description_path.display()))?;
 
-    let output_directory = base_directory.join("object");
-    std::fs::create_dir_all(&output_directory)
-        .with_context(|| format!("Could not create directory {}", output_directory.display()))?;
-
     let ride_description = {
         let json = std::fs::read_to_string(&ride_description_path)
             .context(format!("Could not read file {}", ride_description_path.display()))?;
@@ -842,6 +838,10 @@ fn main() -> anyhow::Result<()> {
         serde_json::from_str::<RideDesc>(&json)
             .context(format!("Could not parse json in file {}", ride_description_path.display()))?
     };
+
+    let output_directory = base_directory.join(&ride_description.id);
+    std::fs::create_dir_all(&output_directory)
+        .with_context(|| format!("Could not create directory {}", output_directory.display()))?;
 
     let models = ride_description
         .meshes
