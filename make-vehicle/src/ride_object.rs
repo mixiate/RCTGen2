@@ -179,84 +179,47 @@ enum Category {
     Stall,
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SpriteGroups {
-    #[serde(skip_serializing_if = "Option::is_none")]
     slope_flat: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes12: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes25: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes42: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes60: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes75: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes_loop: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slope_inverted: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes8: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes16: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes50: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     flat_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     flat_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     flat_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     flat_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     inline_twists: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes12_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes8_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes25_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes8_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes16_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes16_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes25_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes12_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes25_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes25_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes25_inline_twists: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes42_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes42_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes42_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes42_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes60_banked22: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes50_banked45: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes50_banked67: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     slopes50_banked90: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     corkscrews: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     restraint_animation: Option<i32>,
 }
 
@@ -322,6 +285,7 @@ impl SpriteGroups {
     }
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Car {
@@ -334,11 +298,8 @@ struct Car {
     sound_range: i32,
     draw_order: i32,
     sprite_groups: SpriteGroups,
-    #[serde(skip_serializing_if = "Option::is_none")]
     has_additional_colour1: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     has_additional_colour2: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     has_screaming_riders: Option<bool>,
     loading_positions: Vec<i32>,
 }
@@ -387,6 +348,7 @@ impl Car {
     }
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Properties {
@@ -398,14 +360,10 @@ struct Properties {
     num_empty_cars: i32,
     tab_car: i32,
     default_car: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     head_cars: Option<Vec<i32>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     tail_cars: Option<Vec<i32>>,
     build_menu_priority: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     no_collision_crashes: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     rider_controls_speed: Option<bool>,
     car_colors: Vec<Vec<[ColourType; 3]>>,
     cars: Vec<Car>,
@@ -438,30 +396,26 @@ pub(crate) enum ImagePaletteType {
     Keep,
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Image {
     pub(crate) path: String,
     pub(crate) x: i32,
     pub(crate) y: i32,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) src_x: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) src_y: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) src_width: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) src_height: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) format: Option<ImageFormat>,
     pub(crate) palette: ImagePaletteType,
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct RideObject {
     id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
     original_id: Option<String>,
     version: String,
     authors: Vec<String>,
