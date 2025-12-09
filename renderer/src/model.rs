@@ -75,6 +75,7 @@ pub struct Model {
     pub meshes: Vec<Mesh>,
 }
 
+#[derive(Clone)]
 pub struct TransformedMesh<'a> {
     pub mesh: &'a Mesh,
     pub positions: Vec<(f32, f32, f32)>,
@@ -83,6 +84,7 @@ pub struct TransformedMesh<'a> {
     pub is_ghost: bool,
 }
 
+#[derive(Clone)]
 pub struct TransformedModel<'a> {
     pub meshes: Vec<TransformedMesh<'a>>,
 }

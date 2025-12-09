@@ -720,32 +720,92 @@ fn render(
     let angles = VehicleAngles::new();
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
-        let mut transformed_models = Vec::new();
-        for (model_index, model_desc) in vehicle.model.iter().enumerate() {
-            let model = models.get(model_desc.mesh_index).context(format!(
-                "Invalid mesh index {} in vehicle {vehicle_index} model {model_index}",
-                model_desc.mesh_index
-            ))?;
+        let mut images = Vec::new();
 
-            let model_translation: glam::Vec3 = (model_desc.position).into();
+        // The way transformed models work and are added to the scene is terrible. Fix this at some point
+        let vehicle_models = {
+            let mut transformed_models = Vec::new();
+            for (model_index, model_desc) in vehicle.model.iter().enumerate() {
+                let model = models.get(model_desc.mesh_index).context(format!(
+                    "Invalid mesh index {} in vehicle {vehicle_index} model {model_index}",
+                    model_desc.mesh_index
+                ))?;
 
-            let model_rotation = model_desc
-                .orientation
-                .first()
-                .context(format!("Frame 0 not in vehicle {vehicle_index} model {model_index} orientations"))?;
-            let model_rotation = glam::Quat::from_euler(
-                glam::EulerRot::XYZ,
-                model_rotation[0].to_radians(),
-                model_rotation[1].to_radians(),
-                model_rotation[2].to_radians(),
-            );
+                let model_translation: glam::Vec3 = (model_desc.position).into();
 
-            transformed_models.push(model.transform(&model_translation, &model_rotation, None, None));
+                let model_rotation = model_desc
+                    .orientation
+                    .first()
+                    .context(format!("Frame 0 not in vehicle {vehicle_index} model {model_index} orientations"))?;
+                let model_rotation = glam::Quat::from_euler(
+                    glam::EulerRot::XYZ,
+                    model_rotation[0].to_radians(),
+                    model_rotation[1].to_radians(),
+                    model_rotation[2].to_radians(),
+                );
+
+                transformed_models.push(model.transform(&model_translation, &model_rotation, None, None));
+            }
+            transformed_models
+        };
+
+        {
+            let scene = renderer::Scene::new(&render_device, vehicle_models.clone())?;
+            images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
         }
 
-        let scene = renderer::Scene::new(&render_device, transformed_models)?;
+        let rider_models = vehicle
+            .riders
+            .iter()
+            .flatten()
+            .enumerate()
+            .map(|(rider_index, rider)| {
+                let model = models.get(rider.mesh_index).context(format!(
+                    "Invalid mesh index {} in vehicle {vehicle_index} rider {rider_index}",
+                    rider.mesh_index
+                ))?;
 
-        let images = render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles);
+                let model_translation: glam::Vec3 = (rider.position).into();
+
+                let model_rotation = rider
+                    .orientation
+                    .first()
+                    .context(format!("Frame 0 not in vehicle {vehicle_index} rider {rider_index} orientations"))?;
+                let model_rotation = glam::Quat::from_euler(
+                    glam::EulerRot::XYZ,
+                    model_rotation[0].to_radians(),
+                    model_rotation[1].to_radians(),
+                    model_rotation[2].to_radians(),
+                );
+
+                Ok(model.transform(&model_translation, &model_rotation, None, None))
+            })
+            .collect::<anyhow::Result<Vec<_>>>()?;
+
+        for (rider_index, rider_model) in rider_models.iter().enumerate() {
+            let mut models = Vec::new();
+
+            models.push(rider_model.clone());
+
+            let mut vehicle_models = vehicle_models.clone();
+            for model in &mut vehicle_models {
+                for mesh in &mut model.meshes {
+                    mesh.is_mask = true;
+                }
+            }
+            models.append(&mut vehicle_models);
+
+            for rider_model in rider_models[0..rider_index].iter() {
+                let mut rider_model = rider_model.clone();
+                for mesh in &mut rider_model.meshes {
+                    mesh.is_mask = true;
+                }
+                models.push(rider_model);
+            }
+
+            let scene = renderer::Scene::new(&render_device, models)?;
+            images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
+        }
 
         let (image, _coords) = renderer::image::create_atlas(&images);
         let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
