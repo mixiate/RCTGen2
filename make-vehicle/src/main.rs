@@ -698,7 +698,7 @@ fn render(
     output_directory: &std::path::Path,
     ride_desc: &RideDesc,
     models: &[renderer::model::Model],
-) -> anyhow::Result<()> {
+) -> anyhow::Result<Vec<ObjectImage>> {
     use anyhow::Context as _;
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
@@ -718,6 +718,21 @@ fn render(
     );
 
     let angles = VehicleAngles::new();
+
+    let mut object_images = vec![
+        ObjectImage {
+            path: "images/preview.png".to_string(),
+            x: 0,
+            y: 0,
+            src_x: None,
+            src_y: None,
+            src_width: None,
+            src_height: None,
+            format: Some(ObjectImageFormat::Raw),
+            palette: ObjectImagePaletteType::Keep
+        };
+        3
+    ];
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
         let mut images = Vec::new();
@@ -807,12 +822,26 @@ fn render(
             images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
         }
 
-        let (image, _coords) = renderer::image::create_atlas(&images);
+        let (image, coords) = renderer::image::create_atlas(&images);
         let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
         image.save(&file_path)?;
+
+        for (image, coord) in images.iter().zip(coords.iter()) {
+            object_images.push(ObjectImage {
+                path: format!("images/car_{vehicle_index}.png"),
+                x: image.offset.x,
+                y: image.offset.y,
+                src_x: Some(coord.x),
+                src_y: Some(coord.y),
+                src_width: Some(image.width as i32),
+                src_height: Some(image.height as i32),
+                format: None,
+                palette: ObjectImagePaletteType::Keep,
+            });
+        }
     }
 
-    Ok(())
+    Ok(object_images)
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -836,6 +865,37 @@ struct ObjectStrings {
     capacity: ObjectString,
 }
 
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+enum ObjectImageFormat {
+    Raw,
+}
+
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+enum ObjectImagePaletteType {
+    Keep,
+}
+
+#[derive(Clone, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ObjectImage {
+    path: String,
+    x: i32,
+    y: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    src_x: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    src_y: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    src_width: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    src_height: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    format: Option<ObjectImageFormat>,
+    palette: ObjectImagePaletteType,
+}
+
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct RideObject {
@@ -845,11 +905,11 @@ struct RideObject {
     object_type: ObjectType,
     // properties
     strings: ObjectStrings,
-    // images
+    images: Vec<ObjectImage>,
 }
 
 impl RideObject {
-    fn new(ride_desc: &RideDesc) -> Self {
+    fn new(ride_desc: &RideDesc, images: Vec<ObjectImage>) -> Self {
         let strings = ObjectStrings {
             name: ObjectString {
                 en_gb: ride_desc.name.clone(),
@@ -868,15 +928,20 @@ impl RideObject {
             authors: vec![ride_desc.author.clone()],
             object_type: ObjectType::Ride,
             strings,
+            images,
         }
     }
 }
 
-fn write_object_json(output_directory: &std::path::Path, ride_desc: &RideDesc) -> anyhow::Result<()> {
+fn write_object_json(
+    output_directory: &std::path::Path,
+    ride_desc: &RideDesc,
+    images: Vec<ObjectImage>,
+) -> anyhow::Result<()> {
     use anyhow::Context as _;
     use serde::Serialize as _;
 
-    let object = RideObject::new(ride_desc);
+    let object = RideObject::new(ride_desc, images);
 
     let json_formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
     let mut json_buffer = Vec::new();
@@ -957,9 +1022,9 @@ fn main() -> anyhow::Result<()> {
             .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
     }
 
-    render(&images_directory, &ride_description, &models)?;
+    let images = render(&images_directory, &ride_description, &models)?;
 
-    write_object_json(&output_directory, &ride_description)?;
+    write_object_json(&output_directory, &ride_description, images)?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 
