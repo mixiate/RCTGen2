@@ -29,7 +29,8 @@ pub struct Framebuffer {
 }
 
 impl Framebuffer {
-    fn bounds(&self) -> [usize; 4] {
+    fn bounds(&self) -> Option<[usize; 4]> {
+        let mut found_pixel = false;
         let mut min_x = self.width;
         let mut min_y = self.height;
         let mut max_x = 0;
@@ -37,6 +38,7 @@ impl Framebuffer {
         for y in 0..self.height {
             for x in 0..self.width {
                 if self.buffer[y * self.width + x].palette_region_type.is_some() {
+                    found_pixel = true;
                     min_x = std::cmp::min(min_x, x);
                     min_y = std::cmp::min(min_y, y);
                     max_x = std::cmp::max(max_x, x + 1);
@@ -44,7 +46,7 @@ impl Framebuffer {
                 }
             }
         }
-        [min_x, min_y, max_x, max_y]
+        found_pixel.then_some([min_x, min_y, max_x, max_y])
     }
 
     fn get_offset(&self, x: usize, y: usize) -> glam::IVec2 {
@@ -120,7 +122,16 @@ impl Framebuffer {
     }
 
     pub fn into_cropped_indexed_image(self, dither: bool) -> crate::image::IndexedImage {
-        let bounds = self.bounds();
-        self.into_indexed_image_inner(dither, &bounds)
+        if let Some(bounds) = self.bounds() {
+            self.into_indexed_image_inner(dither, &bounds)
+        } else {
+            // Output a 1x1 transparent pixel here as the game often requires sprites even if they are empty
+            crate::image::IndexedImage {
+                pixels: vec![0],
+                width: 1,
+                height: 1,
+                offset: glam::IVec2::new(0, 0),
+            }
+        }
     }
 }
