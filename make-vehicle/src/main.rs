@@ -538,11 +538,16 @@ fn render_vehicle(
 
 const TILE_SIZE: f32 = 3.3;
 
+struct RenderResult {
+    images: Vec<ride_object::Image>,
+    file_paths: Vec<std::path::PathBuf>,
+}
+
 fn render(
     output_directory: &std::path::Path,
     ride_desc: &RideDesc,
     models: &[renderer::model::Model],
-) -> anyhow::Result<Vec<ride_object::Image>> {
+) -> anyhow::Result<RenderResult> {
     use anyhow::Context as _;
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
@@ -576,6 +581,8 @@ fn render(
         };
         3
     ];
+
+    let mut file_paths = Vec::new();
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
         let mut images = Vec::new();
@@ -682,9 +689,35 @@ fn render(
                 palette: ride_object::ImagePaletteType::Keep,
             });
         }
+
+        file_paths.push(file_path);
     }
 
-    Ok(object_images)
+    Ok(RenderResult {
+        images: object_images,
+        file_paths,
+    })
+}
+
+fn create_parkobj(
+    output_directory: &std::path::Path,
+    parkobj_path: &std::path::Path,
+    file_paths: &[std::path::PathBuf],
+) -> anyhow::Result<()> {
+    use std::io::Write as _;
+
+    let file = std::fs::File::create(parkobj_path)?;
+    let mut zip = zip::ZipWriter::new(file);
+    let options = zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+
+    for file_path in file_paths {
+        let file_name = file_path.strip_prefix(output_directory)?;
+        let file_bytes = std::fs::read(file_path)?;
+        zip.start_file_from_path(file_name, options)?;
+        zip.write_all(&file_bytes)?;
+    }
+
+    Ok(())
 }
 
 fn main() -> anyhow::Result<()> {
@@ -753,11 +786,18 @@ fn main() -> anyhow::Result<()> {
             .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
     }
 
-    let images = render(&images_directory, &ride_description, &models)?;
+    let RenderResult { images, mut file_paths } = render(&images_directory, &ride_description, &models)?;
 
     let object = ride_object::RideObject::new(&ride_description, images);
     let object_json_file_path = output_directory.join("object").with_extension("json");
     object.save(&object_json_file_path)?;
+
+    file_paths.push(preview_output_file_path);
+    file_paths.push(object_json_file_path);
+
+    let parkobj_path = output_directory.with_added_extension("parkobj");
+    create_parkobj(&output_directory, &parkobj_path, &file_paths)
+        .with_context(|| format!("Could not create parkobj file {}", parkobj_path.display()))?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 
