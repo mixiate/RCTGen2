@@ -124,19 +124,25 @@ fn main() -> anyhow::Result<()> {
             );
 
             for rotation_index in 0..item.rotations {
-                let model_translation = {
-                    let offsets = [0.0, -1.0, 0.0, -1.5, 0.0, -1.0, 0.0, -1.5];
-                    let offset = glam::Vec3::new(
-                        CLEARANCE_HEIGHT * offsets[2 * rotation_index] / 8.0,
-                        CLEARANCE_HEIGHT * offsets[2 * rotation_index + 1] / 8.0,
-                        0.0,
-                    );
-                    model_translation + offset
+                let scene = {
+                    let model_translation = {
+                        let offsets = [0.0, -1.0, 0.0, -1.5, 0.0, -1.0, 0.0, -1.5];
+                        let offset = glam::Vec3::new(
+                            CLEARANCE_HEIGHT * offsets[2 * rotation_index] / 8.0,
+                            CLEARANCE_HEIGHT * offsets[2 * rotation_index + 1] / 8.0,
+                            0.0,
+                        );
+                        model_translation + offset
+                    };
+                    let scene_models = &[renderer::SceneModelDesc {
+                        model,
+                        translation: model_translation,
+                        rotation: model_rotation,
+                        is_mask: None,
+                        is_ghost: None,
+                    }];
+                    renderer::Scene::new(&render_device, scene_models)?
                 };
-                let scene = renderer::Scene::new(
-                    &render_device,
-                    vec![model.transform(&model_translation, &model_rotation, None, None)],
-                )?;
 
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
                 let camera = camera * view_rotation;

@@ -1,3 +1,11 @@
+pub struct SceneModelDesc<'a> {
+    pub model: &'a crate::model::Model,
+    pub translation: glam::Vec3,
+    pub rotation: glam::Quat,
+    pub is_mask: Option<bool>,
+    pub is_ghost: Option<bool>,
+}
+
 struct SceneMesh<'a> {
     mesh: &'a crate::model::Mesh,
     normals: Vec<glam::Vec3>,
@@ -28,24 +36,29 @@ pub enum RayHit<'a> {
 }
 
 impl Scene<'_> {
-    pub fn new<'a>(
-        embree_device: &'a embree::Device,
-        models: Vec<crate::model::TransformedModel<'a>>,
-    ) -> anyhow::Result<Scene<'a>> {
+    pub fn new<'a>(embree_device: &'a embree::Device, models: &[SceneModelDesc<'a>]) -> anyhow::Result<Scene<'a>> {
         use anyhow::Context as _;
+
         let embree_scene = embree::Scene::try_new(embree_device).context("Could not create embree scene")?;
 
         let meshes = {
-            let mut meshes: Vec<SceneMesh> = Vec::new();
-            for model in models {
-                for mesh in model.meshes {
-                    embree_scene.add_geometry(&mesh.positions, &mesh.mesh.indices)?;
+            let mut meshes = Vec::new();
+            for model_desc in models {
+                let transform =
+                    glam::Mat4::from_translation(model_desc.translation) * glam::Mat4::from_quat(model_desc.rotation);
+                for mesh in &model_desc.model.meshes {
+                    let positions: Vec<_> =
+                        mesh.positions.iter().map(|x| transform.transform_point3(*x).into()).collect();
+                    let normals: Vec<_> =
+                        mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
+
+                    embree_scene.add_geometry(&positions, &mesh.indices)?;
 
                     meshes.push(SceneMesh {
-                        mesh: mesh.mesh,
-                        normals: mesh.normals,
-                        is_mask: mesh.is_mask,
-                        is_ghost: mesh.is_ghost,
+                        mesh,
+                        normals,
+                        is_mask: model_desc.is_mask.unwrap_or(mesh.is_mask),
+                        is_ghost: model_desc.is_ghost.unwrap_or(mesh.is_ghost),
                     });
                 }
             }

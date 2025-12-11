@@ -619,12 +619,22 @@ fn render(
                 let (model, translation, rotation) = model_desc
                     .get_frame_info(models, 0)
                     .with_context(|| format!("Error in vehicle {vehicle_index} model {model_index}"))?;
-                Ok(model.transform(&translation, &rotation, None, None))
+                Ok((model, translation, rotation))
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
 
         {
-            let scene = renderer::Scene::new(&render_device, vehicle_models.clone())?;
+            let scene_models = vehicle_models
+                .iter()
+                .map(|model_desc| renderer::SceneModelDesc {
+                    model: model_desc.0,
+                    translation: model_desc.1,
+                    rotation: model_desc.2,
+                    is_mask: None,
+                    is_ghost: None,
+                })
+                .collect::<Vec<_>>();
+            let scene = renderer::Scene::new(&render_device, &scene_models)?;
             images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
         }
 
@@ -633,36 +643,42 @@ fn render(
             .iter()
             .flatten()
             .enumerate()
-            .map(|(rider_index, model_desc)| {
+            .map(|(model_index, model_desc)| {
                 let (model, translation, rotation) = model_desc
                     .get_frame_info(models, 0)
-                    .with_context(|| format!("Error in vehicle {vehicle_index} rider {rider_index}"))?;
-                Ok(model.transform(&translation, &rotation, None, None))
+                    .with_context(|| format!("Error in vehicle {vehicle_index} rider {model_index}"))?;
+                Ok((model, translation, rotation))
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
 
-        for (rider_index, rider_model) in rider_models.iter().enumerate() {
-            let mut models = Vec::new();
+        for (rider_index, model_desc) in rider_models.iter().enumerate() {
+            let mut scene_models = Vec::new();
 
-            models.push(rider_model.clone());
+            scene_models.push(renderer::SceneModelDesc {
+                model: model_desc.0,
+                translation: model_desc.1,
+                rotation: model_desc.2,
+                is_mask: None,
+                is_ghost: None,
+            });
 
-            let mut vehicle_models = vehicle_models.clone();
-            for model in &mut vehicle_models {
-                for mesh in &mut model.meshes {
-                    mesh.is_mask = true;
-                }
-            }
-            models.append(&mut vehicle_models);
+            scene_models.extend(vehicle_models.iter().map(|model_desc| renderer::SceneModelDesc {
+                model: model_desc.0,
+                translation: model_desc.1,
+                rotation: model_desc.2,
+                is_mask: Some(true),
+                is_ghost: None,
+            }));
 
-            for rider_model in rider_models[0..rider_index].iter() {
-                let mut rider_model = rider_model.clone();
-                for mesh in &mut rider_model.meshes {
-                    mesh.is_mask = true;
-                }
-                models.push(rider_model);
-            }
+            scene_models.extend(rider_models[0..rider_index].iter().map(|model_desc| renderer::SceneModelDesc {
+                model: model_desc.0,
+                translation: model_desc.1,
+                rotation: model_desc.2,
+                is_mask: Some(true),
+                is_ghost: None,
+            }));
 
-            let scene = renderer::Scene::new(&render_device, models)?;
+            let scene = renderer::Scene::new(&render_device, &scene_models)?;
             images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
         }
 
