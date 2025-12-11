@@ -46,9 +46,9 @@ impl IndexedImage {
 }
 
 fn pack_rects_fixed(images: &[IndexedImage], width: usize, height: usize, coords: &mut [glam::IVec2]) -> bool {
-    let mut rect_packer = rect_packer::DensePacker::new(width as i32, height as i32);
+    let mut rect_packer = rect_packer::DensePacker::new(width.try_into().unwrap(), height.try_into().unwrap());
     for (image, coord) in images.iter().zip(coords.iter_mut()) {
-        if let Some(rect) = rect_packer.pack(image.width as i32, image.height as i32, false) {
+        if let Some(rect) = rect_packer.pack(image.width.try_into().unwrap(), image.height.try_into().unwrap(), false) {
             coord.x = rect.x;
             coord.y = rect.y;
         } else {
