@@ -693,8 +693,8 @@ fn render(
                 y: image.offset.y,
                 src_x: Some(coord.x),
                 src_y: Some(coord.y),
-                src_width: Some(image.width as i32),
-                src_height: Some(image.height as i32),
+                src_width: Some(image.width.try_into().unwrap()),
+                src_height: Some(image.height.try_into().unwrap()),
                 format: None,
                 palette: ride_object::ImagePaletteType::Keep,
             });
