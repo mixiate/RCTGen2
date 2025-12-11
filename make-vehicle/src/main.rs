@@ -72,6 +72,30 @@ struct VehicleModelDesc {
     orientation: Vec<[f32; 3]>,
 }
 
+impl VehicleModelDesc {
+    fn get_frame_info<'a>(
+        &self,
+        models: &'a [renderer::model::Model],
+        frame: usize,
+    ) -> anyhow::Result<(&'a renderer::model::Model, glam::Vec3, glam::Quat)> {
+        use anyhow::Context as _;
+
+        let model = models.get(self.mesh_index).context(format!("Invalid mesh index {}", self.mesh_index))?;
+
+        let translation = (self.position).into();
+
+        let rotation = self.orientation.get(frame).context(format!("No orientation found for frame {frame}"))?;
+        let rotation = glam::Quat::from_euler(
+            glam::EulerRot::XYZ,
+            rotation[0].to_radians(),
+            rotation[1].to_radians(),
+            rotation[2].to_radians(),
+        );
+
+        Ok((model, translation, rotation))
+    }
+}
+
 #[derive(Debug, serde::Deserialize)]
 struct VehicleDesc {
     spacing: f32,
@@ -587,32 +611,17 @@ fn render(
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
         let mut images = Vec::new();
 
-        // The way transformed models work and are added to the scene is terrible. Fix this at some point
-        let vehicle_models = {
-            let mut transformed_models = Vec::new();
-            for (model_index, model_desc) in vehicle.model.iter().enumerate() {
-                let model = models.get(model_desc.mesh_index).context(format!(
-                    "Invalid mesh index {} in vehicle {vehicle_index} model {model_index}",
-                    model_desc.mesh_index
-                ))?;
-
-                let model_translation: glam::Vec3 = (model_desc.position).into();
-
-                let model_rotation = model_desc
-                    .orientation
-                    .first()
-                    .context(format!("Frame 0 not in vehicle {vehicle_index} model {model_index} orientations"))?;
-                let model_rotation = glam::Quat::from_euler(
-                    glam::EulerRot::XYZ,
-                    model_rotation[0].to_radians(),
-                    model_rotation[1].to_radians(),
-                    model_rotation[2].to_radians(),
-                );
-
-                transformed_models.push(model.transform(&model_translation, &model_rotation, None, None));
-            }
-            transformed_models
-        };
+        let vehicle_models = vehicle
+            .model
+            .iter()
+            .enumerate()
+            .map(|(model_index, model_desc)| {
+                let (model, translation, rotation) = model_desc
+                    .get_frame_info(models, 0)
+                    .with_context(|| format!("Error in vehicle {vehicle_index} model {model_index}"))?;
+                Ok(model.transform(&translation, &rotation, None, None))
+            })
+            .collect::<anyhow::Result<Vec<_>>>()?;
 
         {
             let scene = renderer::Scene::new(&render_device, vehicle_models.clone())?;
@@ -624,26 +633,11 @@ fn render(
             .iter()
             .flatten()
             .enumerate()
-            .map(|(rider_index, rider)| {
-                let model = models.get(rider.mesh_index).context(format!(
-                    "Invalid mesh index {} in vehicle {vehicle_index} rider {rider_index}",
-                    rider.mesh_index
-                ))?;
-
-                let model_translation: glam::Vec3 = (rider.position).into();
-
-                let model_rotation = rider
-                    .orientation
-                    .first()
-                    .context(format!("Frame 0 not in vehicle {vehicle_index} rider {rider_index} orientations"))?;
-                let model_rotation = glam::Quat::from_euler(
-                    glam::EulerRot::XYZ,
-                    model_rotation[0].to_radians(),
-                    model_rotation[1].to_radians(),
-                    model_rotation[2].to_radians(),
-                );
-
-                Ok(model.transform(&model_translation, &model_rotation, None, None))
+            .map(|(rider_index, model_desc)| {
+                let (model, translation, rotation) = model_desc
+                    .get_frame_info(models, 0)
+                    .with_context(|| format!("Error in vehicle {vehicle_index} rider {rider_index}"))?;
+                Ok(model.transform(&translation, &rotation, None, None))
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
 
