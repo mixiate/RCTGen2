@@ -1,10 +1,15 @@
 pub struct Image {
-    pub pixels: Vec<u8>,
-    pub width: usize,
-    pub height: usize,
+    pixels: Vec<u8>,
+    width: usize,
+    height: usize,
 }
 
 impl Image {
+    pub fn from_raw(width: usize, height: usize, pixels: Vec<u8>) -> Self {
+        assert!(pixels.len() == width * height * 3);
+        Self { pixels, width, height }
+    }
+
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
         let image_file = std::fs::File::create(path)?;
         let w = std::io::BufWriter::new(image_file);

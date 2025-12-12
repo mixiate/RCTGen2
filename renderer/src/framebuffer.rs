@@ -69,12 +69,7 @@ impl Framebuffer {
                 }
             })
             .collect::<Vec<u8>>();
-
-        crate::image::Image {
-            pixels,
-            width: self.width,
-            height: self.height,
-        }
+        crate::image::Image::from_raw(self.width, self.height, pixels)
     }
 
     fn into_indexed_image_inner(mut self, dither: bool, bounds: &[usize; 4]) -> crate::image::IndexedImage {
