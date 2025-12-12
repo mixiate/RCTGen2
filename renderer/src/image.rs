@@ -28,6 +28,24 @@ pub struct IndexedImage {
 }
 
 impl IndexedImage {
+    pub fn new(width: usize, height: usize) -> Self {
+        Self {
+            pixels: vec![0; width * height],
+            width,
+            height,
+            offset: glam::IVec2::new(0, 0),
+        }
+    }
+
+    pub fn with_offset(width: usize, height: usize, offset: glam::IVec2) -> Self {
+        Self {
+            pixels: vec![0; width * height],
+            width,
+            height,
+            offset,
+        }
+    }
+
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
         let image_file = std::fs::File::create(path)?;
         let w = std::io::BufWriter::new(image_file);
@@ -125,24 +143,16 @@ fn pack_rects(images: &[IndexedImage]) -> PackedRects {
 pub fn create_atlas(images: &[IndexedImage]) -> (IndexedImage, Vec<glam::IVec2>) {
     let PackedRects { width, height, coords } = pack_rects(images);
 
-    let mut pixels = vec![0; width * height];
+    let mut atlas_image = IndexedImage::new(width, height);
     for (image, coord) in images.iter().zip(coords.iter()) {
         let rect_x = usize::try_from(coord.x).unwrap();
         let rect_y = usize::try_from(coord.y).unwrap();
         for y in 0..image.height {
             for x in 0..image.width {
-                pixels[(rect_x + x) + (width * (rect_y + y))] = image.pixels[x + (image.width * y)];
+                atlas_image.pixels[(rect_x + x) + (width * (rect_y + y))] = image.pixels[x + (image.width * y)];
             }
         }
     }
 
-    (
-        IndexedImage {
-            pixels,
-            width,
-            height,
-            offset: glam::IVec2::new(0, 0),
-        },
-        coords,
-    )
+    (atlas_image, coords)
 }

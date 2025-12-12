@@ -82,7 +82,7 @@ impl Framebuffer {
         let [min_x, min_y, max_x, max_y] = *bounds;
         let width = max_x - min_x;
         let height = max_y - min_y;
-        let mut pixels = vec![0; width * height];
+        let mut image = crate::image::IndexedImage::with_offset(width, height, self.get_offset(min_x, min_y));
 
         for y in min_y..max_y {
             for x in (min_x..max_x).rev() {
@@ -93,7 +93,7 @@ impl Framebuffer {
                         crate::palette::srgb_to_linear_rgb(&crate::palette::linear_to_srgb_rgb(&fragment.colour));
                     let nearest_colour = crate::palette::get_nearest_colour(&colour, palette_region_type);
 
-                    pixels[(x - min_x) + (y - min_y) * width] = nearest_colour.index;
+                    image.pixels[(x - min_x) + (y - min_y) * width] = nearest_colour.index;
 
                     if dither {
                         let points = [[x - 1, y], [x + 1, y + 1], [x, y + 1], [x - 1, y + 1]];
@@ -108,12 +108,7 @@ impl Framebuffer {
             }
         }
 
-        crate::image::IndexedImage {
-            pixels,
-            width,
-            height,
-            offset: self.get_offset(min_x, min_y),
-        }
+        image
     }
 
     pub fn into_indexed_image(self, dither: bool) -> crate::image::IndexedImage {
@@ -126,12 +121,7 @@ impl Framebuffer {
             self.into_indexed_image_inner(dither, &bounds)
         } else {
             // Output a 1x1 transparent pixel here as the game often requires sprites even if they are empty
-            crate::image::IndexedImage {
-                pixels: vec![0],
-                width: 1,
-                height: 1,
-                offset: glam::IVec2::new(0, 0),
-            }
+            crate::image::IndexedImage::new(1, 1)
         }
     }
 }

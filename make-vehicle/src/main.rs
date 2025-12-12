@@ -791,12 +791,7 @@ fn main() -> anyhow::Result<()> {
             })?;
         }
     } else {
-        let image = renderer::image::IndexedImage {
-            pixels: vec![0],
-            width: 1,
-            height: 1,
-            offset: glam::IVec2::new(0, 0),
-        };
+        let image = renderer::image::IndexedImage::new(1, 1);
         image
             .save(&preview_output_file_path)
             .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
