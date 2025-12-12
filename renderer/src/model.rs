@@ -91,11 +91,12 @@ impl Model {
     pub fn load(path: &std::path::Path) -> anyhow::Result<Model> {
         use anyhow::Context as _;
 
-        let mut obj = obj::Obj::load(path).context(format!("Could not load obj file {}", path.display()))?;
-        obj.load_mtls().context(format!("Could not load mtl file referenced by {}", path.display()))?;
+        let mut obj = obj::Obj::load(path).with_context(|| format!("Could not load obj file {}", path.display()))?;
+        obj.load_mtls()
+            .with_context(|| format!("Could not load mtl file referenced by {}", path.display()))?;
 
         let parent_directory =
-            path.parent().context(format!("Could not get parent directory of {}", path.display()))?;
+            path.parent().with_context(|| format!("Could not get parent directory of {}", path.display()))?;
 
         let mut meshes: Vec<Mesh> = Vec::new();
 
@@ -117,11 +118,7 @@ impl Model {
                             None
                         }
                     })
-                    .context(format!(
-                        "No material found for object {} in {} ",
-                        object.name,
-                        path.display(),
-                    ))?;
+                    .with_context(|| format!("No material found for object {} in {} ", object.name, path.display()))?;
                 let is_mask = material.name.split("_").any(|x| x == "Mask");
                 let is_ghost = material.name.split("_").any(|x| x == "Ghost");
                 let material = Material::new(material, parent_directory)?;
@@ -139,13 +136,13 @@ impl Model {
                             .data
                             .position
                             .get(indices.0)
-                            .context(format!("Invalid index in obj file {}", path.display()))?;
+                            .with_context(|| format!("Invalid index in obj file {}", path.display()))?;
 
                         let uv = if let Some(uv_index) = indices.1 {
                             *obj.data
                                 .texture
                                 .get(uv_index)
-                                .context(format!("Invalid index in obj file {}", path.display()))?
+                                .with_context(|| format!("Invalid index in obj file {}", path.display()))?
                         } else {
                             [0.0; 2]
                         };
@@ -154,7 +151,7 @@ impl Model {
                             *obj.data
                                 .normal
                                 .get(normal_index)
-                                .context(format!("Invalid index in obj file {}", path.display()))?
+                                .with_context(|| format!("Invalid index in obj file {}", path.display()))?
                         } else {
                             [0.0; 3]
                         };
@@ -167,7 +164,7 @@ impl Model {
                             vertices.push(vertex);
                             u32::try_from(index)
                         }
-                        .context(format!("Invalid index in obj file {}", path.display()))?;
+                        .with_context(|| format!("Invalid index in obj file {}", path.display()))?;
                     }
 
                     indices.push(new_indices.into());
