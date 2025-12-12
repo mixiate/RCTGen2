@@ -29,6 +29,17 @@ pub struct Framebuffer {
 }
 
 impl Framebuffer {
+    pub fn new(width: usize, height: usize, offset: glam::Vec2) -> Self {
+        let buffer = vec![Fragment::default(); width * height];
+
+        Self {
+            buffer,
+            width,
+            height,
+            offset,
+        }
+    }
+
     fn bounds(&self) -> Option<[usize; 4]> {
         let mut found_pixel = false;
         let mut min_x = self.width;

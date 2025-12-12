@@ -71,14 +71,16 @@ pub fn render_scene(
     let camera_inverse = camera.inverse();
     let ray_direction = camera_inverse.transform_vector3(glam::Vec3::new(0.0, 0.0, 1.0)).normalize();
 
-    let width = usize::try_from(scene_bounds[2] - scene_bounds[0]).unwrap() + 1;
-    let height = usize::try_from(scene_bounds[3] - scene_bounds[1]).unwrap();
-    let mut buffer = vec![crate::framebuffer::Fragment::default(); width * height];
+    let mut framebuffer = {
+        let width = usize::try_from(scene_bounds[2] - scene_bounds[0]).unwrap() + 1;
+        let height = usize::try_from(scene_bounds[3] - scene_bounds[1]).unwrap();
+        crate::Framebuffer::new(width, height, framebuffer_offset)
+    };
 
     let multi_sample_count = multi_samples_x * multi_samples_y;
 
-    for y in 0..height {
-        for x in 0..width {
+    for y in 0..framebuffer.height {
+        for x in 0..framebuffer.width {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
             let (depth, ghost_depth, edge_type, palette_region_type, is_mask) = {
@@ -204,7 +206,7 @@ pub fn render_scene(
             };
 
             if palette_region_type.is_some() {
-                let fragment = &mut buffer[y * width + x];
+                let fragment = &mut framebuffer.buffer[y * framebuffer.width + x];
                 fragment.palette_region_type = palette_region_type;
 
                 if let Some(edge_type) = edge_type {
@@ -242,10 +244,5 @@ pub fn render_scene(
         }
     }
 
-    crate::Framebuffer {
-        buffer,
-        width,
-        height,
-        offset: framebuffer_offset,
-    }
+    framebuffer
 }
