@@ -206,8 +206,7 @@ pub fn render_scene(
             };
 
             if palette_region_type.is_some() {
-                let fragment_index = y * framebuffer.width() + x;
-                let fragment = &mut framebuffer.buffer[fragment_index];
+                let fragment = framebuffer.get_fragment_mut(x, y);
                 fragment.palette_region_type = palette_region_type;
 
                 if let Some(edge_type) = edge_type {
