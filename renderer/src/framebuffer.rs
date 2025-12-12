@@ -23,9 +23,9 @@ impl Default for Fragment {
 
 pub struct Framebuffer {
     pub(crate) buffer: Vec<Fragment>,
-    pub(crate) width: usize,
-    pub(crate) height: usize,
-    pub(crate) offset: glam::Vec2,
+    width: usize,
+    height: usize,
+    offset: glam::Vec2,
 }
 
 impl Framebuffer {
@@ -38,6 +38,14 @@ impl Framebuffer {
             height,
             offset,
         }
+    }
+
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
     }
 
     fn bounds(&self) -> Option<[usize; 4]> {

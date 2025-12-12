@@ -79,8 +79,8 @@ pub fn render_scene(
 
     let multi_sample_count = multi_samples_x * multi_samples_y;
 
-    for y in 0..framebuffer.height {
-        for x in 0..framebuffer.width {
+    for y in 0..framebuffer.height() {
+        for x in 0..framebuffer.width() {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
             let (depth, ghost_depth, edge_type, palette_region_type, is_mask) = {
@@ -206,7 +206,8 @@ pub fn render_scene(
             };
 
             if palette_region_type.is_some() {
-                let fragment = &mut framebuffer.buffer[y * framebuffer.width + x];
+                let fragment_index = y * framebuffer.width() + x;
+                let fragment = &mut framebuffer.buffer[fragment_index];
                 fragment.palette_region_type = palette_region_type;
 
                 if let Some(edge_type) = edge_type {
