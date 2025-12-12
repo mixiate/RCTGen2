@@ -1,6 +1,7 @@
 mod framebuffer;
 pub mod image;
 pub mod model;
+pub mod pack;
 pub mod palette;
 mod raytrace;
 mod renderer;

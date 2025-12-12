@@ -688,7 +688,7 @@ fn render(
             }
         };
 
-        let (image, coords) = renderer::image::create_atlas(&images);
+        let (image, coords) = renderer::pack::create_atlas(&images);
         let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
         image.save(&file_path)?;
 
