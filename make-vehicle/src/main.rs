@@ -695,8 +695,8 @@ fn render(
         for (image, coord) in images.iter().zip(coords.iter()) {
             object_images.push(ride_object::Image {
                 path: format!("images/car_{vehicle_index}.png"),
-                x: image.offset.x,
-                y: image.offset.y,
+                x: image.offset().x,
+                y: image.offset().y,
                 src_x: Some(coord.x),
                 src_y: Some(coord.y),
                 src_width: Some(image.width.try_into().unwrap()),

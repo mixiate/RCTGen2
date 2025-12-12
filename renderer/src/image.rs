@@ -24,7 +24,7 @@ pub struct IndexedImage {
     pub pixels: Vec<u8>,
     pub width: usize,
     pub height: usize,
-    pub offset: glam::IVec2,
+    offset: glam::IVec2,
 }
 
 impl IndexedImage {
@@ -44,6 +44,10 @@ impl IndexedImage {
             height,
             offset,
         }
+    }
+
+    pub fn offset(&self) -> &glam::IVec2 {
+        &self.offset
     }
 
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
