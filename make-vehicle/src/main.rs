@@ -86,11 +86,12 @@ impl ModelDesc {
     ) -> anyhow::Result<ModelTransform<'a>> {
         use anyhow::Context as _;
 
-        let model = models.get(self.mesh_index).context(format!("Invalid mesh index {}", self.mesh_index))?;
+        let model = models.get(self.mesh_index).with_context(|| format!("Invalid mesh index {}", self.mesh_index))?;
 
         let translation = (self.position).into();
 
-        let rotation = self.orientation.get(frame).context(format!("No orientation found for frame {frame}"))?;
+        let rotation =
+            self.orientation.get(frame).with_context(|| format!("No orientation found for frame {frame}"))?;
         let rotation = glam::Quat::from_euler(
             glam::EulerRot::XYZ,
             rotation[0].to_radians(),
@@ -746,18 +747,18 @@ fn main() -> anyhow::Result<()> {
     let ride_description_path = std::path::PathBuf::from(args.get(1).context("No description file path argument")?);
     let ride_description_path = ride_description_path
         .canonicalize()
-        .context(format!("Invalid file path {}", ride_description_path.display()))?;
+        .with_context(|| format!("Invalid file path {}", ride_description_path.display()))?;
 
     let base_directory = ride_description_path
         .parent()
-        .context(format!("Could not get parent directory of {}", ride_description_path.display()))?;
+        .with_context(|| format!("Could not get parent directory of {}", ride_description_path.display()))?;
 
     let ride_description = {
         let json = std::fs::read_to_string(&ride_description_path)
-            .context(format!("Could not read file {}", ride_description_path.display()))?;
+            .with_context(|| format!("Could not read file {}", ride_description_path.display()))?;
 
         serde_json::from_str::<RideDesc>(&json)
-            .context(format!("Could not parse json in file {}", ride_description_path.display()))?
+            .with_context(|| format!("Could not parse json in file {}", ride_description_path.display()))?
     };
 
     let output_directory = base_directory.join(&ride_description.id);
