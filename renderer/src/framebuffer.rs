@@ -74,7 +74,6 @@ impl Framebuffer {
             pixels,
             width: self.width,
             height: self.height,
-            offset: self.get_offset(0, 0),
         }
     }
 

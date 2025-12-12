@@ -2,7 +2,6 @@ pub struct Image {
     pub pixels: Vec<u8>,
     pub width: usize,
     pub height: usize,
-    pub offset: glam::IVec2,
 }
 
 impl Image {
