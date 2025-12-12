@@ -120,17 +120,23 @@ pub fn render_scene(
                             fragment.edge_type = material.edge_type;
                             fragment.palette_region_type = Some(material.palette_region_type);
 
+                            let uv = {
+                                let uvs = [
+                                    hit.mesh.uvs[hit.indices.0 as usize] * (1.0 - hit.u - hit.v),
+                                    hit.mesh.uvs[hit.indices.1 as usize] * hit.u,
+                                    hit.mesh.uvs[hit.indices.2 as usize] * hit.v,
+                                ];
+                                uvs.iter().sum::<glam::Vec2>()
+                            };
+
                             let diffuse = match &material.diffuse {
                                 crate::model::MaterialColour::Colour(colour) => *colour,
-                                crate::model::MaterialColour::Texture(texture) => {
-                                    let uvs = [
-                                        hit.mesh.uvs[hit.indices.0 as usize] * (1.0 - hit.u - hit.v),
-                                        hit.mesh.uvs[hit.indices.1 as usize] * hit.u,
-                                        hit.mesh.uvs[hit.indices.2 as usize] * hit.v,
-                                    ];
-                                    let uv = uvs.iter().sum::<glam::Vec2>();
-                                    texture.sample_wrapped(uv)
-                                }
+                                crate::model::MaterialColour::Texture(texture) => texture.sample_wrapped(uv),
+                            };
+
+                            let specular = match &material.specular {
+                                crate::model::MaterialColour::Colour(colour) => *colour,
+                                crate::model::MaterialColour::Texture(texture) => texture.sample_wrapped(uv),
                             };
 
                             for light in lights {
@@ -147,7 +153,7 @@ pub fn render_scene(
                                     let angle = reflected_direction.dot(-ray_direction).max(0.0);
                                     let specular_factor =
                                         light.specular_strength * angle.powf(material.specular_exponent);
-                                    fragment.colour += specular_factor * material.specular;
+                                    fragment.colour += specular_factor * specular;
                                 }
                             }
 

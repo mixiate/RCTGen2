@@ -12,8 +12,8 @@ pub(crate) enum MaterialColour {
 
 pub struct Material {
     pub(crate) diffuse: MaterialColour,
-    pub specular: glam::Vec3,
-    pub specular_exponent: f32,
+    pub(crate) specular: MaterialColour,
+    pub(crate) specular_exponent: f32,
     pub(crate) edge_type: Option<crate::renderer::EdgeType>,
     pub(crate) palette_region_type: crate::palette::RegionType,
     pub(crate) use_ao: bool,
@@ -50,9 +50,21 @@ impl Material {
             MaterialColour::Colour(diffuse)
         };
 
+        let specular = if let Some(file_path) = &mtl.map_ks {
+            let file_path = mtl_file_directory.join(file_path);
+            let texture = crate::texture::Texture::load(&file_path, palette_region_type.is_diffuse_greyscale())?;
+            MaterialColour::Texture(texture)
+        } else {
+            let mut specular: glam::Vec3 = mtl.ks.unwrap_or_default().into();
+            if palette_region_type.is_diffuse_greyscale() {
+                specular = crate::palette::linear_rgb_to_luminence_rgb(&specular);
+            }
+            MaterialColour::Colour(specular)
+        };
+
         Ok(Material {
             diffuse,
-            specular: mtl.ks.unwrap_or_default().into(),
+            specular,
             specular_exponent: mtl.ns.unwrap_or_default(),
             edge_type,
             palette_region_type,
