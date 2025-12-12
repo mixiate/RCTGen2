@@ -84,7 +84,12 @@ fn pack_rects(images: &[crate::image::IndexedImage]) -> PackedRects {
     PackedRects { width, height, coords }
 }
 
-pub fn create_atlas(images: &[crate::image::IndexedImage]) -> (crate::image::IndexedImage, Vec<glam::IVec2>) {
+pub struct Atlas {
+    pub image: crate::image::IndexedImage,
+    pub coords: Vec<glam::IVec2>,
+}
+
+pub fn create_atlas(images: &[crate::image::IndexedImage]) -> Atlas {
     let PackedRects { width, height, coords } = pack_rects(images);
 
     let mut atlas_image = crate::image::IndexedImage::new(width, height);
@@ -98,5 +103,8 @@ pub fn create_atlas(images: &[crate::image::IndexedImage]) -> (crate::image::Ind
         }
     }
 
-    (atlas_image, coords)
+    Atlas {
+        image: atlas_image,
+        coords,
+    }
 }

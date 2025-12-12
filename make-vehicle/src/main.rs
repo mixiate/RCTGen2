@@ -688,11 +688,11 @@ fn render(
             }
         };
 
-        let (image, coords) = renderer::pack::create_atlas(&images);
+        let atlas = renderer::pack::create_atlas(&images);
         let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
-        image.save(&file_path)?;
+        atlas.image.save(&file_path)?;
 
-        for (image, coord) in images.iter().zip(coords.iter()) {
+        for (image, coord) in images.iter().zip(atlas.coords.iter()) {
             object_images.push(ride_object::Image {
                 path: format!("images/car_{vehicle_index}.png"),
                 x: image.offset().x,
