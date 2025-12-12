@@ -93,7 +93,7 @@ impl Framebuffer {
                         crate::palette::srgb_to_linear_rgb(&crate::palette::linear_to_srgb_rgb(&fragment.colour));
                     let nearest_colour = crate::palette::get_nearest_colour(&colour, palette_region_type);
 
-                    image.pixels[(x - min_x) + (y - min_y) * width] = nearest_colour.index;
+                    image.set_pixel(x - min_x, y - min_y, nearest_colour.index);
 
                     if dither {
                         let points = [[x - 1, y], [x + 1, y + 1], [x, y + 1], [x - 1, y + 1]];
