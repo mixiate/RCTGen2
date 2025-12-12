@@ -49,19 +49,16 @@ fn main() -> anyhow::Result<()> {
     let scene_description_path = std::path::PathBuf::from(args.get(1).context("No description file path argument.")?);
     let scene_description_path = scene_description_path
         .canonicalize()
-        .context(format!("Invalid file path {}", scene_description_path.display()))?;
-    let base_directory = scene_description_path.parent().context(format!(
-        "Could not get parent directory of {}",
-        scene_description_path.display()
-    ))?;
+        .with_context(|| format!("Invalid file path {}", scene_description_path.display()))?;
+    let base_directory = scene_description_path
+        .parent()
+        .with_context(|| format!("Could not get parent directory of {}", scene_description_path.display()))?;
 
     let test_desc = {
         let json = std::fs::read_to_string(&scene_description_path)
-            .context(format!("Could not read file {}", scene_description_path.display()))?;
-        serde_json::from_str::<TestDesc>(&json).context(format!(
-            "Could not parse json in file {}",
-            scene_description_path.display()
-        ))?
+            .with_context(|| format!("Could not read file {}", scene_description_path.display()))?;
+        serde_json::from_str::<TestDesc>(&json)
+            .with_context(|| format!("Could not parse json in file {}", scene_description_path.display()))?
     };
 
     let sprite_directory = if test_desc.sprite_directory.is_absolute() {
@@ -99,23 +96,22 @@ fn main() -> anyhow::Result<()> {
 
     for (item_index, item) in test_desc.items.iter().enumerate() {
         for frame_index in 0..item.frames {
-            let model = models.get(item.model.mesh_index).context(format!(
-                "Invalid mesh index {} in item {item_index}",
-                item.model.mesh_index
-            ))?;
+            let model = models
+                .get(item.model.mesh_index)
+                .with_context(|| format!("Invalid mesh index {} in item {item_index}", item.model.mesh_index))?;
 
             let model_translation = item
                 .model
                 .position
                 .get(frame_index)
-                .context(format!("Frame {frame_index} not in item {item_index} positions"))?;
+                .with_context(|| format!("Frame {frame_index} not in item {item_index} positions"))?;
             let model_translation: glam::Vec3 = (*model_translation).into();
 
             let model_rotation = item
                 .model
                 .orientation
                 .get(frame_index)
-                .context(format!("Frame {frame_index} not in item {item_index} orientations"))?;
+                .with_context(|| format!("Frame {frame_index} not in item {item_index} orientations"))?;
             let model_rotation = glam::Quat::from_euler(
                 glam::EulerRot::XYZ,
                 model_rotation[0].to_radians(),
