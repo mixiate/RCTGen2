@@ -154,6 +154,7 @@ struct RideDesc {
     secondary_sound: SecondarySound,
     min_cars_per_train: i32,
     max_cars_per_train: i32,
+    limit_air_time_bonus: Option<bool>,
     configuration: Configuration,
     default_colors: Vec<[ride_object::ColourType; 3]>,
     meshes: Vec<std::path::PathBuf>,

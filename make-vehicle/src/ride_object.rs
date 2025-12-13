@@ -355,6 +355,7 @@ struct Properties {
     #[serde(rename = "type")]
     ride_type: RideType,
     category: Category,
+    limit_air_time_bonus: Option<bool>,
     min_cars_per_train: i32,
     max_cars_per_train: i32,
     num_empty_cars: i32,
@@ -441,6 +442,7 @@ impl RideObject {
         let properties = Properties {
             ride_type: ride_desc.ride_type,
             category: Category::Rollercoaster,
+            limit_air_time_bonus: ride_desc.limit_air_time_bonus,
             min_cars_per_train: ride_desc.min_cars_per_train,
             max_cars_per_train: ride_desc.max_cars_per_train,
             num_empty_cars: ride_desc.zero_cars,
