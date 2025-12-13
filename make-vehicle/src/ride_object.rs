@@ -366,6 +366,7 @@ struct Properties {
     build_menu_priority: i32,
     no_collision_crashes: Option<bool>,
     rider_controls_speed: Option<bool>,
+    max_height: Option<i32>,
     car_colors: Vec<Vec<[ColourType; 3]>>,
     cars: Vec<Car>,
 }
@@ -453,6 +454,7 @@ impl RideObject {
             build_menu_priority: ride_desc.build_menu_priority,
             no_collision_crashes,
             rider_controls_speed,
+            max_height: ride_desc.max_height,
             car_colors: ride_desc.default_colors.iter().map(|x| vec![*x]).collect(),
             cars,
         };
