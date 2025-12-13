@@ -94,17 +94,67 @@ pub fn create_atlas(images: &[crate::image::IndexedImage]) -> Atlas {
 
     let mut atlas_image = crate::image::IndexedImage::new(width, height);
     for (image, coord) in images.iter().zip(coords.iter()) {
-        let rect_x = usize::try_from(coord.x).unwrap();
-        let rect_y = usize::try_from(coord.y).unwrap();
-        for y in 0..image.height() {
-            for x in 0..image.width() {
-                atlas_image.set_pixel(rect_x + x, rect_y + y, image.get_pixel(x, y));
-            }
-        }
+        atlas_image.blit(image, coord.x, coord.y);
     }
 
     Atlas {
         image: atlas_image,
+        coords,
+    }
+}
+
+pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas {
+    let (x_min, y_min, x_max, y_max) = {
+        let mut x_min = 0;
+        let mut y_min = 0;
+        let mut x_max = 0;
+        let mut y_max = 0;
+
+        for image in images {
+            let x_neg = image.offset().x;
+            let x_pos = i32::try_from(image.width()).unwrap() + image.offset().x;
+            if x_neg < x_min {
+                x_min = x_neg;
+            }
+            if x_pos > x_max {
+                x_max = x_pos;
+            }
+            let y_neg = image.offset().y;
+            let y_pos = i32::try_from(image.height()).unwrap() + image.offset().y;
+            if y_neg < y_min {
+                y_min = y_neg;
+            }
+            if y_pos > y_max {
+                y_max = y_pos;
+            }
+        }
+        (x_min, y_min, x_max, y_max)
+    };
+
+    let column_width = x_max - x_min;
+    let row_height = y_max - y_min;
+
+    let image_count = i32::try_from(images.len()).unwrap();
+    let rows = image_count / columns;
+    let rows = if image_count % columns != 0 { rows + 1 } else { rows };
+
+    let width = usize::try_from(column_width * columns).unwrap();
+    let height = usize::try_from(row_height * rows).unwrap();
+
+    let mut grid_image = crate::image::IndexedImage::new(width, height);
+    let mut coords = vec![glam::IVec2::new(0, 0); images.len()];
+    for ((i, image), coord) in images.iter().enumerate().zip(coords.iter_mut()) {
+        let i = i32::try_from(i).unwrap();
+        let row = i / columns;
+        let column = i - (row * columns);
+        coord.x = (column_width * column) - x_min + image.offset().x;
+        coord.y = (row_height * row) - y_min + image.offset().y;
+
+        grid_image.blit(image, coord.x, coord.y);
+    }
+
+    Atlas {
+        image: grid_image,
         coords,
     }
 }

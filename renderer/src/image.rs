@@ -70,6 +70,16 @@ impl IndexedImage {
         &self.offset
     }
 
+    pub fn blit(&mut self, image: &IndexedImage, dest_x: i32, dest_y: i32) {
+        let dest_x = usize::try_from(dest_x).unwrap();
+        let dest_y = usize::try_from(dest_y).unwrap();
+        for y in 0..image.height() {
+            for x in 0..image.width() {
+                self.set_pixel(dest_x + x, dest_y + y, image.get_pixel(x, y));
+            }
+        }
+    }
+
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
         let image_file = std::fs::File::create(path)?;
         let w = std::io::BufWriter::new(image_file);
