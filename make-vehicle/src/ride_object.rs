@@ -180,6 +180,15 @@ enum Category {
 }
 
 #[serde_with::skip_serializing_none]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct RatingMultipliers {
+    excitement: Option<i32>,
+    intensity: Option<i32>,
+    nausea: Option<i32>,
+}
+
+#[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SpriteGroups {
@@ -367,6 +376,8 @@ struct Properties {
     no_collision_crashes: Option<bool>,
     rider_controls_speed: Option<bool>,
     max_height: Option<i32>,
+    #[serde(rename = "ratingMultipler")] // Typo in OpenRCT2
+    rating_multipliers: Option<RatingMultipliers>,
     car_colors: Vec<Vec<[ColourType; 3]>>,
     cars: Vec<Car>,
 }
@@ -454,6 +465,7 @@ impl RideObject {
             build_menu_priority: ride_desc.build_menu_priority,
             no_collision_crashes,
             rider_controls_speed,
+            rating_multipliers: ride_desc.rating_multipliers,
             max_height: ride_desc.max_height,
             car_colors: ride_desc.default_colors.iter().map(|x| vec![*x]).collect(),
             cars,

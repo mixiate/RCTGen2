@@ -155,6 +155,7 @@ struct RideDesc {
     min_cars_per_train: i32,
     max_cars_per_train: i32,
     limit_air_time_bonus: Option<bool>,
+    rating_multipliers: Option<ride_object::RatingMultipliers>,
     max_height: Option<i32>,
     configuration: Configuration,
     default_colors: Vec<[ride_object::ColourType; 3]>,
