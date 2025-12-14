@@ -590,17 +590,10 @@ fn get_model_transforms<'a>(
 
 const TILE_SIZE: f32 = 3.3;
 
-struct RenderResult {
-    images: Vec<ride_object::Image>,
-    file_paths: Vec<std::path::PathBuf>,
-}
-
 fn render(
-    output_directory: &std::path::Path,
     ride_desc: &RideDesc,
     models: &[renderer::model::Model],
-    image_output_type: ImageOutputType,
-) -> anyhow::Result<RenderResult> {
+) -> anyhow::Result<Vec<Vec<renderer::image::IndexedImage>>> {
     use anyhow::Context as _;
 
     const RESTRAINT_ROTATION: VehicleRotation = VehicleRotation::new(4, 0.0, 0.0, 0.0);
@@ -622,25 +615,10 @@ fn render(
 
     let angles = VehicleAngles::new();
 
-    let mut object_images = vec![
-        ride_object::Image {
-            path: "images/preview.png".to_string(),
-            x: 0,
-            y: 0,
-            src_x: None,
-            src_y: None,
-            src_width: None,
-            src_height: None,
-            format: Some(ride_object::ImageFormat::Raw),
-            palette: ride_object::ImagePaletteType::Keep
-        };
-        3
-    ];
-
-    let mut file_paths = Vec::new();
+    let mut images = Vec::new();
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
-        let mut images = Vec::new();
+        let mut car_images = Vec::new();
 
         let vehicle_models = get_model_transforms(models, &vehicle.model, 0)
             .with_context(|| format!("Error in vehicle {vehicle_index}"))?;
@@ -657,7 +635,7 @@ fn render(
                 })
                 .collect::<Vec<_>>();
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
+            car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
 
             // Rendering restraints is awkward and bad. Rewrite all of this code.
             if vehicle.flags.as_ref().is_some_and(|x| x.contains(&VehicleFlag::RestraintAnimation)) {
@@ -677,7 +655,7 @@ fn render(
                             })
                             .collect::<Vec<_>>();
                         let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                        images.extend(render_rotations(&scene, &camera, &ride_desc.lights, &RESTRAINT_ROTATION));
+                        car_images.extend(render_rotations(&scene, &camera, &ride_desc.lights, &RESTRAINT_ROTATION));
                     }
                 }
             }
@@ -715,7 +693,7 @@ fn render(
                 }));
 
                 let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
+                car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
 
                 // Rendering restraints is awkward and bad. Rewrite all of this code.
                 if vehicle.flags.as_ref().is_some_and(|x| x.contains(&VehicleFlag::RestraintAnimation)) {
@@ -754,40 +732,16 @@ fn render(
                         }));
 
                         let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                        images.extend(render_rotations(&scene, &camera, &ride_desc.lights, &RESTRAINT_ROTATION));
+                        car_images.extend(render_rotations(&scene, &camera, &ride_desc.lights, &RESTRAINT_ROTATION));
                     }
                 }
             }
         };
 
-        let atlas = match image_output_type {
-            ImageOutputType::Packed => renderer::pack::create_atlas(&images),
-            ImageOutputType::Grid => renderer::pack::create_grid(&images, 32),
-        };
-        let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
-        atlas.image.save(&file_path)?;
-
-        for (image, coord) in images.iter().zip(atlas.coords.iter()) {
-            object_images.push(ride_object::Image {
-                path: format!("images/car_{vehicle_index}.png"),
-                x: image.offset().x,
-                y: image.offset().y,
-                src_x: Some(coord.x),
-                src_y: Some(coord.y),
-                src_width: Some(image.width().try_into().unwrap()),
-                src_height: Some(image.height().try_into().unwrap()),
-                format: None,
-                palette: ride_object::ImagePaletteType::Keep,
-            });
-        }
-
-        file_paths.push(file_path);
+        images.push(car_images);
     }
 
-    Ok(RenderResult {
-        images: object_images,
-        file_paths,
-    })
+    Ok(images)
 }
 
 fn create_parkobj(
@@ -873,10 +827,51 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
             .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
     }
 
-    let RenderResult { images, mut file_paths } =
-        render(&images_directory, &ride_description, &models, image_output_type)?;
+    let images = render(&ride_description, &models)?;
 
-    let object = ride_object::RideObject::new(&ride_description, images);
+    let mut object_images = vec![
+        ride_object::Image {
+            path: "images/preview.png".to_string(),
+            x: 0,
+            y: 0,
+            src_x: None,
+            src_y: None,
+            src_width: None,
+            src_height: None,
+            format: Some(ride_object::ImageFormat::Raw),
+            palette: ride_object::ImagePaletteType::Keep
+        };
+        3
+    ];
+
+    let mut file_paths = Vec::new();
+
+    for (i, images) in images.iter().enumerate() {
+        let atlas = match image_output_type {
+            ImageOutputType::Packed => renderer::pack::create_atlas(images),
+            ImageOutputType::Grid => renderer::pack::create_grid(images, 32),
+        };
+        let file_path = images_directory.join(format!("car_{i}")).with_extension("png");
+        atlas.image.save(&file_path)?;
+
+        for (image, coord) in images.iter().zip(atlas.coords.iter()) {
+            object_images.push(ride_object::Image {
+                path: format!("images/car_{i}.png"),
+                x: image.offset().x,
+                y: image.offset().y,
+                src_x: Some(coord.x),
+                src_y: Some(coord.y),
+                src_width: Some(image.width().try_into().unwrap()),
+                src_height: Some(image.height().try_into().unwrap()),
+                format: None,
+                palette: ride_object::ImagePaletteType::Keep,
+            });
+        }
+
+        file_paths.push(file_path);
+    }
+
+    let object = ride_object::RideObject::new(&ride_description, object_images);
     let object_json_file_path = output_directory.join("object").with_extension("json");
     object.save(&object_json_file_path)?;
 
