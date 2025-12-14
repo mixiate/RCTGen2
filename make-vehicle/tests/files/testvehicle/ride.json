@@ -1,0 +1,86 @@
+{
+    "id": "mix.ride.rctgen2_make_vehicle_test",
+    "author": "mix",
+    "name": "RCTGen2 make vehicle test",
+    "description": "Test description",
+    "capacity": "4 passengers per car",
+    "preview": "preview.png",
+    "ride_type": "twister_rc",
+    "sprites": [
+        "flat",
+        "gentle_slopes",
+        "steep_slopes",
+        "vertical_slopes",
+        "diagonals",
+        "banked_turns",
+        "inline_twists",
+        "slope_bank_transition",
+        "diagonal_bank_transition",
+        "sloped_bank_transition",
+        "banked_sloped_turns",
+        "banked_slope_transition",
+        "corkscrews",
+        "zero_g_rolls",
+        "diagonal_sloped_bank_transition",
+        "dive_loops"
+    ],
+    "zero_cars": 0,
+    "min_cars_per_train": 4,
+    "max_cars_per_train": 8,
+    "build_menu_priority": 3,
+    "preview_tab_car": 0,
+    "running_sound": "steel_smooth",
+    "secondary_sound": "scream1",
+    "rating_multipliers": {
+        "excitement": 10,
+        "intensity": 5,
+        "nausea": 10
+    },
+    "max_height": 34,
+    "limit_air_time_bonus": true,
+    "default_colors": [
+        [
+            "black",
+            "bright_pink",
+            "black"
+        ],
+        [
+            "bordeaux_red",
+            "black",
+            "bordeaux_red"
+        ],
+        [
+            "yellow",
+            "grey",
+            "bright_red"
+        ]
+    ],
+    "configuration": { "default": 0 },
+    "meshes": [
+        "car.obj",
+        "restraints.obj",
+        "guests.obj"
+    ],
+    "vehicles": [
+        {
+            "flags": [ "secondary_remap", "tertiary_remap", "restraint_animation", "riders_scream" ],
+            "model": [
+                { "mesh_index": 0, "position": [0, 0, 0], "orientation": [0, 0, 0] },
+                { "mesh_index": 1, "position": [0.661978, 0.281693, 0], "orientation": [[0, 0, 0], [0, -4, 0], [0, -8, 0], [0, -12, 0]] },
+                { "mesh_index": 1, "position": [0.0, 0.281693, 0], "orientation": [[0, 0, 0], [0, -4, 0], [0, -8, 0], [0, -12, 0]] }
+            ],
+            "mass": 710,
+            "spacing": 2.0,
+            "draw_order": 8,
+            "capacity":4,
+            "riders":[
+                { "mesh_index": 2, "position": [0.33333, 0.0, 0.0], "orientation": [0, 0, 0] },
+                { "mesh_index": 2, "position": [-0.33333, 0.0, 0.0], "orientation": [0, 0, 0] }
+            ]
+        }
+    ],
+    "lights": [
+        { "type": "diffuse", "shadow": false, "direction": [1.0, 1.0, -1.0], "strength": 1.0 },
+        { "type": "specular", "shadow": false, "direction": [1.0, 1.0, -1.0], "strength": 1.0 }
+    ]
+}
