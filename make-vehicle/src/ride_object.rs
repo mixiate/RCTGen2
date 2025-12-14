@@ -412,7 +412,7 @@ pub(crate) enum ImagePaletteType {
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct Image {
+pub(crate) struct ImageFile {
     pub(crate) path: String,
     pub(crate) x: i32,
     pub(crate) y: i32,
@@ -422,6 +422,12 @@ pub(crate) struct Image {
     pub(crate) src_height: Option<i32>,
     pub(crate) format: Option<ImageFormat>,
     pub(crate) palette: ImagePaletteType,
+}
+
+#[derive(Clone, Debug, serde::Serialize)]
+#[serde(untagged)]
+pub(crate) enum Image {
+    ImageFile(ImageFile),
 }
 
 #[serde_with::skip_serializing_none]

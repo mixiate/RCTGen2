@@ -830,7 +830,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
     let images = render(&ride_description, &models)?;
 
     let mut object_images = vec![
-        ride_object::Image {
+        ride_object::Image::ImageFile(ride_object::ImageFile {
             path: "images/preview.png".to_string(),
             x: 0,
             y: 0,
@@ -840,7 +840,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
             src_height: None,
             format: Some(ride_object::ImageFormat::Raw),
             palette: ride_object::ImagePaletteType::Keep
-        };
+        });
         3
     ];
 
@@ -855,7 +855,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
         atlas.image.save(&file_path)?;
 
         for (image, coord) in images.iter().zip(atlas.coords.iter()) {
-            object_images.push(ride_object::Image {
+            object_images.push(ride_object::Image::ImageFile(ride_object::ImageFile {
                 path: format!("images/car_{i}.png"),
                 x: image.offset().x,
                 y: image.offset().y,
@@ -865,7 +865,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
                 src_height: Some(image.height().try_into().unwrap()),
                 format: None,
                 palette: ride_object::ImagePaletteType::Keep,
-            });
+            }));
         }
 
         file_paths.push(file_path);
