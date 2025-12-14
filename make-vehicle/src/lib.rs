@@ -599,6 +599,7 @@ fn render(
     output_directory: &std::path::Path,
     ride_desc: &RideDesc,
     models: &[renderer::model::Model],
+    image_output_type: ImageOutputType,
 ) -> anyhow::Result<RenderResult> {
     use anyhow::Context as _;
 
@@ -759,7 +760,10 @@ fn render(
             }
         };
 
-        let atlas = renderer::pack::create_atlas(&images);
+        let atlas = match image_output_type {
+            ImageOutputType::Packed => renderer::pack::create_atlas(&images),
+            ImageOutputType::Grid => renderer::pack::create_grid(&images, 32),
+        };
         let file_path = output_directory.join(format!("car_{vehicle_index}")).with_extension("png");
         atlas.image.save(&file_path)?;
 
@@ -807,7 +811,13 @@ fn create_parkobj(
     Ok(())
 }
 
-pub fn make_vehicle(ride_description_path: &std::path::Path) -> anyhow::Result<()> {
+#[derive(Clone, Copy, clap::ValueEnum)]
+pub enum ImageOutputType {
+    Packed,
+    Grid,
+}
+
+pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: ImageOutputType) -> anyhow::Result<()> {
     use anyhow::Context as _;
 
     let ride_description_path = ride_description_path
@@ -863,7 +873,8 @@ pub fn make_vehicle(ride_description_path: &std::path::Path) -> anyhow::Result<(
             .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
     }
 
-    let RenderResult { images, mut file_paths } = render(&images_directory, &ride_description, &models)?;
+    let RenderResult { images, mut file_paths } =
+        render(&images_directory, &ride_description, &models, image_output_type)?;
 
     let object = ride_object::RideObject::new(&ride_description, images);
     let object_json_file_path = output_directory.join("object").with_extension("json");
