@@ -144,3 +144,29 @@ impl Archive {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_archive() {
+        let test_files_directory = std::path::PathBuf::from(std::env!("CARGO_MANIFEST_DIR"));
+        let test_files_directory = test_files_directory.join("tests").join("files").join("gx archive");
+
+        let expected_file_path = test_files_directory.join("images").with_extension("dat");
+
+        let test_image_path = test_files_directory.join("rle_test").with_extension("png");
+        let test_image = crate::image::IndexedImage::load(&test_image_path).unwrap();
+        let mut archive = crate::gx::Archive::with_capacity(2);
+        archive.add_indexed_image(&test_image);
+        archive.add_indexed_image_rle(&test_image);
+
+        let temp_dir = tempfile::tempdir().unwrap();
+        let temp_file_path = temp_dir.path().join("images").with_extension("dat");
+        archive.save(&temp_file_path).unwrap();
+
+        let output_file_bytes = std::fs::read(&temp_file_path).unwrap();
+        let expected_file_bytes = std::fs::read(&expected_file_path).unwrap();
+
+        assert_eq!(output_file_bytes, expected_file_bytes);
+    }
+}
