@@ -816,8 +816,14 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
         ImageOutputType::Dat => {
             let mut archive = renderer::gx::Archive::with_capacity(images.len() + 3);
 
-            // Previews
-            archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
+            let preview_image = if let Some(ref preview_file_path) = ride_description.preview {
+                let preview_file_path = base_directory.join(preview_file_path);
+                renderer::image::IndexedImage::load(&preview_file_path)?
+            } else {
+                renderer::image::IndexedImage::new(1, 1)
+            };
+
+            archive.add_indexed_image(&preview_image);
             archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
             archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
 
