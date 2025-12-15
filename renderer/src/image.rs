@@ -84,6 +84,48 @@ impl IndexedImage {
         &self.pixels
     }
 
+    pub fn load(path: &std::path::Path) -> anyhow::Result<Self> {
+        use anyhow::Context as _;
+
+        let file = std::fs::File::open(path)?;
+        let decoder = png::Decoder::new(std::io::BufReader::new(file));
+        let mut reader = decoder.read_info()?;
+
+        let palette = reader
+            .info()
+            .palette
+            .as_ref()
+            .with_context(|| format!("Error reading {}, image has no palette", path.display()))?;
+        anyhow::ensure!(
+            **palette == crate::palette::PALETTE_FLAT,
+            "Error reading {}, image palette is incorrect",
+            path.display()
+        );
+
+        let buffer_size = reader
+            .output_buffer_size()
+            .with_context(|| format!("Error reading {} buffer size", path.display()))?;
+        let mut buffer = vec![0; buffer_size];
+        let info = reader.next_frame(&mut buffer)?;
+        buffer.truncate(info.buffer_size());
+
+        anyhow::ensure!(
+            info.color_type == png::ColorType::Indexed,
+            "Error reading {}, image is not indexed",
+            path.display()
+        );
+
+        let width = usize::try_from(info.width)?;
+        let height = usize::try_from(info.height)?;
+
+        Ok(Self {
+            pixels: buffer,
+            width,
+            height,
+            offset: glam::IVec2::new(0, 0),
+        })
+    }
+
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
         let image_file = std::fs::File::create(path)?;
         let w = std::io::BufWriter::new(image_file);
