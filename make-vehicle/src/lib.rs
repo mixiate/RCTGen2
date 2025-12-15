@@ -765,10 +765,14 @@ fn create_parkobj(
     Ok(())
 }
 
-#[derive(Clone, Copy, clap::ValueEnum)]
-pub enum ImageOutputType {
+pub enum AtlasType {
     Packed,
     Grid,
+}
+
+pub enum ImageOutputType {
+    Dat,
+    Atlas(AtlasType),
 }
 
 pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: ImageOutputType) -> anyhow::Result<()> {
@@ -804,78 +808,106 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
         })
         .collect::<anyhow::Result<Vec<renderer::model::Model>>>()?;
 
-    let images_directory = output_directory.join("images");
-    std::fs::create_dir_all(&images_directory)
-        .with_context(|| format!("Could not create directory {}", images_directory.display()))?;
-
-    let preview_output_file_path = images_directory.join("preview").with_extension("png");
-    if let Some(ref preview_file_path) = ride_description.preview {
-        let preview_file_path = base_directory.join(preview_file_path);
-        if preview_file_path != preview_output_file_path {
-            std::fs::copy(&preview_file_path, &preview_output_file_path).with_context(|| {
-                format!(
-                    "Could not copy preview image {} to {}",
-                    preview_file_path.display(),
-                    preview_output_file_path.display()
-                )
-            })?;
-        }
-    } else {
-        let image = renderer::image::IndexedImage::new(1, 1);
-        image
-            .save(&preview_output_file_path)
-            .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
-    }
-
     let images = render(&ride_description, &models)?;
-
-    let mut object_images = vec![
-        ride_object::Image::ImageFile(ride_object::ImageFile {
-            path: "images/preview.png".to_string(),
-            x: 0,
-            y: 0,
-            src_x: None,
-            src_y: None,
-            src_width: None,
-            src_height: None,
-            format: Some(ride_object::ImageFormat::Raw),
-            palette: ride_object::ImagePaletteType::Keep
-        });
-        3
-    ];
 
     let mut file_paths = Vec::new();
 
-    for (i, images) in images.iter().enumerate() {
-        let atlas = match image_output_type {
-            ImageOutputType::Packed => renderer::pack::create_atlas(images),
-            ImageOutputType::Grid => renderer::pack::create_grid(images, 32),
-        };
-        let file_path = images_directory.join(format!("car_{i}")).with_extension("png");
-        atlas.image.save(&file_path)?;
+    let object_images = match image_output_type {
+        ImageOutputType::Dat => {
+            let mut archive = renderer::gx::Archive::with_capacity(images.len() + 3);
 
-        for (image, coord) in images.iter().zip(atlas.coords.iter()) {
-            object_images.push(ride_object::Image::ImageFile(ride_object::ImageFile {
-                path: format!("images/car_{i}.png"),
-                x: image.offset().x,
-                y: image.offset().y,
-                src_x: Some(coord.x),
-                src_y: Some(coord.y),
-                src_width: Some(image.width().try_into().unwrap()),
-                src_height: Some(image.height().try_into().unwrap()),
-                format: None,
-                palette: ride_object::ImagePaletteType::Keep,
-            }));
+            // Previews
+            archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
+            archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
+            archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
+
+            for images in &images {
+                for image in images {
+                    archive.add_indexed_image(image);
+                }
+            }
+
+            let file_path = output_directory.join("images").with_extension("dat");
+            archive.save(&file_path)?;
+            file_paths.push(file_path);
+
+            let lgx_string = format!("$LGX:images.dat[0..{}]", archive.len() - 1);
+            vec![ride_object::Image::Gx(lgx_string)]
         }
+        ImageOutputType::Atlas(atlas_type) => {
+            let images_directory = output_directory.join("images");
+            std::fs::create_dir_all(&images_directory)
+                .with_context(|| format!("Could not create directory {}", images_directory.display()))?;
 
-        file_paths.push(file_path);
-    }
+            let preview_output_file_path = images_directory.join("preview").with_extension("png");
+            if let Some(ref preview_file_path) = ride_description.preview {
+                let preview_file_path = base_directory.join(preview_file_path);
+                if preview_file_path != preview_output_file_path {
+                    std::fs::copy(&preview_file_path, &preview_output_file_path).with_context(|| {
+                        format!(
+                            "Could not copy preview image {} to {}",
+                            preview_file_path.display(),
+                            preview_output_file_path.display()
+                        )
+                    })?;
+                }
+            } else {
+                let image = renderer::image::IndexedImage::new(1, 1);
+                image
+                    .save(&preview_output_file_path)
+                    .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
+            }
+
+            file_paths.push(preview_output_file_path);
+
+            let mut object_images = vec![
+                ride_object::Image::ImageFile(ride_object::ImageFile {
+                    path: "images/preview.png".to_string(),
+                    x: 0,
+                    y: 0,
+                    src_x: None,
+                    src_y: None,
+                    src_width: None,
+                    src_height: None,
+                    format: Some(ride_object::ImageFormat::Raw),
+                    palette: ride_object::ImagePaletteType::Keep
+                });
+                3
+            ];
+
+            for (i, images) in images.iter().enumerate() {
+                let atlas = match atlas_type {
+                    AtlasType::Packed => renderer::pack::create_atlas(images),
+                    AtlasType::Grid => renderer::pack::create_grid(images, 32),
+                };
+                let file_path = images_directory.join(format!("car_{i}")).with_extension("png");
+                atlas.image.save(&file_path)?;
+
+                for (image, coord) in images.iter().zip(atlas.coords.iter()) {
+                    object_images.push(ride_object::Image::ImageFile(ride_object::ImageFile {
+                        path: format!("images/car_{i}.png"),
+                        x: image.offset().x,
+                        y: image.offset().y,
+                        src_x: Some(coord.x),
+                        src_y: Some(coord.y),
+                        src_width: Some(image.width().try_into().unwrap()),
+                        src_height: Some(image.height().try_into().unwrap()),
+                        format: None,
+                        palette: ride_object::ImagePaletteType::Keep,
+                    }));
+                }
+
+                file_paths.push(file_path);
+            }
+
+            object_images
+        }
+    };
 
     let object = ride_object::RideObject::new(&ride_description, object_images);
     let object_json_file_path = output_directory.join("object").with_extension("json");
     object.save(&object_json_file_path)?;
 
-    file_paths.push(preview_output_file_path);
     file_paths.push(object_json_file_path);
 
     let parkobj_path = output_directory.with_added_extension("parkobj");

@@ -80,6 +80,10 @@ impl IndexedImage {
         }
     }
 
+    pub fn as_raw(&self) -> &Vec<u8> {
+        &self.pixels
+    }
+
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
         let image_file = std::fs::File::create(path)?;
         let w = std::io::BufWriter::new(image_file);

@@ -427,6 +427,7 @@ pub(crate) struct ImageFile {
 #[derive(Clone, Debug, serde::Serialize)]
 #[serde(untagged)]
 pub(crate) enum Image {
+    Gx(String),
     ImageFile(ImageFile),
 }
 
