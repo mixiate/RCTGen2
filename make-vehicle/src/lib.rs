@@ -829,7 +829,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
 
             for images in &images {
                 for image in images {
-                    archive.add_indexed_image(image);
+                    archive.add_indexed_image_rle(image);
                 }
             }
 
