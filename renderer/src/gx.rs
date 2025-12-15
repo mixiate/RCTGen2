@@ -60,17 +60,22 @@ impl Archive {
             let mut last_count_index = None;
             let mut x_offset = 0;
             let mut pixel_count = 0;
+
+            let mut push_run = |last_count_index: &mut Option<usize>, x_offset: &mut usize, pixel_count: &mut usize| {
+                *last_count_index = Some(rle_data.len());
+                rle_data.push(u8::try_from(*pixel_count).unwrap());
+                rle_data.push(u8::try_from(*x_offset).unwrap());
+                for i in 0..*pixel_count {
+                    rle_data.push(image.get_pixel(*x_offset + i, y));
+                }
+                *x_offset = 0;
+                *pixel_count = 0;
+            };
+
             for x in 0..image.width() {
                 if image.get_pixel(x, y) == 0 {
                     if pixel_count != 0 {
-                        last_count_index = Some(rle_data.len());
-                        rle_data.push(u8::try_from(pixel_count).unwrap());
-                        rle_data.push(u8::try_from(x_offset).unwrap());
-                        for i in 0..pixel_count {
-                            rle_data.push(image.get_pixel(x_offset + i, y));
-                        }
-                        x_offset = 0;
-                        pixel_count = 0;
+                        push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
                     }
                 } else {
                     if pixel_count == 0 {
@@ -80,24 +85,15 @@ impl Archive {
                 }
 
                 if pixel_count == 127 {
-                    last_count_index = Some(rle_data.len());
-                    rle_data.push(u8::try_from(pixel_count).unwrap());
-                    rle_data.push(u8::try_from(x_offset).unwrap());
-                    for i in 0..pixel_count {
-                        rle_data.push(image.get_pixel(x_offset + i, y));
-                    }
-                    x_offset = 0;
-                    pixel_count = 0;
+                    push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
                 }
             }
 
             if pixel_count > 0 || last_count_index.is_none() {
-                rle_data.push(u8::try_from(pixel_count).unwrap() | 0b1000_0000);
-                rle_data.push(u8::try_from(x_offset).unwrap());
-                for i in 0..pixel_count {
-                    rle_data.push(image.get_pixel(x_offset + i, y));
-                }
-            } else if let Some(last_count_index) = last_count_index {
+                push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
+            }
+
+            if let Some(last_count_index) = last_count_index {
                 rle_data[last_count_index] |= 0b1000_0000;
             }
         }
