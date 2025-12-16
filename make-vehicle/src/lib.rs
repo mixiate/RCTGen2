@@ -53,6 +53,7 @@ enum SecondarySound {
 struct Configuration {
     default: i32,
     front: Option<i32>,
+    second: Option<i32>,
     rear: Option<i32>,
 }
 

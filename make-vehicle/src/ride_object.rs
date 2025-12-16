@@ -447,6 +447,9 @@ pub(crate) struct RideObject {
 
 impl RideObject {
     pub(crate) fn new(ride_desc: &crate::RideDesc, images: Vec<Image>) -> Self {
+        let head_cars: Vec<i32> =
+            ride_desc.configuration.front.iter().chain(ride_desc.configuration.second.iter()).copied().collect();
+
         let no_collision_crashes = ride_desc
             .flags
             .as_ref()
@@ -467,7 +470,7 @@ impl RideObject {
             num_empty_cars: ride_desc.zero_cars,
             tab_car: ride_desc.preview_tab_car,
             default_car: ride_desc.configuration.default,
-            head_cars: ride_desc.configuration.front.map(|x| vec![x]),
+            head_cars: (!head_cars.is_empty()).then_some(head_cars),
             tail_cars: ride_desc.configuration.rear.map(|x| vec![x]),
             build_menu_priority: ride_desc.build_menu_priority,
             no_collision_crashes,
