@@ -877,9 +877,10 @@ pub fn make_vehicle(
                     src_width: None,
                     src_height: None,
                     format: Some(ride_object::ImageFormat::Raw),
-                    palette: ride_object::ImagePaletteType::Keep
-                });
-                3
+                    palette: ride_object::ImagePaletteType::Keep,
+                }),
+                ride_object::Image::Gx("".to_owned()),
+                ride_object::Image::Gx("".to_owned()),
             ];
 
             for (i, images) in images.iter().enumerate() {
