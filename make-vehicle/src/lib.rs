@@ -66,10 +66,17 @@ enum VehicleFlag {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(untagged)]
+enum Orientation {
+    Single([f32; 3]),
+    Restraints([[f32; 3]; 4]),
+}
+
+#[derive(Debug, serde::Deserialize)]
 struct ModelDesc {
     mesh_index: usize,
     position: [f32; 3],
-    orientation: Vec<[f32; 3]>,
+    orientation: Orientation,
 }
 
 struct ModelTransform<'a> {
@@ -90,9 +97,10 @@ impl ModelDesc {
 
         let translation = (self.position).into();
 
-        let frame = frame.min(self.orientation.len() - 1); // Not ideal..
-        let rotation =
-            self.orientation.get(frame).with_context(|| format!("No orientation found for frame {frame}"))?;
+        let rotation = match self.orientation {
+            Orientation::Single(orientation) => orientation,
+            Orientation::Restraints(orientations) => orientations[frame],
+        };
         let rotation = glam::Quat::from_euler(
             glam::EulerRot::XYZ,
             rotation[0].to_radians(),
