@@ -8,6 +8,8 @@ pub enum ImageOutputType {
 #[derive(clap::Parser)]
 struct Cli {
     ride_description_file_path: std::path::PathBuf,
+    intermediate_output_directory: std::path::PathBuf,
+    parkobj_output_directory: std::path::PathBuf,
     #[arg(long, value_enum, default_value_t = ImageOutputType::Dat)]
     image_output_type: ImageOutputType,
 }
@@ -24,7 +26,12 @@ fn main() -> anyhow::Result<()> {
         ImageOutputType::Packed => make_vehicle::ImageOutputType::Atlas(make_vehicle::AtlasType::Packed),
         ImageOutputType::Grid => make_vehicle::ImageOutputType::Atlas(make_vehicle::AtlasType::Grid),
     };
-    make_vehicle::make_vehicle(&cli.ride_description_file_path, image_output_type)?;
+    make_vehicle::make_vehicle(
+        &cli.ride_description_file_path,
+        &cli.intermediate_output_directory,
+        &cli.parkobj_output_directory,
+        image_output_type,
+    )?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 

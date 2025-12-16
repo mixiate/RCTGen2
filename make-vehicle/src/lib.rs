@@ -775,7 +775,12 @@ pub enum ImageOutputType {
     Atlas(AtlasType),
 }
 
-pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: ImageOutputType) -> anyhow::Result<()> {
+pub fn make_vehicle(
+    ride_description_path: &std::path::Path,
+    intermediate_output_directory: &std::path::Path,
+    parkobj_output_directory: &std::path::Path,
+    image_output_type: ImageOutputType,
+) -> anyhow::Result<()> {
     use anyhow::Context as _;
 
     let ride_description_path = ride_description_path
@@ -794,7 +799,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
             .with_context(|| format!("Could not parse json in file {}", ride_description_path.display()))?
     };
 
-    let output_directory = base_directory.join(&ride_description.id);
+    let output_directory = intermediate_output_directory.join(&ride_description.id);
     std::fs::create_dir_all(&output_directory)
         .with_context(|| format!("Could not create directory {}", output_directory.display()))?;
 
@@ -916,7 +921,7 @@ pub fn make_vehicle(ride_description_path: &std::path::Path, image_output_type: 
 
     file_paths.push(object_json_file_path);
 
-    let parkobj_path = output_directory.with_added_extension("parkobj");
+    let parkobj_path = parkobj_output_directory.join(&ride_description.id).with_added_extension("parkobj");
     create_parkobj(&output_directory, &parkobj_path, &file_paths)
         .with_context(|| format!("Could not create parkobj file {}", parkobj_path.display()))?;
 
