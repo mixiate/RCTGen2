@@ -141,4 +141,21 @@ impl IndexedImage {
 
         Ok(())
     }
+
+    pub fn water_colours_to_regular_colours(&mut self) {
+        const WATER_FIRST_INDEX: u8 = 230;
+        const WATER_LAST_INDEX: u8 = 239;
+
+        for y in 0..self.height() {
+            for x in 0..self.width() {
+                let pixel = self.get_pixel(x, y);
+                if (WATER_FIRST_INDEX..=WATER_LAST_INDEX).contains(&pixel) {
+                    let colour = crate::palette::srgb_to_linear_rgb(&crate::palette::PALETTE[usize::from(pixel)]);
+                    let nearest_colour =
+                        crate::palette::get_nearest_colour(&colour, crate::palette::RegionType::NoRemaps);
+                    self.set_pixel(x, y, nearest_colour.index);
+                }
+            }
+        }
+    }
 }

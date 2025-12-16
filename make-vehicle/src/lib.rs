@@ -823,18 +823,20 @@ pub fn make_vehicle(
 
     let images = render(&ride_description, &models)?;
 
+    let preview_image = if let Some(ref preview_file_path) = ride_description.preview {
+        let preview_file_path = base_directory.join(preview_file_path);
+        let mut preview_image = renderer::image::IndexedImage::load(&preview_file_path)?;
+        preview_image.water_colours_to_regular_colours();
+        preview_image
+    } else {
+        renderer::image::IndexedImage::new(1, 1)
+    };
+
     let mut file_paths = Vec::new();
 
     let object_images = match image_output_type {
         ImageOutputType::Dat => {
             let mut archive = renderer::gx::Archive::with_capacity(images.len() + 3);
-
-            let preview_image = if let Some(ref preview_file_path) = ride_description.preview {
-                let preview_file_path = base_directory.join(preview_file_path);
-                renderer::image::IndexedImage::load(&preview_file_path)?
-            } else {
-                renderer::image::IndexedImage::new(1, 1)
-            };
 
             archive.add_indexed_image(&preview_image);
             archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
@@ -859,23 +861,9 @@ pub fn make_vehicle(
                 .with_context(|| format!("Could not create directory {}", images_directory.display()))?;
 
             let preview_output_file_path = images_directory.join("preview").with_extension("png");
-            if let Some(ref preview_file_path) = ride_description.preview {
-                let preview_file_path = base_directory.join(preview_file_path);
-                if preview_file_path != preview_output_file_path {
-                    std::fs::copy(&preview_file_path, &preview_output_file_path).with_context(|| {
-                        format!(
-                            "Could not copy preview image {} to {}",
-                            preview_file_path.display(),
-                            preview_output_file_path.display()
-                        )
-                    })?;
-                }
-            } else {
-                let image = renderer::image::IndexedImage::new(1, 1);
-                image
-                    .save(&preview_output_file_path)
-                    .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
-            }
+            preview_image
+                .save(&preview_output_file_path)
+                .with_context(|| format!("Could not save preview image {}", preview_output_file_path.display()))?;
 
             file_paths.push(preview_output_file_path);
 
