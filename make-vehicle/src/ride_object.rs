@@ -378,7 +378,7 @@ struct Properties {
     max_height: Option<i32>,
     #[serde(rename = "ratingMultipler")] // Typo in OpenRCT2
     rating_multipliers: Option<RatingMultipliers>,
-    car_colors: Vec<Vec<[ColourType; 3]>>,
+    car_colours: Vec<Vec<[ColourType; 3]>>,
     cars: Vec<Car>,
 }
 
@@ -477,7 +477,7 @@ impl RideObject {
             rider_controls_speed,
             rating_multipliers: ride_desc.rating_multipliers,
             max_height: ride_desc.max_height,
-            car_colors: ride_desc.default_colors.iter().map(|x| vec![*x]).collect(),
+            car_colours: ride_desc.default_colors.iter().map(|x| vec![*x]).collect(),
             cars,
         };
 
