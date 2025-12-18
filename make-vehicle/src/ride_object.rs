@@ -233,13 +233,13 @@ struct SpriteGroups {
 }
 
 impl SpriteGroups {
-    fn new(ride_desc: &crate::RideDesc, vehicle: &crate::VehicleDesc) -> Self {
-        use crate::SpriteGroup;
+    fn new(ride_desc: &crate::ride_desc::Ride, vehicle: &crate::ride_desc::Vehicle) -> Self {
+        use crate::ride_desc::SpriteGroup;
 
         let restraint_animation = vehicle
             .flags
             .as_ref()
-            .and_then(|x| x.contains(&crate::VehicleFlag::RestraintAnimation).then_some(4));
+            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::RestraintAnimation).then_some(4));
 
         let slopes60_banked22 = if ride_desc.sprites.contains(&SpriteGroup::ZeroGRolls) {
             if ride_desc.sprites.contains(&SpriteGroup::DiveLoops) {
@@ -314,16 +314,22 @@ struct Car {
 }
 
 impl Car {
-    fn new(ride_desc: &crate::RideDesc, vehicle: &crate::VehicleDesc) -> Self {
+    fn new(ride_desc: &crate::ride_desc::Ride, vehicle: &crate::ride_desc::Vehicle) -> Self {
         let num_seats = vehicle.capacity.unwrap_or(0);
         let num_seat_rows = vehicle.riders.as_ref().map(|x| x.len() as i32).unwrap_or(0);
 
-        let has_additional_colour1 =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&crate::VehicleFlag::SecondaryRemap).then_some(true));
-        let has_additional_colour2 =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&crate::VehicleFlag::TertiaryRemap).then_some(true));
-        let has_screaming_riders =
-            vehicle.flags.as_ref().and_then(|x| x.contains(&crate::VehicleFlag::RidersScream).then_some(true));
+        let has_additional_colour1 = vehicle
+            .flags
+            .as_ref()
+            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::SecondaryRemap).then_some(true));
+        let has_additional_colour2 = vehicle
+            .flags
+            .as_ref()
+            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::TertiaryRemap).then_some(true));
+        let has_screaming_riders = vehicle
+            .flags
+            .as_ref()
+            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::RidersScream).then_some(true));
 
         let loading_positions = vehicle
             .riders
@@ -446,18 +452,18 @@ pub(crate) struct RideObject {
 }
 
 impl RideObject {
-    pub(crate) fn new(ride_desc: &crate::RideDesc, images: Vec<Image>) -> Self {
+    pub(crate) fn new(ride_desc: &crate::ride_desc::Ride, images: Vec<Image>) -> Self {
         let head_cars: Vec<i32> =
             ride_desc.configuration.front.iter().chain(ride_desc.configuration.second.iter()).copied().collect();
 
         let no_collision_crashes = ride_desc
             .flags
             .as_ref()
-            .and_then(|x| x.contains(&crate::RideFlag::NoCollisionCrashes).then_some(true));
+            .and_then(|x| x.contains(&crate::ride_desc::Flag::NoCollisionCrashes).then_some(true));
         let rider_controls_speed = ride_desc
             .flags
             .as_ref()
-            .and_then(|x| x.contains(&crate::RideFlag::RiderControlsSpeed).then_some(true));
+            .and_then(|x| x.contains(&crate::ride_desc::Flag::RiderControlsSpeed).then_some(true));
 
         let cars = ride_desc.vehicles.iter().map(|vehicle| Car::new(ride_desc, vehicle)).collect();
 

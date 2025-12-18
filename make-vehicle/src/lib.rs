@@ -1,177 +1,5 @@
+mod ride_desc;
 mod ride_object;
-
-#[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum RideFlag {
-    NoCollisionCrashes,
-    RiderControlsSpeed,
-}
-
-#[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum SpriteGroup {
-    Flat,
-    GentleSlopes,
-    SteepSlopes,
-    VerticalSlopes,
-    Diagonals,
-    BankedTurns,
-    InlineTwists,
-    SlopeBankTransition,
-    DiagonalBankTransition,
-    SlopedBankTransition,
-    BankedSlopedTurns,
-    BankedSlopeTransition,
-    Corkscrews,
-    ZeroGRolls,
-    DiagonalSlopedBankTransition,
-    DiveLoops,
-}
-
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum RunningSound {
-    WoodenOld = 1,
-    Wooden = 54,
-    Steel = 2,
-    SteelSmooth = 57,
-    Train = 31,
-    Engine = 21,
-}
-
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum SecondarySound {
-    Scream1 = 0,
-    Scream2 = 1,
-    Scream3 = 2,
-    Whistle = 3,
-    Bell = 4,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct Configuration {
-    default: i32,
-    front: Option<i32>,
-    second: Option<i32>,
-    rear: Option<i32>,
-}
-
-#[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum VehicleFlag {
-    SecondaryRemap,
-    TertiaryRemap,
-    RidersScream,
-    RestraintAnimation,
-}
-
-#[derive(Debug, serde::Deserialize)]
-#[serde(untagged)]
-enum Orientation {
-    Single([f32; 3]),
-    Restraints([[f32; 3]; 4]),
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct ModelDesc {
-    mesh_index: usize,
-    position: [f32; 3],
-    orientation: Orientation,
-}
-
-struct ModelTransform<'a> {
-    model: &'a renderer::model::Model,
-    translation: glam::Vec3,
-    rotation: glam::Quat,
-}
-
-impl ModelDesc {
-    fn get_model_transform<'a>(
-        &self,
-        models: &'a [renderer::model::Model],
-        frame: usize,
-    ) -> anyhow::Result<ModelTransform<'a>> {
-        use anyhow::Context as _;
-
-        let model = models.get(self.mesh_index).with_context(|| format!("Invalid mesh index {}", self.mesh_index))?;
-
-        let translation = (self.position).into();
-
-        let rotation = match self.orientation {
-            Orientation::Single(orientation) => orientation,
-            Orientation::Restraints(orientations) => orientations[frame],
-        };
-        let rotation = glam::Quat::from_euler(
-            glam::EulerRot::XYZ,
-            rotation[0].to_radians(),
-            rotation[2].to_radians(), // Y and Z are swapped. Fix?
-            rotation[1].to_radians(),
-        );
-
-        Ok(ModelTransform {
-            model,
-            translation,
-            rotation,
-        })
-    }
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct VehicleDesc {
-    spacing: f32,
-    mass: i32,
-    draw_order: i32,
-    flags: Option<std::collections::HashSet<VehicleFlag>>,
-    model: Vec<ModelDesc>,
-    capacity: Option<i32>,
-    riders: Option<Vec<ModelDesc>>,
-}
-
-#[derive(Debug, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-enum LightType {
-    Diffuse,
-    Specular,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct LightDesc {
-    r#type: LightType,
-    shadow: bool,
-    direction: [f32; 3],
-    strength: f32,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct RideDesc {
-    id: String,
-    original_id: Option<String>,
-    name: String,
-    description: String,
-    capacity: String,
-    author: String,
-    version: Option<String>,
-    preview: Option<std::path::PathBuf>,
-    ride_type: ride_object::RideType,
-    flags: Option<std::collections::HashSet<RideFlag>>,
-    sprites: std::collections::HashSet<SpriteGroup>,
-    zero_cars: i32,
-    preview_tab_car: i32,
-    build_menu_priority: i32,
-    running_sound: RunningSound,
-    secondary_sound: SecondarySound,
-    min_cars_per_train: i32,
-    max_cars_per_train: i32,
-    limit_air_time_bonus: Option<bool>,
-    rating_multipliers: Option<ride_object::RatingMultipliers>,
-    max_height: Option<i32>,
-    configuration: Configuration,
-    default_colors: Vec<[ride_object::ColourType; 3]>,
-    meshes: Vec<std::path::PathBuf>,
-    vehicles: Vec<VehicleDesc>,
-    lights: Vec<LightDesc>,
-}
 
 struct VehicleRotation {
     count: i32,
@@ -194,7 +22,7 @@ impl VehicleRotation {
 fn render_rotations(
     scene: &renderer::Scene,
     camera: &glam::Mat4,
-    lights: &[LightDesc],
+    lights: &[ride_desc::Light],
     rotation: &VehicleRotation,
 ) -> Vec<renderer::image::IndexedImage> {
     let mut images = Vec::new();
@@ -208,12 +36,12 @@ fn render_rotations(
         let lights: Vec<_> = lights
             .iter()
             .map(|x| renderer::Light {
-                diffuse_strength: if x.r#type == LightType::Diffuse {
+                diffuse_strength: if x.r#type == ride_desc::LightType::Diffuse {
                     x.strength
                 } else {
                     0.0
                 },
-                specular_strength: if x.r#type == LightType::Specular {
+                specular_strength: if x.r#type == ride_desc::LightType::Specular {
                     x.strength
                 } else {
                     0.0
@@ -361,8 +189,8 @@ impl VehicleAngles {
 fn render_vehicle(
     scene: &renderer::Scene,
     camera: &glam::Mat4,
-    lights: &[LightDesc],
-    sprite_groups: &std::collections::HashSet<SpriteGroup>,
+    lights: &[ride_desc::Light],
+    sprite_groups: &std::collections::HashSet<ride_desc::SpriteGroup>,
     angles: &VehicleAngles,
 ) -> Vec<renderer::image::IndexedImage> {
     use VehicleRotation as VR;
@@ -390,22 +218,22 @@ fn render_vehicle(
     } = *angles;
 
     let mut rots = Vec::with_capacity(256);
-    if sprite_groups.contains(&SpriteGroup::Flat) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::Flat) {
         rots.push(VR::new(32, pitch_flat, 0.0, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::GentleSlopes) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::GentleSlopes) {
         rots.push(VR::new(4, pitch_flat_to_gentle, 0.0, 0.0));
         rots.push(VR::new(4, -pitch_flat_to_gentle, 0.0, 0.0));
         rots.push(VR::new(32, pitch_gentle, 0.0, 0.0));
         rots.push(VR::new(32, -pitch_gentle, 0.0, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::SteepSlopes) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::SteepSlopes) {
         rots.push(VR::new(8, pitch_gentle_to_steep, 0.0, 0.0));
         rots.push(VR::new(8, -pitch_gentle_to_steep, 0.0, 0.0));
         rots.push(VR::new(32, pitch_steep, 0.0, 0.0));
         rots.push(VR::new(32, -pitch_steep, 0.0, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::VerticalSlopes) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::VerticalSlopes) {
         rots.push(VR::new(4, pitch_steep_to_vertical, 0.0, 0.0));
         rots.push(VR::new(4, -pitch_steep_to_vertical, 0.0, 0.0));
         rots.push(VR::new(32, pitch_vertical, 0.0, 0.0));
@@ -422,7 +250,7 @@ fn render_vehicle(
         rots.push(VR::new(4, -pitch_vertical - 5.0 * FRAC_PI_12, 0.0, 0.0));
         rots.push(VR::new(4, PI, 0.0, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::Diagonals) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::Diagonals) {
         rots.push(VR::new(4, pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
         rots.push(VR::new(4, -pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
         rots.push(VR::new(4, pitch_gentle_diag, 0.0, FRAC_PI_4));
@@ -430,13 +258,13 @@ fn render_vehicle(
         rots.push(VR::new(4, pitch_steep_diag, 0.0, FRAC_PI_4));
         rots.push(VR::new(4, -pitch_steep_diag, 0.0, FRAC_PI_4));
     }
-    if sprite_groups.contains(&SpriteGroup::BankedTurns) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::BankedTurns) {
         rots.push(VR::new(8, pitch_flat, roll_flat_to_bank, 0.0));
         rots.push(VR::new(8, pitch_flat, -roll_flat_to_bank, 0.0));
         rots.push(VR::new(32, pitch_flat, roll_bank, 0.0));
         rots.push(VR::new(32, pitch_flat, -roll_bank, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::InlineTwists) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::InlineTwists) {
         rots.push(VR::new(4, pitch_flat, 3.0 * FRAC_PI_8, 0.0));
         rots.push(VR::new(4, pitch_flat, -3.0 * FRAC_PI_8, 0.0));
         rots.push(VR::new(4, pitch_flat, FRAC_PI_2, 0.0));
@@ -448,25 +276,25 @@ fn render_vehicle(
         rots.push(VR::new(4, pitch_flat, 7.0 * FRAC_PI_8, 0.0));
         rots.push(VR::new(4, pitch_flat, -7.0 * FRAC_PI_8, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::SlopeBankTransition) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::SlopeBankTransition) {
         rots.push(VR::new(32, pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
         rots.push(VR::new(32, pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
         rots.push(VR::new(32, -pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
         rots.push(VR::new(32, -pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::DiagonalBankTransition) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::DiagonalBankTransition) {
         rots.push(VR::new(4, pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
         rots.push(VR::new(4, pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
         rots.push(VR::new(4, -pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
         rots.push(VR::new(4, -pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
     }
-    if sprite_groups.contains(&SpriteGroup::SlopedBankTransition) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::SlopedBankTransition) {
         rots.push(VR::new(4, pitch_gentle, roll_flat_to_bank, 0.0));
         rots.push(VR::new(4, pitch_gentle, -roll_flat_to_bank, 0.0));
         rots.push(VR::new(4, -pitch_gentle, roll_flat_to_bank, 0.0));
         rots.push(VR::new(4, -pitch_gentle, -roll_flat_to_bank, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::DiagonalSlopedBankTransition) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::DiagonalSlopedBankTransition) {
         rots.push(VR::new(4, pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
         rots.push(VR::new(4, pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
         rots.push(VR::new(4, -pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
@@ -480,19 +308,19 @@ fn render_vehicle(
         rots.push(VR::new(4, -pitch_gentle_diag, roll_bank, FRAC_PI_4));
         rots.push(VR::new(4, -pitch_gentle_diag, -roll_bank, FRAC_PI_4));
     }
-    if sprite_groups.contains(&SpriteGroup::BankedSlopedTurns) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::BankedSlopedTurns) {
         rots.push(VR::new(32, pitch_gentle, roll_bank, 0.0));
         rots.push(VR::new(32, pitch_gentle, -roll_bank, 0.0));
         rots.push(VR::new(32, -pitch_gentle, roll_bank, 0.0));
         rots.push(VR::new(32, -pitch_gentle, -roll_bank, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::BankedSlopeTransition) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::BankedSlopeTransition) {
         rots.push(VR::new(4, pitch_flat_to_gentle, roll_bank, 0.0));
         rots.push(VR::new(4, pitch_flat_to_gentle, -roll_bank, 0.0));
         rots.push(VR::new(4, -pitch_flat_to_gentle, roll_bank, 0.0));
         rots.push(VR::new(4, -pitch_flat_to_gentle, -roll_bank, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::ZeroGRolls) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::ZeroGRolls) {
         //Gentle bank 67.5
         rots.push(VR::new(4, pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
         rots.push(VR::new(4, pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
@@ -539,7 +367,7 @@ fn render_vehicle(
         rots.push(VR::new(4, -pitch_gentle_to_steep, FRAC_PI_2, 0.0));
         rots.push(VR::new(4, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
         //Steep bank 22.5
-        let count = if sprite_groups.contains(&SpriteGroup::DiveLoops) {
+        let count = if sprite_groups.contains(&ride_desc::SpriteGroup::DiveLoops) {
             8
         } else {
             4
@@ -549,7 +377,7 @@ fn render_vehicle(
         rots.push(VR::new(count, -pitch_steep, FRAC_PI_8, 0.0));
         rots.push(VR::new(count, -pitch_steep, -FRAC_PI_8, 0.0));
     }
-    if sprite_groups.contains(&SpriteGroup::DiveLoops) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::DiveLoops) {
         //Steep bank 45
         rots.push(VR::new(8, pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
         rots.push(VR::new(8, pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
@@ -566,7 +394,7 @@ fn render_vehicle(
         rots.push(VR::new(8, -pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
         rots.push(VR::new(8, -pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
     }
-    if sprite_groups.contains(&SpriteGroup::Corkscrews) {
+    if sprite_groups.contains(&ride_desc::SpriteGroup::Corkscrews) {
         for angles in corkscrew_right_up {
             rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
         }
@@ -586,9 +414,9 @@ fn render_vehicle(
 
 fn get_model_transforms<'a>(
     models: &'a [renderer::model::Model],
-    model_descs: &'a [ModelDesc],
+    model_descs: &'a [ride_desc::Model],
     frame: usize,
-) -> anyhow::Result<Vec<ModelTransform<'a>>> {
+) -> anyhow::Result<Vec<ride_desc::ModelTransform<'a>>> {
     use anyhow::Context as _;
     model_descs
         .iter()
@@ -600,7 +428,7 @@ fn get_model_transforms<'a>(
 const TILE_SIZE: f32 = 3.3;
 
 fn render(
-    ride_desc: &RideDesc,
+    ride_desc: &ride_desc::Ride,
     models: &[renderer::model::Model],
 ) -> anyhow::Result<Vec<Vec<renderer::image::IndexedImage>>> {
     use anyhow::Context as _;
@@ -647,7 +475,7 @@ fn render(
             car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
 
             // Rendering restraints is awkward and bad. Rewrite all of this code.
-            if vehicle.flags.as_ref().is_some_and(|x| x.contains(&VehicleFlag::RestraintAnimation)) {
+            if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
                 for frame in 1..4 {
                     let vehicle_models = get_model_transforms(models, &vehicle.model, frame)
                         .with_context(|| format!("Error in vehicle {vehicle_index}"))?;
@@ -705,7 +533,7 @@ fn render(
                 car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
 
                 // Rendering restraints is awkward and bad. Rewrite all of this code.
-                if vehicle.flags.as_ref().is_some_and(|x| x.contains(&VehicleFlag::RestraintAnimation)) {
+                if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
                     for frame in 1..4 {
                         let vehicle_models = get_model_transforms(models, &vehicle.model, frame)
                             .with_context(|| format!("Error in vehicle {vehicle_index}"))?;
@@ -804,7 +632,7 @@ pub fn make_vehicle(
         let json = std::fs::read_to_string(&ride_description_path)
             .with_context(|| format!("Could not read file {}", ride_description_path.display()))?;
 
-        serde_json::from_str::<RideDesc>(&json)
+        serde_json::from_str::<ride_desc::Ride>(&json)
             .with_context(|| format!("Could not parse json in file {}", ride_description_path.display()))?
     };
 
