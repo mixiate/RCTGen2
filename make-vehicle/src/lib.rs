@@ -190,7 +190,7 @@ fn render_vehicle(
     scene: &renderer::Scene,
     camera: &glam::Mat4,
     lights: &[ride_desc::Light],
-    sprite_groups: &std::collections::HashSet<ride_desc::SpriteGroup>,
+    sprite_groups: &ride_object::SpriteGroups,
     angles: &VehicleAngles,
 ) -> Vec<renderer::image::IndexedImage> {
     use VehicleRotation as VR;
@@ -218,194 +218,218 @@ fn render_vehicle(
     } = *angles;
 
     let mut rots = Vec::with_capacity(256);
-    if sprite_groups.contains(&ride_desc::SpriteGroup::Flat) {
-        rots.push(VR::new(32, pitch_flat, 0.0, 0.0));
+    if let Some(count) = sprite_groups.slope_flat {
+        rots.push(VR::new(count, pitch_flat, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::GentleSlopes) {
-        rots.push(VR::new(4, pitch_flat_to_gentle, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_flat_to_gentle, 0.0, 0.0));
-        rots.push(VR::new(32, pitch_gentle, 0.0, 0.0));
-        rots.push(VR::new(32, -pitch_gentle, 0.0, 0.0));
+    if let Some(count) = sprite_groups.slopes12 {
+        rots.push(VR::new(count, pitch_flat_to_gentle, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_flat_to_gentle, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::SteepSlopes) {
-        rots.push(VR::new(8, pitch_gentle_to_steep, 0.0, 0.0));
-        rots.push(VR::new(8, -pitch_gentle_to_steep, 0.0, 0.0));
-        rots.push(VR::new(32, pitch_steep, 0.0, 0.0));
-        rots.push(VR::new(32, -pitch_steep, 0.0, 0.0));
+    if let Some(count) = sprite_groups.slopes25 {
+        rots.push(VR::new(count, pitch_gentle, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::VerticalSlopes) {
-        rots.push(VR::new(4, pitch_steep_to_vertical, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_steep_to_vertical, 0.0, 0.0));
-        rots.push(VR::new(32, pitch_vertical, 0.0, 0.0));
-        rots.push(VR::new(32, -pitch_vertical, 0.0, 0.0));
-        rots.push(VR::new(4, pitch_vertical + FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_vertical - FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, pitch_vertical + 2.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_vertical - 2.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, pitch_vertical + 3.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_vertical - 3.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, pitch_vertical + 4.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_vertical - 4.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, pitch_vertical + 5.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, -pitch_vertical - 5.0 * FRAC_PI_12, 0.0, 0.0));
-        rots.push(VR::new(4, PI, 0.0, 0.0));
+    if let Some(count) = sprite_groups.slopes42 {
+        rots.push(VR::new(count, pitch_gentle_to_steep, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::Diagonals) {
-        rots.push(VR::new(4, pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_gentle_diag, 0.0, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_gentle_diag, 0.0, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_steep_diag, 0.0, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_steep_diag, 0.0, FRAC_PI_4));
+    if let Some(count) = sprite_groups.slopes60 {
+        rots.push(VR::new(count, pitch_steep, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_steep, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::BankedTurns) {
-        rots.push(VR::new(8, pitch_flat, roll_flat_to_bank, 0.0));
-        rots.push(VR::new(8, pitch_flat, -roll_flat_to_bank, 0.0));
-        rots.push(VR::new(32, pitch_flat, roll_bank, 0.0));
-        rots.push(VR::new(32, pitch_flat, -roll_bank, 0.0));
+    if let Some(count) = sprite_groups.slopes75 {
+        rots.push(VR::new(count, pitch_steep_to_vertical, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_steep_to_vertical, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::InlineTwists) {
-        rots.push(VR::new(4, pitch_flat, 3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_flat, -3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_flat, FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, pitch_flat, -FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, pitch_flat, 5.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_flat, -5.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_flat, 3.0 * FRAC_PI_4, 0.0));
-        rots.push(VR::new(4, pitch_flat, -3.0 * FRAC_PI_4, 0.0));
-        rots.push(VR::new(4, pitch_flat, 7.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_flat, -7.0 * FRAC_PI_8, 0.0));
+    if let Some(count) = sprite_groups.slopes90 {
+        rots.push(VR::new(count, pitch_vertical, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_vertical, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::SlopeBankTransition) {
-        rots.push(VR::new(32, pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
-        rots.push(VR::new(32, pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
-        rots.push(VR::new(32, -pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
-        rots.push(VR::new(32, -pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
+    if let Some(count) = sprite_groups.slopes_loop {
+        rots.push(VR::new(count, pitch_vertical + FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_vertical - FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, pitch_vertical + 2.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_vertical - 2.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, pitch_vertical + 3.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_vertical - 3.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, pitch_vertical + 4.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_vertical - 4.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, pitch_vertical + 5.0 * FRAC_PI_12, 0.0, 0.0));
+        rots.push(VR::new(count, -pitch_vertical - 5.0 * FRAC_PI_12, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::DiagonalBankTransition) {
-        rots.push(VR::new(4, pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+    if let Some(count) = sprite_groups.slope_inverted {
+        rots.push(VR::new(count, PI, 0.0, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::SlopedBankTransition) {
-        rots.push(VR::new(4, pitch_gentle, roll_flat_to_bank, 0.0));
-        rots.push(VR::new(4, pitch_gentle, -roll_flat_to_bank, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, roll_flat_to_bank, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, -roll_flat_to_bank, 0.0));
+    if let Some(count) = sprite_groups.slopes8 {
+        rots.push(VR::new(count, pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::DiagonalSlopedBankTransition) {
-        rots.push(VR::new(4, pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_gentle_diag, roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, pitch_gentle_diag, -roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_gentle_diag, roll_bank, FRAC_PI_4));
-        rots.push(VR::new(4, -pitch_gentle_diag, -roll_bank, FRAC_PI_4));
+    if let Some(count) = sprite_groups.slopes16 {
+        rots.push(VR::new(count, pitch_gentle_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_gentle_diag, 0.0, FRAC_PI_4));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::BankedSlopedTurns) {
-        rots.push(VR::new(32, pitch_gentle, roll_bank, 0.0));
-        rots.push(VR::new(32, pitch_gentle, -roll_bank, 0.0));
-        rots.push(VR::new(32, -pitch_gentle, roll_bank, 0.0));
-        rots.push(VR::new(32, -pitch_gentle, -roll_bank, 0.0));
+    if let Some(count) = sprite_groups.slopes50 {
+        rots.push(VR::new(count, pitch_steep_diag, 0.0, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_steep_diag, 0.0, FRAC_PI_4));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::BankedSlopeTransition) {
-        rots.push(VR::new(4, pitch_flat_to_gentle, roll_bank, 0.0));
-        rots.push(VR::new(4, pitch_flat_to_gentle, -roll_bank, 0.0));
-        rots.push(VR::new(4, -pitch_flat_to_gentle, roll_bank, 0.0));
-        rots.push(VR::new(4, -pitch_flat_to_gentle, -roll_bank, 0.0));
+    if let Some(count) = sprite_groups.flat_banked22 {
+        rots.push(VR::new(count, pitch_flat, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, pitch_flat, -roll_flat_to_bank, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::ZeroGRolls) {
-        //Gentle bank 67.5
-        rots.push(VR::new(4, pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
-        //Gentle bank 90
-        rots.push(VR::new(4, pitch_gentle, FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, pitch_gentle, -FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, -FRAC_PI_2, 0.0));
-        //Gentle 112.5
-        rots.push(VR::new(4, pitch_gentle, 5.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_gentle, -5.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, 5.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, -5.0 * FRAC_PI_8, 0.0));
-        //Gentle bank 135
-        rots.push(VR::new(4, pitch_gentle, 3.0 * FRAC_PI_4, 0.0));
-        rots.push(VR::new(4, pitch_gentle, -3.0 * FRAC_PI_4, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, 3.0 * FRAC_PI_4, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, -3.0 * FRAC_PI_4, 0.0));
-        //Gentle bank 157.5
-        rots.push(VR::new(4, pitch_gentle, 7.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_gentle, -7.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, 7.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle, -7.0 * FRAC_PI_8, 0.0));
-        //Gentle-to-steep bank 22.5
-        rots.push(VR::new(4, pitch_gentle_to_steep, FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_gentle_to_steep, -FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, -FRAC_PI_8, 0.0));
-        //Gentle-to-steep bank 45
-        rots.push(VR::new(4, pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0));
-        //Gentle-to-steep bank 67.5
-        rots.push(VR::new(4, pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0));
-        //Gentle-to-steep bank 90
-        rots.push(VR::new(4, pitch_gentle_to_steep, FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, FRAC_PI_2, 0.0));
-        rots.push(VR::new(4, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
-        //Steep bank 22.5
-        let count = if sprite_groups.contains(&ride_desc::SpriteGroup::DiveLoops) {
-            8
-        } else {
-            4
-        };
+    if let Some(count) = sprite_groups.flat_banked45 {
+        rots.push(VR::new(count, pitch_flat, roll_bank, 0.0));
+        rots.push(VR::new(count, pitch_flat, -roll_bank, 0.0));
+    }
+    if let Some(count) = sprite_groups.flat_banked67 {
+        rots.push(VR::new(count, pitch_flat, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_flat, -3.0 * FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.flat_banked90 {
+        rots.push(VR::new(count, pitch_flat, FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, pitch_flat, -FRAC_PI_2, 0.0));
+    }
+    if let Some(count) = sprite_groups.inline_twists {
+        rots.push(VR::new(count, pitch_flat, 5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_flat, -5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_flat, 3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(count, pitch_flat, -3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(count, pitch_flat, 7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_flat, -7.0 * FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes12_banked22 {
+        rots.push(VR::new(count, pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, -pitch_flat_to_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, -pitch_flat_to_gentle, -roll_flat_to_bank, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes8_banked22 {
+        rots.push(VR::new(count, pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(count, pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+    }
+    if let Some(count) = sprite_groups.slopes25_banked22 {
+        rots.push(VR::new(count, pitch_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, roll_flat_to_bank, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -roll_flat_to_bank, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes8_banked45 {
+        rots.push(VR::new(count, pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(count, pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4));
+    }
+    if let Some(count) = sprite_groups.slopes16_banked22 {
+        rots.push(VR::new(count, pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(count, pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4));
+    }
+    if let Some(count) = sprite_groups.slopes16_banked45 {
+        rots.push(VR::new(count, pitch_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(count, pitch_gentle_diag, -roll_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_gentle_diag, roll_bank, FRAC_PI_4));
+        rots.push(VR::new(count, -pitch_gentle_diag, -roll_bank, FRAC_PI_4));
+    }
+    if let Some(count) = sprite_groups.slopes25_banked45 {
+        rots.push(VR::new(count, pitch_gentle, roll_bank, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -roll_bank, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, roll_bank, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -roll_bank, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes12_banked45 {
+        rots.push(VR::new(count, pitch_flat_to_gentle, roll_bank, 0.0));
+        rots.push(VR::new(count, pitch_flat_to_gentle, -roll_bank, 0.0));
+        rots.push(VR::new(count, -pitch_flat_to_gentle, roll_bank, 0.0));
+        rots.push(VR::new(count, -pitch_flat_to_gentle, -roll_bank, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes25_banked67 {
+        rots.push(VR::new(count, pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -3.0 * FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes25_banked90 {
+        rots.push(VR::new(count, pitch_gentle, FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -FRAC_PI_2, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes25_inline_twists {
+        rots.push(VR::new(count, pitch_gentle, 5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, 5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -5.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle, 3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, 3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -3.0 * FRAC_PI_4, 0.0));
+        rots.push(VR::new(count, pitch_gentle, 7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle, -7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, 7.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle, -7.0 * FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes42_banked22 {
+        rots.push(VR::new(count, pitch_gentle_to_steep, FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle_to_steep, -FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, -FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes42_banked45 {
+        rots.push(VR::new(count, pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes42_banked67 {
+        rots.push(VR::new(count, pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes42_banked90 {
+        rots.push(VR::new(count, pitch_gentle_to_steep, FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, FRAC_PI_2, 0.0));
+        rots.push(VR::new(count, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0));
+    }
+    if let Some(count) = sprite_groups.slopes60_banked22 {
         rots.push(VR::new(count, pitch_steep, FRAC_PI_8, 0.0));
         rots.push(VR::new(count, pitch_steep, -FRAC_PI_8, 0.0));
         rots.push(VR::new(count, -pitch_steep, FRAC_PI_8, 0.0));
         rots.push(VR::new(count, -pitch_steep, -FRAC_PI_8, 0.0));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::DiveLoops) {
-        //Steep bank 45
-        rots.push(VR::new(8, pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
-        rots.push(VR::new(8, pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
-        rots.push(VR::new(8, -pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
-        rots.push(VR::new(8, -pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
-        //Steep bank 67.5
-        rots.push(VR::new(8, pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8));
-        rots.push(VR::new(8, pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8));
-        rots.push(VR::new(8, -pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8));
-        rots.push(VR::new(8, -pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8));
-        //Diagonal steep bank 90
-        rots.push(VR::new(8, pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
-        rots.push(VR::new(8, pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
-        rots.push(VR::new(8, -pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
-        rots.push(VR::new(8, -pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
+    if let Some(count) = sprite_groups.slopes50_banked45 {
+        rots.push(VR::new(count, pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
+        rots.push(VR::new(count, pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
+        rots.push(VR::new(count, -pitch_steep_diag, FRAC_PI_4, FRAC_PI_8));
+        rots.push(VR::new(count, -pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8));
     }
-    if sprite_groups.contains(&ride_desc::SpriteGroup::Corkscrews) {
+    if let Some(count) = sprite_groups.slopes50_banked67 {
+        rots.push(VR::new(count, pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8));
+        rots.push(VR::new(count, pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8));
+        rots.push(VR::new(count, -pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8));
+        rots.push(VR::new(count, -pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8));
+    }
+    if let Some(count) = sprite_groups.slopes50_banked90 {
+        rots.push(VR::new(count, pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
+        rots.push(VR::new(count, pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
+        rots.push(VR::new(count, -pitch_steep_diag, FRAC_PI_2, FRAC_PI_8));
+        rots.push(VR::new(count, -pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8));
+    }
+    if let Some(count) = sprite_groups.corkscrews {
         for angles in corkscrew_right_up {
-            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+            rots.push(VR::new(count, angles.pitch, angles.roll, angles.yaw));
         }
         for angles in corkscrew_right_down {
-            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+            rots.push(VR::new(count, angles.pitch, angles.roll, angles.yaw));
         }
         for angles in corkscrew_left_up {
-            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+            rots.push(VR::new(count, angles.pitch, angles.roll, angles.yaw));
         }
         for angles in corkscrew_left_down {
-            rots.push(VR::new(4, angles.pitch, angles.roll, angles.yaw));
+            rots.push(VR::new(count, angles.pitch, angles.roll, angles.yaw));
         }
     }
 
@@ -455,6 +479,8 @@ fn render(
     let mut images = Vec::new();
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
+        let sprite_groups = ride_object::SpriteGroups::new(ride_desc, vehicle);
+
         let mut car_images = Vec::new();
 
         let vehicle_models = get_model_transforms(models, &vehicle.model, 0)
@@ -472,7 +498,7 @@ fn render(
                 })
                 .collect::<Vec<_>>();
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
+            car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &sprite_groups, &angles));
 
             // Rendering restraints is awkward and bad. Rewrite all of this code.
             if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
@@ -530,7 +556,7 @@ fn render(
                 }));
 
                 let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &ride_desc.sprites, &angles));
+                car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &sprite_groups, &angles));
 
                 // Rendering restraints is awkward and bad. Rewrite all of this code.
                 if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
