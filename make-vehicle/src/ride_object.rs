@@ -307,9 +307,12 @@ struct Car {
     sound_range: i32,
     draw_order: i32,
     sprite_groups: SpriteGroups,
-    has_additional_colour1: Option<bool>,
-    has_additional_colour2: Option<bool>,
-    has_screaming_riders: Option<bool>,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    has_additional_colour1: bool,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    has_additional_colour2: bool,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    has_screaming_riders: bool,
     loading_positions: Vec<i32>,
 }
 
@@ -318,18 +321,12 @@ impl Car {
         let num_seats = vehicle.capacity.unwrap_or(0);
         let num_seat_rows = vehicle.riders.as_ref().map(|x| x.len() as i32).unwrap_or(0);
 
-        let has_additional_colour1 = vehicle
-            .flags
-            .as_ref()
-            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::SecondaryRemap).then_some(true));
-        let has_additional_colour2 = vehicle
-            .flags
-            .as_ref()
-            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::TertiaryRemap).then_some(true));
-        let has_screaming_riders = vehicle
-            .flags
-            .as_ref()
-            .and_then(|x| x.contains(&crate::ride_desc::VehicleFlag::RidersScream).then_some(true));
+        let has_additional_colour1 =
+            vehicle.flags.as_ref().is_some_and(|x| x.contains(&crate::ride_desc::VehicleFlag::SecondaryRemap));
+        let has_additional_colour2 =
+            vehicle.flags.as_ref().is_some_and(|x| x.contains(&crate::ride_desc::VehicleFlag::TertiaryRemap));
+        let has_screaming_riders =
+            vehicle.flags.as_ref().is_some_and(|x| x.contains(&crate::ride_desc::VehicleFlag::RidersScream));
 
         let loading_positions = vehicle
             .riders
@@ -370,7 +367,8 @@ struct Properties {
     #[serde(rename = "type")]
     ride_type: RideType,
     category: Category,
-    limit_air_time_bonus: Option<bool>,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    limit_air_time_bonus: bool,
     min_cars_per_train: i32,
     max_cars_per_train: i32,
     num_empty_cars: i32,
@@ -379,8 +377,10 @@ struct Properties {
     head_cars: Option<Vec<i32>>,
     tail_cars: Option<Vec<i32>>,
     build_menu_priority: i32,
-    no_collision_crashes: Option<bool>,
-    rider_controls_speed: Option<bool>,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    no_collision_crashes: bool,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    rider_controls_speed: bool,
     max_height: Option<i32>,
     #[serde(rename = "ratingMultipler")] // Typo in OpenRCT2
     rating_multipliers: Option<RatingMultipliers>,
@@ -456,14 +456,10 @@ impl RideObject {
         let head_cars: Vec<i32> =
             ride_desc.configuration.front.iter().chain(ride_desc.configuration.second.iter()).copied().collect();
 
-        let no_collision_crashes = ride_desc
-            .flags
-            .as_ref()
-            .and_then(|x| x.contains(&crate::ride_desc::Flag::NoCollisionCrashes).then_some(true));
-        let rider_controls_speed = ride_desc
-            .flags
-            .as_ref()
-            .and_then(|x| x.contains(&crate::ride_desc::Flag::RiderControlsSpeed).then_some(true));
+        let no_collision_crashes =
+            ride_desc.flags.as_ref().is_some_and(|x| x.contains(&crate::ride_desc::Flag::NoCollisionCrashes));
+        let rider_controls_speed =
+            ride_desc.flags.as_ref().is_some_and(|x| x.contains(&crate::ride_desc::Flag::RiderControlsSpeed));
 
         let cars = ride_desc.vehicles.iter().map(|vehicle| Car::new(ride_desc, vehicle)).collect();
 

@@ -161,7 +161,8 @@ pub struct Ride {
     pub secondary_sound: SecondarySound,
     pub min_cars_per_train: i32,
     pub max_cars_per_train: i32,
-    pub limit_air_time_bonus: Option<bool>,
+    #[serde(default)]
+    pub limit_air_time_bonus: bool,
     pub rating_multipliers: Option<crate::ride_object::RatingMultipliers>,
     pub max_height: Option<i32>,
     pub configuration: Configuration,
