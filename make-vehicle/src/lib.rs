@@ -186,13 +186,7 @@ impl VehicleAngles {
     }
 }
 
-fn render_vehicle(
-    scene: &renderer::Scene,
-    camera: &glam::Mat4,
-    lights: &[ride_desc::Light],
-    sprite_groups: &ride_object::SpriteGroups,
-    angles: &VehicleAngles,
-) -> Vec<renderer::image::IndexedImage> {
+fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &VehicleAngles) -> Vec<VehicleRotation> {
     use VehicleRotation as VR;
     use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8, PI};
 
@@ -432,8 +426,7 @@ fn render_vehicle(
             rots.push(VR::new(count, angles.pitch, angles.roll, angles.yaw));
         }
     }
-
-    rots.iter().flat_map(|x| render_rotations(scene, camera, lights, x)).collect()
+    rots
 }
 
 fn get_model_transforms<'a>(
@@ -480,6 +473,7 @@ fn render(
 
     for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
         let sprite_groups = ride_object::SpriteGroups::new(ride_desc, vehicle);
+        let vehicle_rotations = list_vehicle_rotations(&sprite_groups, &angles);
 
         let mut car_images = Vec::new();
 
@@ -498,7 +492,9 @@ fn render(
                 })
                 .collect::<Vec<_>>();
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &sprite_groups, &angles));
+            for rotation in &vehicle_rotations {
+                car_images.extend(render_rotations(&scene, &camera, &ride_desc.lights, rotation));
+            }
 
             // Rendering restraints is awkward and bad. Rewrite all of this code.
             if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
@@ -556,7 +552,9 @@ fn render(
                 }));
 
                 let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                car_images.extend(render_vehicle(&scene, &camera, &ride_desc.lights, &sprite_groups, &angles));
+                for rotation in &vehicle_rotations {
+                    car_images.extend(render_rotations(&scene, &camera, &ride_desc.lights, rotation));
+                }
 
                 // Rendering restraints is awkward and bad. Rewrite all of this code.
                 if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
