@@ -443,6 +443,7 @@ fn render(
     models: &[renderer::model::Model],
 ) -> anyhow::Result<Vec<Vec<renderer::image::IndexedImage>>> {
     use anyhow::Context as _;
+    use rayon::prelude::*;
 
     let restraint_rotations = {
         let mut restraint_rotations = Vec::with_capacity(4);
@@ -490,9 +491,9 @@ fn render(
                 })
                 .collect::<Vec<_>>();
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            for rotation in &vehicle_rotations {
-                car_images.push(render_vehicle(&scene, &camera, &ride_desc.lights, rotation));
-            }
+            car_images.par_extend(
+                vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, &ride_desc.lights, x)),
+            );
 
             // Rendering restraints is awkward and bad. Rewrite all of this code.
             if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
@@ -552,9 +553,9 @@ fn render(
                 }));
 
                 let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                for rotation in &vehicle_rotations {
-                    car_images.push(render_vehicle(&scene, &camera, &ride_desc.lights, rotation));
-                }
+                car_images.par_extend(
+                    vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, &ride_desc.lights, x)),
+                );
 
                 // Rendering restraints is awkward and bad. Rewrite all of this code.
                 if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {

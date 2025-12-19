@@ -207,6 +207,8 @@ impl Drop for CommittedScene<'_> {
     }
 }
 
+unsafe impl Sync for CommittedScene<'_> {}
+
 pub fn commit_scene(scene: Scene) -> CommittedScene {
     unsafe { embree4_sys::rtcCommitScene(scene.handle) }
     CommittedScene { scene }
