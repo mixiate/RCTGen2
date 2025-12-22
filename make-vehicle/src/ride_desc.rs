@@ -171,3 +171,13 @@ pub struct Ride {
     pub vehicles: Vec<Vehicle>,
     pub lights: Vec<Light>,
 }
+
+impl Ride {
+    pub fn load(path: &std::path::Path) -> anyhow::Result<Ride> {
+        use anyhow::Context as _;
+
+        let json = std::fs::read_to_string(path).with_context(|| format!("Could not read file {}", path.display()))?;
+
+        serde_json::from_str::<Ride>(&json).with_context(|| format!("Could not parse json in file {}", path.display()))
+    }
+}

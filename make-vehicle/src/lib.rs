@@ -655,13 +655,7 @@ pub fn make_vehicle(
         .parent()
         .with_context(|| format!("Could not get parent directory of {}", ride_description_path.display()))?;
 
-    let ride_description = {
-        let json = std::fs::read_to_string(&ride_description_path)
-            .with_context(|| format!("Could not read file {}", ride_description_path.display()))?;
-
-        serde_json::from_str::<ride_desc::Ride>(&json)
-            .with_context(|| format!("Could not parse json in file {}", ride_description_path.display()))?
-    };
+    let ride_description = ride_desc::Ride::load(&ride_description_path)?;
 
     let output_directory = intermediate_output_directory.join(&ride_description.id);
     std::fs::create_dir_all(&output_directory)
