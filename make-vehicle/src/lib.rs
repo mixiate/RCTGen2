@@ -407,34 +407,14 @@ fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &Ve
     rots
 }
 
-fn get_model_transforms<'a>(
-    models: &'a [renderer::model::Model],
-    model_descs: &'a [ride_desc::Model],
-    frame: usize,
-) -> anyhow::Result<Vec<ride_desc::ModelTransform<'a>>> {
-    use anyhow::Context as _;
-    model_descs
-        .iter()
-        .enumerate()
-        .map(|(i, x)| x.get_model_transform(models, frame).with_context(|| format!("Model {i}")))
-        .collect()
-}
-
 const TILE_SIZE: f32 = 3.3;
 
 fn render(
-    ride_desc: &ride_desc::Ride,
-    models: &[renderer::model::Model],
+    vehicles: &[ride_desc::VehicleRenderDesc],
     lights: &[renderer::Light],
 ) -> anyhow::Result<Vec<Vec<renderer::image::IndexedImage>>> {
     use anyhow::Context as _;
     use rayon::prelude::*;
-
-    let restraint_rotations = {
-        let mut restraint_rotations = Vec::with_capacity(4);
-        push_rotations(&mut restraint_rotations, 4, 0.0, 0.0, 0.0);
-        restraint_rotations
-    };
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
 
@@ -455,17 +435,14 @@ fn render(
 
     let mut images = Vec::new();
 
-    for (vehicle_index, vehicle) in ride_desc.vehicles.iter().enumerate() {
-        let sprite_groups = ride_object::SpriteGroups::new(ride_desc, vehicle);
-        let vehicle_rotations = list_vehicle_rotations(&sprite_groups, &angles);
+    for vehicle in vehicles {
+        let vehicle_rotations = list_vehicle_rotations(&vehicle.sprite_groups, &angles);
 
         let mut car_images = Vec::new();
 
-        let vehicle_models = get_model_transforms(models, &vehicle.model, 0)
-            .with_context(|| format!("Error in vehicle {vehicle_index}"))?;
-
         {
-            let scene_models = vehicle_models
+            let scene_models = vehicle
+                .models
                 .iter()
                 .map(|model_desc| renderer::SceneModelDesc {
                     model: model_desc.model,
@@ -478,110 +455,106 @@ fn render(
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
             car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
 
-            // Rendering restraints is awkward and bad. Rewrite all of this code.
-            if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
-                for frame in 1..4 {
-                    let vehicle_models = get_model_transforms(models, &vehicle.model, frame)
-                        .with_context(|| format!("Error in vehicle {vehicle_index}"))?;
-
-                    {
-                        let scene_models = vehicle_models
-                            .iter()
-                            .map(|model_desc| renderer::SceneModelDesc {
-                                model: model_desc.model,
-                                translation: model_desc.translation,
-                                rotation: model_desc.rotation,
-                                is_mask: None,
-                                is_ghost: None,
-                            })
-                            .collect::<Vec<_>>();
-                        let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                        for rotation in &restraint_rotations {
-                            car_images.push(render_vehicle(&scene, &camera, lights, rotation));
-                        }
+            // Rendering restraints is awkward. Fix this repetition.
+            if let Some(rotation_count) = vehicle.sprite_groups.restraint_animation {
+                let restraint_rotations = {
+                    let mut restraint_rotations = Vec::with_capacity(4);
+                    push_rotations(&mut restraint_rotations, rotation_count, 0.0, 0.0, 0.0);
+                    restraint_rotations
+                };
+                for frame in 0..3 {
+                    let scene_models = vehicle
+                        .models
+                        .iter()
+                        .map(|model_desc| renderer::SceneModelDesc {
+                            model: model_desc.model,
+                            translation: model_desc.restraint_translations[frame],
+                            rotation: model_desc.restraint_rotations[frame],
+                            is_mask: None,
+                            is_ghost: None,
+                        })
+                        .collect::<Vec<_>>();
+                    let scene = renderer::Scene::new(&render_device, &scene_models)?;
+                    for rotation in &restraint_rotations {
+                        car_images.push(render_vehicle(&scene, &camera, lights, rotation));
                     }
                 }
             }
         }
 
-        if let Some(riders) = &vehicle.riders {
-            let rider_models = get_model_transforms(models, riders, 0)
-                .with_context(|| format!("Error in vehicle {vehicle_index} riders"))?;
+        for (rider_index, model_desc) in vehicle.riders.iter().enumerate() {
+            let mut scene_models = Vec::new();
 
-            for (rider_index, model_desc) in rider_models.iter().enumerate() {
-                let mut scene_models = Vec::new();
+            scene_models.push(renderer::SceneModelDesc {
+                model: model_desc.model,
+                translation: model_desc.translation,
+                rotation: model_desc.rotation,
+                is_mask: None,
+                is_ghost: None,
+            });
 
-                scene_models.push(renderer::SceneModelDesc {
-                    model: model_desc.model,
-                    translation: model_desc.translation,
-                    rotation: model_desc.rotation,
-                    is_mask: None,
-                    is_ghost: None,
-                });
+            scene_models.extend(vehicle.models.iter().map(|model_desc| renderer::SceneModelDesc {
+                model: model_desc.model,
+                translation: model_desc.translation,
+                rotation: model_desc.rotation,
+                is_mask: Some(true),
+                is_ghost: None,
+            }));
 
-                scene_models.extend(vehicle_models.iter().map(|model_desc| renderer::SceneModelDesc {
-                    model: model_desc.model,
-                    translation: model_desc.translation,
-                    rotation: model_desc.rotation,
-                    is_mask: Some(true),
-                    is_ghost: None,
-                }));
+            scene_models.extend(vehicle.riders[0..rider_index].iter().map(|model_desc| renderer::SceneModelDesc {
+                model: model_desc.model,
+                translation: model_desc.translation,
+                rotation: model_desc.rotation,
+                is_mask: Some(true),
+                is_ghost: None,
+            }));
 
-                scene_models.extend(rider_models[0..rider_index].iter().map(|model_desc| renderer::SceneModelDesc {
-                    model: model_desc.model,
-                    translation: model_desc.translation,
-                    rotation: model_desc.rotation,
-                    is_mask: Some(true),
-                    is_ghost: None,
-                }));
+            let scene = renderer::Scene::new(&render_device, &scene_models)?;
+            car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
 
-                let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
+            // Rendering restraints is awkward. Fix this repetition.
+            if let Some(rotation_count) = vehicle.sprite_groups.restraint_animation {
+                let restraint_rotations = {
+                    let mut restraint_rotations = Vec::with_capacity(4);
+                    push_rotations(&mut restraint_rotations, rotation_count, 0.0, 0.0, 0.0);
+                    restraint_rotations
+                };
+                for frame in 0..3 {
+                    let mut scene_models = Vec::new();
 
-                // Rendering restraints is awkward and bad. Rewrite all of this code.
-                if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
-                    for frame in 1..4 {
-                        let vehicle_models = get_model_transforms(models, &vehicle.model, frame)
-                            .with_context(|| format!("Error in vehicle {vehicle_index}"))?;
-                        let rider_models = get_model_transforms(models, riders, frame)
-                            .with_context(|| format!("Error in vehicle {vehicle_index} riders"))?;
+                    scene_models.push(renderer::SceneModelDesc {
+                        model: model_desc.model,
+                        translation: model_desc.restraint_translations[frame],
+                        rotation: model_desc.restraint_rotations[frame],
+                        is_mask: None,
+                        is_ghost: None,
+                    });
 
-                        let mut scene_models = Vec::new();
+                    scene_models.extend(vehicle.models.iter().map(|model_desc| renderer::SceneModelDesc {
+                        model: model_desc.model,
+                        translation: model_desc.restraint_translations[frame],
+                        rotation: model_desc.restraint_rotations[frame],
+                        is_mask: Some(true),
+                        is_ghost: None,
+                    }));
 
-                        scene_models.push(renderer::SceneModelDesc {
+                    scene_models.extend(vehicle.riders[0..rider_index].iter().map(|model_desc| {
+                        renderer::SceneModelDesc {
                             model: model_desc.model,
-                            translation: model_desc.translation,
-                            rotation: model_desc.rotation,
-                            is_mask: None,
-                            is_ghost: None,
-                        });
-
-                        scene_models.extend(vehicle_models.iter().map(|model_desc| renderer::SceneModelDesc {
-                            model: model_desc.model,
-                            translation: model_desc.translation,
-                            rotation: model_desc.rotation,
+                            translation: model_desc.restraint_translations[frame],
+                            rotation: model_desc.restraint_rotations[frame],
                             is_mask: Some(true),
                             is_ghost: None,
-                        }));
-
-                        scene_models.extend(rider_models[0..rider_index].iter().map(|model_desc| {
-                            renderer::SceneModelDesc {
-                                model: model_desc.model,
-                                translation: model_desc.translation,
-                                rotation: model_desc.rotation,
-                                is_mask: Some(true),
-                                is_ghost: None,
-                            }
-                        }));
-
-                        let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                        for rotation in &restraint_rotations {
-                            car_images.push(render_vehicle(&scene, &camera, lights, rotation));
                         }
+                    }));
+
+                    let scene = renderer::Scene::new(&render_device, &scene_models)?;
+                    for rotation in &restraint_rotations {
+                        car_images.push(render_vehicle(&scene, &camera, lights, rotation));
                     }
                 }
             }
-        };
+        }
 
         images.push(car_images);
     }
@@ -644,8 +617,9 @@ pub fn make_vehicle(
 
     let models = ride_description.load_models(base_directory)?;
     let lights = ride_description.get_lights();
+    let vehicles = ride_description.get_vehicle_render_descs(&models)?;
 
-    let images = render(&ride_description, &models, &lights)?;
+    let images = render(&vehicles, &lights)?;
 
     let preview_image = if let Some(ref preview_file_path) = ride_description.preview {
         let preview_file_path = base_directory.join(preview_file_path);

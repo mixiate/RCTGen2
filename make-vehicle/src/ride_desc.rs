@@ -71,48 +71,20 @@ pub enum Orientation {
     Restraints([[f32; 3]; 4]),
 }
 
+fn orientation_to_quat(orientation: &[f32; 3]) -> glam::Quat {
+    glam::Quat::from_euler(
+        glam::EulerRot::XYZ,
+        orientation[0].to_radians(),
+        orientation[2].to_radians(), // Y and Z are swapped. Fix?
+        orientation[1].to_radians(),
+    )
+}
+
 #[derive(Debug, serde::Deserialize)]
 pub struct Model {
     pub mesh_index: usize,
     pub position: [f32; 3],
     pub orientation: Orientation,
-}
-
-pub struct ModelTransform<'a> {
-    pub model: &'a renderer::model::Model,
-    pub translation: glam::Vec3,
-    pub rotation: glam::Quat,
-}
-
-impl Model {
-    pub fn get_model_transform<'a>(
-        &self,
-        models: &'a [renderer::model::Model],
-        frame: usize,
-    ) -> anyhow::Result<ModelTransform<'a>> {
-        use anyhow::Context as _;
-
-        let model = models.get(self.mesh_index).with_context(|| format!("Invalid mesh index {}", self.mesh_index))?;
-
-        let translation = (self.position).into();
-
-        let rotation = match self.orientation {
-            Orientation::Single(orientation) => orientation,
-            Orientation::Restraints(orientations) => orientations[frame],
-        };
-        let rotation = glam::Quat::from_euler(
-            glam::EulerRot::XYZ,
-            rotation[0].to_radians(),
-            rotation[2].to_radians(), // Y and Z are swapped. Fix?
-            rotation[1].to_radians(),
-        );
-
-        Ok(ModelTransform {
-            model,
-            translation,
-            rotation,
-        })
-    }
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -211,4 +183,72 @@ impl Ride {
             })
             .collect()
     }
+
+    pub fn get_vehicle_render_descs<'a>(
+        &self,
+        models: &'a [renderer::model::Model],
+    ) -> anyhow::Result<Vec<VehicleRenderDesc<'a>>> {
+        let mut vehicles = Vec::with_capacity(self.vehicles.len());
+        for vehicle in &self.vehicles {
+            let vehicle_models =
+                vehicle.model.iter().map(|x| ModelRenderDesc::new(x, models)).collect::<anyhow::Result<Vec<_>>>()?;
+
+            let riders = vehicle
+                .riders
+                .iter()
+                .flatten()
+                .map(|x| ModelRenderDesc::new(x, models))
+                .collect::<anyhow::Result<Vec<_>>>()?;
+
+            vehicles.push(VehicleRenderDesc {
+                sprite_groups: crate::ride_object::SpriteGroups::new(self, vehicle),
+                models: vehicle_models,
+                riders,
+            });
+        }
+
+        Ok(vehicles)
+    }
+}
+
+pub struct ModelRenderDesc<'a> {
+    pub model: &'a renderer::model::Model,
+    pub translation: glam::Vec3,
+    pub rotation: glam::Quat,
+    pub restraint_translations: [glam::Vec3; 3],
+    pub restraint_rotations: [glam::Quat; 3],
+}
+
+impl ModelRenderDesc<'_> {
+    fn new<'a>(model: &Model, models: &'a [renderer::model::Model]) -> anyhow::Result<ModelRenderDesc<'a>> {
+        use anyhow::Context as _;
+        let translation = model.position.into();
+        let (rotation, restraint_rotations) = match model.orientation {
+            Orientation::Single(orientation) => {
+                let rotation = orientation_to_quat(&orientation);
+                (rotation, [rotation; 3])
+            }
+            Orientation::Restraints(orientations) => (
+                orientation_to_quat(&orientations[0]),
+                [
+                    orientation_to_quat(&orientations[1]),
+                    orientation_to_quat(&orientations[2]),
+                    orientation_to_quat(&orientations[3]),
+                ],
+            ),
+        };
+        Ok(ModelRenderDesc {
+            model: models.get(model.mesh_index).with_context(|| "Invalid mesh index")?,
+            translation,
+            rotation,
+            restraint_translations: [translation; 3],
+            restraint_rotations,
+        })
+    }
+}
+
+pub struct VehicleRenderDesc<'a> {
+    pub sprite_groups: crate::ride_object::SpriteGroups,
+    pub models: Vec<ModelRenderDesc<'a>>,
+    pub riders: Vec<ModelRenderDesc<'a>>,
 }
