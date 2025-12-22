@@ -180,4 +180,15 @@ impl Ride {
 
         serde_json::from_str::<Ride>(&json).with_context(|| format!("Could not parse json in file {}", path.display()))
     }
+
+    pub fn load_models(&self, base_directory: &std::path::Path) -> anyhow::Result<Vec<renderer::model::Model>> {
+        self.meshes
+            .iter()
+            .map(|x| {
+                let x = std::path::PathBuf::from(x);
+                let file_path = if x.is_absolute() { x } else { base_directory.join(x) };
+                renderer::model::Model::load(&file_path)
+            })
+            .collect()
+    }
 }

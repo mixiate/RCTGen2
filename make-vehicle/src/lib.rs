@@ -661,15 +661,7 @@ pub fn make_vehicle(
     std::fs::create_dir_all(&output_directory)
         .with_context(|| format!("Could not create directory {}", output_directory.display()))?;
 
-    let models = ride_description
-        .meshes
-        .iter()
-        .map(|x| {
-            let x = std::path::PathBuf::from(x);
-            let file_path = if x.is_absolute() { x } else { base_directory.join(x) };
-            renderer::model::Model::load(&file_path)
-        })
-        .collect::<anyhow::Result<Vec<renderer::model::Model>>>()?;
+    let models = ride_description.load_models(base_directory)?;
 
     let images = render(&ride_description, &models)?;
 
