@@ -16,7 +16,7 @@ impl VehicleRotation {
 fn render_vehicle(
     scene: &renderer::Scene,
     camera: &glam::Mat4,
-    lights: &[ride_desc::Light],
+    lights: &[renderer::Light],
     rotation: &VehicleRotation,
 ) -> renderer::image::IndexedImage {
     let view_rotation = glam::Mat4::from_euler(glam::EulerRot::YZX, rotation.yaw, rotation.pitch, rotation.roll);
@@ -24,23 +24,7 @@ fn render_vehicle(
     let camera = camera * view_rotation;
 
     let view_rotation_inverse = view_rotation.inverse();
-    let lights: Vec<_> = lights
-        .iter()
-        .map(|x| renderer::Light {
-            diffuse_strength: if x.r#type == ride_desc::LightType::Diffuse {
-                x.strength
-            } else {
-                0.0
-            },
-            specular_strength: if x.r#type == ride_desc::LightType::Specular {
-                x.strength
-            } else {
-                0.0
-            },
-            direction: view_rotation_inverse.transform_vector3(x.direction.into()).normalize(),
-            shadow: x.shadow,
-        })
-        .collect();
+    let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
     let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4);
     framebuffer.into_cropped_indexed_image(true)
@@ -441,6 +425,7 @@ const TILE_SIZE: f32 = 3.3;
 fn render(
     ride_desc: &ride_desc::Ride,
     models: &[renderer::model::Model],
+    lights: &[renderer::Light],
 ) -> anyhow::Result<Vec<Vec<renderer::image::IndexedImage>>> {
     use anyhow::Context as _;
     use rayon::prelude::*;
@@ -491,9 +476,7 @@ fn render(
                 })
                 .collect::<Vec<_>>();
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            car_images.par_extend(
-                vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, &ride_desc.lights, x)),
-            );
+            car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
 
             // Rendering restraints is awkward and bad. Rewrite all of this code.
             if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
@@ -514,7 +497,7 @@ fn render(
                             .collect::<Vec<_>>();
                         let scene = renderer::Scene::new(&render_device, &scene_models)?;
                         for rotation in &restraint_rotations {
-                            car_images.push(render_vehicle(&scene, &camera, &ride_desc.lights, rotation));
+                            car_images.push(render_vehicle(&scene, &camera, lights, rotation));
                         }
                     }
                 }
@@ -553,9 +536,7 @@ fn render(
                 }));
 
                 let scene = renderer::Scene::new(&render_device, &scene_models)?;
-                car_images.par_extend(
-                    vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, &ride_desc.lights, x)),
-                );
+                car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
 
                 // Rendering restraints is awkward and bad. Rewrite all of this code.
                 if vehicle.flags.as_ref().is_some_and(|x| x.contains(&ride_desc::VehicleFlag::RestraintAnimation)) {
@@ -595,7 +576,7 @@ fn render(
 
                         let scene = renderer::Scene::new(&render_device, &scene_models)?;
                         for rotation in &restraint_rotations {
-                            car_images.push(render_vehicle(&scene, &camera, &ride_desc.lights, rotation));
+                            car_images.push(render_vehicle(&scene, &camera, lights, rotation));
                         }
                     }
                 }
@@ -662,8 +643,9 @@ pub fn make_vehicle(
         .with_context(|| format!("Could not create directory {}", output_directory.display()))?;
 
     let models = ride_description.load_models(base_directory)?;
+    let lights = ride_description.get_lights();
 
-    let images = render(&ride_description, &models)?;
+    let images = render(&ride_description, &models, &lights)?;
 
     let preview_image = if let Some(ref preview_file_path) = ride_description.preview {
         let preview_file_path = base_directory.join(preview_file_path);

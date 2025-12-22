@@ -1,8 +1,17 @@
+#[derive(Clone, Copy)]
 pub struct Light {
     pub diffuse_strength: f32,
     pub specular_strength: f32,
     pub direction: glam::Vec3,
     pub shadow: bool,
+}
+
+impl Light {
+    pub fn transform(&self, transform: &glam::Mat4) -> Self {
+        let mut light = *self;
+        light.direction = transform.transform_vector3(light.direction).normalize();
+        light
+    }
 }
 
 #[derive(Clone, Copy)]

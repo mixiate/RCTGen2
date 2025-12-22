@@ -191,4 +191,24 @@ impl Ride {
             })
             .collect()
     }
+
+    pub fn get_lights(&self) -> Vec<renderer::Light> {
+        self.lights
+            .iter()
+            .map(|x| renderer::Light {
+                diffuse_strength: if x.r#type == LightType::Diffuse {
+                    x.strength
+                } else {
+                    0.0
+                },
+                specular_strength: if x.r#type == LightType::Specular {
+                    x.strength
+                } else {
+                    0.0
+                },
+                direction: glam::Vec3::from(x.direction).normalize(),
+                shadow: x.shadow,
+            })
+            .collect()
+    }
 }
