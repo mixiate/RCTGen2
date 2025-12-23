@@ -6,7 +6,7 @@ enum ObjectType {
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
-pub(crate) enum RideType {
+pub enum RideType {
     AirPoweredVerticalRc,
     AlpineRc,
     BoatHire,
@@ -104,7 +104,7 @@ pub(crate) enum RideType {
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
-pub(crate) enum ColourType {
+pub enum ColourType {
     Black,
     Grey,
     White,
@@ -182,7 +182,7 @@ enum Category {
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct RatingMultipliers {
+pub struct RatingMultipliers {
     excitement: Option<i32>,
     intensity: Option<i32>,
     nausea: Option<i32>,
@@ -420,34 +420,34 @@ struct ObjectStrings {
 
 #[derive(Clone, Copy, Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) enum ImageFormat {
+pub enum ImageFormat {
     Raw,
 }
 
 #[derive(Clone, Copy, Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) enum ImagePaletteType {
+pub enum ImagePaletteType {
     Keep,
 }
 
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct ImageFile {
-    pub(crate) path: String,
-    pub(crate) x: i32,
-    pub(crate) y: i32,
-    pub(crate) src_x: Option<i32>,
-    pub(crate) src_y: Option<i32>,
-    pub(crate) src_width: Option<i32>,
-    pub(crate) src_height: Option<i32>,
-    pub(crate) format: Option<ImageFormat>,
-    pub(crate) palette: ImagePaletteType,
+pub struct ImageFile {
+    pub path: String,
+    pub x: i32,
+    pub y: i32,
+    pub src_x: Option<i32>,
+    pub src_y: Option<i32>,
+    pub src_width: Option<i32>,
+    pub src_height: Option<i32>,
+    pub format: Option<ImageFormat>,
+    pub palette: ImagePaletteType,
 }
 
 #[derive(Clone, Debug, serde::Serialize)]
 #[serde(untagged)]
-pub(crate) enum Image {
+pub enum Image {
     Gx(String),
     ImageFile(ImageFile),
 }
@@ -455,7 +455,7 @@ pub(crate) enum Image {
 #[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct RideObject {
+pub struct RideObject {
     id: String,
     original_id: Option<String>,
     version: String,
@@ -467,7 +467,7 @@ pub(crate) struct RideObject {
 }
 
 impl RideObject {
-    pub(crate) fn new(ride_desc: &crate::ride_desc::Ride, images: Vec<Image>) -> Self {
+    pub fn new(ride_desc: &crate::ride_desc::Ride, images: Vec<Image>) -> Self {
         let head_cars: Vec<i32> =
             ride_desc.configuration.front.iter().chain(ride_desc.configuration.second.iter()).copied().collect();
 
@@ -522,7 +522,7 @@ impl RideObject {
         }
     }
 
-    pub(crate) fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
+    pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
         use anyhow::Context as _;
         use serde::Serialize as _;
 
