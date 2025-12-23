@@ -407,6 +407,39 @@ fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &Ve
     rots
 }
 
+fn add_models_to_scene_list<'a>(
+    scene_models: &mut Vec<renderer::SceneModelDesc<'a>>,
+    models: &[ride_desc::ModelRenderDesc<'a>],
+    is_mask: Option<bool>,
+) {
+    for model in models {
+        scene_models.push(renderer::SceneModelDesc {
+            model: model.model,
+            translation: model.translation,
+            rotation: model.rotation,
+            is_mask,
+            is_ghost: None,
+        });
+    }
+}
+
+fn add_restraint_models_to_scene_list<'a>(
+    scene_models: &mut Vec<renderer::SceneModelDesc<'a>>,
+    models: &[ride_desc::ModelRenderDesc<'a>],
+    is_mask: Option<bool>,
+    frame: usize,
+) {
+    for model in models {
+        scene_models.push(renderer::SceneModelDesc {
+            model: model.model,
+            translation: model.restraint_translations[frame],
+            rotation: model.restraint_rotations[frame],
+            is_mask,
+            is_ghost: None,
+        });
+    }
+}
+
 const TILE_SIZE: f32 = 3.3;
 
 fn render(
@@ -441,21 +474,12 @@ fn render(
         let mut car_images = Vec::new();
 
         {
-            let scene_models = vehicle
-                .models
-                .iter()
-                .map(|model_desc| renderer::SceneModelDesc {
-                    model: model_desc.model,
-                    translation: model_desc.translation,
-                    rotation: model_desc.rotation,
-                    is_mask: None,
-                    is_ghost: None,
-                })
-                .collect::<Vec<_>>();
+            let mut scene_models = Vec::new();
+            add_models_to_scene_list(&mut scene_models, &vehicle.models, None);
+
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
             car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
 
-            // Rendering restraints is awkward. Fix this repetition.
             if let Some(rotation_count) = vehicle.sprite_groups.restraint_animation {
                 let restraint_rotations = {
                     let mut restraint_rotations = Vec::with_capacity(4);
@@ -463,17 +487,8 @@ fn render(
                     restraint_rotations
                 };
                 for frame in 0..3 {
-                    let scene_models = vehicle
-                        .models
-                        .iter()
-                        .map(|model_desc| renderer::SceneModelDesc {
-                            model: model_desc.model,
-                            translation: model_desc.restraint_translations[frame],
-                            rotation: model_desc.restraint_rotations[frame],
-                            is_mask: None,
-                            is_ghost: None,
-                        })
-                        .collect::<Vec<_>>();
+                    let mut scene_models = Vec::new();
+                    add_restraint_models_to_scene_list(&mut scene_models, &vehicle.models, None, frame);
                     let scene = renderer::Scene::new(&render_device, &scene_models)?;
                     for rotation in &restraint_rotations {
                         car_images.push(render_vehicle(&scene, &camera, lights, rotation));
@@ -484,35 +499,13 @@ fn render(
 
         for (rider_index, model_desc) in vehicle.riders.iter().enumerate() {
             let mut scene_models = Vec::new();
-
-            scene_models.push(renderer::SceneModelDesc {
-                model: model_desc.model,
-                translation: model_desc.translation,
-                rotation: model_desc.rotation,
-                is_mask: None,
-                is_ghost: None,
-            });
-
-            scene_models.extend(vehicle.models.iter().map(|model_desc| renderer::SceneModelDesc {
-                model: model_desc.model,
-                translation: model_desc.translation,
-                rotation: model_desc.rotation,
-                is_mask: Some(true),
-                is_ghost: None,
-            }));
-
-            scene_models.extend(vehicle.riders[0..rider_index].iter().map(|model_desc| renderer::SceneModelDesc {
-                model: model_desc.model,
-                translation: model_desc.translation,
-                rotation: model_desc.rotation,
-                is_mask: Some(true),
-                is_ghost: None,
-            }));
+            add_models_to_scene_list(&mut scene_models, std::slice::from_ref(model_desc), None);
+            add_models_to_scene_list(&mut scene_models, &vehicle.models, Some(true));
+            add_models_to_scene_list(&mut scene_models, &vehicle.riders[0..rider_index], Some(true));
 
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
             car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
 
-            // Rendering restraints is awkward. Fix this repetition.
             if let Some(rotation_count) = vehicle.sprite_groups.restraint_animation {
                 let restraint_rotations = {
                     let mut restraint_rotations = Vec::with_capacity(4);
@@ -521,32 +514,19 @@ fn render(
                 };
                 for frame in 0..3 {
                     let mut scene_models = Vec::new();
-
-                    scene_models.push(renderer::SceneModelDesc {
-                        model: model_desc.model,
-                        translation: model_desc.restraint_translations[frame],
-                        rotation: model_desc.restraint_rotations[frame],
-                        is_mask: None,
-                        is_ghost: None,
-                    });
-
-                    scene_models.extend(vehicle.models.iter().map(|model_desc| renderer::SceneModelDesc {
-                        model: model_desc.model,
-                        translation: model_desc.restraint_translations[frame],
-                        rotation: model_desc.restraint_rotations[frame],
-                        is_mask: Some(true),
-                        is_ghost: None,
-                    }));
-
-                    scene_models.extend(vehicle.riders[0..rider_index].iter().map(|model_desc| {
-                        renderer::SceneModelDesc {
-                            model: model_desc.model,
-                            translation: model_desc.restraint_translations[frame],
-                            rotation: model_desc.restraint_rotations[frame],
-                            is_mask: Some(true),
-                            is_ghost: None,
-                        }
-                    }));
+                    add_restraint_models_to_scene_list(
+                        &mut scene_models,
+                        std::slice::from_ref(model_desc),
+                        None,
+                        frame,
+                    );
+                    add_restraint_models_to_scene_list(&mut scene_models, &vehicle.models, Some(true), frame);
+                    add_restraint_models_to_scene_list(
+                        &mut scene_models,
+                        &vehicle.riders[0..rider_index],
+                        Some(true),
+                        frame,
+                    );
 
                     let scene = renderer::Scene::new(&render_device, &scene_models)?;
                     for rotation in &restraint_rotations {
