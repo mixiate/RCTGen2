@@ -143,7 +143,7 @@ impl VehicleAngles {
     }
 }
 
-fn push_rotations(rots: &mut Vec<VehicleRotation>, count: i32, pitch: f32, roll: f32, yaw: f32) {
+fn add_rotations_to_list(rots: &mut Vec<VehicleRotation>, count: i32, pitch: f32, roll: f32, yaw: f32) {
     for i in 0..count {
         let yaw = yaw + ((2.0 * i as f32 * std::f32::consts::PI) / count as f32);
         rots.push(VehicleRotation::new(pitch, roll, yaw));
@@ -176,217 +176,217 @@ fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &Ve
 
     let mut rots = Vec::with_capacity(1024);
     if let Some(count) = sprite_groups.slope_flat {
-        push_rotations(&mut rots, count, pitch_flat, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes12 {
-        push_rotations(&mut rots, count, pitch_flat_to_gentle, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes25 {
-        push_rotations(&mut rots, count, pitch_gentle, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes42 {
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes60 {
-        push_rotations(&mut rots, count, pitch_steep, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_steep, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_steep, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_steep, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes75 {
-        push_rotations(&mut rots, count, pitch_steep_to_vertical, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_steep_to_vertical, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_steep_to_vertical, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_to_vertical, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes90 {
-        push_rotations(&mut rots, count, pitch_vertical, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_vertical, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_vertical, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_vertical, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes_loop {
-        push_rotations(&mut rots, count, pitch_vertical + FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_vertical - FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, pitch_vertical + 2.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_vertical - 2.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, pitch_vertical + 3.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_vertical - 3.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, pitch_vertical + 4.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_vertical - 4.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, pitch_vertical + 5.0 * FRAC_PI_12, 0.0, 0.0);
-        push_rotations(&mut rots, count, -pitch_vertical - 5.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_vertical + FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_vertical - FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_vertical + 2.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_vertical - 2.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_vertical + 3.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_vertical - 3.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_vertical + 4.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_vertical - 4.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_vertical + 5.0 * FRAC_PI_12, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_vertical - 5.0 * FRAC_PI_12, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slope_inverted {
-        push_rotations(&mut rots, count, PI, 0.0, 0.0);
+        add_rotations_to_list(&mut rots, count, PI, 0.0, 0.0);
     }
     if let Some(count) = sprite_groups.slopes8 {
-        push_rotations(&mut rots, count, pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle_diag, 0.0, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.slopes16 {
-        push_rotations(&mut rots, count, pitch_gentle_diag, 0.0, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_gentle_diag, 0.0, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_diag, 0.0, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_diag, 0.0, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.slopes50 {
-        push_rotations(&mut rots, count, pitch_steep_diag, 0.0, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_steep_diag, 0.0, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, 0.0, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, 0.0, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.flat_banked22 {
-        push_rotations(&mut rots, count, pitch_flat, roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -roll_flat_to_bank, 0.0);
     }
     if let Some(count) = sprite_groups.flat_banked45 {
-        push_rotations(&mut rots, count, pitch_flat, roll_bank, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -roll_bank, 0.0);
     }
     if let Some(count) = sprite_groups.flat_banked67 {
-        push_rotations(&mut rots, count, pitch_flat, 3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, 3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -3.0 * FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.flat_banked90 {
-        push_rotations(&mut rots, count, pitch_flat, FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -FRAC_PI_2, 0.0);
     }
     if let Some(count) = sprite_groups.inline_twists {
-        push_rotations(&mut rots, count, pitch_flat, 5.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -5.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, 3.0 * FRAC_PI_4, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -3.0 * FRAC_PI_4, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, 7.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_flat, -7.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, 5.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -5.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, 3.0 * FRAC_PI_4, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -3.0 * FRAC_PI_4, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, 7.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat, -7.0 * FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes12_banked22 {
-        push_rotations(&mut rots, count, pitch_flat_to_gentle, roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, pitch_flat_to_gentle, -roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle, roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle, -roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle, roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle, -roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle, roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle, -roll_flat_to_bank, 0.0);
     }
     if let Some(count) = sprite_groups.slopes8_banked22 {
-        push_rotations(&mut rots, count, pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.slopes25_banked22 {
-        push_rotations(&mut rots, count, pitch_gentle, roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, roll_flat_to_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, roll_flat_to_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -roll_flat_to_bank, 0.0);
     }
     if let Some(count) = sprite_groups.slopes8_banked45 {
-        push_rotations(&mut rots, count, pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle_diag, roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle_diag, -roll_bank, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.slopes16_banked22 {
-        push_rotations(&mut rots, count, pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_diag, roll_flat_to_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_diag, -roll_flat_to_bank, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.slopes16_banked45 {
-        push_rotations(&mut rots, count, pitch_gentle_diag, roll_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, pitch_gentle_diag, -roll_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_gentle_diag, roll_bank, FRAC_PI_4);
-        push_rotations(&mut rots, count, -pitch_gentle_diag, -roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_diag, roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_diag, -roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_diag, roll_bank, FRAC_PI_4);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_diag, -roll_bank, FRAC_PI_4);
     }
     if let Some(count) = sprite_groups.slopes25_banked45 {
-        push_rotations(&mut rots, count, pitch_gentle, roll_bank, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -roll_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, roll_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -roll_bank, 0.0);
     }
     if let Some(count) = sprite_groups.slopes12_banked45 {
-        push_rotations(&mut rots, count, pitch_flat_to_gentle, roll_bank, 0.0);
-        push_rotations(&mut rots, count, pitch_flat_to_gentle, -roll_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle, roll_bank, 0.0);
-        push_rotations(&mut rots, count, -pitch_flat_to_gentle, -roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle, roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_flat_to_gentle, -roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle, roll_bank, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_flat_to_gentle, -roll_bank, 0.0);
     }
     if let Some(count) = sprite_groups.slopes25_banked67 {
-        push_rotations(&mut rots, count, pitch_gentle, 3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, 3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, 3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, 3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -3.0 * FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes25_banked90 {
-        push_rotations(&mut rots, count, pitch_gentle, FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -FRAC_PI_2, 0.0);
     }
     if let Some(count) = sprite_groups.slopes25_inline_twists {
-        push_rotations(&mut rots, count, pitch_gentle, 5.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -5.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, 5.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -5.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, 3.0 * FRAC_PI_4, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -3.0 * FRAC_PI_4, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, 3.0 * FRAC_PI_4, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -3.0 * FRAC_PI_4, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, 7.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle, -7.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, 7.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle, -7.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, 5.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -5.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, 5.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -5.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, 3.0 * FRAC_PI_4, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -3.0 * FRAC_PI_4, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, 3.0 * FRAC_PI_4, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -3.0 * FRAC_PI_4, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, 7.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle, -7.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, 7.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle, -7.0 * FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes42_banked22 {
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, -FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, -FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, -FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, -FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes42_banked45 {
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, 2.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, -2.0 * FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes42_banked67 {
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, 3.0 * FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, -3.0 * FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes42_banked90 {
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, pitch_gentle_to_steep, -FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, FRAC_PI_2, 0.0);
-        push_rotations(&mut rots, count, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_gentle_to_steep, -FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, FRAC_PI_2, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_gentle_to_steep, -FRAC_PI_2, 0.0);
     }
     if let Some(count) = sprite_groups.slopes60_banked22 {
-        push_rotations(&mut rots, count, pitch_steep, FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, pitch_steep, -FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_steep, FRAC_PI_8, 0.0);
-        push_rotations(&mut rots, count, -pitch_steep, -FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_steep, FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, pitch_steep, -FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_steep, FRAC_PI_8, 0.0);
+        add_rotations_to_list(&mut rots, count, -pitch_steep, -FRAC_PI_8, 0.0);
     }
     if let Some(count) = sprite_groups.slopes50_banked45 {
-        push_rotations(&mut rots, count, pitch_steep_diag, FRAC_PI_4, FRAC_PI_8);
-        push_rotations(&mut rots, count, pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8);
-        push_rotations(&mut rots, count, -pitch_steep_diag, FRAC_PI_4, FRAC_PI_8);
-        push_rotations(&mut rots, count, -pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, FRAC_PI_4, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, FRAC_PI_4, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, -FRAC_PI_4, FRAC_PI_8);
     }
     if let Some(count) = sprite_groups.slopes50_banked67 {
-        push_rotations(&mut rots, count, pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8);
-        push_rotations(&mut rots, count, pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8);
-        push_rotations(&mut rots, count, -pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8);
-        push_rotations(&mut rots, count, -pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, 3.0 * FRAC_PI_8, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, -3.0 * FRAC_PI_8, FRAC_PI_8);
     }
     if let Some(count) = sprite_groups.slopes50_banked90 {
-        push_rotations(&mut rots, count, pitch_steep_diag, FRAC_PI_2, FRAC_PI_8);
-        push_rotations(&mut rots, count, pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8);
-        push_rotations(&mut rots, count, -pitch_steep_diag, FRAC_PI_2, FRAC_PI_8);
-        push_rotations(&mut rots, count, -pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, FRAC_PI_2, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, FRAC_PI_2, FRAC_PI_8);
+        add_rotations_to_list(&mut rots, count, -pitch_steep_diag, -FRAC_PI_2, FRAC_PI_8);
     }
     if let Some(count) = sprite_groups.corkscrews {
         for angles in corkscrew_right_up {
-            push_rotations(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
+            add_rotations_to_list(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
         }
         for angles in corkscrew_right_down {
-            push_rotations(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
+            add_rotations_to_list(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
         }
         for angles in corkscrew_left_up {
-            push_rotations(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
+            add_rotations_to_list(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
         }
         for angles in corkscrew_left_down {
-            push_rotations(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
+            add_rotations_to_list(&mut rots, count, angles.pitch, angles.roll, angles.yaw);
         }
     }
     rots
@@ -454,7 +454,7 @@ fn render_vehicle(
     let rotations = list_vehicle_rotations(&vehicle.sprite_groups, angles);
     let restraint_rotations = vehicle.sprite_groups.restraint_animation.map(|rotation_count| {
         let mut restraint_rotations = Vec::with_capacity(rotation_count.try_into().unwrap_or_default());
-        push_rotations(&mut restraint_rotations, rotation_count, 0.0, 0.0, 0.0);
+        add_rotations_to_list(&mut restraint_rotations, rotation_count, 0.0, 0.0, 0.0);
         restraint_rotations
     });
 
