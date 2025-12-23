@@ -392,7 +392,7 @@ fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &Ve
     rots
 }
 
-fn add_models_to_scene_list<'a>(
+fn add_models_to_list<'a>(
     scene_models: &mut Vec<renderer::SceneModelDesc<'a>>,
     models: &[ride_desc::ModelRenderDesc<'a>],
     is_mask: Option<bool>,
@@ -408,7 +408,7 @@ fn add_models_to_scene_list<'a>(
     }
 }
 
-fn add_restraint_models_to_scene_list<'a>(
+fn add_restraint_models_to_list<'a>(
     scene_models: &mut Vec<renderer::SceneModelDesc<'a>>,
     models: &[ride_desc::ModelRenderDesc<'a>],
     is_mask: Option<bool>,
@@ -462,7 +462,7 @@ fn render_vehicle(
     {
         let scene_models = {
             let mut scene_models = Vec::new();
-            add_models_to_scene_list(&mut scene_models, &vehicle.models, None);
+            add_models_to_list(&mut scene_models, &vehicle.models, None);
             scene_models
         };
         let scene = renderer::Scene::new(render_device, &scene_models)?;
@@ -472,7 +472,7 @@ fn render_vehicle(
         if let Some(ref restraint_rotations) = restraint_rotations {
             for frame in 0..3 {
                 let mut scene_models = Vec::new();
-                add_restraint_models_to_scene_list(&mut scene_models, &vehicle.models, None, frame);
+                add_restraint_models_to_list(&mut scene_models, &vehicle.models, None, frame);
                 let scene = renderer::Scene::new(render_device, &scene_models)?;
                 for rotation in restraint_rotations {
                     images.push(render_rotation(&scene, camera, lights, rotation));
@@ -483,9 +483,9 @@ fn render_vehicle(
 
     for (rider_index, model_desc) in vehicle.riders.iter().enumerate() {
         let mut scene_models = Vec::new();
-        add_models_to_scene_list(&mut scene_models, std::slice::from_ref(model_desc), None);
-        add_models_to_scene_list(&mut scene_models, &vehicle.models, Some(true));
-        add_models_to_scene_list(&mut scene_models, &vehicle.riders[0..rider_index], Some(true));
+        add_models_to_list(&mut scene_models, std::slice::from_ref(model_desc), None);
+        add_models_to_list(&mut scene_models, &vehicle.models, Some(true));
+        add_models_to_list(&mut scene_models, &vehicle.riders[0..rider_index], Some(true));
 
         let scene = renderer::Scene::new(render_device, &scene_models)?;
         images.par_extend(rotations.par_iter().map(|x| render_rotation(&scene, camera, lights, x)));
@@ -493,14 +493,9 @@ fn render_vehicle(
         if let Some(ref restraint_rotations) = restraint_rotations {
             for frame in 0..3 {
                 let mut scene_models = Vec::new();
-                add_restraint_models_to_scene_list(&mut scene_models, std::slice::from_ref(model_desc), None, frame);
-                add_restraint_models_to_scene_list(&mut scene_models, &vehicle.models, Some(true), frame);
-                add_restraint_models_to_scene_list(
-                    &mut scene_models,
-                    &vehicle.riders[0..rider_index],
-                    Some(true),
-                    frame,
-                );
+                add_restraint_models_to_list(&mut scene_models, std::slice::from_ref(model_desc), None, frame);
+                add_restraint_models_to_list(&mut scene_models, &vehicle.models, Some(true), frame);
+                add_restraint_models_to_list(&mut scene_models, &vehicle.riders[0..rider_index], Some(true), frame);
 
                 let scene = renderer::Scene::new(render_device, &scene_models)?;
                 for rotation in restraint_rotations {
