@@ -13,23 +13,6 @@ impl VehicleRotation {
     }
 }
 
-fn render_rotation(
-    scene: &renderer::Scene,
-    camera: &glam::Mat4,
-    lights: &[renderer::Light],
-    rotation: &VehicleRotation,
-) -> renderer::image::IndexedImage {
-    let view_rotation = glam::Mat4::from_euler(glam::EulerRot::YZX, rotation.yaw, rotation.pitch, rotation.roll);
-
-    let camera = camera * view_rotation;
-
-    let view_rotation_inverse = view_rotation.inverse();
-    let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
-
-    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4);
-    framebuffer.into_cropped_indexed_image(true)
-}
-
 fn corkscrew_right_pitch(angle: f32) -> f32 {
     -(-angle.sin() / 2.0_f32.sqrt()).asin()
 }
@@ -438,6 +421,23 @@ fn add_restraint_models_to_scene_list<'a>(
             is_ghost: None,
         });
     }
+}
+
+fn render_rotation(
+    scene: &renderer::Scene,
+    camera: &glam::Mat4,
+    lights: &[renderer::Light],
+    rotation: &VehicleRotation,
+) -> renderer::image::IndexedImage {
+    let view_rotation = glam::Mat4::from_euler(glam::EulerRot::YZX, rotation.yaw, rotation.pitch, rotation.roll);
+
+    let camera = camera * view_rotation;
+
+    let view_rotation_inverse = view_rotation.inverse();
+    let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
+
+    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4);
+    framebuffer.into_cropped_indexed_image(true)
 }
 
 fn render_vehicle(
