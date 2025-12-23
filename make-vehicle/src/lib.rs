@@ -1,6 +1,8 @@
 mod ride_desc;
 mod ride_object;
 
+const TILE_SIZE: f32 = 3.3;
+
 struct VehicleRotation {
     pitch: f32,
     roll: f32,
@@ -510,8 +512,6 @@ fn render_vehicle(
 
     Ok(images)
 }
-
-const TILE_SIZE: f32 = 3.3;
 
 fn render(
     vehicles: &[ride_desc::VehicleRenderType],
