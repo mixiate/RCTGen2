@@ -666,9 +666,10 @@ pub fn make_vehicle(
             ];
 
             for (i, images) in images.iter().enumerate() {
+                let image_count = images.len().try_into().unwrap_or(32);
                 let atlas = match atlas_type {
                     AtlasType::Packed => renderer::pack::create_atlas(images),
-                    AtlasType::Grid => renderer::pack::create_grid(images, 32),
+                    AtlasType::Grid => renderer::pack::create_grid(images, std::cmp::min(image_count, 32)),
                 };
                 let file_path = images_directory.join(format!("car_{i}")).with_extension("png");
                 atlas.image.save(&file_path)?;
