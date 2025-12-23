@@ -13,7 +13,7 @@ impl VehicleRotation {
     }
 }
 
-fn render_vehicle(
+fn render_rotation(
     scene: &renderer::Scene,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
@@ -483,7 +483,7 @@ fn render(
             add_models_to_scene_list(&mut scene_models, &vehicle.models, None);
 
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
+            car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_rotation(&scene, &camera, lights, x)));
 
             if let Some(ref restraint_rotations) = restraint_rotations {
                 for frame in 0..3 {
@@ -491,7 +491,7 @@ fn render(
                     add_restraint_models_to_scene_list(&mut scene_models, &vehicle.models, None, frame);
                     let scene = renderer::Scene::new(&render_device, &scene_models)?;
                     for rotation in restraint_rotations {
-                        car_images.push(render_vehicle(&scene, &camera, lights, rotation));
+                        car_images.push(render_rotation(&scene, &camera, lights, rotation));
                     }
                 }
             }
@@ -504,7 +504,7 @@ fn render(
             add_models_to_scene_list(&mut scene_models, &vehicle.riders[0..rider_index], Some(true));
 
             let scene = renderer::Scene::new(&render_device, &scene_models)?;
-            car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_vehicle(&scene, &camera, lights, x)));
+            car_images.par_extend(vehicle_rotations.par_iter().map(|x| render_rotation(&scene, &camera, lights, x)));
 
             if let Some(ref restraint_rotations) = restraint_rotations {
                 for frame in 0..3 {
@@ -525,7 +525,7 @@ fn render(
 
                     let scene = renderer::Scene::new(&render_device, &scene_models)?;
                     for rotation in restraint_rotations {
-                        car_images.push(render_vehicle(&scene, &camera, lights, rotation));
+                        car_images.push(render_rotation(&scene, &camera, lights, rotation));
                     }
                 }
             }
