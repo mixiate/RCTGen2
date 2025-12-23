@@ -12,8 +12,11 @@
         "minCarsPerTrain": 4,
         "maxCarsPerTrain": 8,
         "numEmptyCars": 0,
-        "tabCar": 0,
+        "tabCar": 1,
         "defaultCar": 0,
+        "headCars": [
+            1
+        ],
         "buildMenuPriority": 3,
         "maxHeight": 34,
         "ratingMultipler": {
@@ -103,6 +106,21 @@
                     -4,
                     -2
                 ]
+            },
+            {
+                "rotationFrameMask": 0,
+                "spacing": 34864,
+                "mass": 0,
+                "numSeats": 0,
+                "numSeatRows": 0,
+                "frictionSoundId": 57,
+                "soundRange": 0,
+                "carVisual": 1,
+                "drawOrder": 8,
+                "spriteGroups": {
+                    "slopeFlat": 1
+                },
+                "loadingPositions": []
             }
         ]
     },
@@ -34925,6 +34943,16 @@
             "srcY": 4324,
             "srcWidth": 14,
             "srcHeight": 14,
+            "palette": "keep"
+        },
+        {
+            "path": "images/car_1.png",
+            "x": 0,
+            "y": 0,
+            "srcX": 0,
+            "srcY": 0,
+            "srcWidth": 1,
+            "srcHeight": 1,
             "palette": "keep"
         }
     ]

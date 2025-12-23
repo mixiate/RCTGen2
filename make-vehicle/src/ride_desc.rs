@@ -93,6 +93,7 @@ pub struct Vehicle {
     pub mass: i32,
     pub draw_order: i32,
     pub flags: Option<std::collections::HashSet<VehicleFlag>>,
+    #[serde(default)]
     pub model: Vec<Model>,
     pub capacity: Option<i32>,
     pub riders: Option<Vec<Model>>,
@@ -187,24 +188,31 @@ impl Ride {
     pub fn get_vehicle_render_descs<'a>(
         &self,
         models: &'a [renderer::model::Model],
-    ) -> anyhow::Result<Vec<VehicleRenderDesc<'a>>> {
+    ) -> anyhow::Result<Vec<VehicleRenderType<'a>>> {
         let mut vehicles = Vec::with_capacity(self.vehicles.len());
         for vehicle in &self.vehicles {
-            let vehicle_models =
-                vehicle.model.iter().map(|x| ModelRenderDesc::new(x, models)).collect::<anyhow::Result<Vec<_>>>()?;
+            if vehicle.model.is_empty() {
+                vehicles.push(VehicleRenderType::Invisible);
+            } else {
+                let vehicle_models = vehicle
+                    .model
+                    .iter()
+                    .map(|x| ModelRenderDesc::new(x, models))
+                    .collect::<anyhow::Result<Vec<_>>>()?;
 
-            let riders = vehicle
-                .riders
-                .iter()
-                .flatten()
-                .map(|x| ModelRenderDesc::new(x, models))
-                .collect::<anyhow::Result<Vec<_>>>()?;
+                let riders = vehicle
+                    .riders
+                    .iter()
+                    .flatten()
+                    .map(|x| ModelRenderDesc::new(x, models))
+                    .collect::<anyhow::Result<Vec<_>>>()?;
 
-            vehicles.push(VehicleRenderDesc {
-                sprite_groups: crate::ride_object::SpriteGroups::new(self, vehicle),
-                models: vehicle_models,
-                riders,
-            });
+                vehicles.push(VehicleRenderType::Regular(VehicleRenderDesc {
+                    sprite_groups: crate::ride_object::SpriteGroups::new(self, vehicle),
+                    models: vehicle_models,
+                    riders,
+                }));
+            }
         }
 
         Ok(vehicles)
@@ -251,4 +259,10 @@ pub struct VehicleRenderDesc<'a> {
     pub sprite_groups: crate::ride_object::SpriteGroups,
     pub models: Vec<ModelRenderDesc<'a>>,
     pub riders: Vec<ModelRenderDesc<'a>>,
+}
+
+#[expect(clippy::large_enum_variant)]
+pub enum VehicleRenderType<'a> {
+    Regular(VehicleRenderDesc<'a>),
+    Invisible,
 }

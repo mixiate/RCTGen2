@@ -514,7 +514,7 @@ fn render_vehicle(
 const TILE_SIZE: f32 = 3.3;
 
 fn render(
-    vehicles: &[ride_desc::VehicleRenderDesc],
+    vehicles: &[ride_desc::VehicleRenderType],
     lights: &[renderer::Light],
 ) -> anyhow::Result<Vec<Vec<renderer::image::IndexedImage>>> {
     use anyhow::Context as _;
@@ -539,8 +539,15 @@ fn render(
     let mut images = Vec::new();
 
     for vehicle in vehicles {
-        let car_images = render_vehicle(&render_device, &camera, lights, &angles, vehicle)?;
-        images.push(car_images);
+        match vehicle {
+            ride_desc::VehicleRenderType::Regular(vehicle) => {
+                let car_images = render_vehicle(&render_device, &camera, lights, &angles, vehicle)?;
+                images.push(car_images);
+            }
+            ride_desc::VehicleRenderType::Invisible => {
+                images.push(vec![renderer::image::IndexedImage::new(1, 1)]);
+            }
+        }
     }
 
     Ok(images)

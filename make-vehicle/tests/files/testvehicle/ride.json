@@ -28,7 +28,7 @@
     "min_cars_per_train": 4,
     "max_cars_per_train": 8,
     "build_menu_priority": 3,
-    "preview_tab_car": 0,
+    "preview_tab_car": 1,
     "running_sound": "steel_smooth",
     "secondary_sound": "scream1",
     "rating_multipliers": {
@@ -55,7 +55,7 @@
             "bright_red"
         ]
     ],
-    "configuration": { "default": 0 },
+    "configuration": { "front": 1, "default": 0 },
     "meshes": [
         "car.obj",
         "restraints.obj",
@@ -77,6 +77,11 @@
                 { "mesh_index": 2, "position": [0.33333, 0.0, 0.0], "orientation": [0, 0, 0] },
                 { "mesh_index": 2, "position": [-0.33333, 0.0, 0.0], "orientation": [0, 0, 0] }
             ]
+        },
+        {
+            "mass": 0,
+            "spacing": 0.4125,
+            "draw_order": 8
         }
     ],
     "lights": [

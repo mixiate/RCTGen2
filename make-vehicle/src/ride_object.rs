@@ -189,7 +189,7 @@ pub(crate) struct RatingMultipliers {
 }
 
 #[serde_with::skip_serializing_none]
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, Default, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SpriteGroups {
     pub slope_flat: Option<i32>,
@@ -305,6 +305,7 @@ struct Car {
     num_seat_rows: i32,
     friction_sound_id: i32,
     sound_range: i32,
+    car_visual: Option<i32>,
     draw_order: i32,
     sprite_groups: SpriteGroups,
     #[serde(skip_serializing_if = "std::ops::Not::not")]
@@ -318,8 +319,21 @@ struct Car {
 
 impl Car {
     fn new(ride_desc: &crate::ride_desc::Ride, vehicle: &crate::ride_desc::Vehicle) -> Self {
+        let rotation_frame_mask = if vehicle.model.is_empty() { 0 } else { 31 };
+
         let num_seats = vehicle.capacity.unwrap_or(0);
         let num_seat_rows = vehicle.riders.as_ref().map(|x| x.len() as i32).unwrap_or(0);
+
+        let car_visual = vehicle.model.is_empty().then_some(1);
+
+        let sprite_groups = if vehicle.model.is_empty() {
+            SpriteGroups {
+                slope_flat: Some(1),
+                ..SpriteGroups::default()
+            }
+        } else {
+            SpriteGroups::new(ride_desc, vehicle)
+        };
 
         let has_additional_colour1 =
             vehicle.flags.as_ref().is_some_and(|x| x.contains(&crate::ride_desc::VehicleFlag::SecondaryRemap));
@@ -343,15 +357,16 @@ impl Car {
             .collect();
 
         Car {
-            rotation_frame_mask: 31,
+            rotation_frame_mask,
             spacing: ((vehicle.spacing * 278912.0) / crate::TILE_SIZE) as i32,
             mass: vehicle.mass,
             num_seats,
             num_seat_rows,
             friction_sound_id: ride_desc.running_sound as i32,
             sound_range: ride_desc.secondary_sound as i32,
+            car_visual,
             draw_order: vehicle.draw_order,
-            sprite_groups: SpriteGroups::new(ride_desc, vehicle),
+            sprite_groups,
             has_additional_colour1,
             has_additional_colour2,
             has_screaming_riders,
