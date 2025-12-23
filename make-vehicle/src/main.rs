@@ -1,5 +1,5 @@
 #[derive(Clone, Copy, clap::ValueEnum)]
-pub enum ImageOutputType {
+enum ImageOutputType {
     Dat,
     Packed,
     Grid,
