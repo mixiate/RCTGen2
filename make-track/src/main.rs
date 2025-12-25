@@ -1,0 +1,18 @@
+#[derive(clap::Parser)]
+struct Cli {
+    track_description_file_path: std::path::PathBuf,
+}
+
+fn main() -> anyhow::Result<()> {
+    use clap::Parser as _;
+
+    let start_time = std::time::Instant::now();
+
+    let cli = Cli::parse();
+
+    make_track::make_track(&cli.track_description_file_path)?;
+
+    println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
+
+    Ok(())
+}
