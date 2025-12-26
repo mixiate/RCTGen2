@@ -4,13 +4,19 @@ struct Cli {
 }
 
 fn main() -> anyhow::Result<()> {
+    use anyhow::Context as _;
     use clap::Parser as _;
 
     let start_time = std::time::Instant::now();
 
     let cli = Cli::parse();
 
-    make_track::make_track(&cli.track_description_file_path)?;
+    let track_description_file_path = cli
+        .track_description_file_path
+        .canonicalize()
+        .with_context(|| format!("Invalid file path {}", cli.track_description_file_path.display()))?;
+
+    make_track::make_track(&track_description_file_path)?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 
