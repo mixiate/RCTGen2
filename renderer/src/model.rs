@@ -10,6 +10,13 @@ pub(crate) enum MaterialColour {
     Texture(crate::texture::Texture),
 }
 
+impl Default for MaterialColour {
+    fn default() -> Self {
+        Self::Colour(glam::Vec3::new(0.5, 0.5, 0.5))
+    }
+}
+
+#[derive(Default)]
 pub struct Material {
     pub(crate) diffuse: MaterialColour,
     pub(crate) specular: MaterialColour,
@@ -108,20 +115,19 @@ impl Model {
                 anyhow::bail!("Obj does not have any groups {}", path.display());
             }
             for group in &object.groups {
-                let material = group
-                    .material
-                    .as_ref()
-                    .and_then(|x| {
-                        if let obj::ObjMaterial::Mtl(mtl) = x {
-                            Some(mtl)
-                        } else {
-                            None
+                let (material, is_mask, is_ghost) = if let Some(material) = &group.material {
+                    let material = match material {
+                        obj::ObjMaterial::Mtl(mtl) => mtl,
+                        obj::ObjMaterial::Ref(name) => {
+                            anyhow::bail!("Could not read material {name} used by obj {}", path.display())
                         }
-                    })
-                    .with_context(|| format!("No material found for object {} in {} ", object.name, path.display()))?;
-                let is_mask = material.name.split("_").any(|x| x == "Mask");
-                let is_ghost = material.name.split("_").any(|x| x == "Ghost");
-                let material = Material::new(material, parent_directory)?;
+                    };
+                    let is_mask = material.name.split("_").any(|x| x == "Mask");
+                    let is_ghost = material.name.split("_").any(|x| x == "Ghost");
+                    (Material::new(material, parent_directory)?, is_mask, is_ghost)
+                } else {
+                    (Material::default(), false, false)
+                };
 
                 let mut vertices: Vec<Vertex> = Vec::new();
                 let mut indices: Vec<[u32; 3]> = Vec::new();
