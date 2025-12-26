@@ -48,7 +48,7 @@ impl Scene<'_> {
     }
 
     pub fn add_geometry(&self, positions: &[(f32, f32, f32)], indices: &[(u32, u32, u32)]) -> Result<(), Error> {
-        let geometry = Geometry::try_new(self.device, embree4_sys::RTCGeometryType::TRIANGLE)?;
+        let geometry = TriangleGeometry::new(self.device)?;
 
         let vertex_buffer = unsafe {
             embree4_sys::rtcSetNewGeometryBuffer(
@@ -214,18 +214,18 @@ pub fn commit_scene(scene: Scene) -> CommittedScene {
     CommittedScene { scene }
 }
 
-struct Geometry<'a> {
+struct TriangleGeometry<'a> {
     _device: std::marker::PhantomData<&'a Device>,
     handle: embree4_sys::RTCGeometry,
 }
 
-impl Geometry<'_> {
-    pub fn try_new(device: &Device, geometry_type: embree4_sys::RTCGeometryType) -> Result<Geometry<'_>, Error> {
-        let handle = unsafe { embree4_sys::rtcNewGeometry(device.handle, geometry_type) };
+impl TriangleGeometry<'_> {
+    pub fn new(device: &Device) -> Result<TriangleGeometry<'_>, Error> {
+        let handle = unsafe { embree4_sys::rtcNewGeometry(device.handle, embree4_sys::RTCGeometryType::TRIANGLE) };
         if handle.is_null() {
             Err(Error)
         } else {
-            Ok(Geometry {
+            Ok(TriangleGeometry {
                 _device: std::marker::PhantomData,
                 handle,
             })
@@ -233,7 +233,7 @@ impl Geometry<'_> {
     }
 }
 
-impl Drop for Geometry<'_> {
+impl Drop for TriangleGeometry<'_> {
     fn drop(&mut self) {
         unsafe { embree4_sys::rtcReleaseGeometry(self.handle) }
     }
