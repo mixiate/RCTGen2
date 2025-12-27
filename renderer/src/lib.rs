@@ -10,5 +10,5 @@ mod texture;
 
 pub use embree::Device;
 pub use framebuffer::Framebuffer;
-pub use raytrace::{Scene, SceneBuilder, SceneModelDesc};
+pub use raytrace::{Scene, SceneBuilder};
 pub use renderer::{Light, render_scene};

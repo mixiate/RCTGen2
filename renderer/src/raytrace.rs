@@ -1,11 +1,3 @@
-pub struct SceneModelDesc<'a> {
-    pub model: &'a crate::model::Model,
-    pub translation: glam::Vec3,
-    pub rotation: glam::Quat,
-    pub is_mask: Option<bool>,
-    pub is_ghost: Option<bool>,
-}
-
 struct SceneMesh<'a> {
     mesh: &'a crate::model::Mesh,
     normals: Vec<glam::Vec3>,
@@ -88,22 +80,6 @@ pub enum RayHit<'a> {
 }
 
 impl Scene<'_> {
-    pub fn new<'a>(embree_device: &'a embree::Device, models: &[SceneModelDesc<'a>]) -> anyhow::Result<Scene<'a>> {
-        let mut scene_builder = SceneBuilder::new(embree_device)?;
-
-        for model_desc in models {
-            scene_builder.add_model(
-                model_desc.model,
-                model_desc.translation,
-                model_desc.rotation,
-                model_desc.is_mask,
-                model_desc.is_ghost,
-            )?;
-        }
-
-        Ok(scene_builder.build())
-    }
-
     pub fn trace_ray(&'_ self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit<'_>> {
         let mut hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into(), 0.0)?;
         let ghost_depth = hit.distance;
