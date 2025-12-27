@@ -1,24 +1,38 @@
 mod track_desc;
 mod track_sections;
 
+fn get_track_point(track_section: &track_sections::TrackSection, distance: f32) -> track_sections::TrackPoint {
+    if distance < 0.0 {
+        let mut point = (track_section.curve)(0.0);
+        point.position += point.tangent * distance;
+        point
+    } else if distance > track_section.length {
+        let mut point = (track_section.curve)(track_section.length);
+        point.position += point.tangent * (distance - track_section.length);
+        point
+    } else {
+        (track_section.curve)(distance)
+    }
+}
+
 fn add_model_to_scene<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     model: &'a renderer::model::Model,
-    is_mask: Option<bool>,
+    is_ghost: Option<bool>,
     track_section: &track_sections::TrackSection,
     scale: f32,
     offset: f32,
 ) -> anyhow::Result<()> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
         let distance = (position.z * scale) + offset;
-        let point = (track_section.curve)(distance);
+        let point = get_track_point(track_section, distance);
 
         let position = point.position + (point.normal * position.y) + (point.binormal * position.x);
         let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
 
         (position, normal)
     };
-    scene.add_model_transform(model, transform, is_mask, None)
+    scene.add_model_transform(model, transform, None, is_ghost)
 }
 
 #[expect(clippy::too_many_arguments)]
@@ -37,9 +51,21 @@ fn render_track_section(
     let length = scale * track.length;
 
     let mut scene = renderer::SceneBuilder::new(render_device)?;
+
+    add_model_to_scene(&mut scene, &models.track, Some(true), track_section, scale, -length)?;
+    add_model_to_scene(
+        &mut scene,
+        &models.track,
+        Some(true),
+        track_section,
+        scale,
+        track_section.length,
+    )?;
+
     for i in 0..mesh_count {
         add_model_to_scene(&mut scene, &models.track, None, track_section, scale, i as f32 * length)?;
     }
+
     let scene = scene.build();
 
     for i in 0..4 {
