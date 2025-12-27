@@ -47,16 +47,16 @@ impl Scene<'_> {
                 let transform =
                     glam::Mat4::from_translation(model_desc.translation) * glam::Mat4::from_quat(model_desc.rotation);
                 for mesh in &model_desc.model.meshes {
-                    let positions: Vec<_> =
-                        mesh.positions.iter().map(|x| transform.transform_point3(*x).into()).collect();
-                    let normals: Vec<_> =
-                        mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
-
-                    embree_scene.add_geometry(&positions, &mesh.indices)?;
+                    let mut geometry =
+                        embree::TriangleGeometry::new(embree_device, mesh.positions.len(), &mesh.indices)?;
+                    for (position, geom_position) in mesh.positions.iter().zip(geometry.positions().iter_mut()) {
+                        *geom_position = transform.transform_point3(*position).into();
+                    }
+                    embree_scene.add_geometry(geometry)?;
 
                     meshes.push(SceneMesh {
                         mesh,
-                        normals,
+                        normals: mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
                         is_mask: model_desc.is_mask.unwrap_or(mesh.is_mask),
                         is_ghost: model_desc.is_ghost.unwrap_or(mesh.is_ghost),
                     });

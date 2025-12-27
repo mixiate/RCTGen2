@@ -33,7 +33,7 @@ impl Drop for Device {
 }
 
 pub struct Scene<'a> {
-    device: &'a Device,
+    _device: std::marker::PhantomData<&'a Device>,
     handle: embree4_sys::RTCScene,
 }
 
@@ -43,23 +43,17 @@ impl Scene<'_> {
         if handle.is_null() {
             Err(Error)
         } else {
-            Ok(Scene { device, handle })
+            Ok(Scene {
+                _device: std::marker::PhantomData,
+                handle,
+            })
         }
     }
 
-    pub fn add_geometry(&self, positions: &[[f32; 3]], indices: &[[u32; 3]]) -> Result<(), Error> {
-        let mut geometry = TriangleGeometry::new(self.device, positions.len(), indices.len())?;
-
-        geometry.positions().copy_from_slice(positions);
-        geometry.indices().copy_from_slice(indices);
-
+    pub fn add_geometry(&self, geometry: TriangleGeometry) -> Result<(), Error> {
         unsafe { embree4_sys::rtcSetGeometryOccludedFilterFunction(geometry.handle, Some(occlusion_filter)) };
-
-        unsafe {
-            embree4_sys::rtcCommitGeometry(geometry.handle);
-            embree4_sys::rtcAttachGeometry(self.handle, geometry.handle);
-        }
-
+        unsafe { embree4_sys::rtcCommitGeometry(geometry.handle) };
+        unsafe { embree4_sys::rtcAttachGeometry(self.handle, geometry.handle) };
         Ok(())
     }
 }
@@ -181,15 +175,18 @@ pub fn commit_scene(scene: Scene) -> CommittedScene {
     CommittedScene { scene }
 }
 
-struct TriangleGeometry<'a> {
+pub struct TriangleGeometry<'a> {
     _device: std::marker::PhantomData<&'a Device>,
     handle: embree4_sys::RTCGeometry,
     positions: &'a mut [[f32; 3]],
-    indices: &'a mut [[u32; 3]],
 }
 
 impl TriangleGeometry<'_> {
-    pub fn new(device: &Device, positions_count: usize, indices_count: usize) -> Result<TriangleGeometry<'_>, Error> {
+    pub fn new<'a>(
+        device: &'a Device,
+        positions_count: usize,
+        indices: &[[u32; 3]],
+    ) -> Result<TriangleGeometry<'a>, Error> {
         let handle = unsafe { embree4_sys::rtcNewGeometry(device.handle, embree4_sys::RTCGeometryType::TRIANGLE) };
         if handle.is_null() {
             return Err(Error);
@@ -216,27 +213,25 @@ impl TriangleGeometry<'_> {
                 0,
                 embree4_sys::RTCFormat::UINT3,
                 3 * size_of::<u32>(),
-                indices_count,
+                indices.len(),
             )
         };
         if index_buffer.is_null() {
             return Err(Error);
         }
 
+        let index_buffer = unsafe { std::slice::from_raw_parts_mut(index_buffer.cast::<[u32; 3]>(), indices.len()) };
+        index_buffer.copy_from_slice(indices);
+
         Ok(TriangleGeometry {
             _device: std::marker::PhantomData,
             handle,
             positions: unsafe { std::slice::from_raw_parts_mut(vertex_buffer.cast::<[f32; 3]>(), positions_count) },
-            indices: unsafe { std::slice::from_raw_parts_mut(index_buffer.cast::<[u32; 3]>(), indices_count) },
         })
     }
 
     pub fn positions(&mut self) -> &mut [[f32; 3]] {
         self.positions
-    }
-
-    pub fn indices(&mut self) -> &mut [[u32; 3]] {
-        self.indices
     }
 }
 
