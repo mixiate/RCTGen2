@@ -50,6 +50,40 @@ impl<'a> SceneBuilder<'a> {
         Ok(())
     }
 
+    pub fn add_model_transform<F>(
+        &mut self,
+        model: &'a crate::model::Model,
+        transform: F,
+        is_mask: Option<bool>,
+        is_ghost: Option<bool>,
+    ) -> anyhow::Result<()>
+    where
+        F: Fn((&glam::Vec3, &glam::Vec3)) -> (glam::Vec3, glam::Vec3),
+    {
+        for mesh in &model.meshes {
+            let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
+            let mut normals = Vec::with_capacity(mesh.normals.len());
+            for (vertex, geometry_position) in
+                mesh.positions.iter().zip(mesh.normals.iter()).zip(geometry.positions().iter_mut())
+            {
+                let vertex = transform(vertex);
+                *geometry_position = vertex.0.into();
+                normals.push(vertex.1.normalize());
+            }
+            let is_ghost = is_ghost.unwrap_or(mesh.is_ghost);
+            self.embree_scene.add_geometry(geometry, is_ghost)?;
+
+            self.meshes.push(SceneMesh {
+                mesh,
+                normals,
+                is_mask: is_mask.unwrap_or(mesh.is_mask),
+                is_ghost,
+            });
+        }
+
+        Ok(())
+    }
+
     pub fn build(self) -> Scene<'a> {
         Scene {
             embree_scene: embree::commit_scene(self.embree_scene),

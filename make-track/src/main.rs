@@ -1,6 +1,7 @@
 #[derive(clap::Parser)]
 struct Cli {
     track_description_file_path: std::path::PathBuf,
+    output_directory: std::path::PathBuf,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -16,7 +17,12 @@ fn main() -> anyhow::Result<()> {
         .canonicalize()
         .with_context(|| format!("Invalid file path {}", cli.track_description_file_path.display()))?;
 
-    make_track::make_track(&track_description_file_path)?;
+    let output_directory = cli
+        .output_directory
+        .canonicalize()
+        .with_context(|| format!("Invalid file path {}", cli.output_directory.display()))?;
+
+    make_track::make_track(&track_description_file_path, &output_directory)?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 

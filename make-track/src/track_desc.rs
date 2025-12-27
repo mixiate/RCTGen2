@@ -140,12 +140,10 @@ pub struct Track {
     pub sections: std::collections::HashSet<Section>,
     #[expect(unused)]
     pub masks: std::path::PathBuf,
-    #[expect(unused)]
-    pub name: Option<String>,
+    pub name: String,
     #[expect(unused)]
     #[serde(default = "default_lift_offset")]
     pub lift_offset: i32, // unused. unknown default value
-    #[expect(unused)]
     pub length: f32,
     #[expect(unused)]
     #[serde(default = "float_1")]
@@ -187,7 +185,6 @@ pub enum LightType {
 }
 
 #[derive(Debug, serde::Deserialize)]
-#[expect(unused)]
 pub struct Light {
     pub r#type: LightType,
     pub shadow: bool,
@@ -200,9 +197,7 @@ pub struct Desc {
     pub tracks: Vec<Track>,
     #[expect(unused)]
     pub offsets: Option<Offsets>,
-    #[expect(unused)]
     pub lights: Vec<Light>,
-    #[expect(unused)]
     #[serde(default = "bool_true")]
     pub dither: bool,
 }
@@ -212,5 +207,25 @@ impl Desc {
         use anyhow::Context as _;
         let json = std::fs::read_to_string(path).with_context(|| format!("Could not read file {}", path.display()))?;
         serde_json::from_str::<Desc>(&json).with_context(|| format!("Could not parse json in file {}", path.display()))
+    }
+
+    pub fn get_lights(&self) -> Vec<renderer::Light> {
+        self.lights
+            .iter()
+            .map(|x| renderer::Light {
+                diffuse_strength: if x.r#type == LightType::Diffuse {
+                    x.strength
+                } else {
+                    0.0
+                },
+                specular_strength: if x.r#type == LightType::Specular {
+                    x.strength
+                } else {
+                    0.0
+                },
+                direction: glam::Vec3::from(x.direction).normalize(),
+                shadow: x.shadow,
+            })
+            .collect()
     }
 }
