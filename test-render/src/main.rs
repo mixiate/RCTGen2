@@ -130,14 +130,9 @@ fn main() -> anyhow::Result<()> {
                         );
                         model_translation + offset
                     };
-                    let scene_models = &[renderer::SceneModelDesc {
-                        model,
-                        translation: model_translation,
-                        rotation: model_rotation,
-                        is_mask: None,
-                        is_ghost: None,
-                    }];
-                    renderer::Scene::new(&render_device, scene_models)?
+                    let mut scene_builder = renderer::SceneBuilder::new(&render_device)?;
+                    scene_builder.add_model(model, model_translation, model_rotation, None, None)?;
+                    scene_builder.build()
                 };
 
                 let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation_index as f32);
