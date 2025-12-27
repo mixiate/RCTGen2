@@ -13,6 +13,58 @@ struct SceneMesh<'a> {
     is_ghost: bool,
 }
 
+pub struct SceneBuilder<'a> {
+    embree_device: &'a embree::Device,
+    embree_scene: embree::Scene<'a>,
+    meshes: Vec<SceneMesh<'a>>,
+}
+
+impl<'a> SceneBuilder<'a> {
+    pub fn new(embree_device: &'a embree::Device) -> anyhow::Result<SceneBuilder<'a>> {
+        use anyhow::Context as _;
+        let scene = embree::Scene::try_new(embree_device).context("Could not create embree scene")?;
+        Ok(SceneBuilder {
+            embree_device,
+            embree_scene: scene,
+            meshes: Vec::new(),
+        })
+    }
+
+    pub fn add_model(
+        &mut self,
+        model: &'a crate::model::Model,
+        translation: glam::Vec3,
+        rotation: glam::Quat,
+        is_mask: Option<bool>,
+        is_ghost: Option<bool>,
+    ) -> anyhow::Result<()> {
+        let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
+        for mesh in &model.meshes {
+            let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
+            for (position, geom_position) in mesh.positions.iter().zip(geometry.positions().iter_mut()) {
+                *geom_position = transform.transform_point3(*position).into();
+            }
+            self.embree_scene.add_geometry(geometry)?;
+
+            self.meshes.push(SceneMesh {
+                mesh,
+                normals: mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
+                is_mask: is_mask.unwrap_or(mesh.is_mask),
+                is_ghost: is_ghost.unwrap_or(mesh.is_ghost),
+            });
+        }
+
+        Ok(())
+    }
+
+    pub fn build(self) -> Scene<'a> {
+        Scene {
+            embree_scene: embree::commit_scene(self.embree_scene),
+            meshes: self.meshes,
+        }
+    }
+}
+
 pub struct Scene<'a> {
     embree_scene: embree::CommittedScene<'a>,
     meshes: Vec<SceneMesh<'a>>,
@@ -37,37 +89,19 @@ pub enum RayHit<'a> {
 
 impl Scene<'_> {
     pub fn new<'a>(embree_device: &'a embree::Device, models: &[SceneModelDesc<'a>]) -> anyhow::Result<Scene<'a>> {
-        use anyhow::Context as _;
+        let mut scene_builder = SceneBuilder::new(embree_device)?;
 
-        let embree_scene = embree::Scene::try_new(embree_device).context("Could not create embree scene")?;
+        for model_desc in models {
+            scene_builder.add_model(
+                model_desc.model,
+                model_desc.translation,
+                model_desc.rotation,
+                model_desc.is_mask,
+                model_desc.is_ghost,
+            )?;
+        }
 
-        let meshes = {
-            let mut meshes = Vec::new();
-            for model_desc in models {
-                let transform =
-                    glam::Mat4::from_translation(model_desc.translation) * glam::Mat4::from_quat(model_desc.rotation);
-                for mesh in &model_desc.model.meshes {
-                    let mut geometry =
-                        embree::TriangleGeometry::new(embree_device, mesh.positions.len(), &mesh.indices)?;
-                    for (position, geom_position) in mesh.positions.iter().zip(geometry.positions().iter_mut()) {
-                        *geom_position = transform.transform_point3(*position).into();
-                    }
-                    embree_scene.add_geometry(geometry)?;
-
-                    meshes.push(SceneMesh {
-                        mesh,
-                        normals: mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
-                        is_mask: model_desc.is_mask.unwrap_or(mesh.is_mask),
-                        is_ghost: model_desc.is_ghost.unwrap_or(mesh.is_ghost),
-                    });
-                }
-            }
-            meshes
-        };
-
-        let embree_scene = embree::commit_scene(embree_scene);
-
-        Ok(Scene { embree_scene, meshes })
+        Ok(scene_builder.build())
     }
 
     pub fn trace_ray(&'_ self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit<'_>> {
