@@ -77,7 +77,7 @@ pub struct Mesh {
     pub positions: Vec<glam::Vec3>,
     pub normals: Vec<glam::Vec3>,
     pub uvs: Vec<glam::Vec2>,
-    pub indices: Vec<(u32, u32, u32)>,
+    pub indices: Vec<[u32; 3]>,
     pub material: Material,
     pub is_mask: bool,
     pub is_ghost: bool,
@@ -124,7 +124,7 @@ impl Model {
                 let material = Material::new(material, parent_directory)?;
 
                 let mut vertices: Vec<Vertex> = Vec::new();
-                let mut indices: Vec<(u32, u32, u32)> = Vec::new();
+                let mut indices: Vec<[u32; 3]> = Vec::new();
 
                 for poly in &group.polys {
                     if poly.0.len() != 3 {
@@ -167,7 +167,7 @@ impl Model {
                         .with_context(|| format!("Invalid index in obj file {}", path.display()))?;
                     }
 
-                    indices.push(new_indices.into());
+                    indices.push(new_indices);
                 }
 
                 meshes.push(Mesh {

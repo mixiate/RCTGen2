@@ -133,9 +133,9 @@ pub fn render_scene(
 
                             let uv = {
                                 let uvs = [
-                                    hit.mesh.uvs[hit.indices.0 as usize] * (1.0 - hit.u - hit.v),
-                                    hit.mesh.uvs[hit.indices.1 as usize] * hit.u,
-                                    hit.mesh.uvs[hit.indices.2 as usize] * hit.v,
+                                    hit.mesh.uvs[hit.indices[0] as usize] * (1.0 - hit.u - hit.v),
+                                    hit.mesh.uvs[hit.indices[1] as usize] * hit.u,
+                                    hit.mesh.uvs[hit.indices[2] as usize] * hit.v,
                                 ];
                                 uvs.iter().sum::<glam::Vec2>()
                             };

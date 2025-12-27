@@ -47,44 +47,11 @@ impl Scene<'_> {
         }
     }
 
-    pub fn add_geometry(&self, positions: &[(f32, f32, f32)], indices: &[(u32, u32, u32)]) -> Result<(), Error> {
-        let geometry = TriangleGeometry::new(self.device)?;
+    pub fn add_geometry(&self, positions: &[[f32; 3]], indices: &[[u32; 3]]) -> Result<(), Error> {
+        let mut geometry = TriangleGeometry::new(self.device, positions.len(), indices.len())?;
 
-        let vertex_buffer = unsafe {
-            embree4_sys::rtcSetNewGeometryBuffer(
-                geometry.handle,
-                embree4_sys::RTCBufferType::VERTEX,
-                0,
-                embree4_sys::RTCFormat::FLOAT3,
-                3 * size_of::<f32>(),
-                positions.len(),
-            )
-        };
-        if vertex_buffer.is_null() {
-            return Err(Error);
-        }
-
-        let vertex_buffer =
-            unsafe { std::slice::from_raw_parts_mut(vertex_buffer.cast::<(f32, f32, f32)>(), positions.len()) };
-        vertex_buffer.copy_from_slice(positions);
-
-        let index_buffer = unsafe {
-            embree4_sys::rtcSetNewGeometryBuffer(
-                geometry.handle,
-                embree4_sys::RTCBufferType::INDEX,
-                0,
-                embree4_sys::RTCFormat::UINT3,
-                3 * size_of::<u32>(),
-                indices.len(),
-            )
-        };
-        if index_buffer.is_null() {
-            return Err(Error);
-        }
-
-        let index_buffer =
-            unsafe { std::slice::from_raw_parts_mut(index_buffer.cast::<(u32, u32, u32)>(), indices.len()) };
-        index_buffer.copy_from_slice(indices);
+        geometry.positions().copy_from_slice(positions);
+        geometry.indices().copy_from_slice(indices);
 
         unsafe { embree4_sys::rtcSetGeometryOccludedFilterFunction(geometry.handle, Some(occlusion_filter)) };
 
@@ -217,19 +184,59 @@ pub fn commit_scene(scene: Scene) -> CommittedScene {
 struct TriangleGeometry<'a> {
     _device: std::marker::PhantomData<&'a Device>,
     handle: embree4_sys::RTCGeometry,
+    positions: &'a mut [[f32; 3]],
+    indices: &'a mut [[u32; 3]],
 }
 
 impl TriangleGeometry<'_> {
-    pub fn new(device: &Device) -> Result<TriangleGeometry<'_>, Error> {
+    pub fn new(device: &Device, positions_count: usize, indices_count: usize) -> Result<TriangleGeometry<'_>, Error> {
         let handle = unsafe { embree4_sys::rtcNewGeometry(device.handle, embree4_sys::RTCGeometryType::TRIANGLE) };
         if handle.is_null() {
-            Err(Error)
-        } else {
-            Ok(TriangleGeometry {
-                _device: std::marker::PhantomData,
-                handle,
-            })
+            return Err(Error);
         }
+
+        let vertex_buffer = unsafe {
+            embree4_sys::rtcSetNewGeometryBuffer(
+                handle,
+                embree4_sys::RTCBufferType::VERTEX,
+                0,
+                embree4_sys::RTCFormat::FLOAT3,
+                3 * size_of::<f32>(),
+                positions_count,
+            )
+        };
+        if vertex_buffer.is_null() {
+            return Err(Error);
+        }
+
+        let index_buffer = unsafe {
+            embree4_sys::rtcSetNewGeometryBuffer(
+                handle,
+                embree4_sys::RTCBufferType::INDEX,
+                0,
+                embree4_sys::RTCFormat::UINT3,
+                3 * size_of::<u32>(),
+                indices_count,
+            )
+        };
+        if index_buffer.is_null() {
+            return Err(Error);
+        }
+
+        Ok(TriangleGeometry {
+            _device: std::marker::PhantomData,
+            handle,
+            positions: unsafe { std::slice::from_raw_parts_mut(vertex_buffer.cast::<[f32; 3]>(), positions_count) },
+            indices: unsafe { std::slice::from_raw_parts_mut(index_buffer.cast::<[u32; 3]>(), indices_count) },
+        })
+    }
+
+    pub fn positions(&mut self) -> &mut [[f32; 3]] {
+        self.positions
+    }
+
+    pub fn indices(&mut self) -> &mut [[u32; 3]] {
+        self.indices
     }
 }
 

@@ -26,7 +26,7 @@ pub struct RayHitMesh<'a> {
     pub mesh: &'a crate::model::Mesh,
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
-    pub indices: &'a (u32, u32, u32),
+    pub indices: &'a [u32; 3],
 }
 
 pub enum RayHit<'a> {
@@ -94,9 +94,9 @@ impl Scene<'_> {
         let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
 
         let normals = [
-            scene_mesh.normals[usize::try_from(indices.0).unwrap()] * (1.0 - hit.u - hit.v),
-            scene_mesh.normals[usize::try_from(indices.1).unwrap()] * hit.u,
-            scene_mesh.normals[usize::try_from(indices.2).unwrap()] * hit.v,
+            scene_mesh.normals[usize::try_from(indices[0]).unwrap()] * (1.0 - hit.u - hit.v),
+            scene_mesh.normals[usize::try_from(indices[1]).unwrap()] * hit.u,
+            scene_mesh.normals[usize::try_from(indices[2]).unwrap()] * hit.v,
         ];
         let normal = normals.iter().sum::<glam::Vec3>().normalize();
 
