@@ -7,8 +7,24 @@ pub struct TrackPoint {
 
 pub struct TrackSection {
     pub name: &'static str,
-    pub curve: fn(f32, f32) -> TrackPoint,
+    curve: fn(f32, f32) -> TrackPoint,
     pub length: f32,
+}
+
+impl TrackSection {
+    pub fn sample_curve(&self, distance: f32, bank_angle: f32) -> TrackPoint {
+        if distance < 0.0 {
+            let mut point = (self.curve)(0.0, bank_angle);
+            point.position += point.tangent * distance;
+            point
+        } else if distance > self.length {
+            let mut point = (self.curve)(self.length, bank_angle);
+            point.position += point.tangent * (distance - self.length);
+            point
+        } else {
+            (self.curve)(distance, bank_angle)
+        }
+    }
 }
 
 pub const FLAT: TrackSection = TrackSection {
