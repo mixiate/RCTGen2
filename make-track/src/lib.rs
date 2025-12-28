@@ -1,3 +1,5 @@
+mod curves;
+mod track_curves;
 mod track_desc;
 mod track_sections;
 
@@ -118,7 +120,7 @@ fn render(
             &models,
             track_desc.dither,
             track,
-            &track_sections::TRACK_FLAT,
+            &track_sections::FLAT,
             output_directory,
         )?;
 
@@ -129,7 +131,7 @@ fn render(
             &models,
             track_desc.dither,
             track,
-            &track_sections::TRACK_GENTLE,
+            &track_sections::GENTLE,
             output_directory,
         )?;
 
@@ -140,7 +142,7 @@ fn render(
             &models,
             track_desc.dither,
             track,
-            &track_sections::TRACK_MEDIUM_TURN_LEFT,
+            &track_sections::MEDIUM_TURN_LEFT,
             output_directory,
         )?;
     }
