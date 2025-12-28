@@ -117,6 +117,7 @@ fn render(
 
     let track_sections = [
         &track_sections::FLAT,
+        &track_sections::FLAT_TO_GENTLE,
         &track_sections::GENTLE,
         &track_sections::MEDIUM_TURN_LEFT,
         &track_sections::FLAT_TO_LEFT_BANK,
