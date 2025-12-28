@@ -1,6 +1,7 @@
 pub const FLAT_LENGTH: f32 = 1.0;
 pub const FLAT_TO_GENTLE_LENGTH: f32 = 1.027122;
 pub const GENTLE_LENGTH: f32 = 1.080123;
+pub const GENTLE_TO_STEEP_LENGTH: f32 = 1.314179;
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = 1.25 * std::f32::consts::PI;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -54,6 +55,27 @@ pub fn gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPo
     crate::curves::plane_curve_vertical(
         &glam::Vec3::new(0.0, 2.0 * crate::CLEARANCE_HEIGHT * u, u),
         &glam::Vec3::new(0.0, 2.0 * crate::CLEARANCE_HEIGHT, 1.0).normalize(),
+    )
+}
+
+pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical(
+        -0.5,
+        1.0,
+        0.5,
+        0.0,
+        crate::CLEARANCE_HEIGHT,
+        2.0 * crate::CLEARANCE_HEIGHT,
+        crate::CLEARANCE_HEIGHT,
+        0.0,
+        9.384_358_5e-1,
+        -4.936_207_3,
+        1.066_758_3e1,
+        -1.230_785e1,
+        8.338_881,
+        -3.615_561_7,
+        1.741_669,
+        distance,
     )
 }
 
