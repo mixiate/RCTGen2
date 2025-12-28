@@ -79,6 +79,27 @@ pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections
     )
 }
 
+pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical(
+        -0.5,
+        0.5,
+        1.0,
+        0.0,
+        crate::CLEARANCE_HEIGHT,
+        -5.0 * crate::CLEARANCE_HEIGHT,
+        8.0 * crate::CLEARANCE_HEIGHT,
+        0.0,
+        9.384_358_5e-1,
+        -3.696_703,
+        5.780_79,
+        -4.458_387_4,
+        1.774_045_1,
+        -2.382_700_1e-1,
+        5.429_020_5e-1,
+        distance,
+    )
+}
+
 pub fn medium_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     const RADIUS: f32 = -2.5;
     let angle = distance / RADIUS;
