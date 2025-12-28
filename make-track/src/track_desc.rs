@@ -58,6 +58,10 @@ fn default_lift_offset() -> i32 {
     13
 }
 
+fn default_bank_angle() -> f32 {
+    45.0
+}
+
 fn float_1() -> f32 {
     1.0
 }
@@ -158,6 +162,8 @@ pub struct Track {
     #[expect(unused)]
     #[serde(default)]
     pub pivot: f32,
+    #[serde(default = "default_bank_angle")]
+    pub bank_angle: f32,
     pub models: Models<std::path::PathBuf>,
 }
 

@@ -5,7 +5,6 @@ mod track_sections;
 
 const TILE_SIZE: f32 = 3.3;
 const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
-const BANK_ANGLE: f32 = 45.0_f32.to_radians();
 
 fn add_model_to_scene<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
@@ -14,10 +13,11 @@ fn add_model_to_scene<'a>(
     track_section: &track_sections::TrackSection,
     scale: f32,
     offset: f32,
+    bank_angle: f32,
 ) -> anyhow::Result<()> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
         let distance = ((position.z / TILE_SIZE) * scale) + offset;
-        let point = track_section.sample_curve(distance, BANK_ANGLE);
+        let point = track_section.sample_curve(distance, bank_angle);
 
         let position = (point.position * TILE_SIZE) + (point.normal * position.y) + (point.binormal * position.x);
         let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
@@ -41,10 +41,19 @@ fn render_track_section(
     let mesh_count = (0.5 + track_section.length / track.length).floor() as usize;
     let scale = track_section.length / (mesh_count as f32 * track.length);
     let length = scale * track.length;
+    let bank_angle = track.bank_angle.to_radians();
 
     let mut scene = renderer::SceneBuilder::new(render_device)?;
 
-    add_model_to_scene(&mut scene, &models.track, Some(true), track_section, scale, -length)?;
+    add_model_to_scene(
+        &mut scene,
+        &models.track,
+        Some(true),
+        track_section,
+        scale,
+        -length,
+        bank_angle,
+    )?;
     add_model_to_scene(
         &mut scene,
         &models.track,
@@ -52,10 +61,19 @@ fn render_track_section(
         track_section,
         scale,
         track_section.length,
+        bank_angle,
     )?;
 
     for i in 0..mesh_count {
-        add_model_to_scene(&mut scene, &models.track, None, track_section, scale, i as f32 * length)?;
+        add_model_to_scene(
+            &mut scene,
+            &models.track,
+            None,
+            track_section,
+            scale,
+            i as f32 * length,
+            bank_angle,
+        )?;
     }
 
     let scene = scene.build();
