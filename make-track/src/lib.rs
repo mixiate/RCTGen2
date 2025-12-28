@@ -1,6 +1,7 @@
 mod track_desc;
 mod track_sections;
 
+const TILE_SIZE: f32 = 3.3;
 const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
 
 fn get_track_point(track_section: &track_sections::TrackSection, distance: f32) -> track_sections::TrackPoint {
@@ -26,10 +27,10 @@ fn add_model_to_scene<'a>(
     offset: f32,
 ) -> anyhow::Result<()> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
-        let distance = (position.z * scale) + offset;
+        let distance = ((position.z / TILE_SIZE) * scale) + offset;
         let point = get_track_point(track_section, distance);
 
-        let position = point.position + (point.normal * position.y) + (point.binormal * position.x);
+        let position = (point.position * TILE_SIZE) + (point.normal * position.y) + (point.binormal * position.x);
         let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
 
         (position, normal)
@@ -100,10 +101,10 @@ fn render(
         glam::Mat3::from_cols(
             glam::Vec3::new(32.0, 0.0, 32.0),
             glam::Vec3::new(16.0, -16.0 * 6.0_f32.sqrt(), -16.0),
-            glam::Vec3::new(16.0 * 3.0_f32.sqrt(), -16.0 * 2.0_f32.sqrt(), 16.0 * 3.0_f32.sqrt()),
+            glam::Vec3::new(-16.0 * 3.0_f32.sqrt(), -16.0 * 2.0_f32.sqrt(), 16.0 * 3.0_f32.sqrt()),
         )
         .transpose(),
-    );
+    ) / TILE_SIZE;
 
     let lights = track_desc.get_lights();
 
