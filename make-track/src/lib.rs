@@ -157,6 +157,17 @@ fn render(
             &track_sections::FLAT_TO_LEFT_BANK,
             output_directory,
         )?;
+
+        render_track_section(
+            &render_device,
+            &camera,
+            &lights,
+            &models,
+            track_desc.dither,
+            track,
+            &track_sections::FLAT_TO_RIGHT_BANK,
+            output_directory,
+        )?;
     }
 
     Ok(())

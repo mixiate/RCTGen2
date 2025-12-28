@@ -34,3 +34,9 @@ pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_left_bank,
     length: crate::track_curves::FLAT_LENGTH,
 };
+
+pub const FLAT_TO_RIGHT_BANK: TrackSection = TrackSection {
+    name: "flat_to_right_bank",
+    curve: crate::track_curves::flat_to_right_bank,
+    length: crate::track_curves::FLAT_LENGTH,
+};
