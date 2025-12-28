@@ -111,63 +111,29 @@ fn render(
 
     let lights = track_desc.get_lights();
 
+    let track_sections = [
+        &track_sections::FLAT,
+        &track_sections::GENTLE,
+        &track_sections::MEDIUM_TURN_LEFT,
+        &track_sections::FLAT_TO_LEFT_BANK,
+        &track_sections::FLAT_TO_RIGHT_BANK,
+    ];
+
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
 
-        render_track_section(
-            &render_device,
-            &camera,
-            &lights,
-            &models,
-            track_desc.dither,
-            track,
-            &track_sections::FLAT,
-            output_directory,
-        )?;
-
-        render_track_section(
-            &render_device,
-            &camera,
-            &lights,
-            &models,
-            track_desc.dither,
-            track,
-            &track_sections::GENTLE,
-            output_directory,
-        )?;
-
-        render_track_section(
-            &render_device,
-            &camera,
-            &lights,
-            &models,
-            track_desc.dither,
-            track,
-            &track_sections::MEDIUM_TURN_LEFT,
-            output_directory,
-        )?;
-
-        render_track_section(
-            &render_device,
-            &camera,
-            &lights,
-            &models,
-            track_desc.dither,
-            track,
-            &track_sections::FLAT_TO_LEFT_BANK,
-            output_directory,
-        )?;
-
-        render_track_section(
-            &render_device,
-            &camera,
-            &lights,
-            &models,
-            track_desc.dither,
-            track,
-            &track_sections::FLAT_TO_RIGHT_BANK,
-            output_directory,
-        )?;
+        for track_section in &track_sections {
+            render_track_section(
+                &render_device,
+                &camera,
+                &lights,
+                &models,
+                track_desc.dither,
+                track,
+                track_section,
+                output_directory,
+            )?;
+        }
     }
 
     Ok(())
