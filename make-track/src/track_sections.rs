@@ -63,6 +63,12 @@ pub const STEEP_TO_GENTLE: TrackSection = TrackSection {
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
 };
 
+pub const STEEP: TrackSection = TrackSection {
+    name: "steep",
+    curve: crate::track_curves::steep,
+    length: crate::track_curves::STEEP_LENGTH,
+};
+
 pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
