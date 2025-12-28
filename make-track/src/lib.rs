@@ -1,6 +1,8 @@
 mod track_desc;
 mod track_sections;
 
+const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
+
 fn get_track_point(track_section: &track_sections::TrackSection, distance: f32) -> track_sections::TrackPoint {
     if distance < 0.0 {
         let mut point = (track_section.curve)(0.0);

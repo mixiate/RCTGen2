@@ -11,8 +11,6 @@ pub struct TrackSection {
     pub length: f32,
 }
 
-const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
-
 fn plane_curve_vertical(position: &glam::Vec3, tangent: &glam::Vec3) -> TrackPoint {
     TrackPoint {
         position: *position,
@@ -35,8 +33,8 @@ pub const TRACK_FLAT: TrackSection = TrackSection {
 fn curve_gentle(distance: f32) -> TrackPoint {
     let u = distance / TRACK_GENTLE_LENGTH;
     plane_curve_vertical(
-        &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT * u, u),
-        &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
+        &glam::Vec3::new(0.0, 2.0 * crate::CLEARANCE_HEIGHT * u, u),
+        &glam::Vec3::new(0.0, 2.0 * crate::CLEARANCE_HEIGHT, 1.0).normalize(),
     )
 }
 
