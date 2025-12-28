@@ -28,6 +28,27 @@ pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections:
     )
 }
 
+pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical(
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        -crate::CLEARANCE_HEIGHT,
+        2.0 * crate::CLEARANCE_HEIGHT,
+        0.0,
+        1.392_082_2e-5,
+        8.135_797e-4,
+        -1.495_364_8e-3,
+        -5.329_378_4e-3,
+        -8.178_555e-3,
+        6.123_512_2e-2,
+        9.258_196_4e-1,
+        distance,
+    )
+}
+
 pub fn gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     let u = distance / GENTLE_LENGTH;
     crate::curves::plane_curve_vertical(

@@ -45,6 +45,12 @@ pub const GENTLE: TrackSection = TrackSection {
     length: crate::track_curves::GENTLE_LENGTH,
 };
 
+pub const GENTLE_TO_FLAT: TrackSection = TrackSection {
+    name: "gentle_to_flat",
+    curve: crate::track_curves::gentle_to_flat,
+    length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+};
+
 pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
