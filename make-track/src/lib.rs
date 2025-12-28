@@ -5,18 +5,19 @@ mod track_sections;
 
 const TILE_SIZE: f32 = 3.3;
 const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
+const BANK_ANGLE: f32 = 45.0_f32.to_radians();
 
 fn get_track_point(track_section: &track_sections::TrackSection, distance: f32) -> track_sections::TrackPoint {
     if distance < 0.0 {
-        let mut point = (track_section.curve)(0.0);
+        let mut point = (track_section.curve)(0.0, BANK_ANGLE);
         point.position += point.tangent * distance;
         point
     } else if distance > track_section.length {
-        let mut point = (track_section.curve)(track_section.length);
+        let mut point = (track_section.curve)(track_section.length, BANK_ANGLE);
         point.position += point.tangent * (distance - track_section.length);
         point
     } else {
-        (track_section.curve)(distance)
+        (track_section.curve)(distance, BANK_ANGLE)
     }
 }
 
@@ -143,6 +144,17 @@ fn render(
             track_desc.dither,
             track,
             &track_sections::MEDIUM_TURN_LEFT,
+            output_directory,
+        )?;
+
+        render_track_section(
+            &render_device,
+            &camera,
+            &lights,
+            &models,
+            track_desc.dither,
+            track,
+            &track_sections::FLAT_TO_LEFT_BANK,
             output_directory,
         )?;
     }

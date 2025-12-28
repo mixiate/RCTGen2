@@ -7,7 +7,7 @@ pub struct TrackPoint {
 
 pub struct TrackSection {
     pub name: &'static str,
-    pub curve: fn(f32) -> TrackPoint,
+    pub curve: fn(f32, f32) -> TrackPoint,
     pub length: f32,
 }
 
@@ -27,4 +27,10 @@ pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
     length: crate::track_curves::MEDIUM_TURN_LEFT_LENGTH,
+};
+
+pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
+    name: "flat_to_left_bank",
+    curve: crate::track_curves::flat_to_left_bank,
+    length: crate::track_curves::FLAT_LENGTH,
 };
