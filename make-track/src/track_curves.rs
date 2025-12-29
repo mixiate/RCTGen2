@@ -23,6 +23,7 @@ pub const FLAT_TO_GENTLE_DIAG_LENGTH: f32 = 1.433617;
 pub const GENTLE_DIAG_LENGTH: f32 = 1.471_96;
 pub const GENTLE_TO_STEEP_DIAG_LENGTH: f32 = 1.656243;
 pub const STEEP_DIAG_LENGTH: f32 = 2.160247;
+pub const SMALL_FLAT_TO_STEEP_DIAG_LENGTH: f32 = 1.584328;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
@@ -415,6 +416,28 @@ pub fn steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::Tra
     crate::curves::plane_curve_vertical_diagonal(
         &glam::Vec3::new(u, 8.0 * CLEARANCE_HEIGHT * u, u),
         &glam::Vec3::new(1.0, 8.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
+    )
+}
+
+pub fn small_flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    use std::f32::consts::SQRT_2;
+    crate::curves::cubic_curve_vertical_diagonal(
+        SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
+        SQRT_2 * (2.0 - 4.0 * CLEARANCE_HEIGHT),
+        SQRT_2 * (2.0 * CLEARANCE_HEIGHT),
+        0.0,
+        2.0 * CLEARANCE_HEIGHT,
+        CLEARANCE_HEIGHT,
+        0.0,
+        0.0,
+        3.915_141_2e-1,
+        -2.456_954_5,
+        6.302_896_5,
+        -8.560_122_5,
+        6.717_914,
+        -3.224_898_6,
+        1.541_950_8,
+        distance,
     )
 }
 
