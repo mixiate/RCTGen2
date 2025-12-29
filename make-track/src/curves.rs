@@ -51,6 +51,20 @@ pub fn cubic_curve_vertical(
     )
 }
 
+pub fn turn_left(distance: f32, radius: f32) -> crate::track_sections::TrackPoint {
+    let angle = distance / radius;
+    let angle_sin = angle.sin();
+    let angle_cos = angle.cos();
+    let tangent = glam::Vec3::new(-angle_sin, 0.0, angle_cos);
+    let normal = glam::Vec3::new(0.0, 1.0, 0.0);
+    crate::track_sections::TrackPoint {
+        position: glam::Vec3::new(radius * (angle_cos - 1.0), 0.0, radius * angle_sin),
+        tangent,
+        normal,
+        binormal: normal.cross(tangent),
+    }
+}
+
 pub fn banked_curve(
     unbanked_point: &crate::track_sections::TrackPoint,
     angle: f32,
