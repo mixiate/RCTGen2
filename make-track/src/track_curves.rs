@@ -1,3 +1,5 @@
+use crate::CLEARANCE_HEIGHT;
+
 pub const FLAT_LENGTH: f32 = 1.0;
 pub const FLAT_TO_GENTLE_LENGTH: f32 = 1.027122;
 pub const GENTLE_LENGTH: f32 = 1.080123;
@@ -5,7 +7,7 @@ pub const GENTLE_TO_STEEP_LENGTH: f32 = 1.314179;
 pub const STEEP_LENGTH: f32 = 1.914854;
 pub const STEEP_TO_VERTICAL_LENGTH: f32 = 1.535172;
 pub const VERTICAL_TO_STEEP_LENGTH: f32 = 1.531568;
-pub const VERTICAL_LENGTH: f32 = crate::CLEARANCE_HEIGHT * 4.0;
+pub const VERTICAL_LENGTH: f32 = CLEARANCE_HEIGHT * 4.0;
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = 1.25 * std::f32::consts::PI;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -19,7 +21,7 @@ pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections:
         1.0,
         0.0,
         0.0,
-        crate::CLEARANCE_HEIGHT,
+        CLEARANCE_HEIGHT,
         0.0,
         0.0,
         1.392_075_3e-5,
@@ -40,8 +42,8 @@ pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections:
         1.0,
         0.0,
         0.0,
-        -crate::CLEARANCE_HEIGHT,
-        2.0 * crate::CLEARANCE_HEIGHT,
+        -CLEARANCE_HEIGHT,
+        2.0 * CLEARANCE_HEIGHT,
         0.0,
         1.392_082_2e-5,
         8.135_797e-4,
@@ -57,8 +59,8 @@ pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections:
 pub fn gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     let u = distance / GENTLE_LENGTH;
     crate::curves::plane_curve_vertical(
-        &glam::Vec3::new(0.0, 2.0 * crate::CLEARANCE_HEIGHT * u, u),
-        &glam::Vec3::new(0.0, 2.0 * crate::CLEARANCE_HEIGHT, 1.0).normalize(),
+        &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT * u, u),
+        &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
     )
 }
 
@@ -68,9 +70,9 @@ pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections
         1.0,
         0.5,
         0.0,
-        crate::CLEARANCE_HEIGHT,
-        2.0 * crate::CLEARANCE_HEIGHT,
-        crate::CLEARANCE_HEIGHT,
+        CLEARANCE_HEIGHT,
+        2.0 * CLEARANCE_HEIGHT,
+        CLEARANCE_HEIGHT,
         0.0,
         9.384_358_5e-1,
         -4.936_207_3,
@@ -89,9 +91,9 @@ pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections
         0.5,
         1.0,
         0.0,
-        crate::CLEARANCE_HEIGHT,
-        -5.0 * crate::CLEARANCE_HEIGHT,
-        8.0 * crate::CLEARANCE_HEIGHT,
+        CLEARANCE_HEIGHT,
+        -5.0 * CLEARANCE_HEIGHT,
+        8.0 * CLEARANCE_HEIGHT,
         0.0,
         9.384_358_5e-1,
         -3.696_703,
@@ -107,8 +109,8 @@ pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections
 pub fn steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     let u = distance / STEEP_LENGTH;
     crate::curves::plane_curve_vertical(
-        &glam::Vec3::new(0.0, 8.0 * crate::CLEARANCE_HEIGHT * u, u),
-        &glam::Vec3::new(0.0, 8.0 * crate::CLEARANCE_HEIGHT, 1.0).normalize(),
+        &glam::Vec3::new(0.0, 8.0 * CLEARANCE_HEIGHT * u, u),
+        &glam::Vec3::new(0.0, 8.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
     )
 }
 
@@ -118,9 +120,9 @@ pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> crate::track_sectio
         -1.0 / 6.0,
         5.0 / 6.0,
         -1.0 / 2.0,
-        2.0 * crate::CLEARANCE_HEIGHT / 3.0,
-        -crate::CLEARANCE_HEIGHT / 3.0,
-        20.0 * crate::CLEARANCE_HEIGHT / 3.0,
+        2.0 * CLEARANCE_HEIGHT / 3.0,
+        -CLEARANCE_HEIGHT / 3.0,
+        20.0 * CLEARANCE_HEIGHT / 3.0,
         0.0,
         5.185_948e-4,
         1.054_811_2e-3,
@@ -139,9 +141,9 @@ pub fn vertical_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sectio
         2.0 / 3.0,
         0.0,
         0.0,
-        -2.0 * crate::CLEARANCE_HEIGHT / 3.0,
-        crate::CLEARANCE_HEIGHT,
-        20.0 * crate::CLEARANCE_HEIGHT / 3.0,
+        -2.0 * CLEARANCE_HEIGHT / 3.0,
+        CLEARANCE_HEIGHT,
+        20.0 * CLEARANCE_HEIGHT / 3.0,
         0.0,
         -1.151_782_9e-3,
         8.245_657e-3,
