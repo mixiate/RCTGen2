@@ -20,6 +20,15 @@ pub fn plane_curve_vertical(position: &glam::Vec3, tangent: &glam::Vec3) -> crat
     }
 }
 
+pub fn plane_curve_horizontal(position: &glam::Vec3, tangent: &glam::Vec3) -> crate::track_sections::TrackPoint {
+    crate::track_sections::TrackPoint {
+        position: *position,
+        tangent: *tangent,
+        normal: glam::Vec3::new(0.0, 1.0, 0.0),
+        binormal: glam::Vec3::new(tangent.z, 0.0, -tangent.x),
+    }
+}
+
 #[expect(clippy::too_many_arguments)]
 pub fn cubic_curve_vertical(
     x_a: f32,
@@ -45,6 +54,37 @@ pub fn cubic_curve_vertical(
         &glam::Vec3::new(
             0.0,
             cubic_derivative(y_a, y_b, y_c, u),
+            cubic_derivative(x_a, x_b, x_c, u),
+        )
+        .normalize(),
+    )
+}
+
+#[expect(clippy::too_many_arguments)]
+pub fn cubic_curve_horizontal(
+    x_a: f32,
+    x_b: f32,
+    x_c: f32,
+    x_d: f32,
+    y_a: f32,
+    y_b: f32,
+    y_c: f32,
+    y_d: f32,
+    p_a: f32,
+    p_b: f32,
+    p_c: f32,
+    p_d: f32,
+    p_e: f32,
+    p_f: f32,
+    p_g: f32,
+    distance: f32,
+) -> crate::track_sections::TrackPoint {
+    let u = reparameterize(p_a, p_b, p_c, p_d, p_e, p_f, p_g, distance);
+    plane_curve_horizontal(
+        &glam::Vec3::new(cubic(y_a, y_b, y_c, y_d, u), 0.0, cubic(x_a, x_b, x_c, x_d, u)),
+        &glam::Vec3::new(
+            cubic_derivative(y_a, y_b, y_c, u),
+            0.0,
             cubic_derivative(x_a, x_b, x_c, u),
         )
         .normalize(),

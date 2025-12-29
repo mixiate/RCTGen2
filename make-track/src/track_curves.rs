@@ -16,6 +16,7 @@ pub const MEDIUM_TURN_LEFT_RADIUS: f32 = 2.5;
 
 pub const SMALL_TURN_LEFT_LENGTH: f32 = (SMALL_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = (MEDIUM_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
+pub const LARGE_TURN_LEFT_TO_DIAG_LENGTH: f32 = 2.757_1;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
@@ -257,6 +258,48 @@ pub fn small_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections
 
 pub fn medium_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::turn_left(distance, MEDIUM_TURN_LEFT_RADIUS)
+}
+
+pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_horizontal(
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+        44.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        2.0 - 8.0 * CLEARANCE_HEIGHT,
+        8.0 * CLEARANCE_HEIGHT - 3.0,
+        0.0,
+        0.0,
+        1.762_491_6e-5,
+        -8.695_496e-5,
+        2.063_995_9e-4,
+        5.643_969_6e-4,
+        -1.450_647_5e-4,
+        4.397_764e-3,
+        3.340_337e-1,
+        distance,
+    )
+}
+
+pub fn large_turn_right_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_horizontal(
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+        44.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        8.0 * CLEARANCE_HEIGHT - 2.0,
+        3.0 - 8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        0.0,
+        1.762_491_6e-5,
+        -8.695_496e-5,
+        2.063_995_9e-4,
+        5.643_969_6e-4,
+        -1.450_647_5e-4,
+        4.397_764e-3,
+        3.340_337e-1,
+        distance,
+    )
 }
 
 pub fn flat_to_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {

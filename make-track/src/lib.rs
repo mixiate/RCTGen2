@@ -132,6 +132,8 @@ fn render(
         &track_sections::STEEP_TO_FLAT,
         &track_sections::SMALL_TURN_LEFT,
         &track_sections::MEDIUM_TURN_LEFT,
+        &track_sections::LARGE_TURN_LEFT_TO_DIAG,
+        &track_sections::LARGE_TURN_RIGHT_TO_DIAG,
         &track_sections::FLAT_TO_LEFT_BANK,
         &track_sections::FLAT_TO_RIGHT_BANK,
     ];

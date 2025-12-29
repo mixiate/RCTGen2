@@ -123,6 +123,18 @@ pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     length: crate::track_curves::MEDIUM_TURN_LEFT_LENGTH,
 };
 
+pub const LARGE_TURN_LEFT_TO_DIAG: TrackSection = TrackSection {
+    name: "large_turn_left_to_diag",
+    curve: crate::track_curves::large_turn_left_to_diag,
+    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+};
+
+pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
+    name: "large_turn_right_to_diag",
+    curve: crate::track_curves::large_turn_right_to_diag,
+    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+};
+
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "flat_to_left_bank",
     curve: crate::track_curves::flat_to_left_bank,
