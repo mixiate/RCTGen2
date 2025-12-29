@@ -665,3 +665,31 @@ pub fn large_turn_right_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate
         distance,
     )
 }
+
+pub fn large_turn_left_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::large_turn_to_orthogonal_gentle(
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
+        8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
+        3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
+        8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        distance,
+    )
+}
+
+pub fn large_turn_right_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::large_turn_to_orthogonal_gentle(
+        24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
+        3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
+        8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
+        8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        distance,
+    )
+}

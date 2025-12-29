@@ -184,6 +184,8 @@ fn render(
         &track_sections::MEDIUM_TURN_RIGHT_GENTLE,
         &track_sections::LARGE_TURN_LEFT_TO_DIAG_GENTLE,
         &track_sections::LARGE_TURN_RIGHT_TO_DIAG_GENTLE,
+        &track_sections::LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE,
+        &track_sections::LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE,
     ];
 
     for track in &track_desc.tracks {

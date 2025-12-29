@@ -242,3 +242,38 @@ pub fn large_turn_to_diag_gentle(
 
     point
 }
+
+#[expect(clippy::too_many_arguments)]
+pub fn large_turn_to_orthogonal_gentle(
+    x_a: f32,
+    x_b: f32,
+    x_c: f32,
+    x_d: f32,
+    y_a: f32,
+    y_b: f32,
+    y_c: f32,
+    y_d: f32,
+    distance: f32,
+) -> crate::track_sections::TrackPoint {
+    let u = reparameterize(
+        1.751_793e-5,
+        -1.076_157_3e-4,
+        3.104_037e-4,
+        6.329_133_6e-5,
+        1.046_596_3e-3,
+        -3.471_377e-4,
+        3.091_829_4e-1,
+        distance,
+    );
+    let mut point = cubic_curve_horizontal(
+        x_a, x_b, x_c, x_d, y_a, y_b, y_c, y_d, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, u,
+    );
+
+    point.position.y += 6.0 * crate::CLEARANCE_HEIGHT * u - 1.5 * crate::CLEARANCE_HEIGHT * u * (u * u - 2.0 * u + 1.0);
+    point.tangent.y += crate::CLEARANCE_HEIGHT * (6.0 - 1.5 * (3.0 * u * u - 4.0 * u + 1.0))
+        / crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH;
+    point.tangent = point.tangent.normalize();
+    point.normal = point.tangent.cross(point.binormal);
+
+    point
+}
