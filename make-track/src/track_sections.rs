@@ -146,3 +146,15 @@ pub const FLAT_TO_RIGHT_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_right_bank,
     length: crate::track_curves::FLAT_LENGTH,
 };
+
+pub const LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
+    name: "left_bank_to_gentle",
+    curve: crate::track_curves::left_bank_to_gentle,
+    length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+};
+
+pub const RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
+    name: "right_bank_to_gentle",
+    curve: crate::track_curves::right_bank_to_gentle,
+    length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+};
