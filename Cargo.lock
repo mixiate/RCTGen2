@@ -624,6 +624,7 @@ dependencies = [
  "anyhow",
  "clap",
  "glam",
+ "rayon",
  "renderer",
  "serde",
  "serde_json",

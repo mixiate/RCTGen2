@@ -27,6 +27,23 @@ fn add_model_to_scene<'a>(
     scene.add_model_transform(model, transform, None, is_ghost)
 }
 
+fn render_rotation(
+    scene: &renderer::Scene,
+    camera: &glam::Mat4,
+    lights: &[renderer::Light],
+    rotation: usize,
+    dither: bool,
+) -> renderer::image::IndexedImage {
+    let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
+    let camera = camera * view_rotation;
+
+    let view_rotation_inverse = view_rotation.inverse();
+    let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
+
+    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4);
+    framebuffer.into_cropped_indexed_image(dither)
+}
+
 #[expect(clippy::too_many_arguments)]
 fn render_track_section(
     render_device: &renderer::Device,
@@ -38,6 +55,8 @@ fn render_track_section(
     track_section: &track_sections::TrackSection,
     output_directory: &std::path::Path,
 ) -> anyhow::Result<()> {
+    use rayon::prelude::*;
+
     let mesh_count = (0.5 + track_section.length / track.length).floor() as usize;
     let scale = track_section.length / (mesh_count as f32 * track.length);
     let length = scale * track.length;
@@ -78,18 +97,14 @@ fn render_track_section(
 
     let scene = scene.build();
 
-    for i in 0..4 {
-        let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * i as f32);
-        let camera = camera * view_rotation;
+    let images = (0..4)
+        .into_par_iter()
+        .map(|rotation| render_rotation(&scene, camera, lights, rotation, dither))
+        .collect::<Vec<_>>();
 
-        let view_rotation_inverse = view_rotation.inverse();
-        let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
-
-        let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4);
-        let image = framebuffer.into_cropped_indexed_image(dither);
-
+    for (i, image) in images.iter().enumerate() {
         let image_name = format!("{}_{i}", track_section.name);
-        image.save(&output_directory.join(&track.name).join(image_name).with_extension("png"))?;
+        _ = image.save(&output_directory.join(&track.name).join(image_name).with_extension("png"));
     }
 
     Ok(())
