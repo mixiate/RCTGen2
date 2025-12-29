@@ -153,6 +153,7 @@ fn render(
         &track_sections::FLAT_TO_GENTLE_DIAG,
         &track_sections::GENTLE_TO_FLAT_DIAG,
         &track_sections::GENTLE_DIAG,
+        &track_sections::GENTLE_TO_STEEP_DIAG,
         &track_sections::FLAT_TO_LEFT_BANK,
         &track_sections::FLAT_TO_RIGHT_BANK,
         &track_sections::LEFT_BANK_TO_GENTLE,
