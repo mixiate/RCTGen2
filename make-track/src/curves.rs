@@ -159,3 +159,51 @@ pub fn cubic_curve_vertical_diagonal(
         &glam::Vec3::new(d_x / SQRT_2, d_y, d_x / SQRT_2).normalize(),
     )
 }
+
+pub fn sloped_turn_left(radius: f32, gradient: f32, distance: f32) -> crate::track_sections::TrackPoint {
+    let arc_length = radius * (1.0 + gradient * gradient).sqrt();
+    let angle = distance / arc_length;
+
+    let (angle_sin, angle_cos) = angle.sin_cos();
+
+    let tangent_z = 1.0 / (1.0 + gradient * gradient).sqrt();
+    let tangent_y = gradient / (1.0 + gradient * gradient).sqrt();
+
+    let tangent = glam::Vec3::new(-tangent_z * angle_sin, tangent_y, tangent_z * angle_cos).normalize();
+    let normal = glam::Vec3::new(tangent_y * angle_sin, tangent_z, -tangent_y * angle_cos).normalize();
+
+    crate::track_sections::TrackPoint {
+        position: glam::Vec3::new(
+            radius * (angle_cos - 1.0),
+            angle * radius * gradient,
+            radius * angle_sin,
+        ),
+        tangent,
+        normal,
+        binormal: normal.cross(tangent),
+    }
+}
+
+pub fn sloped_turn_right(radius: f32, gradient: f32, distance: f32) -> crate::track_sections::TrackPoint {
+    let arc_length = radius * (1.0 + gradient * gradient).sqrt();
+    let angle = distance / arc_length;
+
+    let (angle_sin, angle_cos) = angle.sin_cos();
+
+    let tangent_z = 1.0 / (1.0 + gradient * gradient).sqrt();
+    let tangent_y = gradient / (1.0 + gradient * gradient).sqrt();
+
+    let tangent = glam::Vec3::new(tangent_z * angle_sin, tangent_y, tangent_z * angle_cos).normalize();
+    let normal = glam::Vec3::new(-tangent_y * angle_sin, tangent_z, -tangent_y * angle_cos).normalize();
+
+    crate::track_sections::TrackPoint {
+        position: glam::Vec3::new(
+            radius * (1.0 - angle_cos),
+            angle * radius * gradient,
+            radius * angle_sin,
+        ),
+        tangent,
+        normal,
+        binormal: normal.cross(tangent),
+    }
+}

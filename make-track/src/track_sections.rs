@@ -308,3 +308,15 @@ pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
 };
+
+pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
+    name: "small_turn_left_gentle",
+    curve: crate::track_curves::small_turn_left_gentle,
+    length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
+};
+
+pub const SMALL_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
+    name: "small_turn_right_gentle",
+    curve: crate::track_curves::small_turn_right_gentle,
+    length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
+};
