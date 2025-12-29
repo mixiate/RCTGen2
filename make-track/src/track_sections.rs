@@ -266,3 +266,45 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_right_to_diag_bank,
     length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
 };
+
+pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
+    name: "flat_to_left_bank_diag",
+    curve: crate::track_curves::flat_to_left_bank_diag,
+    length: crate::track_curves::FLAT_DIAG_LENGTH,
+};
+
+pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
+    name: "flat_to_right_bank_diag",
+    curve: crate::track_curves::flat_to_right_bank_diag,
+    length: crate::track_curves::FLAT_DIAG_LENGTH,
+};
+
+pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
+    name: "left_bank_to_gentle_diag",
+    curve: crate::track_curves::left_bank_to_gentle_diag,
+    length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
+};
+
+pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
+    name: "right_bank_to_gentle_diag",
+    curve: crate::track_curves::right_bank_to_gentle_diag,
+    length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
+};
+
+pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
+    name: "gentle_to_left_bank_diag",
+    curve: crate::track_curves::gentle_to_left_bank_diag,
+    length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
+};
+
+pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
+    name: "gentle_to_right_bank_diag",
+    curve: crate::track_curves::gentle_to_right_bank_diag,
+    length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
+};
+
+pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
+    name: "left_bank_diag",
+    curve: crate::track_curves::left_bank_diag,
+    length: crate::track_curves::FLAT_DIAG_LENGTH,
+};
