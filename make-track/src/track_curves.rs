@@ -28,6 +28,7 @@ pub const FLAT_TO_STEEP_DIAG_LENGTH: f32 = 4.956727;
 
 pub const SMALL_TURN_GENTLE_LENGTH: f32 = 2.493656;
 pub const MEDIUM_TURN_GENTLE_LENGTH: f32 = 4.252_99;
+pub const LARGE_TURN_GENTLE_LENGTH: f32 = 3.017199;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
@@ -633,6 +634,34 @@ pub fn medium_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track
     crate::curves::sloped_turn_right(
         MEDIUM_TURN_LEFT_RADIUS,
         8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LEFT_LENGTH,
+        distance,
+    )
+}
+
+pub fn large_turn_left_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::large_turn_to_diag_gentle(
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+        44.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        2.0 - 8.0 * CLEARANCE_HEIGHT,
+        8.0 * CLEARANCE_HEIGHT - 3.0,
+        0.0,
+        0.0,
+        distance,
+    )
+}
+
+pub fn large_turn_right_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::large_turn_to_diag_gentle(
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+        44.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        8.0 * CLEARANCE_HEIGHT - 2.0,
+        3.0 - 8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        0.0,
         distance,
     )
 }

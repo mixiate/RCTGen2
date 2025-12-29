@@ -332,3 +332,15 @@ pub const MEDIUM_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::medium_turn_right_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
 };
+
+pub const LARGE_TURN_LEFT_TO_DIAG_GENTLE: TrackSection = TrackSection {
+    name: "large_turn_left_to_diag_gentle",
+    curve: crate::track_curves::large_turn_left_to_diag_gentle,
+    length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
+};
+
+pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
+    name: "large_turn_right_to_diag_gentle",
+    curve: crate::track_curves::large_turn_right_to_diag_gentle,
+    length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
+};
