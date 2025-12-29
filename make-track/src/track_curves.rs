@@ -335,6 +335,27 @@ pub fn flat_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sect
     )
 }
 
+pub fn gentle_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical_diagonal(
+        0.0,
+        0.0,
+        FLAT_DIAG_LENGTH,
+        0.0,
+        0.0,
+        -CLEARANCE_HEIGHT,
+        2.0 * CLEARANCE_HEIGHT,
+        0.0,
+        -1.738_415_8e-6,
+        2.698_992_1e-5,
+        -1.163_548_9e-5,
+        -5.606_923e-4,
+        -2.786_307_6e-3,
+        1.775_206_3e-2,
+        6.793_662e-1,
+        distance,
+    )
+}
+
 pub fn flat_to_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::banked_curve(&flat(distance, 0.0), -bank_angle * distance / FLAT_LENGTH)
 }
