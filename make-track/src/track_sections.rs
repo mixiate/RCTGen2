@@ -183,6 +183,12 @@ pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_DIAG_LENGTH,
 };
 
+pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
+    name: "small_steep_to_flat_diag",
+    curve: crate::track_curves::small_steep_to_flat_diag,
+    length: crate::track_curves::SMALL_FLAT_TO_STEEP_DIAG_LENGTH,
+};
+
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "flat_to_left_bank",
     curve: crate::track_curves::flat_to_left_bank,
