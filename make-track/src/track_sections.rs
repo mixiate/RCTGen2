@@ -135,6 +135,12 @@ pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
 };
 
+pub const FLAT_DIAG: TrackSection = TrackSection {
+    name: "flat_diag",
+    curve: crate::track_curves::flat_diag,
+    length: crate::track_curves::FLAT_DIAG_LENGTH,
+};
+
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "flat_to_left_bank",
     curve: crate::track_curves::flat_to_left_bank,

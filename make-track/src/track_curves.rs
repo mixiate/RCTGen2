@@ -18,6 +18,8 @@ pub const SMALL_TURN_LEFT_LENGTH: f32 = (SMALL_TURN_LEFT_RADIUS / 2.0) * std::f3
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = (MEDIUM_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
 pub const LARGE_TURN_LEFT_TO_DIAG_LENGTH: f32 = 2.757_1;
 
+pub const FLAT_DIAG_LENGTH: f32 = std::f32::consts::SQRT_2;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -299,6 +301,15 @@ pub fn large_turn_right_to_diag(distance: f32, _bank_angle: f32) -> crate::track
         4.397_764e-3,
         3.340_337e-1,
         distance,
+    )
+}
+
+pub fn flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let position = distance / FLAT_DIAG_LENGTH;
+    let tangent = 0.5_f32.sqrt();
+    crate::curves::plane_curve_horizontal(
+        &glam::Vec3::new(position, 0.0, position),
+        &glam::Vec3::new(tangent, 0.0, tangent),
     )
 }
 

@@ -149,6 +149,7 @@ fn render(
         &track_sections::MEDIUM_TURN_LEFT,
         &track_sections::LARGE_TURN_LEFT_TO_DIAG,
         &track_sections::LARGE_TURN_RIGHT_TO_DIAG,
+        &track_sections::FLAT_DIAG,
         &track_sections::FLAT_TO_LEFT_BANK,
         &track_sections::FLAT_TO_RIGHT_BANK,
         &track_sections::LEFT_BANK_TO_GENTLE,
