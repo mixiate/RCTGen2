@@ -341,3 +341,19 @@ pub fn gentle_to_right_bank(distance: f32, bank_angle: f32) -> crate::track_sect
 pub fn left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::banked_curve(&flat(distance, 0.0), -bank_angle)
 }
+
+pub fn small_turn_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&small_turn_left(distance, 0.0), -bank_angle)
+}
+
+pub fn medium_turn_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&medium_turn_left(distance, 0.0), -bank_angle)
+}
+
+pub fn large_turn_left_to_diag_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&large_turn_left_to_diag(distance, 0.0), -bank_angle)
+}
+
+pub fn large_turn_right_to_diag_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&large_turn_right_to_diag(distance, 0.0), bank_angle)
+}

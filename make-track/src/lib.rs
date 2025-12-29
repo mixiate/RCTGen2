@@ -156,6 +156,10 @@ fn render(
         &track_sections::GENTLE_TO_LEFT_BANK,
         &track_sections::GENTLE_TO_RIGHT_BANK,
         &track_sections::LEFT_BANK,
+        &track_sections::SMALL_TURN_LEFT_BANK,
+        &track_sections::MEDIUM_TURN_LEFT_BANK,
+        &track_sections::LARGE_TURN_LEFT_TO_DIAG_BANK,
+        &track_sections::LARGE_TURN_RIGHT_TO_DIAG_BANK,
     ];
 
     for track in &track_desc.tracks {

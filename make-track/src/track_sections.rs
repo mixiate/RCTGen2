@@ -176,3 +176,27 @@ pub const LEFT_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank,
     length: crate::track_curves::FLAT_LENGTH,
 };
+
+pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
+    name: "small_turn_left_bank",
+    curve: crate::track_curves::small_turn_left_bank,
+    length: crate::track_curves::SMALL_TURN_LEFT_LENGTH,
+};
+
+pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
+    name: "medium_turn_left_bank",
+    curve: crate::track_curves::medium_turn_left_bank,
+    length: crate::track_curves::MEDIUM_TURN_LEFT_LENGTH,
+};
+
+pub const LARGE_TURN_LEFT_TO_DIAG_BANK: TrackSection = TrackSection {
+    name: "large_turn_left_to_diag_bank",
+    curve: crate::track_curves::large_turn_left_to_diag_bank,
+    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+};
+
+pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
+    name: "large_turn_right_to_diag_bank",
+    curve: crate::track_curves::large_turn_right_to_diag_bank,
+    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+};
