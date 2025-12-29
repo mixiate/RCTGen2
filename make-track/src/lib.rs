@@ -124,6 +124,7 @@ fn render(
         &track_sections::STEEP_TO_GENTLE,
         &track_sections::STEEP,
         &track_sections::STEEP_TO_VERTICAL,
+        &track_sections::VERTICAL_TO_STEEP,
         &track_sections::VERTICAL,
         &track_sections::MEDIUM_TURN_LEFT,
         &track_sections::FLAT_TO_LEFT_BANK,

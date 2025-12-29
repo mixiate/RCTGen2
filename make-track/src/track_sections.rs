@@ -75,6 +75,12 @@ pub const STEEP_TO_VERTICAL: TrackSection = TrackSection {
     length: crate::track_curves::STEEP_TO_VERTICAL_LENGTH,
 };
 
+pub const VERTICAL_TO_STEEP: TrackSection = TrackSection {
+    name: "vertical_to_steep",
+    curve: crate::track_curves::vertical_to_steep,
+    length: crate::track_curves::VERTICAL_TO_STEEP_LENGTH,
+};
+
 pub const VERTICAL: TrackSection = TrackSection {
     name: "vertical",
     curve: crate::track_curves::vertical,

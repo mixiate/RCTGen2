@@ -4,6 +4,7 @@ pub const GENTLE_LENGTH: f32 = 1.080123;
 pub const GENTLE_TO_STEEP_LENGTH: f32 = 1.314179;
 pub const STEEP_LENGTH: f32 = 1.914854;
 pub const STEEP_TO_VERTICAL_LENGTH: f32 = 1.535172;
+pub const VERTICAL_TO_STEEP_LENGTH: f32 = 1.531568;
 pub const VERTICAL_LENGTH: f32 = crate::CLEARANCE_HEIGHT * 4.0;
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = 1.25 * std::f32::consts::PI;
 
@@ -128,6 +129,27 @@ pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> crate::track_sectio
         -4.515_805e-3,
         3.644_174_7e-2,
         6.266_248e-1,
+        distance,
+    )
+}
+
+pub fn vertical_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical(
+        -1.0 / 6.0,
+        2.0 / 3.0,
+        0.0,
+        0.0,
+        -2.0 * crate::CLEARANCE_HEIGHT / 3.0,
+        crate::CLEARANCE_HEIGHT,
+        20.0 * crate::CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        -1.151_782_9e-3,
+        8.245_657e-3,
+        -2.346_102_5e-2,
+        3.383_574e-2,
+        -1.611_165_1e-3,
+        -8.180_113e-2,
+        7.348_989e-1,
         distance,
     )
 }
