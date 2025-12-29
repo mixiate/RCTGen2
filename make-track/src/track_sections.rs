@@ -170,3 +170,9 @@ pub const GENTLE_TO_RIGHT_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_right_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
 };
+
+pub const LEFT_BANK: TrackSection = TrackSection {
+    name: "left_bank",
+    curve: crate::track_curves::left_bank,
+    length: crate::track_curves::FLAT_LENGTH,
+};

@@ -337,3 +337,7 @@ pub fn gentle_to_right_bank(distance: f32, bank_angle: f32) -> crate::track_sect
         bank_angle * distance / FLAT_TO_GENTLE_LENGTH,
     )
 }
+
+pub fn left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&flat(distance, 0.0), -bank_angle)
+}
