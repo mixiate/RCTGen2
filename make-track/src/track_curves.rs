@@ -9,6 +9,7 @@ pub const STEEP_TO_VERTICAL_LENGTH: f32 = 1.535172;
 pub const VERTICAL_TO_STEEP_LENGTH: f32 = 1.531568;
 pub const VERTICAL_LENGTH: f32 = CLEARANCE_HEIGHT * 4.0;
 pub const SMALL_FLAT_TO_STEEP_LENGTH: f32 = 1.220_88;
+pub const FLAT_TO_STEEP_LENGTH: f32 = 4.792426;
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = 1.25 * std::f32::consts::PI;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -199,6 +200,27 @@ pub fn small_steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sect
         4.042_006,
         -5.643_233e-1,
         5.634_841e-1,
+        distance,
+    )
+}
+
+pub fn flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical(
+        -0.5,
+        -0.5,
+        5.0,
+        0.0,
+        -2.0 * CLEARANCE_HEIGHT,
+        13.0 * CLEARANCE_HEIGHT,
+        0.0,
+        0.0,
+        8.279_922e-8,
+        -1.880_159_6e-6,
+        1.284_184_9e-5,
+        -1.130_966_8e-5,
+        -5.341_27e-4,
+        3.995_885_6e-3,
+        2.000_007_6e-1,
         distance,
     )
 }
