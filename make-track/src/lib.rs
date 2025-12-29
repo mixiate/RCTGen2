@@ -159,6 +159,7 @@ fn render(
         &track_sections::SMALL_FLAT_TO_STEEP_DIAG,
         &track_sections::SMALL_STEEP_TO_FLAT_DIAG,
         &track_sections::FLAT_TO_STEEP_DIAG,
+        &track_sections::STEEP_TO_FLAT_DIAG,
         &track_sections::FLAT_TO_LEFT_BANK,
         &track_sections::FLAT_TO_RIGHT_BANK,
         &track_sections::LEFT_BANK_TO_GENTLE,

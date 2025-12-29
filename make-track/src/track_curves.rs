@@ -485,6 +485,27 @@ pub fn flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_secti
     )
 }
 
+pub fn steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical_diagonal(
+        0.0,
+        FLAT_DIAG_LENGTH,
+        2.0 * FLAT_DIAG_LENGTH,
+        0.0,
+        -6.0 * CLEARANCE_HEIGHT,
+        CLEARANCE_HEIGHT,
+        16.0 * CLEARANCE_HEIGHT,
+        0.0,
+        8.712_086_7e-7,
+        -1.501_325_4e-5,
+        1.17064288e-04,
+        -7.344_354e-4,
+        3.529_136_3e-3,
+        -1.323_633_9e-2,
+        2.314_236_3e-1,
+        distance,
+    )
+}
+
 pub fn flat_to_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::banked_curve(&flat(distance, 0.0), -bank_angle * distance / FLAT_LENGTH)
 }
