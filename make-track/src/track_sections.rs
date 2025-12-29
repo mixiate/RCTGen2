@@ -111,6 +111,12 @@ pub const STEEP_TO_FLAT: TrackSection = TrackSection {
     length: crate::track_curves::FLAT_TO_STEEP_LENGTH,
 };
 
+pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
+    name: "small_turn_left",
+    curve: crate::track_curves::small_turn_left,
+    length: crate::track_curves::SMALL_TURN_LEFT_LENGTH,
+};
+
 pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
