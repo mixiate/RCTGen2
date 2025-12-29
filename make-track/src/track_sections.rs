@@ -141,6 +141,12 @@ pub const FLAT_DIAG: TrackSection = TrackSection {
     length: crate::track_curves::FLAT_DIAG_LENGTH,
 };
 
+pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
+    name: "flat_to_gentle_diag",
+    curve: crate::track_curves::flat_to_gentle_diag,
+    length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
+};
+
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "flat_to_left_bank",
     curve: crate::track_curves::flat_to_left_bank,

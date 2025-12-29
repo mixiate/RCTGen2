@@ -117,3 +117,45 @@ pub fn banked_curve(
         binormal: (unbanked_point.normal * -angle_sin) + (unbanked_point.binormal * angle_cos),
     }
 }
+
+pub fn plane_curve_vertical_diagonal(position: &glam::Vec3, tangent: &glam::Vec3) -> crate::track_sections::TrackPoint {
+    use std::f32::consts::SQRT_2;
+    let binormal = 0.5_f32.sqrt();
+    crate::track_sections::TrackPoint {
+        position: *position,
+        tangent: *tangent,
+        normal: glam::Vec3::new(-tangent.y / SQRT_2, tangent.z * SQRT_2, -tangent.y / SQRT_2),
+        binormal: glam::Vec3::new(binormal, 0.0, -binormal),
+    }
+}
+
+#[expect(clippy::too_many_arguments)]
+pub fn cubic_curve_vertical_diagonal(
+    x_a: f32,
+    x_b: f32,
+    x_c: f32,
+    x_d: f32,
+    y_a: f32,
+    y_b: f32,
+    y_c: f32,
+    y_d: f32,
+    p_a: f32,
+    p_b: f32,
+    p_c: f32,
+    p_d: f32,
+    p_e: f32,
+    p_f: f32,
+    p_g: f32,
+    distance: f32,
+) -> crate::track_sections::TrackPoint {
+    use std::f32::consts::SQRT_2;
+    let u = reparameterize(p_a, p_b, p_c, p_d, p_e, p_f, p_g, distance);
+    let x = cubic(x_a, x_b, x_c, x_d, u);
+    let y = cubic(y_a, y_b, y_c, y_d, u);
+    let d_x = cubic_derivative(x_a, x_b, x_c, u);
+    let d_y = cubic_derivative(y_a, y_b, y_c, u);
+    plane_curve_vertical_diagonal(
+        &glam::Vec3::new(x / SQRT_2, y, x / SQRT_2),
+        &glam::Vec3::new(d_x / SQRT_2, d_y, d_x / SQRT_2).normalize(),
+    )
+}
