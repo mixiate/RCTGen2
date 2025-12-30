@@ -368,3 +368,15 @@ pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     curve: crate::track_curves::very_small_turn_right_steep,
     length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
 };
+
+pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
+    name: "vertical_twist_left",
+    curve: crate::track_curves::vertical_twist_left,
+    length: crate::track_curves::VERTICAL_TWIST_LENGTH,
+};
+
+pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
+    name: "vertical_twist_right",
+    curve: crate::track_curves::vertical_twist_right,
+    length: crate::track_curves::VERTICAL_TWIST_LENGTH,
+};

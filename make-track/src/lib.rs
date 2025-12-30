@@ -188,6 +188,8 @@ fn render(
         &track_sections::LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE,
         &track_sections::VERY_SMALL_TURN_LEFT_STEEP,
         &track_sections::VERY_SMALL_TURN_RIGHT_STEEP,
+        &track_sections::VERTICAL_TWIST_LEFT,
+        &track_sections::VERTICAL_TWIST_RIGHT,
     ];
 
     for track in &track_desc.tracks {

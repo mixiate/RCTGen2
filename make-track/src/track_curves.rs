@@ -32,6 +32,7 @@ pub const SMALL_TURN_GENTLE_LENGTH: f32 = 2.493656;
 pub const MEDIUM_TURN_GENTLE_LENGTH: f32 = 4.252_99;
 pub const LARGE_TURN_GENTLE_LENGTH: f32 = 3.017199;
 pub const VERY_SMALL_TURN_STEEP_LENGTH: f32 = 1.812048;
+pub const VERTICAL_TWIST_LENGTH: f32 = CLEARANCE_HEIGHT * 12.0;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
@@ -703,4 +704,28 @@ pub fn very_small_turn_right_steep(distance: f32, _bank_angle: f32) -> crate::tr
         8.0 * CLEARANCE_HEIGHT / VERY_SMALL_TURN_LENGTH,
         distance,
     )
+}
+
+pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let tangent = glam::Vec3::new(0.0, 1.0, 0.0);
+    let normal = 0.5 * std::f32::consts::PI * distance / VERTICAL_TWIST_LENGTH;
+    let normal = glam::Vec3::new(normal.sin(), 0.0, -normal.cos());
+    crate::track_sections::TrackPoint {
+        position: glam::Vec3::new(0.0, distance, 0.0),
+        tangent,
+        normal,
+        binormal: normal.cross(tangent),
+    }
+}
+
+pub fn vertical_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let tangent = glam::Vec3::new(0.0, 1.0, 0.0);
+    let normal = 0.5 * std::f32::consts::PI * distance / VERTICAL_TWIST_LENGTH;
+    let normal = glam::Vec3::new(-normal.sin(), 0.0, -normal.cos());
+    crate::track_sections::TrackPoint {
+        position: glam::Vec3::new(0.0, distance, 0.0),
+        tangent,
+        normal,
+        binormal: normal.cross(tangent),
+    }
 }
