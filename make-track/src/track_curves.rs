@@ -11,9 +11,11 @@ pub const VERTICAL_LENGTH: f32 = CLEARANCE_HEIGHT * 4.0;
 pub const SMALL_FLAT_TO_STEEP_LENGTH: f32 = 1.220_88;
 pub const FLAT_TO_STEEP_LENGTH: f32 = 4.792426;
 
+pub const VERY_SMALL_TURN_RADIUS: f32 = 0.5;
 pub const SMALL_TURN_LEFT_RADIUS: f32 = 1.5;
 pub const MEDIUM_TURN_LEFT_RADIUS: f32 = 2.5;
 
+pub const VERY_SMALL_TURN_LENGTH: f32 = (VERY_SMALL_TURN_RADIUS / 2.0) * std::f32::consts::PI;
 pub const SMALL_TURN_LEFT_LENGTH: f32 = (SMALL_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
 pub const MEDIUM_TURN_LEFT_LENGTH: f32 = (MEDIUM_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
 pub const LARGE_TURN_LEFT_TO_DIAG_LENGTH: f32 = 2.757_1;
@@ -29,6 +31,7 @@ pub const FLAT_TO_STEEP_DIAG_LENGTH: f32 = 4.956727;
 pub const SMALL_TURN_GENTLE_LENGTH: f32 = 2.493656;
 pub const MEDIUM_TURN_GENTLE_LENGTH: f32 = 4.252_99;
 pub const LARGE_TURN_GENTLE_LENGTH: f32 = 3.017199;
+pub const VERY_SMALL_TURN_STEEP_LENGTH: f32 = 1.812048;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
@@ -690,6 +693,22 @@ pub fn large_turn_right_to_orthogonal_gentle(distance: f32, _bank_angle: f32) ->
         7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
         8.0 * CLEARANCE_HEIGHT,
         0.0,
+        distance,
+    )
+}
+
+pub fn very_small_turn_left_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::sloped_turn_left(
+        VERY_SMALL_TURN_RADIUS,
+        8.0 * CLEARANCE_HEIGHT / VERY_SMALL_TURN_LENGTH,
+        distance,
+    )
+}
+
+pub fn very_small_turn_right_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::sloped_turn_right(
+        VERY_SMALL_TURN_RADIUS,
+        8.0 * CLEARANCE_HEIGHT / VERY_SMALL_TURN_LENGTH,
         distance,
     )
 }

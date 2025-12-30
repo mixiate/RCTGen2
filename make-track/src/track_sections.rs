@@ -356,3 +356,15 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_right_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
 };
+
+pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
+    name: "very_small_turn_left_steep",
+    curve: crate::track_curves::very_small_turn_left_steep,
+    length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
+};
+
+pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
+    name: "very_small_turn_right_steep",
+    curve: crate::track_curves::very_small_turn_right_steep,
+    length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
+};
