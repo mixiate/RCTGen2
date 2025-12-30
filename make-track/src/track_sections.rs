@@ -114,25 +114,25 @@ pub const STEEP_TO_FLAT: TrackSection = TrackSection {
 pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
     name: "small_turn_left",
     curve: crate::track_curves::small_turn_left,
-    length: crate::track_curves::SMALL_TURN_LEFT_LENGTH,
+    length: crate::track_curves::SMALL_TURN_LENGTH,
 };
 
 pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
-    length: crate::track_curves::MEDIUM_TURN_LEFT_LENGTH,
+    length: crate::track_curves::MEDIUM_TURN_LENGTH,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG: TrackSection = TrackSection {
     name: "large_turn_left_to_diag",
     curve: crate::track_curves::large_turn_left_to_diag,
-    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+    length: crate::track_curves::LARGE_TURN_LENGTH,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     name: "large_turn_right_to_diag",
     curve: crate::track_curves::large_turn_right_to_diag,
-    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+    length: crate::track_curves::LARGE_TURN_LENGTH,
 };
 
 pub const FLAT_DIAG: TrackSection = TrackSection {
@@ -246,25 +246,25 @@ pub const LEFT_BANK: TrackSection = TrackSection {
 pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
     name: "small_turn_left_bank",
     curve: crate::track_curves::small_turn_left_bank,
-    length: crate::track_curves::SMALL_TURN_LEFT_LENGTH,
+    length: crate::track_curves::SMALL_TURN_LENGTH,
 };
 
 pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
     name: "medium_turn_left_bank",
     curve: crate::track_curves::medium_turn_left_bank,
-    length: crate::track_curves::MEDIUM_TURN_LEFT_LENGTH,
+    length: crate::track_curves::MEDIUM_TURN_LENGTH,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG_BANK: TrackSection = TrackSection {
     name: "large_turn_left_to_diag_bank",
     curve: crate::track_curves::large_turn_left_to_diag_bank,
-    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+    length: crate::track_curves::LARGE_TURN_LENGTH,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_bank",
     curve: crate::track_curves::large_turn_right_to_diag_bank,
-    length: crate::track_curves::LARGE_TURN_LEFT_TO_DIAG_LENGTH,
+    length: crate::track_curves::LARGE_TURN_LENGTH,
 };
 
 pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {

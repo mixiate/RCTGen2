@@ -12,13 +12,13 @@ pub const SMALL_FLAT_TO_STEEP_LENGTH: f32 = 1.220_88;
 pub const FLAT_TO_STEEP_LENGTH: f32 = 4.792426;
 
 pub const VERY_SMALL_TURN_RADIUS: f32 = 0.5;
-pub const SMALL_TURN_LEFT_RADIUS: f32 = 1.5;
-pub const MEDIUM_TURN_LEFT_RADIUS: f32 = 2.5;
+pub const SMALL_TURN_RADIUS: f32 = 1.5;
+pub const MEDIUM_TURN_RADIUS: f32 = 2.5;
 
 pub const VERY_SMALL_TURN_LENGTH: f32 = (VERY_SMALL_TURN_RADIUS / 2.0) * std::f32::consts::PI;
-pub const SMALL_TURN_LEFT_LENGTH: f32 = (SMALL_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
-pub const MEDIUM_TURN_LEFT_LENGTH: f32 = (MEDIUM_TURN_LEFT_RADIUS / 2.0) * std::f32::consts::PI;
-pub const LARGE_TURN_LEFT_TO_DIAG_LENGTH: f32 = 2.757_1;
+pub const SMALL_TURN_LENGTH: f32 = (SMALL_TURN_RADIUS / 2.0) * std::f32::consts::PI;
+pub const MEDIUM_TURN_LENGTH: f32 = (MEDIUM_TURN_RADIUS / 2.0) * std::f32::consts::PI;
+pub const LARGE_TURN_LENGTH: f32 = 2.757_1;
 
 pub const FLAT_DIAG_LENGTH: f32 = std::f32::consts::SQRT_2;
 pub const FLAT_TO_GENTLE_DIAG_LENGTH: f32 = 1.433617;
@@ -268,11 +268,11 @@ pub fn steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::
 }
 
 pub fn small_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::turn_left(distance, SMALL_TURN_LEFT_RADIUS)
+    crate::curves::turn_left(distance, SMALL_TURN_RADIUS)
 }
 
 pub fn medium_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::turn_left(distance, MEDIUM_TURN_LEFT_RADIUS)
+    crate::curves::turn_left(distance, MEDIUM_TURN_RADIUS)
 }
 
 pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -610,33 +610,25 @@ pub fn left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::
 }
 
 pub fn small_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_left(
-        SMALL_TURN_LEFT_RADIUS,
-        4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LEFT_LENGTH,
-        distance,
-    )
+    crate::curves::sloped_turn_left(SMALL_TURN_RADIUS, 4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance)
 }
 
 pub fn small_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_right(
-        SMALL_TURN_LEFT_RADIUS,
-        4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LEFT_LENGTH,
-        distance,
-    )
+    crate::curves::sloped_turn_right(SMALL_TURN_RADIUS, 4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance)
 }
 
 pub fn medium_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::sloped_turn_left(
-        MEDIUM_TURN_LEFT_RADIUS,
-        8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LEFT_LENGTH,
+        MEDIUM_TURN_RADIUS,
+        8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
         distance,
     )
 }
 
 pub fn medium_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::sloped_turn_right(
-        MEDIUM_TURN_LEFT_RADIUS,
-        8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LEFT_LENGTH,
+        MEDIUM_TURN_RADIUS,
+        8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
         distance,
     )
 }
