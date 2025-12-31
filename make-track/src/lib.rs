@@ -198,6 +198,8 @@ fn render(
         &track_sections::RIGHT_BANK_TO_GENTLE_RIGHT_BANK,
         &track_sections::GENTLE_LEFT_BANK_TO_LEFT_BANK,
         &track_sections::GENTLE_RIGHT_BANK_TO_RIGHT_BANK,
+        &track_sections::GENTLE_LEFT_BANK,
+        &track_sections::GENTLE_RIGHT_BANK,
     ];
 
     for track in &track_desc.tracks {
