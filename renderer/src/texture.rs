@@ -60,6 +60,7 @@ impl Texture {
     pub(crate) fn sample_wrapped(&self, uv: glam::Vec2) -> glam::Vec3 {
         let x = (wrap_coord(uv.x) * self.width as f32) as usize;
         let y = (wrap_coord(uv.y) * self.height as f32) as usize;
+        let y = self.height - 1 - y;
         self.pixels[x + self.width * y]
     }
 }
