@@ -222,6 +222,10 @@ fn render(
         &track_sections::SMALL_TURN_RIGHT_BANK_GENTLE,
         &track_sections::MEDIUM_TURN_LEFT_BANK_GENTLE,
         &track_sections::MEDIUM_TURN_RIGHT_BANK_GENTLE,
+        &track_sections::LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE,
+        &track_sections::LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE,
+        &track_sections::LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE,
+        &track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE,
     ];
 
     for track in &track_desc.tracks {

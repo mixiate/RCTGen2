@@ -572,3 +572,27 @@ pub const MEDIUM_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::medium_turn_right_bank_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
 };
+
+pub const LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
+    name: "large_turn_left_bank_to_diag_gentle",
+    curve: crate::track_curves::large_turn_left_bank_to_diag_gentle,
+    length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
+};
+
+pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
+    name: "large_turn_right_bank_to_diag_gentle",
+    curve: crate::track_curves::large_turn_right_bank_to_diag_gentle,
+    length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
+};
+
+pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
+    name: "large_turn_left_bank_to_orthogonal_gentle",
+    curve: crate::track_curves::large_turn_left_bank_to_orthogonal_gentle,
+    length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
+};
+
+pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
+    name: "large_turn_right_bank_to_orthogonal_gentle",
+    curve: crate::track_curves::large_turn_right_bank_to_orthogonal_gentle,
+    length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
+};
