@@ -204,6 +204,10 @@ fn render(
         &track_sections::FLAT_TO_GENTLE_RIGHT_BANK,
         &track_sections::GENTLE_LEFT_BANK_TO_FLAT,
         &track_sections::GENTLE_RIGHT_BANK_TO_FLAT,
+        &track_sections::GENTLE_TO_GENTLE_LEFT_BANK_DIAG,
+        &track_sections::GENTLE_TO_GENTLE_RIGHT_BANK_DIAG,
+        &track_sections::GENTLE_LEFT_BANK_TO_GENTLE_DIAG,
+        &track_sections::GENTLE_RIGHT_BANK_TO_GENTLE_DIAG,
     ];
 
     for track in &track_desc.tracks {

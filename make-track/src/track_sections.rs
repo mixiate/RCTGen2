@@ -464,3 +464,27 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_flat,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
 };
+
+pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
+    name: "gentle_to_gentle_left_bank_diag",
+    curve: crate::track_curves::gentle_to_gentle_left_bank_diag,
+    length: crate::track_curves::GENTLE_DIAG_LENGTH,
+};
+
+pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
+    name: "gentle_to_gentle_right_bank_diag",
+    curve: crate::track_curves::gentle_to_gentle_right_bank_diag,
+    length: crate::track_curves::GENTLE_DIAG_LENGTH,
+};
+
+pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
+    name: "gentle_left_bank_to_gentle_diag",
+    curve: crate::track_curves::gentle_left_bank_to_gentle_diag,
+    length: crate::track_curves::GENTLE_DIAG_LENGTH,
+};
+
+pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
+    name: "gentle_right_bank_to_gentle_diag",
+    curve: crate::track_curves::gentle_right_bank_to_gentle_diag,
+    length: crate::track_curves::GENTLE_DIAG_LENGTH,
+};
