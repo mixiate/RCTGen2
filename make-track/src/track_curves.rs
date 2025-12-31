@@ -35,7 +35,9 @@ pub const VERY_SMALL_TURN_STEEP_LENGTH: f32 = 1.812048;
 pub const VERTICAL_TWIST_LENGTH: f32 = CLEARANCE_HEIGHT * 12.0;
 
 pub const S_BEND_LENGTH: f32 = 3.240_75;
+
 pub const SMALL_HELIX_LENGTH: f32 = 2.365_02;
+pub const MEDIUM_HELIX_LENGTH: f32 = 3.932292;
 
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
@@ -959,6 +961,20 @@ pub fn small_helix_left(distance: f32, bank_angle: f32) -> crate::track_sections
 pub fn small_helix_right(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::banked_curve(
         &crate::curves::sloped_turn_right(SMALL_TURN_RADIUS, CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance),
+        bank_angle,
+    )
+}
+
+pub fn medium_helix_left(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(
+        &crate::curves::sloped_turn_left(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
+        -bank_angle,
+    )
+}
+
+pub fn medium_helix_right(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(
+        &crate::curves::sloped_turn_right(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
         bank_angle,
     )
 }

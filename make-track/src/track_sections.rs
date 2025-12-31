@@ -620,3 +620,15 @@ pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::small_helix_right,
     length: crate::track_curves::SMALL_HELIX_LENGTH,
 };
+
+pub const MEDIUM_HELIX_LEFT: TrackSection = TrackSection {
+    name: "medium_helix_left",
+    curve: crate::track_curves::medium_helix_left,
+    length: crate::track_curves::MEDIUM_HELIX_LENGTH,
+};
+
+pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
+    name: "medium_helix_right",
+    curve: crate::track_curves::medium_helix_right,
+    length: crate::track_curves::MEDIUM_HELIX_LENGTH,
+};
