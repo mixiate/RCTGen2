@@ -729,3 +729,19 @@ pub fn vertical_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sec
         binormal: normal.cross(tangent),
     }
 }
+
+pub fn gentle_to_gentle_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&gentle(distance, 0.0), -bank_angle * distance / GENTLE_LENGTH)
+}
+
+pub fn gentle_to_gentle_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&gentle(distance, 0.0), bank_angle * distance / GENTLE_LENGTH)
+}
+
+pub fn gentle_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&gentle(distance, 0.0), -bank_angle * (1.0 - distance / GENTLE_LENGTH))
+}
+
+pub fn gentle_right_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&gentle(distance, 0.0), bank_angle * (1.0 - distance / GENTLE_LENGTH))
+}

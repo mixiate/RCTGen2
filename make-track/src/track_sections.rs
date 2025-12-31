@@ -380,3 +380,27 @@ pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::vertical_twist_right,
     length: crate::track_curves::VERTICAL_TWIST_LENGTH,
 };
+
+pub const GENTLE_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
+    name: "gentle_to_gentle_left_bank",
+    curve: crate::track_curves::gentle_to_gentle_left_bank,
+    length: crate::track_curves::GENTLE_LENGTH,
+};
+
+pub const GENTLE_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
+    name: "gentle_to_gentle_right_bank",
+    curve: crate::track_curves::gentle_to_gentle_right_bank,
+    length: crate::track_curves::GENTLE_LENGTH,
+};
+
+pub const GENTLE_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
+    name: "gentle_left_bank_to_gentle",
+    curve: crate::track_curves::gentle_left_bank_to_gentle,
+    length: crate::track_curves::GENTLE_LENGTH,
+};
+
+pub const GENTLE_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
+    name: "gentle_right_bank_to_gentle",
+    curve: crate::track_curves::gentle_right_bank_to_gentle,
+    length: crate::track_curves::GENTLE_LENGTH,
+};
