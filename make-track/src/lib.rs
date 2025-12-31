@@ -218,6 +218,8 @@ fn render(
         &track_sections::FLAT_TO_GENTLE_RIGHT_BANK_DIAG,
         &track_sections::GENTLE_LEFT_BANK_TO_FLAT_DIAG,
         &track_sections::GENTLE_RIGHT_BANK_TO_FLAT_DIAG,
+        &track_sections::SMALL_TURN_LEFT_BANK_GENTLE,
+        &track_sections::SMALL_TURN_RIGHT_BANK_GENTLE,
     ];
 
     for track in &track_desc.tracks {
