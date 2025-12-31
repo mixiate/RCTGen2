@@ -596,3 +596,15 @@ pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSectio
     curve: crate::track_curves::large_turn_right_bank_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
 };
+
+pub const S_BEND_LEFT: TrackSection = TrackSection {
+    name: "s_bend_left",
+    curve: crate::track_curves::s_bend_left,
+    length: crate::track_curves::S_BEND_LENGTH,
+};
+
+pub const S_BEND_RIGHT: TrackSection = TrackSection {
+    name: "s_bend_right",
+    curve: crate::track_curves::s_bend_right,
+    length: crate::track_curves::S_BEND_LENGTH,
+};

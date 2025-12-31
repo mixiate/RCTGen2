@@ -226,6 +226,8 @@ fn render(
         &track_sections::LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE,
         &track_sections::LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE,
         &track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE,
+        &track_sections::S_BEND_LEFT,
+        &track_sections::S_BEND_RIGHT,
     ];
 
     for track in &track_desc.tracks {

@@ -34,6 +34,8 @@ pub const LARGE_TURN_GENTLE_LENGTH: f32 = 3.017199;
 pub const VERY_SMALL_TURN_STEEP_LENGTH: f32 = 1.812048;
 pub const VERTICAL_TWIST_LENGTH: f32 = CLEARANCE_HEIGHT * 12.0;
 
+pub const S_BEND_LENGTH: f32 = 3.240_75;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -902,4 +904,46 @@ pub fn large_turn_left_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32)
 
 pub fn large_turn_right_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::banked_curve(&large_turn_right_to_orthogonal_gentle(distance, 0.0), bank_angle)
+}
+
+pub fn s_bend_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_horizontal(
+        152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
+        9.0 - 76.0 * CLEARANCE_HEIGHT,
+        76.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        2.0,
+        -3.0,
+        0.0,
+        0.0,
+        -1.635_673_2e-3,
+        1.855_282_9e-2,
+        -7.523_388_4e-2,
+        1.22409634e-01,
+        -6.922_434e-2,
+        7.410_992e-2,
+        1.904_630_5e-1,
+        distance,
+    )
+}
+
+pub fn s_bend_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_horizontal(
+        152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
+        9.0 - 76.0 * CLEARANCE_HEIGHT,
+        76.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        -2.0,
+        3.0,
+        0.0,
+        0.0,
+        -1.635_673_2e-3,
+        1.855_282_9e-2,
+        -7.523_388_4e-2,
+        1.22409634e-01,
+        -6.922_434e-2,
+        7.410_992e-2,
+        1.904_630_5e-1,
+        distance,
+    )
 }
