@@ -137,6 +137,7 @@ impl Model {
                             .position
                             .get(indices.0)
                             .with_context(|| format!("Invalid index in obj file {}", path.display()))?;
+                        let position = [position[0], position[1], -position[2]];
 
                         let uv = if let Some(uv_index) = indices.1 {
                             *obj.data
@@ -155,6 +156,7 @@ impl Model {
                         } else {
                             [0.0; 3]
                         };
+                        let normal = [normal[0], normal[1], -normal[2]];
 
                         let vertex = Vertex { position, uv, normal };
                         *new_index = if let Some(index) = vertices.iter().position(|x| *x == vertex) {
@@ -167,6 +169,7 @@ impl Model {
                         .with_context(|| format!("Invalid index in obj file {}", path.display()))?;
                     }
 
+                    new_indices.swap(2, 1);
                     indices.push(new_indices);
                 }
 
