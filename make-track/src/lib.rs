@@ -228,6 +228,8 @@ fn render(
         &track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE,
         &track_sections::S_BEND_LEFT,
         &track_sections::S_BEND_RIGHT,
+        &track_sections::SMALL_HELIX_LEFT,
+        &track_sections::SMALL_HELIX_RIGHT,
     ];
 
     for track in &track_desc.tracks {

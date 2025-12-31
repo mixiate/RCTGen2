@@ -608,3 +608,15 @@ pub const S_BEND_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::s_bend_right,
     length: crate::track_curves::S_BEND_LENGTH,
 };
+
+pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
+    name: "small_helix_left",
+    curve: crate::track_curves::small_helix_left,
+    length: crate::track_curves::SMALL_HELIX_LENGTH,
+};
+
+pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
+    name: "small_helix_right",
+    curve: crate::track_curves::small_helix_right,
+    length: crate::track_curves::SMALL_HELIX_LENGTH,
+};
