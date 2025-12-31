@@ -819,3 +819,19 @@ pub fn gentle_right_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> crate
         bank_angle * (1.0 - distance / GENTLE_DIAG_LENGTH),
     )
 }
+
+pub fn left_bank_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&flat_to_gentle_diag(distance, 0.0), -bank_angle)
+}
+
+pub fn right_bank_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&flat_to_gentle_diag(distance, 0.0), bank_angle)
+}
+
+pub fn gentle_left_bank_to_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&gentle_to_flat_diag(distance, 0.0), -bank_angle)
+}
+
+pub fn gentle_right_bank_to_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&gentle_to_flat_diag(distance, 0.0), bank_angle)
+}
