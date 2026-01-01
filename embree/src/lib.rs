@@ -162,12 +162,6 @@ impl CommittedScene<'_> {
     }
 }
 
-impl Drop for CommittedScene<'_> {
-    fn drop(&mut self) {
-        unsafe { embree4_sys::rtcReleaseScene(self.scene.handle) }
-    }
-}
-
 unsafe impl Sync for CommittedScene<'_> {}
 
 pub fn commit_scene(scene: Scene) -> CommittedScene {
