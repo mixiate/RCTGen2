@@ -59,6 +59,9 @@ const CORKSCREW_SEGMENT_1_LENGTH: f32 = 1.682311;
 const CORKSCREW_SEGMENT_2_LENGTH: f32 = 1.744083;
 pub const CORKSCREW_LENGTH: f32 = CORKSCREW_SEGMENT_1_LENGTH + CORKSCREW_SEGMENT_2_LENGTH;
 
+const LARGE_CORKSCREW_SEGMENT_LENGTH: f32 = 2.665301;
+pub const LARGE_CORKSCREW_LENGTH: f32 = LARGE_CORKSCREW_SEGMENT_LENGTH * 2.0;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1256,6 +1259,68 @@ pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections
             4.020_663_4e-3,
             1.835_438_5e-1,
             (distance - CORKSCREW_SEGMENT_1_LENGTH) * 3.3,
+        )
+    }
+}
+
+pub fn large_corkscrew_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(large_corkscrew_right(distance, 0.0))
+}
+
+pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    if distance < LARGE_CORKSCREW_SEGMENT_LENGTH {
+        crate::curves::bezier3d(
+            0.282_916_96,
+            0.067_083_03,
+            0.0,
+            0.0,
+            -0.748_280_3,
+            2.007_046,
+            0.0,
+            0.0,
+            0.132_916_97,
+            -1.432_917,
+            3.45,
+            0.0,
+            0.474996,
+            -0.837494,
+            0.250000,
+            -0.033411,
+            -9.074_917e-5,
+            7.445_654e-4,
+            -1.878_248_3e-3,
+            6.060_894e-4,
+            1.037_640_4e-3,
+            3.515_044_2e-2,
+            2.898_299_7e-1,
+            distance,
+        )
+    } else {
+        crate::curves::bezier3d(
+            0.132_916_97,
+            1.034_165_7,
+            0.982_916_95,
+            0.35,
+            -0.748_280_3,
+            0.237_795_14,
+            1.769_250_6,
+            1.258_765_5,
+            0.282_916_96,
+            -0.915_834_25,
+            0.982_916_95,
+            2.15,
+            1.376_4,
+            -1.314599,
+            0.0,
+            -0.028389,
+            -9.074_93e-5,
+            9.485_533e-4,
+            -3.509_311_5e-3,
+            5.223_509e-3,
+            -4.264_674_6e-3,
+            -2.094_027_2e-2,
+            4.444_436_4e-1,
+            distance - LARGE_CORKSCREW_SEGMENT_LENGTH,
         )
     }
 }
