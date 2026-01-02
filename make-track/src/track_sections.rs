@@ -656,3 +656,15 @@ pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::barrel_roll_right,
     length: crate::track_curves::BARREL_ROLL_LENGTH,
 };
+
+pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
+    name: "inline_twist_left",
+    curve: crate::track_curves::inline_twist_left,
+    length: crate::track_curves::BARREL_ROLL_LENGTH,
+};
+
+pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
+    name: "inline_twist_right",
+    curve: crate::track_curves::inline_twist_right,
+    length: crate::track_curves::BARREL_ROLL_LENGTH,
+};

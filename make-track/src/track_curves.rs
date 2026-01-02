@@ -1029,3 +1029,12 @@ pub fn barrel_roll_left(distance: f32, _bank_angle: f32) -> crate::track_section
 pub fn barrel_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::flip_x_axis(barrel_roll_left(distance, 0.0))
 }
+
+pub fn inline_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let radius = CLEARANCE_HEIGHT / 6.0;
+    crate::curves::roll_left(BARREL_ROLL_LENGTH, radius, distance)
+}
+
+pub fn inline_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(inline_twist_left(distance, 0.0))
+}
