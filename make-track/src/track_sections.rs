@@ -686,3 +686,9 @@ pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::vertical_loop_right,
     length: crate::track_curves::VERTICAL_LOOP_LENGTH,
 };
+
+pub const QUARTER_LOOP: TrackSection = TrackSection {
+    name: "quarter_loop",
+    curve: crate::track_curves::quarter_loop,
+    length: crate::track_curves::QUARTER_LOOP_LENGTH,
+};

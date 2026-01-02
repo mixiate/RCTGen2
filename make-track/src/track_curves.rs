@@ -53,6 +53,8 @@ const VERTICAL_LOOP_SEGMENT_1_LENGTH: f32 = 0.540062;
 const VERTICAL_LOOP_SEGMENT_2_LENGTH: f32 = VERTICAL_LOOP_SEGMENT_1_LENGTH + 2.686603;
 pub const VERTICAL_LOOP_LENGTH: f32 = (VERTICAL_LOOP_SEGMENT_2_LENGTH + 1.730928) * VERTICAL_LOOP_FACTOR;
 
+pub const QUARTER_LOOP_LENGTH: f32 = 4.253756;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1169,4 +1171,25 @@ pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_secti
 
 pub fn vertical_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::flip_x_axis(vertical_loop_left(distance, 0.0))
+}
+
+pub fn quarter_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::cubic_curve_vertical(
+        5.0 - 64.0 * CLEARANCE_HEIGHT / 3.0,
+        -7.5 + 64.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        0.0,
+        -22.0 * CLEARANCE_HEIGHT / 3.0,
+        CLEARANCE_HEIGHT / 3.0,
+        64.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+        6.498_695e-6,
+        -9.733_33e-5,
+        4.536_263_6e-4,
+        -8.858_447_5e-4,
+        1.634_993_9e-3,
+        -1.788_864_1e-3,
+        2.298_307_7e-1,
+        distance,
+    )
 }

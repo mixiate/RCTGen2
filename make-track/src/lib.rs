@@ -241,6 +241,7 @@ fn render(
         &track_sections::HALF_LOOP,
         &track_sections::VERTICAL_LOOP_LEFT,
         &track_sections::VERTICAL_LOOP_RIGHT,
+        &track_sections::QUARTER_LOOP,
     ];
 
     for track in &track_desc.tracks {
