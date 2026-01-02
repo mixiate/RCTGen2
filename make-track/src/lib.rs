@@ -242,6 +242,8 @@ fn render(
         &track_sections::VERTICAL_LOOP_LEFT,
         &track_sections::VERTICAL_LOOP_RIGHT,
         &track_sections::QUARTER_LOOP,
+        &track_sections::CORKSCREW_LEFT,
+        &track_sections::CORKSCREW_RIGHT,
     ];
 
     for track in &track_desc.tracks {

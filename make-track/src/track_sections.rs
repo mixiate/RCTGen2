@@ -692,3 +692,15 @@ pub const QUARTER_LOOP: TrackSection = TrackSection {
     curve: crate::track_curves::quarter_loop,
     length: crate::track_curves::QUARTER_LOOP_LENGTH,
 };
+
+pub const CORKSCREW_LEFT: TrackSection = TrackSection {
+    name: "corkscrew_left",
+    curve: crate::track_curves::corkscrew_left,
+    length: crate::track_curves::CORKSCREW_LENGTH,
+};
+
+pub const CORKSCREW_RIGHT: TrackSection = TrackSection {
+    name: "corkscrew_right",
+    curve: crate::track_curves::corkscrew_right,
+    length: crate::track_curves::CORKSCREW_LENGTH,
+};

@@ -6,6 +6,10 @@ fn cubic_derivative(a: f32, b: f32, c: f32, x: f32) -> f32 {
     x * (3.0 * x * a + 2.0 * b) + c
 }
 
+fn cubic_second_derivative(a: f32, b: f32, x: f32) -> f32 {
+    6.0 * x * a + 2.0 * b
+}
+
 #[expect(clippy::too_many_arguments)]
 pub fn reparameterize(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, x: f32) -> f32 {
     x * (x * (x * (x * (x * (x * (x * a + b) + c) + d) + e) + f) + g)
@@ -158,6 +162,65 @@ pub fn cubic_curve_vertical_diagonal(
         &glam::Vec3::new(x / SQRT_2, y, x / SQRT_2),
         &glam::Vec3::new(d_x / SQRT_2, d_y, d_x / SQRT_2).normalize(),
     )
+}
+
+#[expect(clippy::too_many_arguments)]
+pub fn bezier3d(
+    xa: f32,
+    xb: f32,
+    xc: f32,
+    xd: f32,
+    ya: f32,
+    yb: f32,
+    yc: f32,
+    yd: f32,
+    za: f32,
+    zb: f32,
+    zc: f32,
+    zd: f32,
+    ra: f32,
+    rb: f32,
+    rc: f32,
+    rd: f32,
+    pa: f32,
+    pb: f32,
+    pc: f32,
+    pd: f32,
+    pe: f32,
+    pf: f32,
+    pg: f32,
+    distance: f32,
+) -> crate::track_sections::TrackPoint {
+    let u = reparameterize(pa, pb, pc, pd, pe, pf, pg, distance);
+
+    let position = glam::Vec3::new(
+        cubic(xa, xb, xc, xd, u),
+        cubic(ya, yb, yc, yd, u),
+        cubic(za, zb, zc, zd, u),
+    );
+    let tangent = glam::Vec3::new(
+        cubic_derivative(xa, xb, xc, u),
+        cubic_derivative(ya, yb, yc, u),
+        cubic_derivative(za, zb, zc, u),
+    )
+    .normalize();
+    let second_derivative = glam::Vec3::new(
+        cubic_second_derivative(xa, xb, u),
+        cubic_second_derivative(ya, yb, u),
+        cubic_second_derivative(za, zb, u),
+    );
+    let normal = (second_derivative - (tangent * tangent.dot(second_derivative))).normalize();
+    let binormal = normal.cross(tangent);
+
+    let angle = cubic(ra, rb, rc, rd, u);
+    let (angle_sin, angle_cos) = angle.sin_cos();
+
+    crate::track_sections::TrackPoint {
+        position,
+        tangent,
+        normal: (normal * angle_cos) + (binormal * angle_sin),
+        binormal: (normal * -angle_sin) + (binormal * angle_cos),
+    }
 }
 
 pub fn flip_x_axis(mut point: crate::track_sections::TrackPoint) -> crate::track_sections::TrackPoint {
