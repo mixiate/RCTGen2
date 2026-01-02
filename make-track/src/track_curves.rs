@@ -43,6 +43,11 @@ pub const SMALL_TURN_BANK_TO_GENTLE_LENGTH: f32 = 2.442_29;
 
 pub const BARREL_ROLL_LENGTH: f32 = 3.091882;
 
+const HALF_LOOP_SEGMENT_1_LENGTH: f32 = 0.540062;
+const HALF_LOOP_SEGMENT_2_LENGTH: f32 = 2.685141;
+const HALF_LOOP_SEGMENT_3_LENGTH: f32 = 1.956695;
+pub const HALF_LOOP_LENGTH: f32 = HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH + HALF_LOOP_SEGMENT_3_LENGTH;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1037,4 +1042,55 @@ pub fn inline_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sectio
 
 pub fn inline_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::flip_x_axis(inline_twist_left(distance, 0.0))
+}
+
+pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    if distance < HALF_LOOP_SEGMENT_1_LENGTH {
+        crate::curves::plane_curve_vertical(
+            &glam::Vec3::new(
+                0.0,
+                CLEARANCE_HEIGHT * (distance / HALF_LOOP_SEGMENT_1_LENGTH),
+                0.5 * (distance / HALF_LOOP_SEGMENT_1_LENGTH),
+            ),
+            &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT / 1.0, 1.0).normalize(),
+        )
+    } else if distance < HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH {
+        crate::curves::cubic_curve_vertical(
+            3.0 - 32.0 * CLEARANCE_HEIGHT / 3.0,
+            16.0 * CLEARANCE_HEIGHT - 6.5,
+            4.0,
+            0.5,
+            -14.0 * CLEARANCE_HEIGHT / 3.0,
+            19.0 * CLEARANCE_HEIGHT / 3.0,
+            8.0 * CLEARANCE_HEIGHT,
+            CLEARANCE_HEIGHT,
+            2.357_051_7e-3,
+            -1.826_351e-2,
+            5.676_165e-2,
+            -8.778_73e-2,
+            7.477_113_6e-2,
+            4.925_161e-3,
+            2.348_179_7e-1,
+            distance - HALF_LOOP_SEGMENT_1_LENGTH,
+        )
+    } else {
+        crate::curves::cubic_curve_vertical(
+            0.0,
+            -16.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+            16.0 * CLEARANCE_HEIGHT / 3.0 + 1.0,
+            -8.0 * CLEARANCE_HEIGHT / 3.0,
+            -4.0 * CLEARANCE_HEIGHT / 3.0,
+            32.0 * CLEARANCE_HEIGHT / 3.0,
+            32.0 * CLEARANCE_HEIGHT / 3.0,
+            4.506_846_4e-3,
+            -2.191_735_8e-2,
+            3.116_755_2e-2,
+            -1.888_024_2e-2,
+            1.569_730_6e-2,
+            2.662_445_4e-2,
+            4.591_454e-1,
+            distance - (HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH),
+        )
+    }
 }

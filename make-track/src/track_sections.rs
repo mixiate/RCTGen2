@@ -668,3 +668,9 @@ pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::inline_twist_right,
     length: crate::track_curves::BARREL_ROLL_LENGTH,
 };
+
+pub const HALF_LOOP: TrackSection = TrackSection {
+    name: "half_loop",
+    curve: crate::track_curves::half_loop,
+    length: crate::track_curves::HALF_LOOP_LENGTH,
+};

@@ -238,6 +238,7 @@ fn render(
         &track_sections::BARREL_ROLL_RIGHT,
         &track_sections::INLINE_TWIST_LEFT,
         &track_sections::INLINE_TWIST_RIGHT,
+        &track_sections::HALF_LOOP,
     ];
 
     for track in &track_desc.tracks {
