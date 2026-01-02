@@ -239,6 +239,8 @@ fn render(
         &track_sections::INLINE_TWIST_LEFT,
         &track_sections::INLINE_TWIST_RIGHT,
         &track_sections::HALF_LOOP,
+        &track_sections::VERTICAL_LOOP_LEFT,
+        &track_sections::VERTICAL_LOOP_RIGHT,
     ];
 
     for track in &track_desc.tracks {

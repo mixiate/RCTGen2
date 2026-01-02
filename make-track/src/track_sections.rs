@@ -674,3 +674,15 @@ pub const HALF_LOOP: TrackSection = TrackSection {
     curve: crate::track_curves::half_loop,
     length: crate::track_curves::HALF_LOOP_LENGTH,
 };
+
+pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
+    name: "vertical_loop_left",
+    curve: crate::track_curves::vertical_loop_left,
+    length: crate::track_curves::VERTICAL_LOOP_LENGTH,
+};
+
+pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
+    name: "vertical_loop_right",
+    curve: crate::track_curves::vertical_loop_right,
+    length: crate::track_curves::VERTICAL_LOOP_LENGTH,
+};

@@ -48,6 +48,11 @@ const HALF_LOOP_SEGMENT_2_LENGTH: f32 = 2.685141;
 const HALF_LOOP_SEGMENT_3_LENGTH: f32 = 1.956695;
 pub const HALF_LOOP_LENGTH: f32 = HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH + HALF_LOOP_SEGMENT_3_LENGTH;
 
+const VERTICAL_LOOP_FACTOR: f32 = 1.006604;
+const VERTICAL_LOOP_SEGMENT_1_LENGTH: f32 = 0.540062;
+const VERTICAL_LOOP_SEGMENT_2_LENGTH: f32 = VERTICAL_LOOP_SEGMENT_1_LENGTH + 2.686603;
+pub const VERTICAL_LOOP_LENGTH: f32 = (VERTICAL_LOOP_SEGMENT_2_LENGTH + 1.730928) * VERTICAL_LOOP_FACTOR;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1093,4 +1098,75 @@ pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
             distance - (HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH),
         )
     }
+}
+
+pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let proj_distance = distance / VERTICAL_LOOP_FACTOR;
+
+    let mut point = if proj_distance < VERTICAL_LOOP_SEGMENT_1_LENGTH {
+        crate::curves::plane_curve_vertical(
+            &glam::Vec3::new(
+                0.0,
+                CLEARANCE_HEIGHT * (proj_distance / VERTICAL_LOOP_SEGMENT_1_LENGTH),
+                0.5 * (proj_distance / VERTICAL_LOOP_SEGMENT_1_LENGTH),
+            ),
+            &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
+        )
+    } else if proj_distance < VERTICAL_LOOP_SEGMENT_2_LENGTH {
+        // reparameterization coefficients from the original
+        let distance = (proj_distance - VERTICAL_LOOP_SEGMENT_1_LENGTH) * 3.3;
+        let distance = 3.674_234_6 * distance / 3.3;
+        crate::curves::cubic_curve_vertical(
+            1.0,
+            -3.5,
+            4.0,
+            0.5,
+            -20.0 * CLEARANCE_HEIGHT / 3.0,
+            26.0 * CLEARANCE_HEIGHT / 3.0,
+            8.0 * CLEARANCE_HEIGHT,
+            CLEARANCE_HEIGHT,
+            2.607_359_6e-7,
+            -7.423_059_3e-6,
+            8.476_578e-5,
+            -4.816_861_8e-4,
+            1.507_416_7e-3,
+            3.648_267_6e-4,
+            6.399_354e-2,
+            distance,
+        )
+    } else {
+        crate::curves::cubic_curve_vertical(
+            0.0,
+            -1.0,
+            0.0,
+            2.0,
+            -11.0 * CLEARANCE_HEIGHT / 3.0,
+            9.0 * CLEARANCE_HEIGHT / 6.0,
+            8.0 * CLEARANCE_HEIGHT,
+            33.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            (proj_distance - VERTICAL_LOOP_SEGMENT_2_LENGTH)
+                / (VERTICAL_LOOP_LENGTH / VERTICAL_LOOP_FACTOR - VERTICAL_LOOP_SEGMENT_2_LENGTH),
+        )
+    };
+
+    point.position.x -= 0.5 * distance / VERTICAL_LOOP_LENGTH;
+
+    point.tangent.x -= 0.5 * VERTICAL_LOOP_FACTOR / (VERTICAL_LOOP_LENGTH * 3.3);
+    point.tangent = point.tangent.normalize();
+
+    point.normal = glam::Vec3::new(0.0, point.tangent.z, -point.tangent.y).normalize();
+    point.binormal = point.normal.cross(point.tangent);
+
+    point
+}
+
+pub fn vertical_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(vertical_loop_left(distance, 0.0))
 }
