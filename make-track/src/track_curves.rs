@@ -41,6 +41,8 @@ pub const MEDIUM_HELIX_LENGTH: f32 = 3.932292;
 
 pub const SMALL_TURN_BANK_TO_GENTLE_LENGTH: f32 = 2.442_29;
 
+pub const BARREL_ROLL_LENGTH: f32 = 3.091882;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1017,4 +1019,13 @@ pub fn small_turn_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::
 
 pub fn small_turn_right_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::flip_x_axis(small_turn_left_bank_to_gentle(distance, bank_angle))
+}
+
+pub fn barrel_roll_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let radius = 7.0 * CLEARANCE_HEIGHT / 6.0;
+    crate::curves::roll_left(BARREL_ROLL_LENGTH, radius, distance)
+}
+
+pub fn barrel_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(barrel_roll_left(distance, 0.0))
 }

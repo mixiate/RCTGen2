@@ -286,3 +286,27 @@ pub fn large_turn_to_orthogonal_gentle(
 
     point
 }
+
+pub fn roll_left(length: f32, radius: f32, distance: f32) -> crate::track_sections::TrackPoint {
+    use std::f32::consts::PI;
+
+    let u = distance / length;
+
+    let (sin, cos) = (PI * u).sin_cos();
+
+    let position = glam::Vec3::new(radius * sin, radius * (1.0 - cos), 3.0 * u);
+    let tangent = if (1.0e-4..=length - 1.0e-4).contains(&distance) {
+        glam::Vec3::new(radius * PI * cos / length, radius * PI * sin / length, 1.0).normalize()
+    } else {
+        glam::Vec3::new(0.0, 0.0, 1.0)
+    };
+    let normal = glam::Vec3::new(-sin, cos, 0.0);
+    let binormal = normal.cross(tangent);
+
+    crate::track_sections::TrackPoint {
+        position,
+        tangent,
+        normal,
+        binormal,
+    }
+}

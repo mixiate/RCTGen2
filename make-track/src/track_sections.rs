@@ -644,3 +644,15 @@ pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_right_bank_to_gentle,
     length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
 };
+
+pub const BARREL_ROLL_LEFT: TrackSection = TrackSection {
+    name: "barrel_roll_left",
+    curve: crate::track_curves::barrel_roll_left,
+    length: crate::track_curves::BARREL_ROLL_LENGTH,
+};
+
+pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
+    name: "barrel_roll_right",
+    curve: crate::track_curves::barrel_roll_right,
+    length: crate::track_curves::BARREL_ROLL_LENGTH,
+};
