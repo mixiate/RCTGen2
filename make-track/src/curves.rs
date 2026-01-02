@@ -7,7 +7,7 @@ fn cubic_derivative(a: f32, b: f32, c: f32, x: f32) -> f32 {
 }
 
 #[expect(clippy::too_many_arguments)]
-fn reparameterize(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, x: f32) -> f32 {
+pub fn reparameterize(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, x: f32) -> f32 {
     x * (x * (x * (x * (x * (x * (x * a + b) + c) + d) + e) + f) + g)
 }
 
@@ -158,6 +158,15 @@ pub fn cubic_curve_vertical_diagonal(
         &glam::Vec3::new(x / SQRT_2, y, x / SQRT_2),
         &glam::Vec3::new(d_x / SQRT_2, d_y, d_x / SQRT_2).normalize(),
     )
+}
+
+pub fn flip_x_axis(mut point: crate::track_sections::TrackPoint) -> crate::track_sections::TrackPoint {
+    point.position.x *= -1.0;
+    point.normal.x *= -1.0;
+    point.tangent.x *= -1.0;
+    point.binormal.y *= -1.0;
+    point.binormal.z *= -1.0;
+    point
 }
 
 pub fn sloped_turn_left(radius: f32, gradient: f32, distance: f32) -> crate::track_sections::TrackPoint {

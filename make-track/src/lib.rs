@@ -232,6 +232,8 @@ fn render(
         &track_sections::SMALL_HELIX_RIGHT,
         &track_sections::MEDIUM_HELIX_LEFT,
         &track_sections::MEDIUM_HELIX_RIGHT,
+        &track_sections::SMALL_TURN_LEFT_BANK_TO_GENTLE,
+        &track_sections::SMALL_TURN_RIGHT_BANK_TO_GENTLE,
     ];
 
     for track in &track_desc.tracks {

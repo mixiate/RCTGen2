@@ -632,3 +632,15 @@ pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::medium_helix_right,
     length: crate::track_curves::MEDIUM_HELIX_LENGTH,
 };
+
+pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
+    name: "small_turn_left_bank_to_gentle",
+    curve: crate::track_curves::small_turn_left_bank_to_gentle,
+    length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
+};
+
+pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
+    name: "small_turn_right_bank_to_gentle",
+    curve: crate::track_curves::small_turn_right_bank_to_gentle,
+    length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
+};

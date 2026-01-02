@@ -39,6 +39,8 @@ pub const S_BEND_LENGTH: f32 = 3.240_75;
 pub const SMALL_HELIX_LENGTH: f32 = 2.365_02;
 pub const MEDIUM_HELIX_LENGTH: f32 = 3.932292;
 
+pub const SMALL_TURN_BANK_TO_GENTLE_LENGTH: f32 = 2.442_29;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -977,4 +979,42 @@ pub fn medium_helix_right(distance: f32, bank_angle: f32) -> crate::track_sectio
         &crate::curves::sloped_turn_right(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
         bank_angle,
     )
+}
+
+pub fn small_turn_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    let radius = SMALL_TURN_RADIUS;
+    let distance = crate::curves::reparameterize(
+        1.205_140_4e-11,
+        -1.087_381_1e-9,
+        2.562_959_8e-8,
+        3.909_113e-7,
+        -2.875_509e-5,
+        -2.670_483_7e-4,
+        1.278_172_9e-1,
+        distance * 3.3,
+    );
+
+    let a = 0.349_539_94;
+    let b = 0.262_832_5;
+
+    let rot = 0.5 * std::f32::consts::PI;
+    let (sin, cos) = (rot * distance).sin_cos();
+
+    let position = glam::Vec3::new(radius * (cos - 1.0), distance * (a * distance + b), radius * sin);
+    let tangent = glam::Vec3::new(-rot * radius * sin, 2.0 * a * distance + b, rot * radius * cos).normalize();
+    let binormal = glam::Vec3::new(0.0, 1.0, 0.0).cross(tangent).normalize();
+    let normal = tangent.cross(binormal);
+
+    let point = crate::track_sections::TrackPoint {
+        position,
+        tangent,
+        normal,
+        binormal,
+    };
+
+    crate::curves::banked_curve(&point, -bank_angle * (1.0 - distance))
+}
+
+pub fn small_turn_right_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(small_turn_left_bank_to_gentle(distance, bank_angle))
 }
