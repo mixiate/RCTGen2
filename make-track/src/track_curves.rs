@@ -76,6 +76,9 @@ pub const LARGE_HALF_LOOP_LENGTH: f32 = (LARGE_HALF_LOOP_SEGMENT_2_LENGTH + 3.54
 const ZERO_G_ROLL_BASE_LENGTH: f32 = 3.083249;
 pub const ZERO_G_ROLL_LENGTH: f32 = 3.266924;
 
+const LARGE_ZERO_G_ROLL_BASE_LENGTH: f32 = 5.385804;
+pub const LARGE_ZERO_G_ROLL_LENGTH: f32 = 5.568162;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1516,4 +1519,54 @@ pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_section
 
 pub fn zero_g_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::flip_x_axis(zero_g_roll_left(distance, 0.0))
+}
+
+pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    use std::f32::consts::PI;
+
+    let roll_rate_final = 0.85 * PI / 3.0;
+    let roll_rate_initial = 0.15 * PI / 3.0;
+
+    let a = (roll_rate_final + roll_rate_initial - 2.0 * PI / LARGE_ZERO_G_ROLL_BASE_LENGTH)
+        / (LARGE_ZERO_G_ROLL_BASE_LENGTH * LARGE_ZERO_G_ROLL_BASE_LENGTH);
+    let b = (3.0 * PI / LARGE_ZERO_G_ROLL_BASE_LENGTH - 2.0 * roll_rate_initial - roll_rate_final)
+        / LARGE_ZERO_G_ROLL_BASE_LENGTH;
+    let c = roll_rate_initial;
+
+    crate::curves::zero_g_roll(
+        4.0 * CLEARANCE_HEIGHT / 6.0,
+        0.0,
+        1.0,
+        3.0,
+        0.0,
+        -8.0 * CLEARANCE_HEIGHT,
+        0.0,
+        24.0 * CLEARANCE_HEIGHT,
+        0.0,
+        a,
+        b,
+        c,
+        0.0,
+        1.944_656_1e-7,
+        -1.273_624_7e-5,
+        1.207_163_8e-4,
+        -4.840_112_5e-4,
+        1.934_358_2e-3,
+        -3.275_567_7e-3,
+        1.742_188_6e-1,
+        crate::curves::reparameterize(
+            1.663_500_7e-6,
+            1.729_110_9e-6,
+            -1.907_052_6e-4,
+            8.341_236e-4,
+            -1.881_829_2e-3,
+            1.209_923e-3,
+            9.993_430_4e-1,
+            distance,
+        ),
+    )
+}
+
+pub fn large_zero_g_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(large_zero_g_roll_left(distance, 0.0))
 }

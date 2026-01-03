@@ -752,3 +752,15 @@ pub const ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::zero_g_roll_right,
     length: crate::track_curves::ZERO_G_ROLL_LENGTH,
 };
+
+pub const LARGE_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
+    name: "large_zero_g_roll_left",
+    curve: crate::track_curves::large_zero_g_roll_left,
+    length: crate::track_curves::LARGE_ZERO_G_ROLL_LENGTH,
+};
+
+pub const LARGE_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
+    name: "large_zero_g_roll_right",
+    curve: crate::track_curves::large_zero_g_roll_right,
+    length: crate::track_curves::LARGE_ZERO_G_ROLL_LENGTH,
+};

@@ -252,6 +252,8 @@ fn render(
         &track_sections::LARGE_HALF_LOOP_RIGHT,
         &track_sections::ZERO_G_ROLL_LEFT,
         &track_sections::ZERO_G_ROLL_RIGHT,
+        &track_sections::LARGE_ZERO_G_ROLL_LEFT,
+        &track_sections::LARGE_ZERO_G_ROLL_RIGHT,
     ];
 
     for track in &track_desc.tracks {
