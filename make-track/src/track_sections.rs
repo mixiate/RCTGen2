@@ -716,3 +716,15 @@ pub const LARGE_CORKSCREW_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::large_corkscrew_right,
     length: crate::track_curves::LARGE_CORKSCREW_LENGTH,
 };
+
+pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
+    name: "medium_half_loop_left",
+    curve: crate::track_curves::medium_half_loop_left,
+    length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
+};
+
+pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
+    name: "medium_half_loop_right",
+    curve: crate::track_curves::medium_half_loop_right,
+    length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
+};

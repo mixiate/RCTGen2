@@ -62,6 +62,12 @@ pub const CORKSCREW_LENGTH: f32 = CORKSCREW_SEGMENT_1_LENGTH + CORKSCREW_SEGMENT
 const LARGE_CORKSCREW_SEGMENT_LENGTH: f32 = 2.665301;
 pub const LARGE_CORKSCREW_LENGTH: f32 = LARGE_CORKSCREW_SEGMENT_LENGTH * 2.0;
 
+const MEDIUM_HALF_LOOP_FACTOR: f32 = 1.005_056_3;
+const MEDIUM_HALF_LOOP_SEGMENT_1_LENGTH: f32 = 4.605006;
+const MEDIUM_HALF_LOOP_SEGMENT_2_LENGTH: f32 = 2.988654;
+pub const MEDIUM_HALF_LOOP_LENGTH: f32 =
+    (MEDIUM_HALF_LOOP_SEGMENT_1_LENGTH + MEDIUM_HALF_LOOP_SEGMENT_2_LENGTH) * MEDIUM_HALF_LOOP_FACTOR;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1323,4 +1329,66 @@ pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_se
             distance - LARGE_CORKSCREW_SEGMENT_LENGTH,
         )
     }
+}
+
+pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    if distance < 0.001 {
+        return gentle(0.0, 0.0);
+    }
+
+    let proj_distance = distance / MEDIUM_HALF_LOOP_FACTOR;
+
+    let mut point = if proj_distance < MEDIUM_HALF_LOOP_SEGMENT_1_LENGTH {
+        crate::curves::cubic_curve_vertical(
+            1.2,
+            -5.3,
+            7.0,
+            0.0,
+            -22.0 * CLEARANCE_HEIGHT / 3.0,
+            28.0 * CLEARANCE_HEIGHT / 3.0,
+            14.0 * CLEARANCE_HEIGHT,
+            0.0,
+            6.510_708e-5,
+            -8.732_485_6e-4,
+            4.688_747e-3,
+            -1.242_191_5e-2,
+            1.792_376_3e-2,
+            -1.210_900_5e-3,
+            1.346_642_7e-1,
+            proj_distance,
+        )
+    } else {
+        crate::curves::cubic_curve_vertical(
+            0.65,
+            -2.55,
+            0.0,
+            2.9,
+            -56.0 * CLEARANCE_HEIGHT / 3.0 + 3.15,
+            28.0 * CLEARANCE_HEIGHT - 1.0 * 6.3,
+            3.15,
+            16.0 * CLEARANCE_HEIGHT,
+            3.056_875e-5,
+            -3.166_901_6e-4,
+            1.075_546_4e-3,
+            -1.047_478_5e-3,
+            -4.773_461_3e-3,
+            1.861_982_6e-2,
+            3.174_685_8e-1,
+            proj_distance - MEDIUM_HALF_LOOP_SEGMENT_1_LENGTH,
+        )
+    };
+
+    point.position.x -= distance / MEDIUM_HALF_LOOP_LENGTH;
+
+    point.tangent.x -= MEDIUM_HALF_LOOP_FACTOR / (MEDIUM_HALF_LOOP_LENGTH * 3.3);
+    point.tangent = point.tangent.normalize();
+
+    point.normal = glam::Vec3::new(0.0, point.tangent.z, -point.tangent.y).normalize();
+    point.binormal = point.normal.cross(point.tangent);
+
+    point
+}
+
+pub fn medium_half_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis(medium_half_loop_left(distance, 0.0))
 }
