@@ -728,3 +728,15 @@ pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::medium_half_loop_right,
     length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
 };
+
+pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
+    name: "large_half_loop_left",
+    curve: crate::track_curves::large_half_loop_left,
+    length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
+};
+
+pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
+    name: "large_half_loop_right",
+    curve: crate::track_curves::large_half_loop_right,
+    length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
+};
