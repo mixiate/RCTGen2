@@ -79,6 +79,8 @@ pub const ZERO_G_ROLL_LENGTH: f32 = 3.266924;
 const LARGE_ZERO_G_ROLL_BASE_LENGTH: f32 = 5.385804;
 pub const LARGE_ZERO_G_ROLL_LENGTH: f32 = 5.568162;
 
+pub const DIVE_LOOP_45_LENGTH: f32 = 5.335896;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1569,4 +1571,37 @@ pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_s
 
 pub fn large_zero_g_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::flip_x_axis(large_zero_g_roll_left(distance, 0.0))
+}
+
+pub fn dive_loop_45_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::bezier3d(
+        1.0,
+        -3.0,
+        3.0,
+        0.0,
+        -2.177_324,
+        0.816_496_55,
+        4.898_979,
+        0.0,
+        0.5,
+        0.0,
+        3.0,
+        0.0,
+        2.295_108_8,
+        -3.700_379_6,
+        6.238_097e-1,
+        7.814_611e-1,
+        -6.201_532e-6,
+        7.962_013_5e-5,
+        -3.934_916_5e-4,
+        1.074_27e-3,
+        -1.089_816_3e-3,
+        3.519_146_7e-3,
+        1.541_733_3e-1,
+        distance,
+    )
+}
+
+pub fn dive_loop_45_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flip_x_axis_diagonal(dive_loop_45_left(distance, 0.0))
 }

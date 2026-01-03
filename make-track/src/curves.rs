@@ -286,6 +286,15 @@ pub fn flip_x_axis(mut point: crate::track_sections::TrackPoint) -> crate::track
     point
 }
 
+pub fn flip_x_axis_diagonal(mut point: crate::track_sections::TrackPoint) -> crate::track_sections::TrackPoint {
+    use glam::Vec3Swizzles as _;
+    point.position = point.position.with_xz(glam::Vec2::new(point.position.z, point.position.x));
+    point.normal = point.normal.with_xz(glam::Vec2::new(point.normal.z, point.normal.x));
+    point.tangent = point.tangent.with_xz(glam::Vec2::new(point.tangent.z, point.tangent.x));
+    point.binormal = point.normal.cross(point.tangent);
+    point
+}
+
 pub fn sloped_turn_left(radius: f32, gradient: f32, distance: f32) -> crate::track_sections::TrackPoint {
     let arc_length = radius * (1.0 + gradient * gradient).sqrt();
     let angle = distance / arc_length;

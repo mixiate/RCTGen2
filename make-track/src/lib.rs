@@ -254,6 +254,8 @@ fn render(
         &track_sections::ZERO_G_ROLL_RIGHT,
         &track_sections::LARGE_ZERO_G_ROLL_LEFT,
         &track_sections::LARGE_ZERO_G_ROLL_RIGHT,
+        &track_sections::DIVE_LOOP_45_LEFT,
+        &track_sections::DIVE_LOOP_45_RIGHT,
     ];
 
     for track in &track_desc.tracks {

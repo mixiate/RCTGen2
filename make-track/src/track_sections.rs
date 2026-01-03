@@ -764,3 +764,15 @@ pub const LARGE_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::large_zero_g_roll_right,
     length: crate::track_curves::LARGE_ZERO_G_ROLL_LENGTH,
 };
+
+pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
+    name: "dive_loop_45_left",
+    curve: crate::track_curves::dive_loop_45_left,
+    length: crate::track_curves::DIVE_LOOP_45_LENGTH,
+};
+
+pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
+    name: "dive_loop_45_right",
+    curve: crate::track_curves::dive_loop_45_right,
+    length: crate::track_curves::DIVE_LOOP_45_LENGTH,
+};
