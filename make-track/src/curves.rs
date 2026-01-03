@@ -223,6 +223,60 @@ pub fn bezier3d(
     }
 }
 
+#[expect(clippy::too_many_arguments)]
+pub fn zero_g_roll(
+    radius: f32,
+    xa: f32,
+    xb: f32,
+    xc: f32,
+    xd: f32,
+    ya: f32,
+    yb: f32,
+    yc: f32,
+    yd: f32,
+    ra: f32,
+    rb: f32,
+    rc: f32,
+    rd: f32,
+    pa: f32,
+    pb: f32,
+    pc: f32,
+    pd: f32,
+    pe: f32,
+    pf: f32,
+    pg: f32,
+    distance: f32,
+) -> crate::track_sections::TrackPoint {
+    let u = reparameterize(pa, pb, pc, pd, pe, pf, pg, distance);
+
+    let unbanked_point = plane_curve_vertical(
+        &glam::Vec3::new(0.0, cubic(ya, yb, yc, yd, u), cubic(xa, xb, xc, xd, u)),
+        &glam::Vec3::new(0.0, cubic_derivative(ya, yb, yc, u), cubic_derivative(xa, xb, xc, u)).normalize(),
+    );
+
+    let roll = cubic(ra, rb, rc, rd, distance);
+    let roll_rate = cubic_derivative(ra, rb, rc, distance);
+
+    let (roll_sin, roll_cos) = roll.sin_cos();
+
+    let position = unbanked_point.normal * (radius * (1.0 - roll_cos));
+    let position = position + (unbanked_point.binormal * (radius * roll_sin));
+    let position = unbanked_point.position + position;
+
+    let tangent = unbanked_point.normal * radius * roll_rate * roll_sin;
+    let tangent = tangent + (unbanked_point.binormal * radius * roll_rate * roll_cos);
+    let tangent = (unbanked_point.tangent + tangent).normalize();
+
+    let normal = (unbanked_point.normal * roll_cos) + (unbanked_point.binormal * -roll_sin);
+
+    crate::track_sections::TrackPoint {
+        position,
+        tangent,
+        normal,
+        binormal: normal.cross(tangent),
+    }
+}
+
 pub fn flip_x_axis(mut point: crate::track_sections::TrackPoint) -> crate::track_sections::TrackPoint {
     point.position.x *= -1.0;
     point.normal.x *= -1.0;

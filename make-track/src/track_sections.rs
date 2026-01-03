@@ -740,3 +740,15 @@ pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::large_half_loop_right,
     length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
 };
+
+pub const ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
+    name: "zero_g_roll_left",
+    curve: crate::track_curves::zero_g_roll_left,
+    length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+};
+
+pub const ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
+    name: "zero_g_roll_right",
+    curve: crate::track_curves::zero_g_roll_right,
+    length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+};
