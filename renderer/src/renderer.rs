@@ -177,6 +177,10 @@ pub fn render_scene(
                             let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
                             fragment.is_mask = true;
                         }
+                        Some(crate::raytrace::RayHit::Ghost(depth)) => {
+                            let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
+                            fragment.ghost_depth = depth;
+                        }
                         _ => {}
                     }
                 }
@@ -233,6 +237,7 @@ pub fn render_scene(
                             total_weight += sample_weight;
                         }
                     }
+                    colour *= 1.0 / total_weight;
                     match edge_type {
                         crate::renderer::EdgeType::Light => fragment.colour = colour,
                         crate::renderer::EdgeType::Dark => {
