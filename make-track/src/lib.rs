@@ -104,7 +104,7 @@ fn render_track_section(
 
     for (i, image) in images.iter().enumerate() {
         let image_name = format!("{}_{i}", track_section.name);
-        _ = image.save(&output_directory.join(&track.name).join(image_name).with_extension("png"));
+        _ = image.save(&output_directory.join(image_name).with_extension("png"));
     }
 
     Ok(())
@@ -261,6 +261,9 @@ fn render(
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
 
+        let output_directory = output_directory.join(&track.name);
+        std::fs::create_dir_all(&output_directory)?;
+
         for track_section in &track_sections {
             render_track_section(
                 &render_device,
@@ -270,7 +273,7 @@ fn render(
                 track_desc.dither,
                 track,
                 track_section,
-                output_directory,
+                &output_directory,
             )?;
         }
     }
