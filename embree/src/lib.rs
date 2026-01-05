@@ -50,8 +50,11 @@ impl Scene<'_> {
         }
     }
 
-    pub fn add_geometry(&self, geometry: TriangleGeometry) -> Result<(), Error> {
-        unsafe { embree4_sys::rtcSetGeometryOccludedFilterFunction(geometry.handle, Some(occlusion_filter)) };
+    pub fn add_geometry(&self, geometry: TriangleGeometry, cull_back_faces: bool) -> Result<(), Error> {
+        if cull_back_faces {
+            unsafe { embree4_sys::rtcSetGeometryIntersectFilterFunction(geometry.handle, Some(filter_back_faces)) };
+        }
+        unsafe { embree4_sys::rtcSetGeometryOccludedFilterFunction(geometry.handle, Some(filter_back_faces)) };
         unsafe { embree4_sys::rtcCommitGeometry(geometry.handle) };
         unsafe { embree4_sys::rtcAttachGeometry(self.handle, geometry.handle) };
         Ok(())
@@ -253,7 +256,7 @@ pub struct Bounds {
     pub upper_z: f32,
 }
 
-unsafe extern "C" fn occlusion_filter(args: *const embree4_sys::RTCFilterFunctionNArguments) {
+unsafe extern "C" fn filter_back_faces(args: *const embree4_sys::RTCFilterFunctionNArguments) {
     if unsafe { (*args).N } != 1 {
         return;
     }

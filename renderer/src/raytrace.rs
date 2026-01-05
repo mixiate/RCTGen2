@@ -36,13 +36,14 @@ impl<'a> SceneBuilder<'a> {
             for (position, geom_position) in mesh.positions.iter().zip(geometry.positions().iter_mut()) {
                 *geom_position = transform.transform_point3(*position).into();
             }
-            self.embree_scene.add_geometry(geometry)?;
+            let is_ghost = is_ghost.unwrap_or(mesh.is_ghost);
+            self.embree_scene.add_geometry(geometry, is_ghost)?;
 
             self.meshes.push(SceneMesh {
                 mesh,
                 normals: mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
                 is_mask: is_mask.unwrap_or(mesh.is_mask),
-                is_ghost: is_ghost.unwrap_or(mesh.is_ghost),
+                is_ghost,
             });
         }
 
