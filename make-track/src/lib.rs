@@ -3,7 +3,7 @@ mod track_curves;
 mod track_desc;
 mod track_sections;
 
-const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
+const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 1.0 / (2.0 * 6.0.sqrt())
 
 fn add_model_to_scene<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
