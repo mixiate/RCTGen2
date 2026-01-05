@@ -1,0 +1,39 @@
+#[test]
+fn test_make_track() {
+    let make_track_directory = std::path::PathBuf::from(std::env!("CARGO_MANIFEST_DIR"));
+    let data_directory = make_track_directory.parent().unwrap().join("data");
+    let test_files_directory = make_track_directory.join("tests").join("files");
+
+    let track_description_directory = test_files_directory.join("src").join("test-track");
+    let track_description_file_path = track_description_directory.join("track").with_extension("json");
+
+    let output_directory = tempfile::tempdir().unwrap();
+
+    make_track::make_track(&data_directory, &track_description_file_path, output_directory.path()).unwrap();
+
+    let output_directory = output_directory.path().join("test-track");
+    let expected_directory = test_files_directory.join("output").join("test-track");
+
+    {
+        let output_file_count = std::fs::read_dir(&output_directory).unwrap().count();
+        let expected_file_count = std::fs::read_dir(&output_directory).unwrap().count();
+        assert!(output_file_count == expected_file_count);
+    }
+
+    for entry in std::fs::read_dir(&output_directory).unwrap() {
+        let entry = entry.unwrap();
+
+        let output_file_path = entry.path();
+        let output_file = renderer::image::IndexedImage::load(&output_file_path, &renderer::palette::PALETTE_FLAT)
+            .expect(&format!("Could not open {output_file_path:?}"));
+
+        let expected_file_path = expected_directory.join(entry.file_name());
+        let expected_file = renderer::image::IndexedImage::load(&expected_file_path, &renderer::palette::PALETTE_FLAT)
+            .expect(&format!("Could not open {expected_file_path:?}"));
+
+        assert!(
+            output_file.as_raw() == expected_file.as_raw(),
+            "{output_file_path:?} != {expected_file_path:?}"
+        );
+    }
+}
