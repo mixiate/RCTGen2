@@ -158,7 +158,8 @@ fn main() -> anyhow::Result<()> {
                     })
                     .collect();
 
-                let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4);
+                const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // ?
+                let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4, EDGE_DISTANCE);
 
                 let image = framebuffer.to_image();
                 let image_path =

@@ -40,7 +40,8 @@ fn render_rotation(
     let view_rotation_inverse = view_rotation.inverse();
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
-    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4);
+    const EDGE_DISTANCE: f32 = 0.088_388_346;
+    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4, EDGE_DISTANCE);
     framebuffer.into_cropped_indexed_image(dither)
 }
 

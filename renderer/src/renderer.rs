@@ -67,9 +67,8 @@ pub fn render_scene(
     lights: &[Light],
     multi_samples_x: usize,
     multi_samples_y: usize,
+    edge_distance: f32,
 ) -> crate::Framebuffer {
-    const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // what is this? scale of the camera?
-
     use rand_pcg::rand_core::SeedableRng as _;
     let mut rng = rand_pcg::Pcg32::seed_from_u64(1);
 
@@ -201,11 +200,11 @@ pub fn render_scene(
             };
 
             let (depth, edge_type, palette_region_type) = if let Some(closest_sample) = closest_sample
-                && (min_depth < ghost_depth - EDGE_DISTANCE && !is_mask)
+                && (min_depth < ghost_depth - edge_distance && !is_mask)
             {
                 let mut inside_count = 0;
                 for sample in samples.iter().filter(|x| !x.is_mask) {
-                    if sample.depth <= min_depth + EDGE_DISTANCE && sample.palette_region_type.is_some() {
+                    if sample.depth <= min_depth + edge_distance && sample.palette_region_type.is_some() {
                         inside_count += 1;
                     }
                 }
@@ -229,8 +228,8 @@ pub fn render_scene(
                     let mut weight = 0.0;
                     let mut total_weight = 0.0;
                     for sample in samples.iter().filter(|x| !x.is_mask) {
-                        if !(sample.ghost_depth <= depth + EDGE_DISTANCE && sample.depth > depth + EDGE_DISTANCE) {
-                            if sample.depth <= depth + EDGE_DISTANCE && sample.palette_region_type.is_some() {
+                        if !(sample.ghost_depth <= depth + edge_distance && sample.depth > depth + edge_distance) {
+                            if sample.depth <= depth + edge_distance && sample.palette_region_type.is_some() {
                                 colour += sample.colour * sample_weight;
                                 weight += sample_weight;
                             }
