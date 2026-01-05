@@ -3,7 +3,6 @@ mod track_curves;
 mod track_desc;
 mod track_sections;
 
-const TILE_SIZE: f32 = 3.3;
 const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 8 pixels tall
 
 fn add_model_to_scene<'a>(
@@ -16,10 +15,10 @@ fn add_model_to_scene<'a>(
     bank_angle: f32,
 ) -> anyhow::Result<()> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
-        let distance = ((position.z / TILE_SIZE) * scale) + offset;
+        let distance = (position.z * scale) + offset;
         let point = track_section.sample_curve(distance, bank_angle);
 
-        let position = (point.position * TILE_SIZE) + (point.normal * position.y) + (point.binormal * position.x);
+        let position = point.position + (point.normal * position.y) + (point.binormal * position.x);
         let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
 
         (position, normal)
@@ -127,7 +126,7 @@ fn render(
             glam::Vec3::new(-16.0 * 3.0_f32.sqrt(), -16.0 * 2.0_f32.sqrt(), 16.0 * 3.0_f32.sqrt()),
         )
         .transpose(),
-    ) / TILE_SIZE;
+    );
 
     let lights = track_desc.get_lights();
 
