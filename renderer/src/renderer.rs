@@ -150,7 +150,10 @@ pub fn render_scene(
                             };
 
                             for light in lights {
-                                if light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
+                                if material.shadows
+                                    && light.shadow
+                                    && scene.trace_occlusion_ray(&hit.position, &light.direction)
+                                {
                                     continue;
                                 }
                                 if light.diffuse_strength > 0.0 {
