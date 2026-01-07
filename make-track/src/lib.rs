@@ -1,4 +1,5 @@
 mod curves;
+mod mask;
 mod track_curves;
 mod track_desc;
 mod track_sections;
@@ -112,6 +113,7 @@ fn render_track_section(
 
 fn render(
     track_desc: &track_desc::Desc,
+    data_directory: &std::path::Path,
     base_directory: &std::path::Path,
     output_directory: &std::path::Path,
 ) -> anyhow::Result<()> {
@@ -261,6 +263,12 @@ fn render(
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
 
+        let masks = mask::Masks::load(&data_directory.join("masks").join(&track.masks).with_extension("json"))?;
+
+        for (key, value) in masks.track_sections.iter() {
+            println!("{key} {value:?}");
+        }
+
         let output_directory = output_directory.join(&track.name);
         std::fs::create_dir_all(&output_directory)?;
 
@@ -282,6 +290,7 @@ fn render(
 }
 
 pub fn make_track(
+    data_directory: &std::path::Path,
     track_description_file_path: &std::path::Path,
     output_directory: &std::path::Path,
 ) -> anyhow::Result<()> {
@@ -296,7 +305,7 @@ pub fn make_track(
         )
     })?;
 
-    render(&desc, base_directory, output_directory)?;
+    render(&desc, data_directory, base_directory, output_directory)?;
 
     Ok(())
 }

@@ -142,7 +142,6 @@ pub struct Track {
     pub flags: std::collections::HashSet<Flag>,
     #[expect(unused)]
     pub sections: std::collections::HashSet<Section>,
-    #[expect(unused)]
     pub masks: std::path::PathBuf,
     pub name: String,
     #[expect(unused)]
