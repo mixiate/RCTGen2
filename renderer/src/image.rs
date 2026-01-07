@@ -84,7 +84,7 @@ impl IndexedImage {
         &self.pixels
     }
 
-    pub fn load(path: &std::path::Path) -> anyhow::Result<Self> {
+    pub fn load(path: &std::path::Path, expected_palette: &[u8]) -> anyhow::Result<Self> {
         use anyhow::Context as _;
 
         let file = std::fs::File::open(path)?;
@@ -97,7 +97,7 @@ impl IndexedImage {
             .as_ref()
             .with_context(|| format!("Error reading {}, image has no palette", path.display()))?;
         anyhow::ensure!(
-            **palette == crate::palette::PALETTE_FLAT,
+            *palette == expected_palette,
             "Error reading {}, image palette is incorrect",
             path.display()
         );

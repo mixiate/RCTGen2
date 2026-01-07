@@ -151,7 +151,7 @@ mod tests {
         let expected_file_path = test_files_directory.join("images").with_extension("dat");
 
         let test_image_path = test_files_directory.join("rle_test").with_extension("png");
-        let test_image = crate::image::IndexedImage::load(&test_image_path).unwrap();
+        let test_image = crate::image::IndexedImage::load(&test_image_path, &crate::palette::PALETTE_FLAT).unwrap();
         let mut archive = crate::gx::Archive::with_capacity(2);
         archive.add_indexed_image(&test_image);
         archive.add_indexed_image_rle(&test_image);

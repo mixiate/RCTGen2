@@ -605,7 +605,8 @@ pub fn make_vehicle(
 
     let preview_image = if let Some(ref preview_file_path) = ride_description.preview {
         let preview_file_path = base_directory.join(preview_file_path);
-        let mut preview_image = renderer::image::IndexedImage::load(&preview_file_path)?;
+        let mut preview_image =
+            renderer::image::IndexedImage::load(&preview_file_path, &renderer::palette::PALETTE_FLAT)?;
         preview_image.water_colours_to_regular_colours();
         preview_image
     } else {
