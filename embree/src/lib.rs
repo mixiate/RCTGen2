@@ -32,6 +32,8 @@ impl Drop for Device {
     }
 }
 
+unsafe impl Sync for Device {}
+
 pub struct Scene<'a> {
     _device: std::marker::PhantomData<&'a Device>,
     handle: embree4_sys::RTCScene,

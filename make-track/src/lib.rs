@@ -118,6 +118,7 @@ fn render(
     output_directory: &std::path::Path,
 ) -> anyhow::Result<()> {
     use anyhow::Context as _;
+    use rayon::prelude::*;
 
     let render_device = renderer::Device::try_new().context("Could not create render device")?;
 
@@ -272,18 +273,21 @@ fn render(
         let output_directory = output_directory.join(&track.name);
         std::fs::create_dir_all(&output_directory)?;
 
-        for track_section in &track_sections {
-            render_track_section(
-                &render_device,
-                &camera,
-                &lights,
-                &models,
-                track_desc.dither,
-                track,
-                track_section,
-                &output_directory,
-            )?;
-        }
+        track_sections
+            .into_par_iter()
+            .map(|track_section| {
+                render_track_section(
+                    &render_device,
+                    &camera,
+                    &lights,
+                    &models,
+                    track_desc.dither,
+                    track,
+                    track_section,
+                    &output_directory,
+                )
+            })
+            .collect::<anyhow::Result<Vec<_>>>()?;
     }
 
     Ok(())
