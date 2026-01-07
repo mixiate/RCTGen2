@@ -9,7 +9,7 @@ const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 1.0 / (2.0 * 6.0.sqrt())
 fn add_model_to_scene<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     model: &'a renderer::model::Model,
-    is_ghost: Option<bool>,
+    mesh_type: Option<renderer::MeshType>,
     track_section: &track_sections::TrackSection,
     scale: f32,
     offset: f32,
@@ -24,7 +24,7 @@ fn add_model_to_scene<'a>(
 
         (position, normal)
     };
-    scene.add_model_transform(model, transform, None, is_ghost)
+    scene.add_model_transform(model, transform, mesh_type)
 }
 
 fn render_rotation(
@@ -69,7 +69,7 @@ fn render_track_section(
     add_model_to_scene(
         &mut scene,
         &models.track,
-        Some(true),
+        Some(renderer::MeshType::Ghost),
         track_section,
         scale,
         -length,
@@ -78,7 +78,7 @@ fn render_track_section(
     add_model_to_scene(
         &mut scene,
         &models.track,
-        Some(true),
+        Some(renderer::MeshType::Ghost),
         track_section,
         scale,
         track_section.length,

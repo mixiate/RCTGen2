@@ -3,7 +3,7 @@ struct SceneMesh<'a> {
     normals: Vec<glam::Vec3>,
 }
 
-#[derive(PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum MeshType {
     Normal,
     Mask,
@@ -70,8 +70,7 @@ impl<'a> SceneBuilder<'a> {
         &mut self,
         model: &'a crate::model::Model,
         transform: F,
-        is_mask: Option<bool>,
-        is_ghost: Option<bool>,
+        mesh_type: Option<MeshType>,
     ) -> anyhow::Result<()>
     where
         F: Fn((&glam::Vec3, &glam::Vec3)) -> (glam::Vec3, glam::Vec3),
@@ -86,20 +85,17 @@ impl<'a> SceneBuilder<'a> {
                 *geometry_position = vertex.0.into();
                 normals.push(vertex.1.normalize());
             }
-            let is_ghost = is_ghost.unwrap_or(mesh.is_ghost);
-            self.embree_scene.add_geometry(geometry, is_ghost)?;
-
-            let is_mask = is_mask.unwrap_or(mesh.is_mask);
+            self.embree_scene.add_geometry(geometry, mesh.is_ghost || mesh_type == Some(MeshType::Ghost))?;
 
             self.meshes.push(SceneMesh { mesh, normals });
 
-            let mesh_type = if is_ghost {
+            let mesh_type = mesh_type.unwrap_or(if mesh.is_ghost {
                 MeshType::Ghost
-            } else if is_mask {
+            } else if mesh.is_mask {
                 MeshType::Mask
             } else {
                 MeshType::Normal
-            };
+            });
             self.mesh_types.push(mesh_type);
         }
 
