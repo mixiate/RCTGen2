@@ -423,6 +423,7 @@ fn add_restraint_models_to_scene<'a>(
 
 fn render_rotation(
     scene: &renderer::Scene,
+    mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
     lights: &[renderer::Light],
     rotation: &VehicleRotation,
@@ -435,7 +436,7 @@ fn render_rotation(
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
     const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // ?
-    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4, EDGE_DISTANCE);
+    let framebuffer = renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
     framebuffer.into_cropped_indexed_image(true)
 }
 
@@ -459,17 +460,17 @@ fn render_vehicle(
     {
         let mut scene = renderer::SceneBuilder::new(render_device)?;
         add_models_to_scene(&mut scene, &vehicle.models, None)?;
-        let scene = scene.build();
+        let (scene, mesh_types) = scene.build();
 
-        images.par_extend(rotations.par_iter().map(|x| render_rotation(&scene, camera, lights, x)));
+        images.par_extend(rotations.par_iter().map(|x| render_rotation(&scene, &mesh_types, camera, lights, x)));
 
         if let Some(ref restraint_rotations) = restraint_rotations {
             for frame in 0..3 {
                 let mut scene = renderer::SceneBuilder::new(render_device)?;
                 add_restraint_models_to_scene(&mut scene, &vehicle.models, None, frame)?;
-                let scene = scene.build();
+                let (scene, mesh_types) = scene.build();
                 for rotation in restraint_rotations {
-                    images.push(render_rotation(&scene, camera, lights, rotation));
+                    images.push(render_rotation(&scene, &mesh_types, camera, lights, rotation));
                 }
             }
         }
@@ -480,9 +481,9 @@ fn render_vehicle(
         add_models_to_scene(&mut scene, std::slice::from_ref(model_desc), None)?;
         add_models_to_scene(&mut scene, &vehicle.models, Some(true))?;
         add_models_to_scene(&mut scene, &vehicle.riders[0..rider_index], Some(true))?;
-        let scene = scene.build();
+        let (scene, mesh_types) = scene.build();
 
-        images.par_extend(rotations.par_iter().map(|x| render_rotation(&scene, camera, lights, x)));
+        images.par_extend(rotations.par_iter().map(|x| render_rotation(&scene, &mesh_types, camera, lights, x)));
 
         if let Some(ref restraint_rotations) = restraint_rotations {
             for frame in 0..3 {
@@ -490,10 +491,10 @@ fn render_vehicle(
                 add_restraint_models_to_scene(&mut scene, std::slice::from_ref(model_desc), None, frame)?;
                 add_restraint_models_to_scene(&mut scene, &vehicle.models, Some(true), frame)?;
                 add_restraint_models_to_scene(&mut scene, &vehicle.riders[0..rider_index], Some(true), frame)?;
-                let scene = scene.build();
+                let (scene, mesh_types) = scene.build();
 
                 for rotation in restraint_rotations {
-                    images.push(render_rotation(&scene, camera, lights, rotation));
+                    images.push(render_rotation(&scene, &mesh_types, camera, lights, rotation));
                 }
             }
         }

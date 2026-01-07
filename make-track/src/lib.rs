@@ -29,6 +29,7 @@ fn add_model_to_scene<'a>(
 
 fn render_rotation(
     scene: &renderer::Scene,
+    mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
     lights: &[renderer::Light],
     rotation: usize,
@@ -41,7 +42,7 @@ fn render_rotation(
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
     const EDGE_DISTANCE: f32 = 0.088_388_346;
-    let framebuffer = renderer::render_scene(scene, &camera, &lights, 4, 4, EDGE_DISTANCE);
+    let framebuffer = renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
     framebuffer.into_cropped_indexed_image(dither)
 }
 
@@ -96,11 +97,11 @@ fn render_track_section(
         )?;
     }
 
-    let scene = scene.build();
+    let (scene, mesh_types) = scene.build();
 
     let images = (0..4)
         .into_par_iter()
-        .map(|rotation| render_rotation(&scene, camera, lights, rotation, dither))
+        .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation, dither))
         .collect::<Vec<_>>();
 
     for (i, image) in images.iter().enumerate() {

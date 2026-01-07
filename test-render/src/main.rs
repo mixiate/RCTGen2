@@ -120,7 +120,7 @@ fn main() -> anyhow::Result<()> {
             );
 
             for rotation_index in 0..item.rotations {
-                let scene = {
+                let (scene, mesh_types) = {
                     let model_translation = {
                         let offsets = [0.0, -1.0, 0.0, -1.5, 0.0, -1.0, 0.0, -1.5];
                         let offset = glam::Vec3::new(
@@ -159,7 +159,7 @@ fn main() -> anyhow::Result<()> {
                     .collect();
 
                 const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // ?
-                let framebuffer = renderer::render_scene(&scene, &camera, &lights, 4, 4, EDGE_DISTANCE);
+                let framebuffer = renderer::render_scene(&scene, &mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
 
                 let image = framebuffer.to_image();
                 let image_path =

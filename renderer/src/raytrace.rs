@@ -1,14 +1,20 @@
 struct SceneMesh<'a> {
     mesh: &'a crate::model::Mesh,
     normals: Vec<glam::Vec3>,
-    is_mask: bool,
-    is_ghost: bool,
+}
+
+#[derive(PartialEq)]
+pub enum MeshType {
+    Normal,
+    Mask,
+    Ghost,
 }
 
 pub struct SceneBuilder<'a> {
     embree_device: &'a embree::Device,
     embree_scene: embree::Scene<'a>,
     meshes: Vec<SceneMesh<'a>>,
+    mesh_types: Vec<MeshType>,
 }
 
 impl<'a> SceneBuilder<'a> {
@@ -19,6 +25,7 @@ impl<'a> SceneBuilder<'a> {
             embree_device,
             embree_scene: scene,
             meshes: Vec::new(),
+            mesh_types: Vec::new(),
         })
     }
 
@@ -39,12 +46,21 @@ impl<'a> SceneBuilder<'a> {
             let is_ghost = is_ghost.unwrap_or(mesh.is_ghost);
             self.embree_scene.add_geometry(geometry, is_ghost)?;
 
+            let is_mask = is_mask.unwrap_or(mesh.is_mask);
+
             self.meshes.push(SceneMesh {
                 mesh,
                 normals: mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
-                is_mask: is_mask.unwrap_or(mesh.is_mask),
-                is_ghost,
             });
+
+            let mesh_type = if is_ghost {
+                MeshType::Ghost
+            } else if is_mask {
+                MeshType::Mask
+            } else {
+                MeshType::Normal
+            };
+            self.mesh_types.push(mesh_type);
         }
 
         Ok(())
@@ -73,22 +89,31 @@ impl<'a> SceneBuilder<'a> {
             let is_ghost = is_ghost.unwrap_or(mesh.is_ghost);
             self.embree_scene.add_geometry(geometry, is_ghost)?;
 
-            self.meshes.push(SceneMesh {
-                mesh,
-                normals,
-                is_mask: is_mask.unwrap_or(mesh.is_mask),
-                is_ghost,
-            });
+            let is_mask = is_mask.unwrap_or(mesh.is_mask);
+
+            self.meshes.push(SceneMesh { mesh, normals });
+
+            let mesh_type = if is_ghost {
+                MeshType::Ghost
+            } else if is_mask {
+                MeshType::Mask
+            } else {
+                MeshType::Normal
+            };
+            self.mesh_types.push(mesh_type);
         }
 
         Ok(())
     }
 
-    pub fn build(self) -> Scene<'a> {
-        Scene {
-            embree_scene: embree::commit_scene(self.embree_scene),
-            meshes: self.meshes,
-        }
+    pub fn build(self) -> (Scene<'a>, Vec<MeshType>) {
+        (
+            Scene {
+                embree_scene: embree::commit_scene(self.embree_scene),
+                meshes: self.meshes,
+            },
+            self.mesh_types,
+        )
     }
 }
 
@@ -115,13 +140,18 @@ pub enum RayHit<'a> {
 }
 
 impl Scene<'_> {
-    pub fn trace_ray(&'_ self, origin: &glam::Vec3, direction: &glam::Vec3) -> Option<RayHit<'_>> {
+    pub fn trace_ray(
+        &'_ self,
+        mesh_types: &[MeshType],
+        origin: &glam::Vec3,
+        direction: &glam::Vec3,
+    ) -> Option<RayHit<'_>> {
         let mut hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into(), 0.0)?;
         let ghost_depth = hit.distance;
 
-        let mut scene_mesh = &self.meshes[usize::try_from(hit.geometry_id).unwrap()];
+        let mut geometry_id = usize::try_from(hit.geometry_id).unwrap();
 
-        while scene_mesh.is_ghost {
+        while mesh_types[geometry_id] == MeshType::Ghost {
             let near = hit.distance + 0.0001;
             let next_hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into(), near);
             if next_hit.is_none() {
@@ -129,12 +159,14 @@ impl Scene<'_> {
             }
             hit = next_hit.unwrap();
 
-            scene_mesh = &self.meshes[usize::try_from(hit.geometry_id).unwrap()];
+            geometry_id = usize::try_from(hit.geometry_id).unwrap();
         }
 
-        if scene_mesh.is_mask {
+        if mesh_types[geometry_id] == MeshType::Mask {
             return Some(RayHit::Mask);
         }
+
+        let scene_mesh = &self.meshes[geometry_id];
 
         let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
 

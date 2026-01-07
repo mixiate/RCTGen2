@@ -63,6 +63,7 @@ fn calculate_ao_factor(
 
 pub fn render_scene(
     scene: &crate::raytrace::Scene,
+    mesh_types: &[crate::raytrace::MeshType],
     camera: &glam::Mat4,
     lights: &[Light],
     multi_samples_x: usize,
@@ -93,7 +94,7 @@ pub fn render_scene(
 
             let (depth, ghost_depth, edge_type, palette_region_type, is_mask) = {
                 let ray_origin = camera_inverse.transform_vector3(ray_origin);
-                match scene.trace_ray(&ray_origin, &ray_direction) {
+                match scene.trace_ray(mesh_types, &ray_origin, &ray_direction) {
                     Some(crate::raytrace::RayHit::Mesh(hit)) => (
                         hit.depth,
                         hit.ghost_depth,
@@ -120,7 +121,7 @@ pub fn render_scene(
                     ) + ray_origin;
                     let ray_origin = camera_inverse.transform_vector3(ray_origin);
 
-                    match scene.trace_ray(&ray_origin, &ray_direction) {
+                    match scene.trace_ray(mesh_types, &ray_origin, &ray_direction) {
                         Some(crate::raytrace::RayHit::Mesh(hit)) => {
                             let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
                             let material = &hit.mesh.material;
