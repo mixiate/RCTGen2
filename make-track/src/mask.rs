@@ -2,7 +2,7 @@
 #[expect(unused)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
-pub enum Operation {
+enum OperationDesc {
     Split(Vec<bool>),
     SplitEnds(bool),
     Transfer(Vec<bool>),
@@ -11,31 +11,65 @@ pub enum Operation {
 #[derive(Debug, serde::Deserialize)]
 #[expect(unused)]
 #[serde(deny_unknown_fields)]
-pub struct View {
-    pub mask: std::path::PathBuf,
+struct ViewDesc {
+    mask: std::path::PathBuf,
     #[serde(default)]
-    pub mirror: bool,
+    mirror: bool,
     #[serde(default)]
-    pub offset: Vec<[i32; 2]>,
+    offset: Vec<[i32; 2]>,
     #[serde(default)]
-    pub extrude_behind: bool,
+    extrude_behind: bool,
     #[serde(default)]
-    pub extrude_in_front: bool,
+    extrude_in_front: bool,
     #[serde(flatten)]
-    pub operation: Option<Operation>,
+    operation: Option<OperationDesc>,
 }
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(transparent)]
+struct MasksDesc {
+    track_sections: std::collections::HashMap<String, Vec<ViewDesc>>,
+}
+
+impl MasksDesc {
+    fn load(path: &std::path::Path) -> anyhow::Result<MasksDesc> {
+        use anyhow::Context as _;
+        let json = std::fs::read_to_string(path).with_context(|| format!("Could not read {}", path.display()))?;
+        serde_json::from_str::<MasksDesc>(&json).with_context(|| format!("Could not parse json in {}", path.display()))
+    }
+}
+
+pub struct View {
+    pub extrude_behind: bool,
+    pub extrude_ahead: bool,
+}
+
 pub struct Masks {
-    pub track_sections: std::collections::HashMap<String, Vec<View>>,
+    track_sections: std::collections::HashMap<String, Vec<View>>,
 }
 
 impl Masks {
     pub fn load(path: &std::path::Path) -> anyhow::Result<Masks> {
-        use anyhow::Context as _;
-        let json = std::fs::read_to_string(path).with_context(|| format!("Could not read file {}", path.display()))?;
-        serde_json::from_str::<Masks>(&json).with_context(|| format!("Could not parse json in file {}", path.display()))
+        let desc = MasksDesc::load(path)?;
+
+        let mut track_sections = std::collections::HashMap::new();
+
+        for (name, views) in desc.track_sections {
+            let views = views
+                .iter()
+                .map(|view_desc| View {
+                    extrude_behind: view_desc.extrude_behind,
+                    extrude_ahead: view_desc.extrude_in_front,
+                })
+                .collect();
+            track_sections.insert(name, views);
+        }
+
+        Ok(Masks { track_sections })
+    }
+
+    pub fn get_views(&self, track_section_name: &str) -> Option<&[View]> {
+        self.track_sections.get(track_section_name).map(|x| x.as_slice())
     }
 }

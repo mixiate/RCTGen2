@@ -100,7 +100,7 @@ fn render_track_section(
 
     let (scene, mesh_types) = scene.build();
 
-    let has_extrusions = views.iter().any(|x| x.extrude_behind) || views.iter().any(|x| x.extrude_in_front);
+    let has_extrusions = views.iter().any(|x| x.extrude_behind) || views.iter().any(|x| x.extrude_ahead);
 
     let images = if has_extrusions {
         let mut view_mesh_types = vec![mesh_types; views.len()];
@@ -110,7 +110,7 @@ fn render_track_section(
                     *mesh_type = renderer::MeshType::Normal;
                 }
             }
-            if view.extrude_in_front {
+            if view.extrude_ahead {
                 for mesh_type in &mut mesh_types[extrude_ahead_range.clone()] {
                     *mesh_type = renderer::MeshType::Normal;
                 }
@@ -302,7 +302,7 @@ fn render(
         track_sections
             .into_par_iter()
             .map(|track_section| {
-                if let Some(views) = masks.track_sections.get(track_section.name) {
+                if let Some(views) = masks.get_views(track_section.name) {
                     render_track_section(
                         &render_device,
                         &camera,
