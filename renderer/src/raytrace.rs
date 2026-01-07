@@ -66,10 +66,12 @@ impl<'a> SceneBuilder<'a> {
         model: &'a crate::model::Model,
         transform: F,
         mesh_type: Option<MeshType>,
-    ) -> anyhow::Result<()>
+    ) -> anyhow::Result<std::ops::Range<usize>>
     where
         F: Fn((&glam::Vec3, &glam::Vec3)) -> (glam::Vec3, glam::Vec3),
     {
+        let start_index = self.meshes.len();
+
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
             let mut normals = Vec::with_capacity(mesh.normals.len());
@@ -94,7 +96,10 @@ impl<'a> SceneBuilder<'a> {
             self.mesh_types.push(mesh_type);
         }
 
-        Ok(())
+        Ok(std::ops::Range {
+            start: start_index,
+            end: self.meshes.len(),
+        })
     }
 
     pub fn build(self) -> (Scene<'a>, Vec<MeshType>) {

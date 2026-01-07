@@ -14,7 +14,7 @@ fn add_model_to_scene<'a>(
     scale: f32,
     offset: f32,
     bank_angle: f32,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<std::ops::Range<usize>> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
         let distance = (position.z * scale) + offset;
         let point = track_section.sample_curve(distance, bank_angle);
@@ -55,6 +55,7 @@ fn render_track_section(
     dither: bool,
     track: &track_desc::Track,
     track_section: &track_sections::TrackSection,
+    views: &[mask::View],
     output_directory: &std::path::Path,
 ) -> anyhow::Result<()> {
     use rayon::prelude::*;
@@ -66,7 +67,7 @@ fn render_track_section(
 
     let mut scene = renderer::SceneBuilder::new(render_device)?;
 
-    add_model_to_scene(
+    let extrude_behind_range = add_model_to_scene(
         &mut scene,
         &models.track,
         Some(renderer::MeshType::Ghost),
@@ -75,7 +76,7 @@ fn render_track_section(
         -length,
         bank_angle,
     )?;
-    add_model_to_scene(
+    let extrude_ahead_range = add_model_to_scene(
         &mut scene,
         &models.track,
         Some(renderer::MeshType::Ghost),
@@ -99,10 +100,38 @@ fn render_track_section(
 
     let (scene, mesh_types) = scene.build();
 
-    let images = (0..4)
-        .into_par_iter()
-        .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation, dither))
-        .collect::<Vec<_>>();
+    let has_extrusions = views.iter().any(|x| x.extrude_behind) || views.iter().any(|x| x.extrude_in_front);
+
+    let images = if has_extrusions {
+        let mut view_mesh_types = vec![mesh_types; views.len()];
+        for (mesh_types, view) in view_mesh_types.iter_mut().zip(views.iter()) {
+            if view.extrude_behind {
+                for mesh_type in &mut mesh_types[extrude_behind_range.clone()] {
+                    *mesh_type = renderer::MeshType::Normal;
+                }
+            }
+            if view.extrude_in_front {
+                for mesh_type in &mut mesh_types[extrude_ahead_range.clone()] {
+                    *mesh_type = renderer::MeshType::Normal;
+                }
+            }
+        }
+        let view_mesh_types = view_mesh_types;
+
+        views
+            .into_par_iter()
+            .zip(view_mesh_types)
+            .enumerate()
+            .map(|(rotation, (_view, mesh_types))| {
+                render_rotation(&scene, &mesh_types, camera, lights, rotation, dither)
+            })
+            .collect::<Vec<_>>()
+    } else {
+        (0..views.len())
+            .into_par_iter()
+            .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation, dither))
+            .collect::<Vec<_>>()
+    };
 
     for (i, image) in images.iter().enumerate() {
         let image_name = format!("{}_{i}", track_section.name);
@@ -267,26 +296,27 @@ fn render(
 
         let masks = mask::Masks::load(&data_directory.join("masks").join(&track.masks).with_extension("json"))?;
 
-        for (key, value) in masks.track_sections.iter() {
-            println!("{key} {value:?}");
-        }
-
         let output_directory = output_directory.join(&track.name);
         std::fs::create_dir_all(&output_directory)?;
 
         track_sections
             .into_par_iter()
             .map(|track_section| {
-                render_track_section(
-                    &render_device,
-                    &camera,
-                    &lights,
-                    &models,
-                    track_desc.dither,
-                    track,
-                    track_section,
-                    &output_directory,
-                )
+                if let Some(views) = masks.track_sections.get(track_section.name) {
+                    render_track_section(
+                        &render_device,
+                        &camera,
+                        &lights,
+                        &models,
+                        track_desc.dither,
+                        track,
+                        track_section,
+                        views,
+                        &output_directory,
+                    )
+                } else {
+                    Ok(())
+                }
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
     }

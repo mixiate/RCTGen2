@@ -12,17 +12,17 @@ pub enum Operation {
 #[expect(unused)]
 #[serde(deny_unknown_fields)]
 pub struct View {
-    mask: std::path::PathBuf,
+    pub mask: std::path::PathBuf,
     #[serde(default)]
-    mirror: bool,
+    pub mirror: bool,
     #[serde(default)]
-    offset: Vec<[i32; 2]>,
+    pub offset: Vec<[i32; 2]>,
     #[serde(default)]
-    extrude_behind: bool,
+    pub extrude_behind: bool,
     #[serde(default)]
-    extrude_in_front: bool,
+    pub extrude_in_front: bool,
     #[serde(flatten)]
-    operation: Option<Operation>,
+    pub operation: Option<Operation>,
 }
 
 #[derive(Debug, serde::Deserialize)]
