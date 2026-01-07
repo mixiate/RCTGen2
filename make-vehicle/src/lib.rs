@@ -395,10 +395,10 @@ fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &Ve
 fn add_models_to_scene<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &[ride_desc::ModelRenderDesc<'a>],
-    is_mask: Option<bool>,
+    mesh_type: Option<renderer::MeshType>,
 ) -> anyhow::Result<()> {
     for model in models {
-        scene.add_model(model.model, model.translation, model.rotation, is_mask, None)?;
+        scene.add_model(model.model, model.translation, model.rotation, mesh_type)?;
     }
     Ok(())
 }
@@ -406,7 +406,7 @@ fn add_models_to_scene<'a>(
 fn add_restraint_models_to_scene<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &[ride_desc::ModelRenderDesc<'a>],
-    is_mask: Option<bool>,
+    mesh_type: Option<renderer::MeshType>,
     frame: usize,
 ) -> anyhow::Result<()> {
     for model in models {
@@ -414,8 +414,7 @@ fn add_restraint_models_to_scene<'a>(
             model.model,
             model.restraint_translations[frame],
             model.restraint_rotations[frame],
-            is_mask,
-            None,
+            mesh_type,
         )?;
     }
     Ok(())
@@ -477,10 +476,12 @@ fn render_vehicle(
     }
 
     for (rider_index, model_desc) in vehicle.riders.iter().enumerate() {
+        use renderer::MeshType::Mask;
+
         let mut scene = renderer::SceneBuilder::new(render_device)?;
         add_models_to_scene(&mut scene, std::slice::from_ref(model_desc), None)?;
-        add_models_to_scene(&mut scene, &vehicle.models, Some(true))?;
-        add_models_to_scene(&mut scene, &vehicle.riders[0..rider_index], Some(true))?;
+        add_models_to_scene(&mut scene, &vehicle.models, Some(Mask))?;
+        add_models_to_scene(&mut scene, &vehicle.riders[0..rider_index], Some(Mask))?;
         let (scene, mesh_types) = scene.build();
 
         images.par_extend(rotations.par_iter().map(|x| render_rotation(&scene, &mesh_types, camera, lights, x)));
@@ -489,8 +490,8 @@ fn render_vehicle(
             for frame in 0..3 {
                 let mut scene = renderer::SceneBuilder::new(render_device)?;
                 add_restraint_models_to_scene(&mut scene, std::slice::from_ref(model_desc), None, frame)?;
-                add_restraint_models_to_scene(&mut scene, &vehicle.models, Some(true), frame)?;
-                add_restraint_models_to_scene(&mut scene, &vehicle.riders[0..rider_index], Some(true), frame)?;
+                add_restraint_models_to_scene(&mut scene, &vehicle.models, Some(Mask), frame)?;
+                add_restraint_models_to_scene(&mut scene, &vehicle.riders[0..rider_index], Some(Mask), frame)?;
                 let (scene, mesh_types) = scene.build();
 
                 for rotation in restraint_rotations {

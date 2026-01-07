@@ -34,8 +34,7 @@ impl<'a> SceneBuilder<'a> {
         model: &'a crate::model::Model,
         translation: glam::Vec3,
         rotation: glam::Quat,
-        is_mask: Option<bool>,
-        is_ghost: Option<bool>,
+        mesh_type: Option<MeshType>,
     ) -> anyhow::Result<()> {
         let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
         for mesh in &model.meshes {
@@ -43,23 +42,19 @@ impl<'a> SceneBuilder<'a> {
             for (position, geom_position) in mesh.positions.iter().zip(geometry.positions().iter_mut()) {
                 *geom_position = transform.transform_point3(*position).into();
             }
-            let is_ghost = is_ghost.unwrap_or(mesh.is_ghost);
-            self.embree_scene.add_geometry(geometry, is_ghost)?;
+            let normals = mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
 
-            let is_mask = is_mask.unwrap_or(mesh.is_mask);
+            self.embree_scene.add_geometry(geometry, mesh.is_ghost || mesh_type == Some(MeshType::Ghost))?;
 
-            self.meshes.push(SceneMesh {
-                mesh,
-                normals: mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect(),
-            });
+            self.meshes.push(SceneMesh { mesh, normals });
 
-            let mesh_type = if is_ghost {
+            let mesh_type = mesh_type.unwrap_or(if mesh.is_ghost {
                 MeshType::Ghost
-            } else if is_mask {
+            } else if mesh.is_mask {
                 MeshType::Mask
             } else {
                 MeshType::Normal
-            };
+            });
             self.mesh_types.push(mesh_type);
         }
 
