@@ -70,6 +70,10 @@ impl IndexedImage {
         &self.offset
     }
 
+    pub fn set_offset(&mut self, offset: glam::IVec2) {
+        self.offset = offset;
+    }
+
     pub fn blit(&mut self, image: &IndexedImage, dest_x: i32, dest_y: i32) {
         let dest_x = usize::try_from(dest_x).unwrap();
         let dest_y = usize::try_from(dest_y).unwrap();

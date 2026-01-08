@@ -40,20 +40,62 @@ impl MasksDesc {
     }
 }
 
+const PRIMARY_INDEX_MASK: u8 = 0b00_000_111;
+const SECONDARY_INDEX_MASK: u8 = 0b00_111_000;
+const SECONDARY_INDEX_SHIFT: u8 = 3;
+const ORIGIN_MASK: u8 = 0b01_000_000;
+
+#[expect(unused)]
+pub struct MaskImage {
+    image: renderer::image::IndexedImage,
+    section_count: i32,
+}
+
+impl MaskImage {
+    fn new(path: &std::path::Path) -> anyhow::Result<MaskImage> {
+        use anyhow::Context as _;
+
+        let mut image = renderer::image::IndexedImage::load(path, &PALETTE_FLAT)
+            .with_context(|| format!("Could not load {}", path.display()))?;
+
+        let mut section_count = 0;
+        let mut origin = None;
+        for y in 0..image.height() {
+            for x in 0..image.width() {
+                let pixel = image.get_pixel(x, y);
+                section_count = std::cmp::max(section_count, pixel & PRIMARY_INDEX_MASK);
+                section_count = std::cmp::max(section_count, (pixel & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT);
+
+                if pixel & ORIGIN_MASK != 0 {
+                    if origin.is_none() {
+                        origin = Some(glam::IVec2::new(x.try_into().unwrap(), y.try_into().unwrap()));
+                    } else {
+                        anyhow::bail!("More than one origin in {}", path.display());
+                    }
+                }
+            }
+        }
+
+        let origin = origin.with_context(|| format!("No origin found in {}", path.display()))?;
+        image.set_offset(origin);
+
+        Ok(MaskImage {
+            image,
+            section_count: section_count.into(),
+        })
+    }
+}
+
 pub struct View {
     #[expect(unused)]
-    pub image: renderer::image::IndexedImage,
+    pub image: MaskImage,
     pub extrude_behind: bool,
     pub extrude_ahead: bool,
 }
 
 impl View {
     fn new(view_desc: &ViewDesc, directory: &std::path::Path) -> anyhow::Result<View> {
-        use anyhow::Context as _;
-
-        let image_path = directory.join(&view_desc.mask);
-        let image = renderer::image::IndexedImage::load(&image_path, &PALETTE_FLAT)
-            .with_context(|| format!("Could not load {}", image_path.display()))?;
+        let image = MaskImage::new(&directory.join(&view_desc.mask))?;
 
         Ok(View {
             image,
