@@ -45,10 +45,9 @@ const SECONDARY_INDEX_MASK: u8 = 0b00_111_000;
 const SECONDARY_INDEX_SHIFT: u8 = 3;
 const ORIGIN_MASK: u8 = 0b01_000_000;
 
-#[expect(unused)]
 pub struct MaskImage {
     image: renderer::image::IndexedImage,
-    section_count: i32,
+    section_count: usize,
 }
 
 impl MaskImage {
@@ -86,9 +85,15 @@ impl MaskImage {
     }
 }
 
+pub struct Sprite {
+    pub index: u8,
+    pub offset: glam::IVec2,
+}
+
 pub struct View {
-    #[expect(unused)]
-    pub image: MaskImage,
+    image: MaskImage,
+    mirror: bool,
+    pub sprites: Vec<Sprite>,
     pub extrude_behind: bool,
     pub extrude_ahead: bool,
 }
@@ -97,11 +102,35 @@ impl View {
     fn new(view_desc: &ViewDesc, directory: &std::path::Path) -> anyhow::Result<View> {
         let image = MaskImage::new(&directory.join(&view_desc.mask))?;
 
+        let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
+
+        let mut sprites = Vec::with_capacity(section_count * 2);
+        for i in 0..section_count {
+            sprites.push(Sprite {
+                index: (i + 1).try_into().unwrap(),
+                offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
+            });
+        }
+
         Ok(View {
             image,
+            mirror: view_desc.mirror,
+            sprites,
             extrude_behind: view_desc.extrude_behind,
             extrude_ahead: view_desc.extrude_in_front,
         })
+    }
+
+    pub fn sample(&self, x: i32, y: i32, index: u8) -> bool {
+        let x = if self.mirror { -x - 1 } else { x };
+
+        let x = x + self.image.image.offset().x;
+        let y = y + self.image.image.offset().y;
+
+        let x = usize::try_from(x.clamp(0, (self.image.image.width() - 1).try_into().unwrap())).unwrap();
+        let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
+
+        self.image.image.get_pixel(x, y) & PRIMARY_INDEX_MASK == index
     }
 }
 

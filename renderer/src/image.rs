@@ -24,6 +24,8 @@ impl Image {
         Ok(())
     }
 }
+
+#[derive(Clone)]
 pub struct IndexedImage {
     pixels: Vec<u8>,
     width: usize,

@@ -133,9 +133,18 @@ fn render_track_section(
             .collect::<Vec<_>>()
     };
 
-    for (i, image) in images.iter().enumerate() {
-        let image_name = format!("{}_{i}", track_section.name);
-        _ = image.save(&output_directory.join(image_name).with_extension("png"));
+    for ((view_index, view), mut image) in views.iter().enumerate().zip(images) {
+        image.set_offset(image.offset() + glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32));
+        let split_images = split_image(&image, view);
+
+        for (sprite_index, image) in split_images.iter().enumerate() {
+            let image_name = if view.sprites.len() > 1 {
+                format!("{}_{view_index}_{sprite_index}", track_section.name)
+            } else {
+                format!("{}_{view_index}", track_section.name)
+            };
+            image.save(&output_directory.join(image_name).with_extension("png"))?;
+        }
     }
 
     Ok(())
@@ -322,6 +331,30 @@ fn render(
     }
 
     Ok(())
+}
+
+fn split_image(image: &renderer::image::IndexedImage, view: &mask::View) -> Vec<renderer::image::IndexedImage> {
+    view.sprites
+        .iter()
+        .map(|sprite| {
+            let mut split_image = image.clone();
+
+            for y in 0..split_image.height() {
+                for x in 0..split_image.width() {
+                    let mask_x = image.offset().x + i32::try_from(x).unwrap();
+                    let mask_y = image.offset().y + i32::try_from(y).unwrap();
+
+                    if !view.sample(mask_x, mask_y, sprite.index) {
+                        split_image.set_pixel(x, y, 0);
+                    }
+                }
+            }
+
+            split_image.set_offset(split_image.offset() + sprite.offset);
+
+            split_image
+        })
+        .collect()
 }
 
 pub fn make_track(
