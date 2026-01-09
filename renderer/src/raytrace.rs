@@ -191,6 +191,11 @@ impl Scene<'_> {
         self.embree_scene.occluded_1(&(*origin).into(), &(*direction).into())
     }
 
+    pub fn trace_depth_ray(&self, origin: &glam::Vec3, direction: &glam::Vec3) -> f32 {
+        let hit = self.embree_scene.intersect_1(&(*origin).into(), &(*direction).into(), 0.0);
+        hit.map_or(f32::INFINITY, |x| x.distance)
+    }
+
     pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4) -> [i32; 4] {
         let scene_bounds = self.embree_scene.bounds();
         let scene_bounds = [

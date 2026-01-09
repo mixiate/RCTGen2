@@ -139,3 +139,35 @@ impl Framebuffer {
         }
     }
 }
+
+pub struct DepthBuffer {
+    buffer: Vec<f32>,
+    width: usize,
+    height: usize,
+    pub offset: glam::IVec2,
+}
+
+impl DepthBuffer {
+    pub fn new(width: usize, height: usize, offset: glam::IVec2) -> Self {
+        let buffer = vec![f32::INFINITY; width * height];
+
+        Self {
+            buffer,
+            width,
+            height,
+            offset,
+        }
+    }
+
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
+    pub fn set_depth(&mut self, x: usize, y: usize, depth: f32) {
+        self.buffer[x + y * self.width] = depth;
+    }
+}

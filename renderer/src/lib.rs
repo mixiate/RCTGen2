@@ -9,6 +9,6 @@ mod renderer;
 mod texture;
 
 pub use embree::Device;
-pub use framebuffer::Framebuffer;
+pub use framebuffer::{DepthBuffer, Framebuffer};
 pub use raytrace::{MeshType, Scene, SceneBuilder};
-pub use renderer::{Light, render_scene};
+pub use renderer::{Light, render_scene, render_scene_depth};

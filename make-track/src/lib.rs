@@ -46,6 +46,12 @@ fn render_rotation(
     framebuffer.into_cropped_indexed_image(dither)
 }
 
+fn render_rotation_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation: usize) -> renderer::DepthBuffer {
+    let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
+    let camera = camera * view_rotation;
+    renderer::render_scene_depth(scene, &camera, 4, 4)
+}
+
 #[expect(clippy::too_many_arguments)]
 fn render_track_section(
     render_device: &renderer::Device,
@@ -130,6 +136,29 @@ fn render_track_section(
         (0..views.len())
             .into_par_iter()
             .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation, dither))
+            .collect::<Vec<_>>()
+    };
+
+    let _mask_depths = {
+        let mut scene = renderer::SceneBuilder::new(render_device)?;
+
+        for i in -1..(i32::try_from(mesh_count).unwrap() + 1) {
+            add_model_to_scene(
+                &mut scene,
+                &models.mask,
+                None,
+                track_section,
+                scale,
+                i as f32 * length,
+                bank_angle,
+            )?;
+        }
+
+        let (scene, _) = scene.build();
+
+        (0..views.len())
+            .into_par_iter()
+            .map(|rotation| render_rotation_depth(&scene, camera, rotation))
             .collect::<Vec<_>>()
     };
 
