@@ -96,37 +96,13 @@ impl CommittedScene<'_> {
         if ray_hit.hit.geomID == embree4_sys::RTC_INVALID_GEOMETRY_ID {
             return None;
         }
-
-        let mut position = [0.0_f32; 3];
-        let interpolate_arguments = embree4_sys::RTCInterpolateArguments {
-            geometry: unsafe { embree4_sys::rtcGetGeometry(self.scene.handle, ray_hit.hit.geomID) },
-            primID: ray_hit.hit.primID,
+        Some(RayHit {
+            geometry_id: ray_hit.hit.geomID,
+            primitive_id: ray_hit.hit.primID,
             u: ray_hit.hit.u,
             v: ray_hit.hit.v,
-            bufferType: embree4_sys::RTCBufferType::VERTEX,
-            bufferSlot: 0,
-            P: (&raw mut position).cast(),
-            dPdu: std::ptr::null_mut(),
-            dPdv: std::ptr::null_mut(),
-            ddPdudu: std::ptr::null_mut(),
-            ddPdvdv: std::ptr::null_mut(),
-            ddPdudv: std::ptr::null_mut(),
-            valueCount: 3,
-        };
-        unsafe { embree4_sys::rtcInterpolate(&raw const interpolate_arguments) }
-
-        if ray_hit.hit.geomID == embree4_sys::RTC_INVALID_GEOMETRY_ID {
-            None
-        } else {
-            Some(RayHit {
-                geometry_id: ray_hit.hit.geomID,
-                primitive_id: ray_hit.hit.primID,
-                position,
-                u: ray_hit.hit.u,
-                v: ray_hit.hit.v,
-                distance: ray_hit.ray.tfar,
-            })
-        }
+            distance: ray_hit.ray.tfar,
+        })
     }
 
     pub fn occluded_1(&self, origin: &(f32, f32, f32), direction: &(f32, f32, f32)) -> bool {
@@ -151,6 +127,27 @@ impl CommittedScene<'_> {
         };
         unsafe { embree4_sys::rtcOccluded1(self.scene.handle, &raw mut ray, &raw mut arguments) }
         ray.tfar <= 0.0
+    }
+
+    pub fn interpolate(&self, geometry_id: u32, primitive_id: u32, u: f32, v: f32) -> [f32; 3] {
+        let mut position = [0.0_f32; 3];
+        let interpolate_arguments = embree4_sys::RTCInterpolateArguments {
+            geometry: unsafe { embree4_sys::rtcGetGeometry(self.scene.handle, geometry_id) },
+            primID: primitive_id,
+            u,
+            v,
+            bufferType: embree4_sys::RTCBufferType::VERTEX,
+            bufferSlot: 0,
+            P: (&raw mut position).cast(),
+            dPdu: std::ptr::null_mut(),
+            dPdv: std::ptr::null_mut(),
+            ddPdudu: std::ptr::null_mut(),
+            ddPdvdv: std::ptr::null_mut(),
+            ddPdudv: std::ptr::null_mut(),
+            valueCount: 3,
+        };
+        unsafe { embree4_sys::rtcInterpolate(&raw const interpolate_arguments) }
+        position
     }
 
     pub fn bounds(&self) -> Bounds {
@@ -243,7 +240,6 @@ impl Drop for TriangleGeometry<'_> {
 pub struct RayHit {
     pub geometry_id: u32,
     pub primitive_id: u32,
-    pub position: [f32; 3],
     pub u: f32,
     pub v: f32,
     pub distance: f32,

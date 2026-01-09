@@ -166,6 +166,8 @@ impl Scene<'_> {
 
         let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
 
+        let position = self.embree_scene.interpolate(hit.geometry_id, hit.primitive_id, hit.u, hit.v);
+
         let normals = [
             scene_mesh.normals[usize::try_from(indices[0]).unwrap()] * (1.0 - hit.u - hit.v),
             scene_mesh.normals[usize::try_from(indices[1]).unwrap()] * hit.u,
@@ -179,7 +181,7 @@ impl Scene<'_> {
             depth: hit.distance,
             ghost_depth,
             mesh: scene_mesh.mesh,
-            position: hit.position.into(),
+            position: position.into(),
             normal,
             indices,
         }))
