@@ -351,6 +351,7 @@ fn split_image(image: &renderer::image::IndexedImage, view: &mask::View) -> Vec<
             }
 
             split_image.set_offset(split_image.offset() + sprite.offset);
+            split_image.crop();
 
             split_image
         })

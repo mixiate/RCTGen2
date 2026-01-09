@@ -86,6 +86,46 @@ impl IndexedImage {
         }
     }
 
+    pub fn crop(&mut self) {
+        let (min_x, min_y, max_x, max_y) = {
+            let mut min_x = self.width;
+            let mut min_y = self.height;
+            let mut max_x = 0;
+            let mut max_y = 0;
+            for y in 0..self.height {
+                for x in 0..self.width {
+                    if self.get_pixel(x, y) != 0 {
+                        min_x = std::cmp::min(min_x, x);
+                        min_y = std::cmp::min(min_y, y);
+                        max_x = std::cmp::max(max_x, x + 1);
+                        max_y = std::cmp::max(max_y, y + 1);
+                    }
+                }
+            }
+            (min_x, min_y, max_x, max_y)
+        };
+
+        if max_x < min_x {
+            self.width = 1;
+            self.height = 1;
+            self.offset = glam::IVec2::splat(0);
+            self.pixels.truncate(1);
+        } else {
+            let stride = self.width;
+            self.offset += glam::IVec2::new(min_x.try_into().unwrap(), min_y.try_into().unwrap());
+            self.width = max_x - min_x;
+            self.height = max_y - min_y;
+
+            for y in 0..self.height {
+                for x in 0..self.width {
+                    self.pixels[x + y * self.width] = self.pixels[(x + min_x) + (y + min_y) * stride];
+                }
+            }
+
+            self.pixels.truncate(self.width * self.height);
+        }
+    }
+
     pub fn as_raw(&self) -> &Vec<u8> {
         &self.pixels
     }
