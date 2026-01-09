@@ -1088,13 +1088,11 @@
     ],
     "s_bend_right": [
         {
-            "mirror": true,
-            "mask": "default/s_bend_left_1.png",
+            "mask": "default/s_bend_right_0.png",
             "offset": [[0, 0], [-32, 16], [-64, 0], [-96, 16]]
         },
         {
-            "mirror": true,
-            "mask": "default/s_bend_left_0.png",
+            "mask": "default/s_bend_right_1.png",
             "offset": [[0, 0], [-32, -16], [0, -32], [-32, -48]]
         }
     ],
