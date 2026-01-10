@@ -95,6 +95,16 @@ pub struct Sprite {
     pub operation: Option<Operation>,
 }
 
+impl Sprite {
+    fn new(index: usize, offset: Option<&[i32; 2]>, operation: Option<Operation>) -> Self {
+        Sprite {
+            index: index.try_into().unwrap(),
+            offset: (*offset.unwrap_or(&[0, 0])).into(),
+            operation,
+        }
+    }
+}
+
 pub struct View {
     image: MaskImage,
     mirror: bool,
@@ -113,11 +123,7 @@ impl View {
 
                 let mut sprites = Vec::with_capacity(section_count * 2);
                 for i in 0..section_count {
-                    sprites.push(Sprite {
-                        index: (i + 1).try_into().unwrap(),
-                        offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
-                        operation: None,
-                    });
+                    sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None));
                 }
                 sprites
             }
@@ -127,26 +133,11 @@ impl View {
 
                 let mut sprites = Vec::with_capacity(section_count * 2);
                 for i in 0..section_count {
-                    let index = (i + 1).try_into().unwrap();
-                    let offset = (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into();
-
                     if *splits.get(i).unwrap_or(&false) {
-                        sprites.push(Sprite {
-                            index,
-                            offset,
-                            operation: Some(Operation::Intersect),
-                        });
-                        sprites.push(Sprite {
-                            index,
-                            offset,
-                            operation: Some(Operation::Difference),
-                        });
+                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), Some(Operation::Intersect)));
+                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), Some(Operation::Difference)));
                     } else {
-                        sprites.push(Sprite {
-                            index,
-                            offset,
-                            operation: None,
-                        });
+                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None));
                     }
                 }
                 sprites
@@ -155,23 +146,11 @@ impl View {
                 let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
 
                 let mut sprites = Vec::with_capacity(section_count);
-                sprites.push(Sprite {
-                    index: 1,
-                    offset: (*view_desc.offset.first().unwrap_or(&[0, 0])).into(),
-                    operation: Some(Operation::Intersect),
-                });
+                sprites.push(Sprite::new(1, view_desc.offset.first(), Some(Operation::Intersect)));
                 for i in 1..(section_count - 1) {
-                    sprites.push(Sprite {
-                        index: (i + 1).try_into().unwrap(),
-                        offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
-                        operation: None,
-                    });
+                    sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None));
                 }
-                sprites.push(Sprite {
-                    index: 1,
-                    offset: (*view_desc.offset.last().unwrap_or(&[0, 0])).into(),
-                    operation: Some(Operation::Difference),
-                });
+                sprites.push(Sprite::new(1, view_desc.offset.last(), Some(Operation::Difference)));
                 sprites
             }
             Some(OperationDesc::Transfer(transfers)) => {
@@ -200,11 +179,7 @@ impl View {
                     };
                     previous_transfer = transfer;
 
-                    sprites.push(Sprite {
-                        index: (i + 1).try_into().unwrap(),
-                        offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
-                        operation,
-                    });
+                    sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), operation));
                 }
                 sprites
             }
