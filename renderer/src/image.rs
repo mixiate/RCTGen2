@@ -30,7 +30,7 @@ pub struct IndexedImage {
     pixels: Vec<u8>,
     width: usize,
     height: usize,
-    offset: glam::IVec2,
+    pub offset: glam::IVec2,
 }
 
 impl IndexedImage {
@@ -66,14 +66,6 @@ impl IndexedImage {
 
     pub fn height(&self) -> usize {
         self.height
-    }
-
-    pub fn offset(&self) -> &glam::IVec2 {
-        &self.offset
-    }
-
-    pub fn set_offset(&mut self, offset: glam::IVec2) {
-        self.offset = offset;
     }
 
     pub fn blit(&mut self, image: &IndexedImage, dest_x: i32, dest_y: i32) {

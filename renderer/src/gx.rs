@@ -32,8 +32,8 @@ impl Archive {
             data_offset: u32::try_from(self.data.len()).unwrap(),
             width: i16::try_from(image.width()).unwrap(),
             height: i16::try_from(image.height()).unwrap(),
-            offset_x: i16::try_from(image.offset().x).unwrap(),
-            offset_y: i16::try_from(image.offset().y).unwrap(),
+            offset_x: i16::try_from(image.offset.x).unwrap(),
+            offset_y: i16::try_from(image.offset.y).unwrap(),
             flags: ENTRY_FLAG_TRANSPARENT,
             zoom_offset: 0,
         });
@@ -45,8 +45,8 @@ impl Archive {
             data_offset: u32::try_from(self.data.len()).unwrap(),
             width: i16::try_from(image.width()).unwrap(),
             height: i16::try_from(image.height()).unwrap(),
-            offset_x: i16::try_from(image.offset().x).unwrap(),
-            offset_y: i16::try_from(image.offset().y).unwrap(),
+            offset_x: i16::try_from(image.offset.x).unwrap(),
+            offset_y: i16::try_from(image.offset.y).unwrap(),
             flags: ENTRY_FLAG_TRANSPARENT | ENTRY_FLAG_RLE,
             zoom_offset: 0,
         });

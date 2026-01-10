@@ -165,7 +165,8 @@ fn render_track_section(
 
         let track_depth = image.to_depth();
         let mut image = image.into_indexed_image(dither);
-        image.set_offset(image.offset() + offset_offset);
+        image.offset += offset_offset;
+        let image = image;
 
         mask_depth.offset += offset_offset;
 
@@ -374,8 +375,8 @@ fn split_sprite(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset().x + i32::try_from(x).unwrap();
-            let mask_y = image.offset().y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::try_from(x).unwrap();
+            let mask_y = image.offset.y + i32::try_from(y).unwrap();
 
             if !view.sample_primary(mask_x, mask_y, sprite.index) {
                 image.set_pixel(x, y, 0);
@@ -394,8 +395,8 @@ fn split_sprite_intersect(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset().x + i32::try_from(x).unwrap();
-            let mask_y = image.offset().y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::try_from(x).unwrap();
+            let mask_y = image.offset.y + i32::try_from(y).unwrap();
 
             let track_depth = track_depth.get_depth(x, y);
             let mask_depth = {
@@ -429,8 +430,8 @@ fn split_sprite_difference(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset().x + i32::try_from(x).unwrap();
-            let mask_y = image.offset().y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::try_from(x).unwrap();
+            let mask_y = image.offset.y + i32::try_from(y).unwrap();
 
             let track_depth = track_depth.get_depth(x, y);
             let mask_depth = {
@@ -464,8 +465,8 @@ fn split_sprite_transfer_next(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset().x + i32::try_from(x).unwrap();
-            let mask_y = image.offset().y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::try_from(x).unwrap();
+            let mask_y = image.offset.y + i32::try_from(y).unwrap();
 
             let track_depth = track_depth.get_depth(x, y);
             let mask_depth = {
@@ -514,7 +515,7 @@ fn split_image(
                 }
             };
 
-            split_image.set_offset(split_image.offset() + sprite.offset);
+            split_image.offset += sprite.offset;
             split_image.crop();
 
             split_image

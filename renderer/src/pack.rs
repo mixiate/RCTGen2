@@ -111,16 +111,16 @@ pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas
         let mut y_max = 0;
 
         for image in images {
-            let x_neg = image.offset().x;
-            let x_pos = i32::try_from(image.width()).unwrap() + image.offset().x;
+            let x_neg = image.offset.x;
+            let x_pos = i32::try_from(image.width()).unwrap() + image.offset.x;
             if x_neg < x_min {
                 x_min = x_neg;
             }
             if x_pos > x_max {
                 x_max = x_pos;
             }
-            let y_neg = image.offset().y;
-            let y_pos = i32::try_from(image.height()).unwrap() + image.offset().y;
+            let y_neg = image.offset.y;
+            let y_pos = i32::try_from(image.height()).unwrap() + image.offset.y;
             if y_neg < y_min {
                 y_min = y_neg;
             }
@@ -147,8 +147,8 @@ pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas
         let i = i32::try_from(i).unwrap();
         let row = i / columns;
         let column = i - (row * columns);
-        coord.x = (column_width * column) - x_min + image.offset().x;
-        coord.y = (row_height * row) - y_min + image.offset().y;
+        coord.x = (column_width * column) - x_min + image.offset.x;
+        coord.y = (row_height * row) - y_min + image.offset.y;
 
         grid_image.blit(image, coord.x, coord.y);
     }

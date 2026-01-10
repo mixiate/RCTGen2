@@ -676,8 +676,8 @@ pub fn make_vehicle(
                 for (image, coord) in images.iter().zip(atlas.coords.iter()) {
                     object_images.push(ride_object::Image::ImageFile(ride_object::ImageFile {
                         path: format!("images/car_{i}.png"),
-                        x: image.offset().x,
-                        y: image.offset().y,
+                        x: image.offset.x,
+                        y: image.offset.y,
                         src_x: Some(coord.x),
                         src_y: Some(coord.y),
                         src_width: Some(image.width().try_into().unwrap()),

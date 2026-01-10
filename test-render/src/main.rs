@@ -174,7 +174,7 @@ fn main() -> anyhow::Result<()> {
                 println!(
                     "{} {}",
                     image_path.strip_prefix(base_directory).unwrap_or(&image_path).display(),
-                    image.offset()
+                    image.offset
                 );
             }
         }

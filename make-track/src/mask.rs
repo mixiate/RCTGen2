@@ -52,7 +52,7 @@ impl MaskImage {
     fn new(path: &std::path::Path) -> anyhow::Result<MaskImage> {
         use anyhow::Context as _;
 
-        let mut image = renderer::image::IndexedImage::load(path, &PALETTE_FLAT)
+        let image = renderer::image::IndexedImage::load(path, &PALETTE_FLAT)
             .with_context(|| format!("Could not load {}", path.display()))?;
 
         let mut section_count = 0;
@@ -74,7 +74,8 @@ impl MaskImage {
         }
 
         let origin = origin.with_context(|| format!("No origin found in {}", path.display()))?;
-        image.set_offset(origin);
+        let mut image = image;
+        image.offset = origin;
 
         Ok(MaskImage {
             image,
@@ -197,8 +198,8 @@ impl View {
     pub fn sample_primary(&self, x: i32, y: i32, index: u8) -> bool {
         let x = if self.mirror { -x - 1 } else { x };
 
-        let x = x + self.image.image.offset().x;
-        let y = y + self.image.image.offset().y;
+        let x = x + self.image.image.offset.x;
+        let y = y + self.image.image.offset.y;
 
         let x = usize::try_from(x.clamp(0, (self.image.image.width() - 1).try_into().unwrap())).unwrap();
         let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
@@ -209,8 +210,8 @@ impl View {
     pub fn sample_secondary(&self, x: i32, y: i32, index: u8) -> bool {
         let x = if self.mirror { -x - 1 } else { x };
 
-        let x = x + self.image.image.offset().x;
-        let y = y + self.image.image.offset().y;
+        let x = x + self.image.image.offset.x;
+        let y = y + self.image.image.offset.y;
 
         let x = usize::try_from(x.clamp(0, (self.image.image.width() - 1).try_into().unwrap())).unwrap();
         let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
