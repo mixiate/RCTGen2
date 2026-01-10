@@ -135,7 +135,7 @@ fn render_track_section(
             .collect::<Vec<_>>()
     };
 
-    let _mask_depths = {
+    let mask_depths = {
         let mut scene = renderer::SceneBuilder::new(render_device)?;
 
         for i in -1..(i32::try_from(mesh_count).unwrap() + 1) {
@@ -158,17 +158,35 @@ fn render_track_section(
             .collect::<Vec<_>>()
     };
 
-    for ((view_index, view), image) in views.iter().enumerate().zip(images) {
-        let _track_depth = image.to_depth();
-        let mut image = image.into_cropped_indexed_image(dither);
-        image.set_offset(image.offset() + glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32));
-        let split_images = split_image(&image, view);
+    for ((view_index, view), (image, mut mask_depth)) in
+        views.iter().enumerate().zip(images.into_iter().zip(mask_depths))
+    {
+        let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32);
+
+        let track_depth = image.to_depth();
+        let mut image = image.into_indexed_image(dither);
+        image.set_offset(image.offset() + offset_offset);
+
+        mask_depth.offset += offset_offset;
+
+        let split_images = split_image(&image, view, &track_depth, &mask_depth, false);
 
         for (sprite_index, image) in split_images.iter().enumerate() {
             let image_name = if view.sprites.len() > 1 {
-                format!("{}_{view_index}_{sprite_index}", track_section.name)
+                format!("{}_{view_index}_{sprite_index}_back", track_section.name)
             } else {
-                format!("{}_{view_index}", track_section.name)
+                format!("{}_{view_index}_back", track_section.name)
+            };
+            image.save(&output_directory.join(image_name).with_extension("png"))?;
+        }
+
+        let split_images = split_image(&image, view, &track_depth, &mask_depth, true);
+
+        for (sprite_index, image) in split_images.iter().enumerate() {
+            let image_name = if view.sprites.len() > 1 {
+                format!("{}_{view_index}_{sprite_index}_front", track_section.name)
+            } else {
+                format!("{}_{view_index}_front", track_section.name)
             };
             image.save(&output_directory.join(image_name).with_extension("png"))?;
         }
@@ -360,7 +378,13 @@ fn render(
     Ok(())
 }
 
-fn split_image(image: &renderer::image::IndexedImage, view: &mask::View) -> Vec<renderer::image::IndexedImage> {
+fn split_image(
+    image: &renderer::image::IndexedImage,
+    view: &mask::View,
+    track_depth: &renderer::DepthBuffer,
+    mask_depth: &renderer::DepthBuffer,
+    front: bool,
+) -> Vec<renderer::image::IndexedImage> {
     view.sprites
         .iter()
         .map(|sprite| {
@@ -371,7 +395,26 @@ fn split_image(image: &renderer::image::IndexedImage, view: &mask::View) -> Vec<
                     let mask_x = image.offset().x + i32::try_from(x).unwrap();
                     let mask_y = image.offset().y + i32::try_from(y).unwrap();
 
-                    if !view.sample(mask_x, mask_y, sprite.index) {
+                    let track_depth = track_depth.get_depth(x, y);
+                    let mask_depth = {
+                        let x = mask_x - mask_depth.offset.x;
+                        let y = mask_y - mask_depth.offset.y;
+                        if x >= 0
+                            && x < mask_depth.width().try_into().unwrap()
+                            && y >= 0
+                            && y < mask_depth.height().try_into().unwrap()
+                        {
+                            mask_depth.get_depth(usize::try_from(x).unwrap(), usize::try_from(y).unwrap())
+                        } else {
+                            f32::INFINITY
+                        }
+                    };
+
+                    if front {
+                        if !view.sample(mask_x, mask_y, sprite.index) || track_depth >= mask_depth {
+                            split_image.set_pixel(x, y, 0);
+                        }
+                    } else if !view.sample(mask_x, mask_y, sprite.index) || track_depth < mask_depth {
                         split_image.set_pixel(x, y, 0);
                     }
                 }

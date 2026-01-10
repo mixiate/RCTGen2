@@ -176,6 +176,10 @@ impl DepthBuffer {
         self.height
     }
 
+    pub fn get_depth(&self, x: usize, y: usize) -> f32 {
+        self.buffer[x + y * self.width]
+    }
+
     pub fn set_depth(&mut self, x: usize, y: usize, depth: f32) {
         self.buffer[x + y * self.width] = depth;
     }
