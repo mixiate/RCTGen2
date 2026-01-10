@@ -1,10 +1,13 @@
+const MAX_VIEW_COUNT: usize = 4;
+const MAX_SECTION_COUNT: usize = 7;
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 enum OperationDesc {
-    Split(Vec<bool>),
+    Split(heapless::Vec<bool, MAX_SECTION_COUNT>),
     SplitEnds(bool),
-    Transfer(Vec<bool>),
+    Transfer(heapless::Vec<bool, MAX_SECTION_COUNT>),
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -14,7 +17,7 @@ struct ViewDesc {
     #[serde(default)]
     mirror: bool,
     #[serde(default)]
-    offset: Vec<[i32; 2]>,
+    offset: heapless::Vec<[i32; 2], MAX_SECTION_COUNT>,
     #[serde(default)]
     extrude_behind: bool,
     #[serde(default)]
@@ -27,7 +30,7 @@ struct ViewDesc {
 #[serde(deny_unknown_fields)]
 #[serde(transparent)]
 struct MasksDesc {
-    track_sections: std::collections::HashMap<String, Vec<ViewDesc>>,
+    track_sections: std::collections::HashMap<String, heapless::Vec<ViewDesc, MAX_VIEW_COUNT>>,
 }
 
 impl MasksDesc {
