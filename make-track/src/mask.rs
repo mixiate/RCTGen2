@@ -200,27 +200,25 @@ impl View {
         })
     }
 
-    pub fn sample_primary(&self, x: i32, y: i32, index: u8) -> bool {
+    fn translate_coords(&self, x: i32, y: i32) -> (usize, usize) {
         let x = if self.mirror { -x - 1 } else { x };
 
         let x = x + self.image.image.offset.x;
         let y = y + self.image.image.offset.y;
 
-        let x = usize::try_from(x.clamp(0, (self.image.image.width() - 1).try_into().unwrap())).unwrap();
-        let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
+        (
+            x.clamp(0, self.image.image.width() as i32 - 1) as usize,
+            y.clamp(0, self.image.image.height() as i32 - 1) as usize,
+        )
+    }
 
+    pub fn sample_primary(&self, x: i32, y: i32, index: u8) -> bool {
+        let (x, y) = self.translate_coords(x, y);
         self.image.image.get_pixel(x, y) & PRIMARY_INDEX_MASK == index
     }
 
     pub fn sample_secondary(&self, x: i32, y: i32, index: u8) -> bool {
-        let x = if self.mirror { -x - 1 } else { x };
-
-        let x = x + self.image.image.offset.x;
-        let y = y + self.image.image.offset.y;
-
-        let x = usize::try_from(x.clamp(0, (self.image.image.width() - 1).try_into().unwrap())).unwrap();
-        let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
-
+        let (x, y) = self.translate_coords(x, y);
         (self.image.image.get_pixel(x, y) & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT == index
     }
 }
