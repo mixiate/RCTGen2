@@ -153,6 +153,29 @@ impl View {
                 }
                 sprites
             }
+            Some(OperationDesc::SplitEnds(true)) => {
+                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
+
+                let mut sprites = Vec::with_capacity(section_count);
+                sprites.push(Sprite {
+                    index: 1,
+                    offset: (*view_desc.offset.first().unwrap_or(&[0, 0])).into(),
+                    operation: Some(Operation::Intersect),
+                });
+                for i in 1..(section_count - 1) {
+                    sprites.push(Sprite {
+                        index: (i + 1).try_into().unwrap(),
+                        offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
+                        operation: None,
+                    });
+                }
+                sprites.push(Sprite {
+                    index: 1,
+                    offset: (*view_desc.offset.last().unwrap_or(&[0, 0])).into(),
+                    operation: Some(Operation::Difference),
+                });
+                sprites
+            }
             _ => Vec::new(),
         };
 
