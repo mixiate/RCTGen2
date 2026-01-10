@@ -135,9 +135,8 @@ fn render_track_section(
             .collect::<Vec<_>>()
     };
 
-    let mask_depths = {
+    let mask_depths = if views.iter().any(|x| x.requires_track_mask) {
         let mut scene = renderer::SceneBuilder::new(render_device)?;
-
         for i in -1..(i32::try_from(mesh_count).unwrap() + 1) {
             add_model_to_scene(
                 &mut scene,
@@ -149,28 +148,40 @@ fn render_track_section(
                 bank_angle,
             )?;
         }
-
         let (scene, _) = scene.build();
 
-        (0..views.len())
+        views
             .into_par_iter()
-            .map(|rotation| render_rotation_depth(&scene, camera, rotation))
+            .enumerate()
+            .map(|(rotation, view)| {
+                if view.requires_track_mask {
+                    Some(render_rotation_depth(&scene, camera, rotation))
+                } else {
+                    None
+                }
+            })
             .collect::<Vec<_>>()
+    } else {
+        vec![None, None, None, None] // ehh
     };
 
-    for ((view_index, view), (image, mut mask_depth)) in
-        views.iter().enumerate().zip(images.into_iter().zip(mask_depths))
-    {
+    for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images.into_iter().zip(mask_depths)) {
         let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32);
 
-        let track_depth = image.to_depth();
-        let mut image = image.into_indexed_image(dither);
-        image.offset += offset_offset;
-        let image = image;
+        let split_images = if let Some(mut mask_depth) = mask_depth {
+            let track_depth = image.to_depth();
+            let mut image = image.into_indexed_image(dither);
 
-        mask_depth.offset += offset_offset;
+            image.offset += offset_offset;
+            mask_depth.offset += offset_offset;
 
-        let split_images = split_image(&image, view, &track_depth, &mask_depth);
+            split_image_depth(&image, view, &track_depth, &mask_depth)
+        } else {
+            let mut image = image.into_indexed_image(dither);
+            image.offset += offset_offset;
+
+            split_image(&image, view)
+        };
 
         for (sprite_index, image) in split_images.iter().enumerate() {
             let image_name = if view.sprites.len() > 1 {
@@ -493,7 +504,19 @@ fn split_sprite_transfer_next(
     image
 }
 
-fn split_image(
+fn split_image(image: &renderer::image::IndexedImage, view: &mask::View) -> Vec<renderer::image::IndexedImage> {
+    view.sprites
+        .iter()
+        .map(|sprite| {
+            let mut split_image = split_sprite(view, sprite, image.clone());
+            split_image.offset += sprite.offset;
+            split_image.crop();
+            split_image
+        })
+        .collect()
+}
+
+fn split_image_depth(
     image: &renderer::image::IndexedImage,
     view: &mask::View,
     track_depth: &renderer::DepthBuffer,

@@ -110,6 +110,7 @@ pub struct View {
     image: MaskImage,
     mirror: bool,
     pub sprites: Vec<Sprite>,
+    pub requires_track_mask: bool,
     pub extrude_behind: bool,
     pub extrude_ahead: bool,
 }
@@ -190,6 +191,7 @@ impl View {
             image,
             mirror: view_desc.mirror,
             sprites,
+            requires_track_mask: view_desc.operation.is_some(),
             extrude_behind: view_desc.extrude_behind,
             extrude_ahead: view_desc.extrude_in_front,
         })
