@@ -9,7 +9,6 @@ enum OperationDesc {
 }
 
 #[derive(Debug, serde::Deserialize)]
-#[expect(unused)]
 #[serde(deny_unknown_fields)]
 struct ViewDesc {
     mask: std::path::PathBuf,
@@ -85,9 +84,17 @@ impl MaskImage {
     }
 }
 
+#[expect(unused)]
+pub enum Operation {
+    Difference,
+    Intersect,
+    TransferNext,
+}
+
 pub struct Sprite {
     pub index: u8,
     pub offset: glam::IVec2,
+    pub operation: Option<Operation>,
 }
 
 pub struct View {
@@ -102,15 +109,52 @@ impl View {
     fn new(view_desc: &ViewDesc, directory: &std::path::Path) -> anyhow::Result<View> {
         let image = MaskImage::new(&directory.join(&view_desc.mask))?;
 
-        let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
+        let sprites = match &view_desc.operation {
+            None => {
+                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
 
-        let mut sprites = Vec::with_capacity(section_count * 2);
-        for i in 0..section_count {
-            sprites.push(Sprite {
-                index: (i + 1).try_into().unwrap(),
-                offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
-            });
-        }
+                let mut sprites = Vec::with_capacity(section_count * 2);
+                for i in 0..section_count {
+                    sprites.push(Sprite {
+                        index: (i + 1).try_into().unwrap(),
+                        offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
+                        operation: None,
+                    });
+                }
+                sprites
+            }
+            Some(OperationDesc::Split(splits)) => {
+                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
+                let section_count = std::cmp::max(section_count, splits.len());
+
+                let mut sprites = Vec::with_capacity(section_count * 2);
+                for i in 0..section_count {
+                    let index = (i + 1).try_into().unwrap();
+                    let offset = (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into();
+
+                    if *splits.get(i).unwrap_or(&false) {
+                        sprites.push(Sprite {
+                            index,
+                            offset,
+                            operation: Some(Operation::Intersect),
+                        });
+                        sprites.push(Sprite {
+                            index,
+                            offset,
+                            operation: Some(Operation::Difference),
+                        });
+                    } else {
+                        sprites.push(Sprite {
+                            index,
+                            offset,
+                            operation: None,
+                        });
+                    }
+                }
+                sprites
+            }
+            _ => Vec::new(),
+        };
 
         Ok(View {
             image,
@@ -121,7 +165,7 @@ impl View {
         })
     }
 
-    pub fn sample(&self, x: i32, y: i32, index: u8) -> bool {
+    pub fn sample_primary(&self, x: i32, y: i32, index: u8) -> bool {
         let x = if self.mirror { -x - 1 } else { x };
 
         let x = x + self.image.image.offset().x;
@@ -131,6 +175,18 @@ impl View {
         let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
 
         self.image.image.get_pixel(x, y) & PRIMARY_INDEX_MASK == index
+    }
+
+    pub fn sample_secondary(&self, x: i32, y: i32, index: u8) -> bool {
+        let x = if self.mirror { -x - 1 } else { x };
+
+        let x = x + self.image.image.offset().x;
+        let y = y + self.image.image.offset().y;
+
+        let x = usize::try_from(x.clamp(0, (self.image.image.width() - 1).try_into().unwrap())).unwrap();
+        let y = usize::try_from(y.clamp(0, (self.image.image.height() - 1).try_into().unwrap())).unwrap();
+
+        (self.image.image.get_pixel(x, y) & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT == index
     }
 }
 
