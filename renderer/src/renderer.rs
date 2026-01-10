@@ -225,6 +225,8 @@ pub fn render_scene(
                 let fragment = framebuffer.get_fragment_mut(x, y);
                 fragment.palette_region_type = palette_region_type;
 
+                fragment.depth = samples.iter().fold(f32::INFINITY, |a, &b| a.min(b.depth));
+
                 if let Some(edge_type) = edge_type {
                     let sample_count = samples.iter().filter(|x| !x.is_mask).count();
                     let sample_weight = 1.0 / sample_count as f32;
