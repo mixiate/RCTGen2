@@ -138,6 +138,15 @@ impl Framebuffer {
             crate::image::IndexedImage::new(1, 1)
         }
     }
+
+    pub fn to_depth(&self) -> DepthBuffer {
+        let offset = glam::IVec2::new(self.offset.x.floor() as i32, self.offset.y.floor() as i32 - 1);
+        let mut depth_buffer = DepthBuffer::new(self.width, self.height, offset);
+        for (fragment, depth) in self.buffer.iter().zip(depth_buffer.buffer.iter_mut()) {
+            *depth = fragment.depth;
+        }
+        depth_buffer
+    }
 }
 
 pub struct DepthBuffer {

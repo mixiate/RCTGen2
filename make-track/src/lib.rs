@@ -33,8 +33,7 @@ fn render_rotation(
     camera: &glam::Mat4,
     lights: &[renderer::Light],
     rotation: usize,
-    dither: bool,
-) -> renderer::image::IndexedImage {
+) -> renderer::Framebuffer {
     let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
     let camera = camera * view_rotation;
 
@@ -42,8 +41,7 @@ fn render_rotation(
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
     const EDGE_DISTANCE: f32 = 0.088_388_346;
-    let framebuffer = renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
-    framebuffer.into_cropped_indexed_image(dither)
+    renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE)
 }
 
 fn render_rotation_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation: usize) -> renderer::DepthBuffer {
@@ -128,14 +126,12 @@ fn render_track_section(
             .into_par_iter()
             .zip(view_mesh_types)
             .enumerate()
-            .map(|(rotation, (_view, mesh_types))| {
-                render_rotation(&scene, &mesh_types, camera, lights, rotation, dither)
-            })
+            .map(|(rotation, (_view, mesh_types))| render_rotation(&scene, &mesh_types, camera, lights, rotation))
             .collect::<Vec<_>>()
     } else {
         (0..views.len())
             .into_par_iter()
-            .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation, dither))
+            .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation))
             .collect::<Vec<_>>()
     };
 
@@ -162,7 +158,9 @@ fn render_track_section(
             .collect::<Vec<_>>()
     };
 
-    for ((view_index, view), mut image) in views.iter().enumerate().zip(images) {
+    for ((view_index, view), image) in views.iter().enumerate().zip(images) {
+        let _track_depth = image.to_depth();
+        let mut image = image.into_cropped_indexed_image(dither);
         image.set_offset(image.offset() + glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32));
         let split_images = split_image(&image, view);
 
