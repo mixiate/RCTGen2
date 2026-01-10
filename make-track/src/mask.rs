@@ -1,5 +1,4 @@
 #[derive(Debug, serde::Deserialize)]
-#[expect(unused)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 enum OperationDesc {
@@ -84,7 +83,6 @@ impl MaskImage {
     }
 }
 
-#[expect(unused)]
 pub enum Operation {
     Difference,
     Intersect,
@@ -110,7 +108,7 @@ impl View {
         let image = MaskImage::new(&directory.join(&view_desc.mask))?;
 
         let sprites = match &view_desc.operation {
-            None => {
+            None | Some(OperationDesc::SplitEnds(false)) => {
                 let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
 
                 let mut sprites = Vec::with_capacity(section_count * 2);
@@ -176,7 +174,40 @@ impl View {
                 });
                 sprites
             }
-            _ => Vec::new(),
+            Some(OperationDesc::Transfer(transfers)) => {
+                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
+                let section_count = std::cmp::max(section_count, transfers.len());
+
+                if transfers.len() == section_count && transfers.last() == Some(&true) {
+                    anyhow::bail!("Cannot use transfer on the last sprite");
+                }
+
+                let mut previous_transfer = false;
+                let mut sprites = Vec::with_capacity(section_count * 2);
+                for i in 0..section_count {
+                    let transfer = *transfers.get(i).unwrap_or(&false);
+                    anyhow::ensure!(
+                        !(transfer && previous_transfer),
+                        "Cannot use transfer on consecutive sprites"
+                    );
+
+                    let operation = if previous_transfer {
+                        Some(Operation::Difference)
+                    } else if transfer {
+                        Some(Operation::TransferNext)
+                    } else {
+                        None
+                    };
+                    previous_transfer = transfer;
+
+                    sprites.push(Sprite {
+                        index: (i + 1).try_into().unwrap(),
+                        offset: (*view_desc.offset.get(i).unwrap_or(&[0, 0])).into(),
+                        operation,
+                    });
+                }
+                sprites
+            }
         };
 
         Ok(View {
@@ -229,7 +260,11 @@ impl Masks {
         let mut track_sections = std::collections::HashMap::new();
 
         for (name, views) in desc.track_sections {
-            let views = views.iter().map(|x| View::new(x, directory)).collect::<anyhow::Result<Vec<View>>>()?;
+            let views = views
+                .iter()
+                .map(|x| View::new(x, directory))
+                .collect::<anyhow::Result<Vec<View>>>()
+                .with_context(|| format!("{} {}", path.display(), name))?;
             track_sections.insert(name, views);
         }
 

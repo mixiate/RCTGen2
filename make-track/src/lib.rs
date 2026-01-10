@@ -455,6 +455,43 @@ fn split_sprite_difference(
     image
 }
 
+fn split_sprite_transfer_next(
+    view: &mask::View,
+    sprite: &mask::Sprite,
+    mut image: renderer::image::IndexedImage,
+    track_depth: &renderer::DepthBuffer,
+    mask_depth: &renderer::DepthBuffer,
+) -> renderer::image::IndexedImage {
+    for y in 0..image.height() {
+        for x in 0..image.width() {
+            let mask_x = image.offset().x + i32::try_from(x).unwrap();
+            let mask_y = image.offset().y + i32::try_from(y).unwrap();
+
+            let track_depth = track_depth.get_depth(x, y);
+            let mask_depth = {
+                let x = mask_x - mask_depth.offset.x;
+                let y = mask_y - mask_depth.offset.y;
+                if x >= 0
+                    && x < mask_depth.width().try_into().unwrap()
+                    && y >= 0
+                    && y < mask_depth.height().try_into().unwrap()
+                {
+                    mask_depth.get_depth(usize::try_from(x).unwrap(), usize::try_from(y).unwrap())
+                } else {
+                    f32::INFINITY
+                }
+            };
+
+            if !(view.sample_primary(mask_x, mask_y, sprite.index)
+                || view.sample_primary(mask_x, mask_y, sprite.index + 1) && track_depth > mask_depth)
+            {
+                image.set_pixel(x, y, 0);
+            }
+        }
+    }
+    image
+}
+
 fn split_image(
     image: &renderer::image::IndexedImage,
     view: &mask::View,
@@ -472,7 +509,9 @@ fn split_image(
                 Some(mask::Operation::Intersect) => {
                     split_sprite_intersect(view, sprite, image.clone(), track_depth, mask_depth)
                 }
-                _ => image.clone(),
+                Some(mask::Operation::TransferNext) => {
+                    split_sprite_transfer_next(view, sprite, image.clone(), track_depth, mask_depth)
+                }
             };
 
             split_image.set_offset(split_image.offset() + sprite.offset);
