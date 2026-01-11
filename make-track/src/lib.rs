@@ -168,6 +168,11 @@ fn render_track_section(
 
     for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images.into_iter().zip(mask_depths)) {
         let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32);
+        let mask_y_offset = if track_section.mask_offset_y {
+            track.z_offset as i32 - 8 // offset masks are presumably made for z_offset of 8 by default
+        } else {
+            0
+        };
 
         let split_images = if let Some(mut mask_depth) = mask_depth {
             let track_depth = image.to_depth();
@@ -176,12 +181,12 @@ fn render_track_section(
             image.offset += offset_offset;
             mask_depth.offset += offset_offset;
 
-            split::split_image_depth(&image, view, &track_depth, &mask_depth)
+            split::split_image_depth(&image, view, mask_y_offset, &track_depth, &mask_depth)
         } else {
             let mut image = image.into_indexed_image(dither);
             image.offset += offset_offset;
 
-            split::split_image(&image, view)
+            split::split_image(&image, view, mask_y_offset)
         };
 
         for (sprite_index, image) in split_images.iter().enumerate() {
