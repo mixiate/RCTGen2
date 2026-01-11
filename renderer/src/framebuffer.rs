@@ -48,6 +48,10 @@ impl Framebuffer {
         self.height
     }
 
+    pub(crate) fn get_fragment(&self, x: usize, y: usize) -> &Fragment {
+        &self.buffer[x + (y * self.width)]
+    }
+
     pub(crate) fn get_fragment_mut(&mut self, x: usize, y: usize) -> &mut Fragment {
         &mut self.buffer[x + (y * self.width)]
     }
@@ -139,13 +143,26 @@ impl Framebuffer {
         }
     }
 
-    pub fn to_depth(&self) -> DepthBuffer {
-        let offset = glam::IVec2::new(self.offset.x.floor() as i32, self.offset.y.floor() as i32 - 1);
-        let mut depth_buffer = DepthBuffer::new(self.width, self.height, offset);
-        for (fragment, depth) in self.buffer.iter().zip(depth_buffer.buffer.iter_mut()) {
-            *depth = fragment.depth;
+    pub fn to_cropped_depth(&self) -> DepthBuffer {
+        if let Some(bounds) = self.bounds() {
+            let [min_x, min_y, max_x, max_y] = bounds;
+            let width = max_x - min_x;
+            let height = max_y - min_y;
+            let offset = glam::IVec2::new(
+                min_x as i32 + self.offset.x.floor() as i32,
+                // ORIGINAL COMMENT: y - 1 compensates for error not sure why it's needed TODO work out why it's needed
+                min_y as i32 + self.offset.y.floor() as i32 - 1,
+            );
+            let mut depth_buffer = DepthBuffer::new(width, height, offset);
+            for y in min_y..max_y {
+                for x in min_x..max_x {
+                    depth_buffer.set_depth(x - min_x, y - min_y, self.get_fragment(x, y).depth);
+                }
+            }
+            depth_buffer
+        } else {
+            DepthBuffer::new(1, 1, glam::IVec2::default())
         }
-        depth_buffer
     }
 }
 

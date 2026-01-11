@@ -175,8 +175,8 @@ fn render_track_section(
         };
 
         let split_images = if let Some(mut mask_depth) = mask_depth {
-            let track_depth = image.to_depth();
-            let mut image = image.into_indexed_image(dither);
+            let track_depth = image.to_cropped_depth();
+            let mut image = image.into_cropped_indexed_image(dither);
 
             image.offset += offset_offset;
             mask_depth.offset += offset_offset;
