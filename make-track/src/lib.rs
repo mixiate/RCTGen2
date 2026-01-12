@@ -68,7 +68,7 @@ fn render_track_section(
     let mesh_count = (0.5 + track_section.length / track.length).floor() as usize;
     let scale = track_section.length / (mesh_count as f32 * track.length);
     let length = scale * track.length;
-    let bank_angle = track.bank_angle.to_radians();
+    let bank_angle = track.bank_angle();
 
     let mut scene = renderer::SceneBuilder::new(render_device)?;
 

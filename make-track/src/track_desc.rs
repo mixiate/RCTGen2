@@ -161,8 +161,14 @@ pub struct Track {
     #[serde(default)]
     pub pivot: f32,
     #[serde(default = "default_bank_angle")]
-    pub bank_angle: f32,
+    bank_angle: f32,
     pub models: Models<std::path::PathBuf>,
+}
+
+impl Track {
+    pub fn bank_angle(&self) -> f32 {
+        self.bank_angle.to_radians()
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
