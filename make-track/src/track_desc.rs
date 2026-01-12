@@ -172,19 +172,18 @@ impl Track {
 }
 
 #[derive(Debug, serde::Deserialize)]
-#[expect(unused)]
 pub struct Offsets {
-    flat: [f32; 8],
-    gentle: [f32; 8],
-    steep: [f32; 8],
-    flat_banked: [f32; 8],
-    gentle_banked: [f32; 8],
-    inverted: [f32; 8],
-    diagonal: [f32; 8],
-    diagonal_gentle: [f32; 8],
-    diagonal_steep: [f32; 8],
-    diagonal_banked: [f32; 8],
-    vertical: [f32; 8],
+    pub flat: [[f32; 2]; 4],
+    pub gentle: [[f32; 2]; 4],
+    pub steep: [[f32; 2]; 4],
+    pub flat_banked: [[f32; 2]; 4],
+    pub gentle_banked: [[f32; 2]; 4],
+    pub inverted: [[f32; 2]; 4],
+    pub diagonal: [[f32; 2]; 4],
+    pub diagonal_gentle: [[f32; 2]; 4],
+    pub diagonal_steep: [[f32; 2]; 4],
+    pub diagonal_banked: [[f32; 2]; 4],
+    pub vertical: [[f32; 2]; 4],
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize)]
@@ -205,7 +204,6 @@ pub struct Light {
 #[derive(Debug, serde::Deserialize)]
 pub struct Desc {
     pub tracks: Vec<Track>,
-    #[expect(unused)]
     pub offsets: Option<Offsets>,
     pub lights: Vec<Light>,
     #[serde(default = "bool_true")]

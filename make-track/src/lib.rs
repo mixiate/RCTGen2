@@ -1,5 +1,6 @@
 mod curves;
 mod mask;
+mod offset;
 mod split;
 mod track_curves;
 mod track_desc;
@@ -380,6 +381,14 @@ fn render(
                 }
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
+
+        if let Some(offsets) = &track_desc.offsets {
+            for track_section in track_sections {
+                let offset_start = offset::calculate(offsets, track_section, track.bank_angle(), 0.0, 0);
+                let offset_end = offset::calculate(offsets, track_section, track.bank_angle(), track_section.length, 0);
+                println!("{} {offset_start} {offset_end}", track_section.name);
+            }
+        }
     }
 
     Ok(())
