@@ -382,6 +382,208 @@ fn split_track_section(
     Ok(())
 }
 
+fn list_track_sections(
+    sections: &std::collections::HashSet<track_desc::Section>,
+) -> Vec<&track_sections::TrackSection> {
+    use track_desc::Section;
+
+    let mut track_sections = Vec::new();
+
+    if sections.contains(&Section::Flat) {
+        track_sections.push(&track_sections::FLAT);
+    }
+    if sections.contains(&Section::GentleSlopes) {
+        track_sections.push(&track_sections::FLAT_TO_GENTLE);
+        track_sections.push(&track_sections::GENTLE_TO_FLAT);
+        track_sections.push(&track_sections::GENTLE);
+    }
+    if sections.contains(&Section::SteepSlopes) {
+        track_sections.push(&track_sections::GENTLE_TO_STEEP);
+        track_sections.push(&track_sections::STEEP_TO_GENTLE);
+        track_sections.push(&track_sections::STEEP);
+    }
+    if sections.contains(&Section::VerticalSlopes) {
+        track_sections.push(&track_sections::STEEP_TO_VERTICAL);
+        track_sections.push(&track_sections::VERTICAL_TO_STEEP);
+        track_sections.push(&track_sections::VERTICAL);
+    }
+    if sections.contains(&Section::SmallSlopeTransitions) {
+        track_sections.push(&track_sections::SMALL_FLAT_TO_STEEP);
+        track_sections.push(&track_sections::SMALL_STEEP_TO_FLAT);
+        track_sections.push(&track_sections::SMALL_FLAT_TO_STEEP_DIAG);
+        track_sections.push(&track_sections::SMALL_STEEP_TO_FLAT_DIAG);
+    }
+    if sections.contains(&Section::LargeSlopeTransitions) {
+        track_sections.push(&track_sections::FLAT_TO_STEEP);
+        track_sections.push(&track_sections::STEEP_TO_FLAT);
+        track_sections.push(&track_sections::FLAT_TO_STEEP_DIAG);
+        track_sections.push(&track_sections::STEEP_TO_FLAT_DIAG);
+    }
+    if sections.contains(&Section::Turns) {
+        track_sections.push(&track_sections::SMALL_TURN_LEFT);
+        track_sections.push(&track_sections::MEDIUM_TURN_LEFT);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_DIAG);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_DIAG);
+    }
+    if sections.contains(&Section::Diagonals) {
+        track_sections.push(&track_sections::FLAT_DIAG);
+    }
+    if sections.contains(&Section::Diagonals) && sections.contains(&Section::GentleSlopes) {
+        track_sections.push(&track_sections::FLAT_TO_GENTLE_DIAG);
+        track_sections.push(&track_sections::GENTLE_TO_FLAT_DIAG);
+        track_sections.push(&track_sections::GENTLE_DIAG);
+    }
+    if sections.contains(&Section::Diagonals) && sections.contains(&Section::SteepSlopes) {
+        track_sections.push(&track_sections::GENTLE_TO_STEEP_DIAG);
+        track_sections.push(&track_sections::STEEP_TO_GENTLE_DIAG);
+        track_sections.push(&track_sections::STEEP_DIAG);
+    }
+    if sections.contains(&Section::BankedTurns) {
+        track_sections.push(&track_sections::FLAT_TO_LEFT_BANK);
+        track_sections.push(&track_sections::FLAT_TO_RIGHT_BANK);
+        track_sections.push(&track_sections::LEFT_BANK_TO_GENTLE);
+        track_sections.push(&track_sections::RIGHT_BANK_TO_GENTLE);
+        track_sections.push(&track_sections::GENTLE_TO_LEFT_BANK);
+        track_sections.push(&track_sections::GENTLE_TO_RIGHT_BANK);
+        track_sections.push(&track_sections::LEFT_BANK);
+
+        if sections.contains(&Section::Diagonals) {
+            track_sections.push(&track_sections::FLAT_TO_LEFT_BANK_DIAG);
+            track_sections.push(&track_sections::FLAT_TO_RIGHT_BANK_DIAG);
+            track_sections.push(&track_sections::LEFT_BANK_TO_GENTLE_DIAG);
+            track_sections.push(&track_sections::RIGHT_BANK_TO_GENTLE_DIAG);
+            track_sections.push(&track_sections::GENTLE_TO_LEFT_BANK_DIAG);
+            track_sections.push(&track_sections::GENTLE_TO_RIGHT_BANK_DIAG);
+            track_sections.push(&track_sections::LEFT_BANK_DIAG);
+        }
+
+        track_sections.push(&track_sections::SMALL_TURN_LEFT_BANK);
+        track_sections.push(&track_sections::MEDIUM_TURN_LEFT_BANK);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_DIAG_BANK);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_DIAG_BANK);
+    }
+    if sections.contains(&Section::SlopedTurns) && sections.contains(&Section::GentleSlopes) {
+        track_sections.push(&track_sections::SMALL_TURN_LEFT_GENTLE);
+        track_sections.push(&track_sections::SMALL_TURN_RIGHT_GENTLE);
+        track_sections.push(&track_sections::MEDIUM_TURN_LEFT_GENTLE);
+        track_sections.push(&track_sections::MEDIUM_TURN_RIGHT_GENTLE);
+    }
+    if sections.contains(&Section::SlopedTurns) && sections.contains(&Section::SteepSlopes) {
+        track_sections.push(&track_sections::VERY_SMALL_TURN_LEFT_STEEP);
+        track_sections.push(&track_sections::VERY_SMALL_TURN_RIGHT_STEEP);
+    }
+    if sections.contains(&Section::SlopedTurns) && sections.contains(&Section::VerticalSlopes) {
+        track_sections.push(&track_sections::VERTICAL_TWIST_LEFT);
+        track_sections.push(&track_sections::VERTICAL_TWIST_RIGHT);
+    }
+    if sections.contains(&Section::BankedSlopedTurns) {
+        track_sections.push(&track_sections::GENTLE_TO_GENTLE_LEFT_BANK);
+        track_sections.push(&track_sections::GENTLE_TO_GENTLE_RIGHT_BANK);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_TO_GENTLE);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_TO_GENTLE);
+        track_sections.push(&track_sections::LEFT_BANK_TO_GENTLE_LEFT_BANK);
+        track_sections.push(&track_sections::RIGHT_BANK_TO_GENTLE_RIGHT_BANK);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_TO_LEFT_BANK);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_TO_RIGHT_BANK);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK);
+        track_sections.push(&track_sections::FLAT_TO_GENTLE_LEFT_BANK);
+        track_sections.push(&track_sections::FLAT_TO_GENTLE_RIGHT_BANK);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_TO_FLAT);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_TO_FLAT);
+        track_sections.push(&track_sections::SMALL_TURN_LEFT_BANK_GENTLE);
+        track_sections.push(&track_sections::SMALL_TURN_RIGHT_BANK_GENTLE);
+        track_sections.push(&track_sections::MEDIUM_TURN_LEFT_BANK_GENTLE);
+        track_sections.push(&track_sections::MEDIUM_TURN_RIGHT_BANK_GENTLE);
+    }
+    if sections.contains(&Section::SBends) {
+        track_sections.push(&track_sections::S_BEND_LEFT);
+        track_sections.push(&track_sections::S_BEND_RIGHT);
+    }
+    if sections.contains(&Section::Helices) {
+        track_sections.push(&track_sections::SMALL_HELIX_LEFT);
+        track_sections.push(&track_sections::SMALL_HELIX_RIGHT);
+        track_sections.push(&track_sections::MEDIUM_HELIX_LEFT);
+        track_sections.push(&track_sections::MEDIUM_HELIX_RIGHT);
+    }
+    if sections.contains(&Section::TurnBankTransitions) {
+        track_sections.push(&track_sections::SMALL_TURN_LEFT_BANK_TO_GENTLE);
+        track_sections.push(&track_sections::SMALL_TURN_RIGHT_BANK_TO_GENTLE);
+    }
+    if sections.contains(&Section::BarrelRolls) {
+        track_sections.push(&track_sections::BARREL_ROLL_LEFT);
+        track_sections.push(&track_sections::BARREL_ROLL_RIGHT);
+    }
+    if sections.contains(&Section::InlineTwists) {
+        track_sections.push(&track_sections::INLINE_TWIST_LEFT);
+        track_sections.push(&track_sections::INLINE_TWIST_RIGHT);
+    }
+    if sections.contains(&Section::HalfLoops) {
+        track_sections.push(&track_sections::HALF_LOOP);
+    }
+    if sections.contains(&Section::VerticalLoops) {
+        track_sections.push(&track_sections::VERTICAL_LOOP_LEFT);
+        track_sections.push(&track_sections::VERTICAL_LOOP_RIGHT);
+    }
+    if sections.contains(&Section::QuarterLoops) {
+        track_sections.push(&track_sections::QUARTER_LOOP);
+    }
+    if sections.contains(&Section::Corkscrews) {
+        track_sections.push(&track_sections::CORKSCREW_LEFT);
+        track_sections.push(&track_sections::CORKSCREW_RIGHT);
+    }
+    if sections.contains(&Section::LargeCorkscrews) {
+        track_sections.push(&track_sections::LARGE_CORKSCREW_LEFT);
+        track_sections.push(&track_sections::LARGE_CORKSCREW_RIGHT);
+    }
+    if sections.contains(&Section::MediumHalfLoops) {
+        track_sections.push(&track_sections::MEDIUM_HALF_LOOP_LEFT);
+        track_sections.push(&track_sections::MEDIUM_HALF_LOOP_RIGHT);
+    }
+    if sections.contains(&Section::LargeHalfLoops) {
+        track_sections.push(&track_sections::LARGE_HALF_LOOP_LEFT);
+        track_sections.push(&track_sections::LARGE_HALF_LOOP_RIGHT);
+    }
+    if sections.contains(&Section::ZeroGRolls) {
+        track_sections.push(&track_sections::ZERO_G_ROLL_LEFT);
+        track_sections.push(&track_sections::ZERO_G_ROLL_RIGHT);
+        track_sections.push(&track_sections::LARGE_ZERO_G_ROLL_LEFT);
+        track_sections.push(&track_sections::LARGE_ZERO_G_ROLL_RIGHT);
+    }
+    if sections.contains(&Section::DiveLoops) {
+        track_sections.push(&track_sections::DIVE_LOOP_45_LEFT);
+        track_sections.push(&track_sections::DIVE_LOOP_45_RIGHT);
+    }
+    if sections.contains(&Section::LargeSlopedTurns) {
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_DIAG_GENTLE);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_DIAG_GENTLE);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE);
+    }
+    if sections.contains(&Section::LargeBankedSlopedTurns) {
+        track_sections.push(&track_sections::GENTLE_TO_GENTLE_LEFT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_TO_GENTLE_RIGHT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_TO_GENTLE_DIAG);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_TO_GENTLE_DIAG);
+        track_sections.push(&track_sections::LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG);
+        track_sections.push(&track_sections::RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_DIAG);
+        track_sections.push(&track_sections::FLAT_TO_GENTLE_LEFT_BANK_DIAG);
+        track_sections.push(&track_sections::FLAT_TO_GENTLE_RIGHT_BANK_DIAG);
+        track_sections.push(&track_sections::GENTLE_LEFT_BANK_TO_FLAT_DIAG);
+        track_sections.push(&track_sections::GENTLE_RIGHT_BANK_TO_FLAT_DIAG);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE);
+    }
+
+    track_sections
+}
+
 fn render(
     track_desc: &track_desc::Desc,
     data_directory: &std::path::Path,
@@ -404,134 +606,6 @@ fn render(
 
     let lights = track_desc.get_lights();
 
-    let track_sections = [
-        &track_sections::FLAT,
-        &track_sections::FLAT_TO_GENTLE,
-        &track_sections::GENTLE,
-        &track_sections::GENTLE_TO_FLAT,
-        &track_sections::GENTLE_TO_STEEP,
-        &track_sections::STEEP_TO_GENTLE,
-        &track_sections::STEEP,
-        &track_sections::STEEP_TO_VERTICAL,
-        &track_sections::VERTICAL_TO_STEEP,
-        &track_sections::VERTICAL,
-        &track_sections::SMALL_FLAT_TO_STEEP,
-        &track_sections::SMALL_STEEP_TO_FLAT,
-        &track_sections::FLAT_TO_STEEP,
-        &track_sections::STEEP_TO_FLAT,
-        &track_sections::SMALL_TURN_LEFT,
-        &track_sections::MEDIUM_TURN_LEFT,
-        &track_sections::LARGE_TURN_LEFT_TO_DIAG,
-        &track_sections::LARGE_TURN_RIGHT_TO_DIAG,
-        &track_sections::FLAT_DIAG,
-        &track_sections::FLAT_TO_GENTLE_DIAG,
-        &track_sections::GENTLE_TO_FLAT_DIAG,
-        &track_sections::GENTLE_DIAG,
-        &track_sections::GENTLE_TO_STEEP_DIAG,
-        &track_sections::STEEP_TO_GENTLE_DIAG,
-        &track_sections::STEEP_DIAG,
-        &track_sections::SMALL_FLAT_TO_STEEP_DIAG,
-        &track_sections::SMALL_STEEP_TO_FLAT_DIAG,
-        &track_sections::FLAT_TO_STEEP_DIAG,
-        &track_sections::STEEP_TO_FLAT_DIAG,
-        &track_sections::FLAT_TO_LEFT_BANK,
-        &track_sections::FLAT_TO_RIGHT_BANK,
-        &track_sections::LEFT_BANK_TO_GENTLE,
-        &track_sections::RIGHT_BANK_TO_GENTLE,
-        &track_sections::GENTLE_TO_LEFT_BANK,
-        &track_sections::GENTLE_TO_RIGHT_BANK,
-        &track_sections::LEFT_BANK,
-        &track_sections::SMALL_TURN_LEFT_BANK,
-        &track_sections::MEDIUM_TURN_LEFT_BANK,
-        &track_sections::LARGE_TURN_LEFT_TO_DIAG_BANK,
-        &track_sections::LARGE_TURN_RIGHT_TO_DIAG_BANK,
-        &track_sections::FLAT_TO_LEFT_BANK_DIAG,
-        &track_sections::FLAT_TO_RIGHT_BANK_DIAG,
-        &track_sections::LEFT_BANK_TO_GENTLE_DIAG,
-        &track_sections::RIGHT_BANK_TO_GENTLE_DIAG,
-        &track_sections::GENTLE_TO_LEFT_BANK_DIAG,
-        &track_sections::GENTLE_TO_RIGHT_BANK_DIAG,
-        &track_sections::LEFT_BANK_DIAG,
-        &track_sections::SMALL_TURN_LEFT_GENTLE,
-        &track_sections::SMALL_TURN_RIGHT_GENTLE,
-        &track_sections::MEDIUM_TURN_LEFT_GENTLE,
-        &track_sections::MEDIUM_TURN_RIGHT_GENTLE,
-        &track_sections::LARGE_TURN_LEFT_TO_DIAG_GENTLE,
-        &track_sections::LARGE_TURN_RIGHT_TO_DIAG_GENTLE,
-        &track_sections::LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE,
-        &track_sections::LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE,
-        &track_sections::VERY_SMALL_TURN_LEFT_STEEP,
-        &track_sections::VERY_SMALL_TURN_RIGHT_STEEP,
-        &track_sections::VERTICAL_TWIST_LEFT,
-        &track_sections::VERTICAL_TWIST_RIGHT,
-        &track_sections::GENTLE_TO_GENTLE_LEFT_BANK,
-        &track_sections::GENTLE_TO_GENTLE_RIGHT_BANK,
-        &track_sections::GENTLE_LEFT_BANK_TO_GENTLE,
-        &track_sections::GENTLE_RIGHT_BANK_TO_GENTLE,
-        &track_sections::LEFT_BANK_TO_GENTLE_LEFT_BANK,
-        &track_sections::RIGHT_BANK_TO_GENTLE_RIGHT_BANK,
-        &track_sections::GENTLE_LEFT_BANK_TO_LEFT_BANK,
-        &track_sections::GENTLE_RIGHT_BANK_TO_RIGHT_BANK,
-        &track_sections::GENTLE_LEFT_BANK,
-        &track_sections::GENTLE_RIGHT_BANK,
-        &track_sections::FLAT_TO_GENTLE_LEFT_BANK,
-        &track_sections::FLAT_TO_GENTLE_RIGHT_BANK,
-        &track_sections::GENTLE_LEFT_BANK_TO_FLAT,
-        &track_sections::GENTLE_RIGHT_BANK_TO_FLAT,
-        &track_sections::GENTLE_TO_GENTLE_LEFT_BANK_DIAG,
-        &track_sections::GENTLE_TO_GENTLE_RIGHT_BANK_DIAG,
-        &track_sections::GENTLE_LEFT_BANK_TO_GENTLE_DIAG,
-        &track_sections::GENTLE_RIGHT_BANK_TO_GENTLE_DIAG,
-        &track_sections::LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG,
-        &track_sections::RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG,
-        &track_sections::GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG,
-        &track_sections::GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG,
-        &track_sections::GENTLE_LEFT_BANK_DIAG,
-        &track_sections::GENTLE_RIGHT_BANK_DIAG,
-        &track_sections::FLAT_TO_GENTLE_LEFT_BANK_DIAG,
-        &track_sections::FLAT_TO_GENTLE_RIGHT_BANK_DIAG,
-        &track_sections::GENTLE_LEFT_BANK_TO_FLAT_DIAG,
-        &track_sections::GENTLE_RIGHT_BANK_TO_FLAT_DIAG,
-        &track_sections::SMALL_TURN_LEFT_BANK_GENTLE,
-        &track_sections::SMALL_TURN_RIGHT_BANK_GENTLE,
-        &track_sections::MEDIUM_TURN_LEFT_BANK_GENTLE,
-        &track_sections::MEDIUM_TURN_RIGHT_BANK_GENTLE,
-        &track_sections::LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE,
-        &track_sections::LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE,
-        &track_sections::LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE,
-        &track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE,
-        &track_sections::S_BEND_LEFT,
-        &track_sections::S_BEND_RIGHT,
-        &track_sections::SMALL_HELIX_LEFT,
-        &track_sections::SMALL_HELIX_RIGHT,
-        &track_sections::MEDIUM_HELIX_LEFT,
-        &track_sections::MEDIUM_HELIX_RIGHT,
-        &track_sections::SMALL_TURN_LEFT_BANK_TO_GENTLE,
-        &track_sections::SMALL_TURN_RIGHT_BANK_TO_GENTLE,
-        &track_sections::BARREL_ROLL_LEFT,
-        &track_sections::BARREL_ROLL_RIGHT,
-        &track_sections::INLINE_TWIST_LEFT,
-        &track_sections::INLINE_TWIST_RIGHT,
-        &track_sections::HALF_LOOP,
-        &track_sections::VERTICAL_LOOP_LEFT,
-        &track_sections::VERTICAL_LOOP_RIGHT,
-        &track_sections::QUARTER_LOOP,
-        &track_sections::CORKSCREW_LEFT,
-        &track_sections::CORKSCREW_RIGHT,
-        &track_sections::LARGE_CORKSCREW_LEFT,
-        &track_sections::LARGE_CORKSCREW_RIGHT,
-        &track_sections::MEDIUM_HALF_LOOP_LEFT,
-        &track_sections::MEDIUM_HALF_LOOP_RIGHT,
-        &track_sections::LARGE_HALF_LOOP_LEFT,
-        &track_sections::LARGE_HALF_LOOP_RIGHT,
-        &track_sections::ZERO_G_ROLL_LEFT,
-        &track_sections::ZERO_G_ROLL_RIGHT,
-        &track_sections::LARGE_ZERO_G_ROLL_LEFT,
-        &track_sections::LARGE_ZERO_G_ROLL_RIGHT,
-        &track_sections::DIVE_LOOP_45_LEFT,
-        &track_sections::DIVE_LOOP_45_RIGHT,
-    ];
-
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
 
@@ -539,6 +613,8 @@ fn render(
 
         let output_directory = output_directory.join(&track.name);
         std::fs::create_dir_all(&output_directory)?;
+
+        let track_sections = list_track_sections(&track.sections);
 
         track_sections
             .into_par_iter()
