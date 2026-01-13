@@ -265,11 +265,10 @@ fn render_track_section_views(
         }
         let view_mesh_types = view_mesh_types;
 
-        views
+        view_mesh_types
             .into_par_iter()
-            .zip(view_mesh_types)
             .enumerate()
-            .map(|(rotation, (_view, mesh_types))| render_scene(&scene, &mesh_types, camera, lights, rotation))
+            .map(|(rotation, mesh_types)| render_scene(&scene, &mesh_types, camera, lights, rotation))
             .collect::<Vec<_>>()
     } else {
         (0..views.len())
