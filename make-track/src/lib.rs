@@ -29,6 +29,67 @@ fn add_model_to_scene<'a>(
     scene.add_model_transform(model, transform, mesh_type)
 }
 
+struct TrackScene<'a> {
+    scene: renderer::Scene<'a>,
+    mesh_types: Vec<renderer::MeshType>,
+    extrude_behind_range: std::ops::Range<usize>,
+    extrude_ahead_range: std::ops::Range<usize>,
+}
+
+impl TrackScene<'_> {
+    fn new<'a>(
+        render_device: &'a renderer::Device,
+        models: &'a track_desc::Models<renderer::model::Model>,
+        track_section: &track_sections::TrackSection,
+        mesh_count: usize,
+        scale: f32,
+        length: f32,
+        bank_angle: f32,
+    ) -> anyhow::Result<TrackScene<'a>> {
+        let mut scene = renderer::SceneBuilder::new(render_device)?;
+
+        let extrude_behind_range = add_model_to_scene(
+            &mut scene,
+            &models.track,
+            Some(renderer::MeshType::Ghost),
+            track_section,
+            scale,
+            -length,
+            bank_angle,
+        )?;
+        let extrude_ahead_range = add_model_to_scene(
+            &mut scene,
+            &models.track,
+            Some(renderer::MeshType::Ghost),
+            track_section,
+            scale,
+            track_section.length,
+            bank_angle,
+        )?;
+
+        for i in 0..mesh_count {
+            add_model_to_scene(
+                &mut scene,
+                &models.track,
+                None,
+                track_section,
+                scale,
+                i as f32 * length,
+                bank_angle,
+            )?;
+        }
+
+        let (scene, mesh_types) = scene.build();
+
+        Ok(TrackScene {
+            scene,
+            mesh_types,
+            extrude_behind_range,
+            extrude_ahead_range,
+        })
+    }
+}
+
 fn render_rotation(
     scene: &renderer::Scene,
     mesh_types: &[renderer::MeshType],
@@ -71,40 +132,20 @@ fn render_track_section(
     let length = scale * track.length;
     let bank_angle = track.bank_angle();
 
-    let mut scene = renderer::SceneBuilder::new(render_device)?;
-
-    let extrude_behind_range = add_model_to_scene(
-        &mut scene,
-        &models.track,
-        Some(renderer::MeshType::Ghost),
+    let TrackScene {
+        scene,
+        mesh_types,
+        extrude_behind_range,
+        extrude_ahead_range,
+    } = TrackScene::new(
+        render_device,
+        models,
         track_section,
+        mesh_count,
         scale,
-        -length,
+        length,
         bank_angle,
     )?;
-    let extrude_ahead_range = add_model_to_scene(
-        &mut scene,
-        &models.track,
-        Some(renderer::MeshType::Ghost),
-        track_section,
-        scale,
-        track_section.length,
-        bank_angle,
-    )?;
-
-    for i in 0..mesh_count {
-        add_model_to_scene(
-            &mut scene,
-            &models.track,
-            None,
-            track_section,
-            scale,
-            i as f32 * length,
-            bank_angle,
-        )?;
-    }
-
-    let (scene, mesh_types) = scene.build();
 
     let has_extrusions = views.iter().any(|x| x.extrude_behind) || views.iter().any(|x| x.extrude_ahead);
 
