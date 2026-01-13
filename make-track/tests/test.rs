@@ -1,18 +1,17 @@
-#[test]
-fn test_make_track() {
+fn test_make_track(track_name: &str) {
     let make_track_directory = std::path::PathBuf::from(std::env!("CARGO_MANIFEST_DIR"));
     let data_directory = make_track_directory.parent().unwrap().join("data");
     let test_files_directory = make_track_directory.join("tests").join("files");
 
-    let track_description_directory = test_files_directory.join("src").join("test-track");
+    let track_description_directory = test_files_directory.join("src").join(track_name);
     let track_description_file_path = track_description_directory.join("track").with_extension("json");
 
     let output_directory = tempfile::tempdir().unwrap();
 
     make_track::make_track(&data_directory, &track_description_file_path, output_directory.path()).unwrap();
 
-    let output_directory = output_directory.path().join("test-track");
-    let expected_directory = test_files_directory.join("output").join("test-track");
+    let output_directory = output_directory.path().join(track_name);
+    let expected_directory = test_files_directory.join("output").join(track_name);
 
     {
         let output_file_count = std::fs::read_dir(&output_directory).unwrap().count();
@@ -36,4 +35,14 @@ fn test_make_track() {
             "{output_file_path:?} != {expected_file_path:?}"
         );
     }
+}
+
+#[test]
+fn test_track() {
+    test_make_track("test-track");
+}
+
+#[test]
+fn test_track_offsets() {
+    test_make_track("test-track-offsets");
 }
