@@ -90,6 +90,30 @@ impl TrackScene<'_> {
     }
 }
 
+fn create_mask_scene<'a>(
+    render_device: &'a renderer::Device,
+    models: &'a track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    mesh_count: usize,
+    scale: f32,
+    length: f32,
+    bank_angle: f32,
+) -> anyhow::Result<renderer::Scene<'a>> {
+    let mut scene = renderer::SceneBuilder::new(render_device)?;
+    for i in -1..(i32::try_from(mesh_count).unwrap() + 1) {
+        add_model_to_scene(
+            &mut scene,
+            &models.mask,
+            None,
+            track_section,
+            scale,
+            i as f32 * length,
+            bank_angle,
+        )?;
+    }
+    Ok(scene.build().0)
+}
+
 fn render_rotation(
     scene: &renderer::Scene,
     mesh_types: &[renderer::MeshType],
@@ -179,20 +203,15 @@ fn render_track_section(
     };
 
     let mask_depths = if views.iter().any(|x| x.requires_track_mask) {
-        let mut scene = renderer::SceneBuilder::new(render_device)?;
-        for i in -1..(i32::try_from(mesh_count).unwrap() + 1) {
-            add_model_to_scene(
-                &mut scene,
-                &models.mask,
-                None,
-                track_section,
-                scale,
-                i as f32 * length,
-                bank_angle,
-            )?;
-        }
-        let (scene, _) = scene.build();
-
+        let scene = create_mask_scene(
+            render_device,
+            models,
+            track_section,
+            mesh_count,
+            scale,
+            length,
+            bank_angle,
+        )?;
         views
             .into_par_iter()
             .enumerate()
