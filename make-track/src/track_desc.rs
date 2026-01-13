@@ -13,7 +13,7 @@ pub enum Flag {
 
 #[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum Section {
+pub enum TrackGroup {
     Flat,
     Turns,
     GentleSlopes,
@@ -126,7 +126,7 @@ pub struct Track {
     #[expect(unused)]
     #[serde(default)]
     pub flags: std::collections::HashSet<Flag>,
-    pub sections: std::collections::HashSet<Section>,
+    pub sections: std::collections::HashSet<TrackGroup>,
     pub masks: std::path::PathBuf,
     pub name: String,
     pub length: f32,
