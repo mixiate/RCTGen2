@@ -22,14 +22,10 @@ fn add_model_to_scene<'a>(
 ) -> anyhow::Result<std::ops::Range<usize>> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
         let distance = (position.z * scale) + distance;
-        let point = track_section.sample_curve(distance, bank_angle);
+        let point = track_section.sample_curve(distance, bank_angle, offset_start, offset_end);
 
         let position = point.position + (point.normal * position.y) + (point.binormal * position.x);
         let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
-
-        let v = (distance / track_section.length).clamp(0.0, 1.0);
-        let position = position + (offset_start * (2.0 * v * v * v - 3.0 * v * v + 1.0));
-        let position = position + (offset_end * (-2.0 * v * v * v + 3.0 * v * v));
 
         (position, normal)
     };

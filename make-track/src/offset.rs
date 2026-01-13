@@ -118,8 +118,8 @@ fn get_track_point(
     bank_angle: f32,
     distance: f32,
 ) -> (crate::track_sections::TrackPoint, bool) {
-    let point = track_section.sample_curve(distance, bank_angle);
-    let point_unbanked = track_section.sample_curve(distance, 0.0);
+    let point = track_section.sample_curve(distance, bank_angle, &glam::Vec3::ZERO, &glam::Vec3::ZERO);
+    let point_unbanked = track_section.sample_curve(distance, 0.0, &glam::Vec3::ZERO, &glam::Vec3::ZERO);
 
     let angle = point.normal.angle_between(point_unbanked.normal);
     let banked = angle > bank_angle * 0.9 && angle < bank_angle * 1.1;

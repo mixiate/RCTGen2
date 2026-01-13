@@ -14,7 +14,13 @@ pub struct TrackSection {
 }
 
 impl TrackSection {
-    pub fn sample_curve(&self, distance: f32, bank_angle: f32) -> TrackPoint {
+    pub fn sample_curve(
+        &self,
+        distance: f32,
+        bank_angle: f32,
+        offset_start: &glam::Vec3,
+        offset_end: &glam::Vec3,
+    ) -> TrackPoint {
         let mut track_point = if distance < 0.0 {
             let mut point = (self.curve)(0.0, bank_angle);
             point.position += point.tangent * distance;
@@ -28,6 +34,11 @@ impl TrackSection {
         };
 
         track_point.position += self.position_offset;
+
+        let v = (distance / self.length).clamp(0.0, 1.0);
+        track_point.position += offset_start * (2.0 * v * v * v - 3.0 * v * v + 1.0);
+        track_point.position += offset_end * (-2.0 * v * v * v + 3.0 * v * v);
+
         track_point
     }
 }
