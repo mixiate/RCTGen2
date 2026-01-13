@@ -148,7 +148,7 @@ fn create_mask_scene<'a>(
     Ok(scene.build().0)
 }
 
-fn render_rotation(
+fn render_scene(
     scene: &renderer::Scene,
     mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
@@ -165,7 +165,7 @@ fn render_rotation(
     renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE)
 }
 
-fn render_rotation_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation: usize) -> renderer::DepthBuffer {
+fn render_scene_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation: usize) -> renderer::DepthBuffer {
     let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
     let camera = camera * view_rotation;
     renderer::render_scene_depth(scene, &camera, 4, 4)
@@ -208,7 +208,7 @@ fn render_track_section_view(
         }
     }
 
-    let image = render_rotation(&scene, &mesh_types, camera, lights, rotation);
+    let image = render_scene(&scene, &mesh_types, camera, lights, rotation);
 
     let mask_depth = if view.requires_track_mask {
         let scene = create_mask_scene(
@@ -219,7 +219,7 @@ fn render_track_section_view(
             offset_start,
             offset_end,
         )?;
-        Some(render_rotation_depth(&scene, camera, rotation))
+        Some(render_scene_depth(&scene, camera, rotation))
     } else {
         None
     };
@@ -269,12 +269,12 @@ fn render_track_section_views(
             .into_par_iter()
             .zip(view_mesh_types)
             .enumerate()
-            .map(|(rotation, (_view, mesh_types))| render_rotation(&scene, &mesh_types, camera, lights, rotation))
+            .map(|(rotation, (_view, mesh_types))| render_scene(&scene, &mesh_types, camera, lights, rotation))
             .collect::<Vec<_>>()
     } else {
         (0..views.len())
             .into_par_iter()
-            .map(|rotation| render_rotation(&scene, &mesh_types, camera, lights, rotation))
+            .map(|rotation| render_scene(&scene, &mesh_types, camera, lights, rotation))
             .collect::<Vec<_>>()
     };
 
@@ -285,7 +285,7 @@ fn render_track_section_views(
             .enumerate()
             .map(|(rotation, view)| {
                 if view.requires_track_mask {
-                    Some(render_rotation_depth(&scene, camera, rotation))
+                    Some(render_scene_depth(&scene, camera, rotation))
                 } else {
                     None
                 }
