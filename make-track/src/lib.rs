@@ -36,6 +36,27 @@ fn add_model_to_scene<'a>(
     scene.add_model_transform(model, transform, mesh_type)
 }
 
+struct TrackModelDesc {
+    mesh_count: usize,
+    scale: f32,
+    length: f32,
+    bank_angle: f32,
+}
+
+impl TrackModelDesc {
+    fn new(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
+        let mesh_count = (0.5 + track_section.length / track.length).floor() as usize;
+        let scale = track_section.length / (mesh_count as f32 * track.length);
+
+        Self {
+            mesh_count,
+            scale,
+            length: scale * track.length,
+            bank_angle: track.bank_angle(),
+        }
+    }
+}
+
 struct TrackScene<'a> {
     scene: renderer::Scene<'a>,
     mesh_types: Vec<renderer::MeshType>,
@@ -44,15 +65,11 @@ struct TrackScene<'a> {
 }
 
 impl TrackScene<'_> {
-    #[expect(clippy::too_many_arguments)]
     fn new<'a>(
         render_device: &'a renderer::Device,
         models: &'a track_desc::Models<renderer::model::Model>,
         track_section: &track_sections::TrackSection,
-        mesh_count: usize,
-        scale: f32,
-        length: f32,
-        bank_angle: f32,
+        track_model_desc: &TrackModelDesc,
         offset_start: &glam::Vec3,
         offset_end: &glam::Vec3,
     ) -> anyhow::Result<TrackScene<'a>> {
@@ -63,35 +80,35 @@ impl TrackScene<'_> {
             &models.track,
             Some(renderer::MeshType::Ghost),
             track_section,
-            scale,
-            bank_angle,
+            track_model_desc.scale,
+            track_model_desc.bank_angle,
             offset_start,
             offset_end,
-            -length,
+            -track_model_desc.length,
         )?;
         let extrude_ahead_range = add_model_to_scene(
             &mut scene,
             &models.track,
             Some(renderer::MeshType::Ghost),
             track_section,
-            scale,
-            bank_angle,
+            track_model_desc.scale,
+            track_model_desc.bank_angle,
             offset_start,
             offset_end,
             track_section.length,
         )?;
 
-        for i in 0..mesh_count {
+        for i in 0..track_model_desc.mesh_count {
             add_model_to_scene(
                 &mut scene,
                 &models.track,
                 None,
                 track_section,
-                scale,
-                bank_angle,
+                track_model_desc.scale,
+                track_model_desc.bank_angle,
                 offset_start,
                 offset_end,
-                i as f32 * length,
+                i as f32 * track_model_desc.length,
             )?;
         }
 
@@ -106,30 +123,26 @@ impl TrackScene<'_> {
     }
 }
 
-#[expect(clippy::too_many_arguments)]
 fn create_mask_scene<'a>(
     render_device: &'a renderer::Device,
     models: &'a track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    mesh_count: usize,
-    scale: f32,
-    length: f32,
-    bank_angle: f32,
+    track_model_desc: &TrackModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<renderer::Scene<'a>> {
     let mut scene = renderer::SceneBuilder::new(render_device)?;
-    for i in -1..(i32::try_from(mesh_count).unwrap() + 1) {
+    for i in -1..(i32::try_from(track_model_desc.mesh_count).unwrap() + 1) {
         add_model_to_scene(
             &mut scene,
             &models.mask,
             None,
             track_section,
-            scale,
-            bank_angle,
+            track_model_desc.scale,
+            track_model_desc.bank_angle,
             offset_start,
             offset_end,
-            i as f32 * length,
+            i as f32 * track_model_desc.length,
         )?;
     }
     Ok(scene.build().0)
@@ -173,14 +186,11 @@ fn render_track_section(
 ) -> anyhow::Result<()> {
     use rayon::prelude::*;
 
-    let mesh_count = (0.5 + track_section.length / track.length).floor() as usize;
-    let scale = track_section.length / (mesh_count as f32 * track.length);
-    let length = scale * track.length;
-    let bank_angle = track.bank_angle();
+    let model_desc = TrackModelDesc::new(track, track_section);
 
     let (offset_start, offset_end) = if let Some(offsets) = offsets {
-        let offset_start = offset::calculate(offsets, track_section, bank_angle, 0.0, 0);
-        let offset_end = offset::calculate(offsets, track_section, bank_angle, track_section.length, 0);
+        let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, 0);
+        let offset_end = offset::calculate(offsets, track_section, model_desc.bank_angle, track_section.length, 0);
         (offset_start, offset_end)
     } else {
         (glam::Vec3::splat(0.0), glam::Vec3::splat(0.0))
@@ -195,10 +205,7 @@ fn render_track_section(
         render_device,
         models,
         track_section,
-        mesh_count,
-        scale,
-        length,
-        bank_angle,
+        &model_desc,
         &offset_start,
         &offset_end,
     )?;
@@ -239,10 +246,7 @@ fn render_track_section(
             render_device,
             models,
             track_section,
-            mesh_count,
-            scale,
-            length,
-            bank_angle,
+            &model_desc,
             &offset_start,
             &offset_end,
         )?;
