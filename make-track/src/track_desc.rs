@@ -44,10 +44,6 @@ pub enum Section {
     TurnBankTransitions,
 }
 
-fn default_lift_offset() -> i32 {
-    13
-}
-
 fn default_bank_angle() -> f32 {
     45.0
 }
@@ -134,9 +130,6 @@ pub struct Track {
     pub sections: std::collections::HashSet<Section>,
     pub masks: std::path::PathBuf,
     pub name: String,
-    #[expect(unused)]
-    #[serde(default = "default_lift_offset")]
-    pub lift_offset: i32, // unused. unknown default value
     pub length: f32,
     #[expect(unused)]
     #[serde(default = "float_1")]
