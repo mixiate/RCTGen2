@@ -172,43 +172,80 @@ fn render_rotation_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation:
 }
 
 #[expect(clippy::too_many_arguments)]
-fn render_track_section(
+fn render_track_section_view(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
     models: &track_desc::Models<renderer::model::Model>,
-    dither: bool,
-    track: &track_desc::Track,
-    offsets: Option<&track_desc::Offsets>,
     track_section: &track_sections::TrackSection,
-    views: &[mask::View],
-    output_directory: &std::path::Path,
-) -> anyhow::Result<()> {
-    use rayon::prelude::*;
-
-    let model_desc = TrackModelDesc::new(track, track_section);
-
-    let (offset_start, offset_end) = if let Some(offsets) = offsets {
-        let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, 0);
-        let offset_end = offset::calculate(offsets, track_section, model_desc.bank_angle, track_section.length, 0);
-        (offset_start, offset_end)
-    } else {
-        (glam::Vec3::splat(0.0), glam::Vec3::splat(0.0))
-    };
-
+    model_desc: &TrackModelDesc,
+    view: &mask::View,
+    rotation: usize,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+) -> anyhow::Result<(renderer::Framebuffer, Option<renderer::DepthBuffer>)> {
     let TrackScene {
         scene,
-        mesh_types,
+        mut mesh_types,
         extrude_behind_range,
         extrude_ahead_range,
     } = TrackScene::new(
         render_device,
         models,
         track_section,
-        &model_desc,
-        &offset_start,
-        &offset_end,
+        model_desc,
+        offset_start,
+        offset_end,
     )?;
+    if view.extrude_behind {
+        for mesh_type in &mut mesh_types[extrude_behind_range.clone()] {
+            *mesh_type = renderer::MeshType::Normal;
+        }
+    }
+    if view.extrude_ahead {
+        for mesh_type in &mut mesh_types[extrude_ahead_range.clone()] {
+            *mesh_type = renderer::MeshType::Normal;
+        }
+    }
+
+    let image = render_rotation(&scene, &mesh_types, camera, lights, rotation);
+
+    let mask_depth = if view.requires_track_mask {
+        let scene = create_mask_scene(
+            render_device,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+        )?;
+        Some(render_rotation_depth(&scene, camera, rotation))
+    } else {
+        None
+    };
+
+    Ok((image, mask_depth))
+}
+
+fn render_track_section_views(
+    render_device: &renderer::Device,
+    camera: &glam::Mat4,
+    lights: &[renderer::Light],
+    models: &track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    model_desc: &TrackModelDesc,
+    views: &[mask::View],
+) -> anyhow::Result<(Vec<renderer::Framebuffer>, Vec<Option<renderer::DepthBuffer>>)> {
+    use rayon::prelude::*;
+
+    let offset = glam::Vec3::splat(0.0);
+
+    let TrackScene {
+        scene,
+        mesh_types,
+        extrude_behind_range,
+        extrude_ahead_range,
+    } = TrackScene::new(render_device, models, track_section, model_desc, &offset, &offset)?;
 
     let has_extrusions = views.iter().any(|x| x.extrude_behind) || views.iter().any(|x| x.extrude_ahead);
 
@@ -242,14 +279,7 @@ fn render_track_section(
     };
 
     let mask_depths = if views.iter().any(|x| x.requires_track_mask) {
-        let scene = create_mask_scene(
-            render_device,
-            models,
-            track_section,
-            &model_desc,
-            &offset_start,
-            &offset_end,
-        )?;
+        let scene = create_mask_scene(render_device, models, track_section, model_desc, &offset, &offset)?;
         views
             .into_par_iter()
             .enumerate()
@@ -263,6 +293,59 @@ fn render_track_section(
             .collect::<Vec<_>>()
     } else {
         vec![None, None, None, None] // ehh
+    };
+
+    Ok((images, mask_depths))
+}
+
+#[expect(clippy::too_many_arguments)]
+fn render_track_section(
+    render_device: &renderer::Device,
+    camera: &glam::Mat4,
+    lights: &[renderer::Light],
+    models: &track_desc::Models<renderer::model::Model>,
+    dither: bool,
+    track: &track_desc::Track,
+    offsets: Option<&track_desc::Offsets>,
+    track_section: &track_sections::TrackSection,
+    views: &[mask::View],
+    output_directory: &std::path::Path,
+) -> anyhow::Result<()> {
+    use rayon::prelude::*;
+
+    let model_desc = TrackModelDesc::new(track, track_section);
+
+    let (images, mask_depths) = if let Some(offsets) = offsets {
+        let images_mask_depths = views
+            .into_par_iter()
+            .enumerate()
+            .map(|(rotation, view)| {
+                let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
+                let offset_end = offset::calculate(
+                    offsets,
+                    track_section,
+                    model_desc.bank_angle,
+                    track_section.length,
+                    rotation,
+                );
+                render_track_section_view(
+                    render_device,
+                    camera,
+                    lights,
+                    models,
+                    track_section,
+                    &model_desc,
+                    view,
+                    rotation,
+                    &offset_start,
+                    &offset_end,
+                )
+            })
+            .collect::<anyhow::Result<Vec<_>>>()?;
+
+        images_mask_depths.into_iter().unzip()
+    } else {
+        render_track_section_views(render_device, camera, lights, models, track_section, &model_desc, views)?
     };
 
     for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images.into_iter().zip(mask_depths)) {
