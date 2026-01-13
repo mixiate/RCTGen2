@@ -235,7 +235,7 @@ fn render_track_section_views(
     track_section: &track_sections::TrackSection,
     model_desc: &TrackModelDesc,
     views: &[mask::View],
-) -> anyhow::Result<(Vec<renderer::Framebuffer>, Vec<Option<renderer::DepthBuffer>>)> {
+) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
 
     let offset = glam::Vec3::splat(0.0);
@@ -288,7 +288,7 @@ fn render_track_section_views(
         vec![None, None, None, None] // ehh
     };
 
-    Ok((images, mask_depths))
+    Ok(images.into_iter().zip(mask_depths).collect())
 }
 
 #[expect(clippy::too_many_arguments)]
@@ -297,19 +297,17 @@ fn render_track_section(
     camera: &glam::Mat4,
     lights: &[renderer::Light],
     models: &track_desc::Models<renderer::model::Model>,
-    dither: bool,
     track: &track_desc::Track,
     offsets: Option<&track_desc::Offsets>,
     track_section: &track_sections::TrackSection,
     views: &[mask::View],
-    output_directory: &std::path::Path,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
 
     let model_desc = TrackModelDesc::new(track, track_section);
 
-    let (images, mask_depths) = if let Some(offsets) = offsets {
-        let images_mask_depths = views
+    Ok(if let Some(offsets) = offsets {
+        views
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
@@ -334,17 +332,24 @@ fn render_track_section(
                     &offset_end,
                 )
             })
-            .collect::<anyhow::Result<Vec<_>>>()?;
-
-        images_mask_depths.into_iter().unzip()
+            .collect::<anyhow::Result<Vec<_>>>()?
     } else {
         render_track_section_views(render_device, camera, lights, models, track_section, &model_desc, views)?
-    };
+    })
+}
 
-    for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images.into_iter().zip(mask_depths)) {
-        let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset as i32);
+fn split_track_section(
+    images: Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>,
+    views: &[mask::View],
+    dither: bool,
+    track_section: &track_sections::TrackSection,
+    track_z_offset: i32,
+    output_directory: &std::path::Path,
+) -> anyhow::Result<()> {
+    for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images) {
+        let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track_z_offset);
         let mask_y_offset = if track_section.mask_offset_y {
-            track.z_offset as i32 - 8 // offset masks are presumably made for z_offset of 8 by default
+            track_z_offset - 8 // offset masks are presumably made for track z_offset of 8 by default
         } else {
             0
         };
@@ -544,13 +549,21 @@ fn render(
                         &camera,
                         &lights,
                         &models,
-                        track_desc.dither,
                         track,
                         track_desc.offsets.as_ref(),
                         track_section,
                         views,
-                        &output_directory,
                     )
+                    .and_then(|images| {
+                        split_track_section(
+                            images,
+                            views,
+                            track_desc.dither,
+                            track_section,
+                            track.z_offset as i32,
+                            &output_directory,
+                        )
+                    })
                 } else {
                     Ok(())
                 }
