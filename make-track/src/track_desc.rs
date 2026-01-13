@@ -16,11 +16,6 @@ pub enum Flag {
 #[serde(rename_all = "snake_case")]
 pub enum Section {
     Flat,
-    Brakes,
-    BlockBrakes,
-    DiagonalBrakes,
-    SlopedBrakes,
-    MagneticBrakes,
     Turns,
     GentleSlopes,
     SteepSlopes,
@@ -33,7 +28,6 @@ pub enum Section {
     LargeSlopedTurns,
     LargeBankedSlopedTurns,
     SBends,
-    BankedSBends,
     Helices,
     SmallSlopeTransitions,
     LargeSlopeTransitions,
@@ -48,10 +42,7 @@ pub enum Section {
     LargeHalfLoops,
     ZeroGRolls,
     DiveLoops,
-    Boosters,
-    LaunchedLifts,
     TurnBankTransitions,
-    VerticalBoosters,
 }
 
 fn default_lift_offset() -> i32 {
