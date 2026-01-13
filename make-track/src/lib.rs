@@ -282,13 +282,7 @@ fn render_track_section_views(
         views
             .into_par_iter()
             .enumerate()
-            .map(|(rotation, view)| {
-                if view.requires_track_mask {
-                    Some(render_scene_depth(&scene, camera, rotation))
-                } else {
-                    None
-                }
-            })
+            .map(|(rotation, view)| view.requires_track_mask.then(|| render_scene_depth(&scene, camera, rotation)))
             .collect::<Vec<_>>()
     } else {
         vec![None, None, None, None] // ehh
