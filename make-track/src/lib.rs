@@ -363,7 +363,7 @@ fn split_track_section(
 
             split::split_image_depth(&image, view, mask_y_offset, &track_depth, &mask_depth)
         } else {
-            let mut image = image.into_indexed_image(dither);
+            let mut image = image.into_cropped_indexed_image(dither);
             image.offset += offset_offset;
 
             split::split_image(&image, view, mask_y_offset)
