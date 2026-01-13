@@ -35,7 +35,9 @@ impl<'a> SceneBuilder<'a> {
         translation: glam::Vec3,
         rotation: glam::Quat,
         mesh_type: Option<MeshType>,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<std::ops::Range<usize>> {
+        let start_index = self.meshes.len();
+
         let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
@@ -58,7 +60,10 @@ impl<'a> SceneBuilder<'a> {
             self.mesh_types.push(mesh_type);
         }
 
-        Ok(())
+        Ok(std::ops::Range {
+            start: start_index,
+            end: self.meshes.len(),
+        })
     }
 
     pub fn add_model_transform<F>(
