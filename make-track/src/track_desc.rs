@@ -9,7 +9,6 @@ pub enum Flag {
     HasSupports,
     SeparateTie,
     TieAtBoundary,
-    SpecialEndOffsets,
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
