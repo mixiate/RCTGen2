@@ -46,3 +46,8 @@ fn test_track() {
 fn test_track_offsets() {
     test_make_track("test-track-offsets");
 }
+
+#[test]
+fn test_track_tie() {
+    test_make_track("test-track-tie");
+}
