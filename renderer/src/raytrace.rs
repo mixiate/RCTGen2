@@ -34,7 +34,7 @@ impl<'a> SceneBuilder<'a> {
         model: &'a crate::model::Model,
         translation: glam::Vec3,
         rotation: glam::Quat,
-        mesh_type: Option<MeshType>,
+        mesh_type: MeshType,
     ) -> anyhow::Result<std::ops::Range<usize>> {
         let start_index = self.meshes.len();
 
@@ -46,17 +46,10 @@ impl<'a> SceneBuilder<'a> {
             }
             let normals = mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
 
-            self.embree_scene.add_geometry(geometry, mesh.is_ghost || mesh_type == Some(MeshType::Ghost))?;
+            self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
 
             self.meshes.push(SceneMesh { mesh, normals });
 
-            let mesh_type = mesh_type.unwrap_or(if mesh.is_ghost {
-                MeshType::Ghost
-            } else if mesh.is_mask {
-                MeshType::Mask
-            } else {
-                MeshType::Normal
-            });
             self.mesh_types.push(mesh_type);
         }
 
@@ -70,7 +63,7 @@ impl<'a> SceneBuilder<'a> {
         &mut self,
         model: &'a crate::model::Model,
         transform: F,
-        mesh_type: Option<MeshType>,
+        mesh_type: MeshType,
     ) -> anyhow::Result<std::ops::Range<usize>>
     where
         F: Fn((&glam::Vec3, &glam::Vec3)) -> (glam::Vec3, glam::Vec3),
@@ -87,17 +80,10 @@ impl<'a> SceneBuilder<'a> {
                 *geometry_position = vertex.0.into();
                 normals.push(vertex.1.normalize());
             }
-            self.embree_scene.add_geometry(geometry, mesh.is_ghost || mesh_type == Some(MeshType::Ghost))?;
+            self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
 
             self.meshes.push(SceneMesh { mesh, normals });
 
-            let mesh_type = mesh_type.unwrap_or(if mesh.is_ghost {
-                MeshType::Ghost
-            } else if mesh.is_mask {
-                MeshType::Mask
-            } else {
-                MeshType::Normal
-            });
             self.mesh_types.push(mesh_type);
         }
 

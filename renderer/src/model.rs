@@ -90,8 +90,6 @@ pub struct Mesh {
     pub uvs: Vec<glam::Vec2>,
     pub indices: Vec<[u32; 3]>,
     pub material: Material,
-    pub is_mask: bool,
-    pub is_ghost: bool,
 }
 
 pub struct Model {
@@ -119,18 +117,16 @@ impl Model {
                 anyhow::bail!("Obj does not have any groups {}", path.display());
             }
             for group in &object.groups {
-                let (material, is_mask, is_ghost) = if let Some(material) = &group.material {
+                let material = if let Some(material) = &group.material {
                     let material = match material {
                         obj::ObjMaterial::Mtl(mtl) => mtl,
                         obj::ObjMaterial::Ref(name) => {
                             anyhow::bail!("Could not read material {name} used by obj {}", path.display())
                         }
                     };
-                    let is_mask = material.name.split("_").any(|x| x == "Mask");
-                    let is_ghost = material.name.split("_").any(|x| x == "Ghost");
-                    (Material::new(material, parent_directory)?, is_mask, is_ghost)
+                    Material::new(material, parent_directory)?
                 } else {
-                    (Material::default(), false, false)
+                    Material::default()
                 };
 
                 let mut vertices: Vec<Vertex> = Vec::new();
@@ -189,8 +185,6 @@ impl Model {
                     uvs: vertices.iter().map(|x| x.uv.into()).collect(),
                     indices,
                     material,
-                    is_mask,
-                    is_ghost,
                 });
             }
         }
