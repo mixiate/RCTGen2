@@ -35,9 +35,8 @@ impl<'a> SceneBuilder<'a> {
         translation: glam::Vec3,
         rotation: glam::Quat,
         mesh_type: MeshType,
-    ) -> anyhow::Result<std::ops::Range<usize>> {
-        let start_index = self.meshes.len();
-
+        mesh_ids: Option<&mut Vec<usize>>,
+    ) -> anyhow::Result<()> {
         let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
@@ -48,15 +47,16 @@ impl<'a> SceneBuilder<'a> {
 
             self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
 
+            if let Some(&mut ref mut mesh_ids) = mesh_ids {
+                mesh_ids.push(self.meshes.len());
+            }
+
             self.meshes.push(SceneMesh { mesh, normals });
 
             self.mesh_types.push(mesh_type);
         }
 
-        Ok(std::ops::Range {
-            start: start_index,
-            end: self.meshes.len(),
-        })
+        Ok(())
     }
 
     pub fn add_model_transform<F>(
@@ -64,12 +64,11 @@ impl<'a> SceneBuilder<'a> {
         model: &'a crate::model::Model,
         transform: F,
         mesh_type: MeshType,
-    ) -> anyhow::Result<std::ops::Range<usize>>
+        mesh_ids: Option<&mut Vec<usize>>,
+    ) -> anyhow::Result<()>
     where
         F: Fn((&glam::Vec3, &glam::Vec3)) -> (glam::Vec3, glam::Vec3),
     {
-        let start_index = self.meshes.len();
-
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
             let mut normals = Vec::with_capacity(mesh.normals.len());
@@ -82,15 +81,16 @@ impl<'a> SceneBuilder<'a> {
             }
             self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
 
+            if let Some(&mut ref mut mesh_ids) = mesh_ids {
+                mesh_ids.push(self.meshes.len());
+            }
+
             self.meshes.push(SceneMesh { mesh, normals });
 
             self.mesh_types.push(mesh_type);
         }
 
-        Ok(std::ops::Range {
-            start: start_index,
-            end: self.meshes.len(),
-        })
+        Ok(())
     }
 
     pub fn build(self) -> (Scene<'a>, Vec<MeshType>) {

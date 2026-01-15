@@ -131,7 +131,13 @@ fn main() -> anyhow::Result<()> {
                         model_translation + offset
                     };
                     let mut scene_builder = renderer::SceneBuilder::new(&render_device)?;
-                    scene_builder.add_model(model, model_translation, model_rotation, renderer::MeshType::Normal)?;
+                    scene_builder.add_model(
+                        model,
+                        model_translation,
+                        model_rotation,
+                        renderer::MeshType::Normal,
+                        None,
+                    )?;
                     scene_builder.build()
                 };
 

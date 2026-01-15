@@ -398,7 +398,7 @@ fn add_models_to_scene<'a>(
     mesh_type: renderer::MeshType,
 ) -> anyhow::Result<()> {
     for model in models {
-        scene.add_model(model.model, model.translation, model.rotation, mesh_type)?;
+        scene.add_model(model.model, model.translation, model.rotation, mesh_type, None)?;
     }
     Ok(())
 }
@@ -415,6 +415,7 @@ fn add_restraint_models_to_scene<'a>(
             model.restraint_translations[frame],
             model.restraint_rotations[frame],
             mesh_type,
+            None,
         )?;
     }
     Ok(())
