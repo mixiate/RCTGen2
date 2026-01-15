@@ -22,6 +22,8 @@ struct ViewDesc {
     extrude_behind: bool,
     #[serde(default)]
     extrude_in_front: bool,
+    #[serde(default)]
+    mask_end: bool,
     #[serde(flatten)]
     operation: Option<OperationDesc>,
 }
@@ -114,8 +116,8 @@ pub struct View {
     mirror: bool,
     pub sprites: Vec<Sprite>,
     pub requires_track_mask: bool,
-    pub extrude_behind: bool,
-    pub extrude_ahead: bool,
+    pub extrude_behind_type: Option<renderer::MeshType>,
+    pub extrude_ahead_type: Option<renderer::MeshType>,
 }
 
 impl View {
@@ -190,13 +192,26 @@ impl View {
             }
         };
 
+        let extrude_behind_type = if view_desc.extrude_behind {
+            Some(renderer::MeshType::Normal)
+        } else {
+            None
+        };
+        let extrude_ahead_type = if view_desc.extrude_in_front {
+            Some(renderer::MeshType::Normal)
+        } else if view_desc.mask_end {
+            Some(renderer::MeshType::Mask)
+        } else {
+            None
+        };
+
         Ok(View {
             image,
             mirror: view_desc.mirror,
             sprites,
             requires_track_mask: view_desc.operation.is_some(),
-            extrude_behind: view_desc.extrude_behind,
-            extrude_ahead: view_desc.extrude_in_front,
+            extrude_behind_type,
+            extrude_ahead_type,
         })
     }
 

@@ -51,7 +51,8 @@
     ],
     "gentle_to_steep": [
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         },
         {
             "mask": "default/single_tile.png",
@@ -62,7 +63,8 @@
             "split": [true]
         },
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         }
     ],
     "steep_to_gentle": [
@@ -83,7 +85,8 @@
     ],
     "steep": [
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         },
         {
             "mask": "default/single_tile.png"
@@ -92,7 +95,8 @@
             "mask": "default/single_tile.png"
         },
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         }
     ],
     "steep_to_vertical": [
@@ -111,7 +115,8 @@
     ],
     "vertical_to_steep": [
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         },
         {
             "mask": "default/single_tile.png"
@@ -120,7 +125,8 @@
             "mask": "default/single_tile.png"
         },
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         }
     ],
     "vertical": [
@@ -720,11 +726,13 @@
     "very_small_turn_left_steep": [
         {
             "mask": "default/very_small_turn_left_steep_0.png",
-            "split": [false, false]
+            "split": [false, false],
+            "mask_end": true
         },
         {
             "mask": "default/very_small_turn_left_steep_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "mask_end": true
         },
         {
             "mask": "default/very_small_turn_left_steep_2.png"
@@ -748,12 +756,14 @@
         {
             "mirror": true,
             "mask": "default/very_small_turn_left_steep_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "mask_end": true
         },
         {
             "mirror": true,
             "mask": "default/very_small_turn_left_steep_0.png",
-            "split": [false, false]
+            "split": [false, false],
+            "mask_end": true
         }
     ],
     "vertical_twist_left": [
@@ -1441,6 +1451,7 @@
     "flat_to_steep": [
         {
             "mask": "default/flat_to_steep_0.png",
+            "mask_end": true,
             "offset": [[0, 0], [-32, 16], [-64, 48], [-96, 88]]
         },
         {
@@ -1453,6 +1464,7 @@
         },
         {
             "mask": "default/flat_to_steep_3.png",
+            "mask_end": true,
             "offset": [[0, 0], [32, 16], [64, 48], [96, 88]]
         }
     ],
@@ -1517,7 +1529,8 @@
     ],
     "small_flat_to_steep": [
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         },
         {
             "mask": "default/single_tile.png",
@@ -1528,7 +1541,8 @@
             "split": [true]
         },
         {
-            "mask": "default/single_tile.png"
+            "mask": "default/single_tile.png",
+            "mask_end": true
         }
     ],
     "small_steep_to_flat": [

@@ -263,14 +263,14 @@ fn render_track_section_view(
         offset_start,
         offset_end,
     )?;
-    if view.extrude_behind {
+    if let Some(mesh_type) = view.extrude_behind_type {
         for mesh_type_index in &extrude_behind_mesh_ids {
-            mesh_types[*mesh_type_index] = renderer::MeshType::Normal;
+            mesh_types[*mesh_type_index] = mesh_type;
         }
     }
-    if view.extrude_ahead {
+    if let Some(mesh_type) = view.extrude_ahead_type {
         for mesh_type_index in &extrude_ahead_mesh_ids {
-            mesh_types[*mesh_type_index] = renderer::MeshType::Normal;
+            mesh_types[*mesh_type_index] = mesh_type;
         }
     }
 
@@ -313,19 +313,20 @@ fn render_track_section_views(
         extrude_ahead_mesh_ids,
     } = TrackScene::new(render_device, models, track_section, model_desc, &offset, &offset)?;
 
-    let has_extrusions = views.iter().any(|x| x.extrude_behind) || views.iter().any(|x| x.extrude_ahead);
+    let has_extrusions =
+        views.iter().any(|x| x.extrude_behind_type.is_some()) || views.iter().any(|x| x.extrude_ahead_type.is_some());
 
     let images = if has_extrusions {
         let mut view_mesh_types = vec![mesh_types; views.len()];
         for (mesh_types, view) in view_mesh_types.iter_mut().zip(views.iter()) {
-            if view.extrude_behind {
+            if let Some(mesh_type) = view.extrude_behind_type {
                 for mesh_type_index in &extrude_behind_mesh_ids {
-                    mesh_types[*mesh_type_index] = renderer::MeshType::Normal;
+                    mesh_types[*mesh_type_index] = mesh_type;
                 }
             }
-            if view.extrude_ahead {
+            if let Some(mesh_type) = view.extrude_ahead_type {
                 for mesh_type_index in &extrude_ahead_mesh_ids {
-                    mesh_types[*mesh_type_index] = renderer::MeshType::Normal;
+                    mesh_types[*mesh_type_index] = mesh_type;
                 }
             }
         }
