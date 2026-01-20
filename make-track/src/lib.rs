@@ -91,9 +91,17 @@ fn build_track_segment<'a>(
 ) -> anyhow::Result<()> {
     let distance = segment_index as f32 * track_model_desc.length;
 
+    let track_model = if segment_index % 2 == 1
+        && let Some(track_alt) = &models.track_alt
+    {
+        track_alt
+    } else {
+        &models.track
+    };
+
     add_model_to_scene(
         scene,
-        &models.track,
+        track_model,
         mesh_type,
         track_section,
         track_model_desc.scale,
