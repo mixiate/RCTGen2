@@ -77,115 +77,105 @@ impl TrackModelDesc {
     }
 }
 
-struct TrackScene<'a> {
-    scene: renderer::Scene<'a>,
-    mesh_types: Vec<renderer::MeshType>,
+struct TrackSectionMeshIds {
     extrude_behind_mesh_ids: Vec<usize>,
     extrude_ahead_mesh_ids: Vec<usize>,
 }
 
-impl TrackScene<'_> {
-    fn new<'a>(
-        render_device: &'a renderer::Device,
-        models: &'a track_desc::Models<renderer::model::Model>,
-        track_section: &track_sections::TrackSection,
-        track_model_desc: &TrackModelDesc,
-        offset_start: &glam::Vec3,
-        offset_end: &glam::Vec3,
-    ) -> anyhow::Result<TrackScene<'a>> {
-        let mut scene = renderer::SceneBuilder::new(render_device)?;
-
-        let mut extrude_behind_mesh_ids = Vec::new();
-        add_model_to_scene(
-            &mut scene,
-            &models.track,
-            renderer::MeshType::Ghost,
+fn build_track_section<'a>(
+    scene: &mut renderer::SceneBuilder<'a>,
+    models: &'a track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    track_model_desc: &TrackModelDesc,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+) -> anyhow::Result<TrackSectionMeshIds> {
+    let mut extrude_behind_mesh_ids = Vec::new();
+    add_model_to_scene(
+        scene,
+        &models.track,
+        renderer::MeshType::Ghost,
+        track_section,
+        track_model_desc.scale,
+        track_model_desc.bank_angle,
+        offset_start,
+        offset_end,
+        -track_model_desc.length,
+        Some(&mut extrude_behind_mesh_ids),
+    )?;
+    let mut extrude_ahead_mesh_ids = Vec::new();
+    add_model_to_scene(
+        scene,
+        &models.track,
+        renderer::MeshType::Ghost,
+        track_section,
+        track_model_desc.scale,
+        track_model_desc.bank_angle,
+        offset_start,
+        offset_end,
+        track_section.length,
+        Some(&mut extrude_ahead_mesh_ids),
+    )?;
+    if let Some(tie_model) = &models.tie {
+        add_tie_model_to_scene(
+            scene,
             track_section,
-            track_model_desc.scale,
-            track_model_desc.bank_angle,
+            tie_model,
+            renderer::MeshType::Ghost,
+            track_model_desc,
             offset_start,
             offset_end,
             -track_model_desc.length,
             Some(&mut extrude_behind_mesh_ids),
         )?;
-        let mut extrude_ahead_mesh_ids = Vec::new();
-        add_model_to_scene(
-            &mut scene,
-            &models.track,
-            renderer::MeshType::Ghost,
+        add_tie_model_to_scene(
+            scene,
             track_section,
-            track_model_desc.scale,
-            track_model_desc.bank_angle,
+            tie_model,
+            renderer::MeshType::Ghost,
+            track_model_desc,
             offset_start,
             offset_end,
             track_section.length,
             Some(&mut extrude_ahead_mesh_ids),
         )?;
+    };
+
+    for i in 0..track_model_desc.mesh_count {
+        let distance = i as f32 * track_model_desc.length;
+
+        add_model_to_scene(
+            scene,
+            &models.track,
+            renderer::MeshType::Normal,
+            track_section,
+            track_model_desc.scale,
+            track_model_desc.bank_angle,
+            offset_start,
+            offset_end,
+            distance,
+            None,
+        )?;
+
         if let Some(tie_model) = &models.tie {
             add_tie_model_to_scene(
-                &mut scene,
+                scene,
                 track_section,
                 tie_model,
-                renderer::MeshType::Ghost,
-                track_model_desc,
-                offset_start,
-                offset_end,
-                -track_model_desc.length,
-                Some(&mut extrude_behind_mesh_ids),
-            )?;
-            add_tie_model_to_scene(
-                &mut scene,
-                track_section,
-                tie_model,
-                renderer::MeshType::Ghost,
-                track_model_desc,
-                offset_start,
-                offset_end,
-                track_section.length,
-                Some(&mut extrude_ahead_mesh_ids),
-            )?;
-        };
-
-        for i in 0..track_model_desc.mesh_count {
-            let distance = i as f32 * track_model_desc.length;
-
-            add_model_to_scene(
-                &mut scene,
-                &models.track,
                 renderer::MeshType::Normal,
-                track_section,
-                track_model_desc.scale,
-                track_model_desc.bank_angle,
+                track_model_desc,
                 offset_start,
                 offset_end,
                 distance,
                 None,
             )?;
-
-            if let Some(tie_model) = &models.tie {
-                add_tie_model_to_scene(
-                    &mut scene,
-                    track_section,
-                    tie_model,
-                    renderer::MeshType::Normal,
-                    track_model_desc,
-                    offset_start,
-                    offset_end,
-                    distance,
-                    None,
-                )?;
-            }
         }
-
-        let (scene, mesh_types) = scene.build();
-
-        Ok(TrackScene {
-            scene,
-            mesh_types,
-            extrude_behind_mesh_ids,
-            extrude_ahead_mesh_ids,
-        })
     }
+
+    Ok(TrackSectionMeshIds {
+        extrude_behind_mesh_ids,
+        extrude_ahead_mesh_ids,
+    })
 }
 
 fn create_mask_scene<'a>(
@@ -250,19 +240,13 @@ fn render_track_section_view(
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<(renderer::Framebuffer, Option<renderer::DepthBuffer>)> {
-    let TrackScene {
-        scene,
-        mut mesh_types,
+    let mut scene = renderer::SceneBuilder::new(render_device)?;
+    let TrackSectionMeshIds {
         extrude_behind_mesh_ids,
         extrude_ahead_mesh_ids,
-    } = TrackScene::new(
-        render_device,
-        models,
-        track_section,
-        model_desc,
-        offset_start,
-        offset_end,
-    )?;
+    } = build_track_section(&mut scene, models, track_section, model_desc, offset_start, offset_end)?;
+    let (scene, mut mesh_types) = scene.build();
+
     if let Some(mesh_type) = view.extrude_behind_type {
         for mesh_type_index in &extrude_behind_mesh_ids {
             mesh_types[*mesh_type_index] = mesh_type;
@@ -304,14 +288,14 @@ fn render_track_section_views(
 ) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
 
-    let offset = glam::Vec3::splat(0.0);
+    let offset = glam::Vec3::ZERO;
 
-    let TrackScene {
-        scene,
-        mesh_types,
+    let mut scene = renderer::SceneBuilder::new(render_device)?;
+    let TrackSectionMeshIds {
         extrude_behind_mesh_ids,
         extrude_ahead_mesh_ids,
-    } = TrackScene::new(render_device, models, track_section, model_desc, &offset, &offset)?;
+    } = build_track_section(&mut scene, models, track_section, model_desc, &offset, &offset)?;
+    let (scene, mesh_types) = scene.build();
 
     let has_extrusions =
         views.iter().any(|x| x.extrude_behind_type.is_some()) || views.iter().any(|x| x.extrude_ahead_type.is_some());
