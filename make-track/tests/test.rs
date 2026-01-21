@@ -51,3 +51,9 @@ fn test_track_offsets() {
 fn test_track_tie() {
     test_make_track("test-track-tie");
 }
+
+#[test]
+fn test_track_alt() {
+    // this only tests the flat track because the alt track mesh system is quite flawed
+    test_make_track("test-track-alt");
+}
