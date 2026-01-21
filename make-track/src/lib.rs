@@ -78,7 +78,11 @@ impl TrackModelDesc {
 
     /// Attempts to use an even number of alternating track meshes if it doesn't cause too much distortion
     fn new_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
-        let mesh_count = (0.5 + track_section.length / (track.length * 2.0)).floor() as i32 * 2;
+        let mesh_count = if track_section.prefer_odd_alt_mesh_count {
+            (track_section.length / (track.length * 2.0)).floor() as i32 * 2 + 1
+        } else {
+            (0.5 + track_section.length / (track.length * 2.0)).floor() as i32 * 2
+        };
         let scale = track_section.length / (mesh_count as f32 * track.length);
 
         if scale > 0.9 && scale < 1.11111 {
