@@ -112,7 +112,8 @@ fn build_track_segment<'a>(
 ) -> anyhow::Result<()> {
     let distance = segment_index as f32 * track_model_desc.length;
 
-    let track_model = if segment_index % 2 == 1
+    let remainder = if track_section.invert_alt_mesh { 0 } else { 1 };
+    let track_model = if segment_index % 2 == remainder
         && let Some(track_alt) = &models.track_alt
     {
         track_alt
