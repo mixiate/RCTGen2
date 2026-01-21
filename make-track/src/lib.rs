@@ -75,6 +75,23 @@ impl TrackModelDesc {
             bank_angle: track.bank_angle(),
         }
     }
+
+    /// Attempts to use an even number of alternating track meshes if it doesn't cause too much distortion
+    fn new_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
+        let mesh_count = (0.5 + track_section.length / (track.length * 2.0)).floor() as i32 * 2;
+        let scale = track_section.length / (mesh_count as f32 * track.length);
+
+        if scale > 0.9 && scale < 1.11111 {
+            Self {
+                mesh_count,
+                scale,
+                length: scale * track.length,
+                bank_angle: track.bank_angle(),
+            }
+        } else {
+            Self::new(track, track_section)
+        }
+    }
 }
 
 #[expect(clippy::too_many_arguments)]
@@ -365,7 +382,11 @@ fn render_track_section(
 ) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
 
-    let model_desc = TrackModelDesc::new(track, track_section);
+    let model_desc = if track.models.track_alt.is_some() {
+        TrackModelDesc::new_alternating(track, track_section)
+    } else {
+        TrackModelDesc::new(track, track_section)
+    };
 
     Ok(if let Some(offsets) = offsets {
         views
