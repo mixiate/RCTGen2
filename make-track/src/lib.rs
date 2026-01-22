@@ -9,7 +9,7 @@ mod track_sections;
 const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 1.0 / (2.0 * 6.0.sqrt())
 
 #[expect(clippy::too_many_arguments)]
-fn add_model_to_scene<'a>(
+fn scene_add_track_model_transformed<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     model: &'a renderer::model::Model,
     mesh_type: renderer::MeshType,
@@ -116,7 +116,7 @@ fn build_track_segment<'a>(
         &models.track
     };
 
-    add_model_to_scene(
+    scene_add_track_model_transformed(
         scene,
         track_model,
         mesh_type,
@@ -215,7 +215,7 @@ fn create_mask_scene<'a>(
 ) -> anyhow::Result<renderer::Scene<'a>> {
     let mut scene = renderer::SceneBuilder::new(render_device)?;
     for i in -1..(track_model_desc.mesh_count + 1) {
-        add_model_to_scene(
+        scene_add_track_model_transformed(
             &mut scene,
             &models.mask,
             renderer::MeshType::Normal,
