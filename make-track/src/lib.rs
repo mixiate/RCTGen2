@@ -34,7 +34,7 @@ fn add_model_to_scene<'a>(
 }
 
 #[expect(clippy::too_many_arguments)]
-fn add_tie_model_to_scene<'a>(
+fn scene_add_track_model<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     track_section: &track_sections::TrackSection,
     tie_model: &'a renderer::model::Model,
@@ -130,7 +130,7 @@ fn build_track_segment<'a>(
     )?;
 
     if let Some(tie_model) = &models.tie {
-        add_tie_model_to_scene(
+        scene_add_track_model(
             scene,
             track_section,
             tie_model,
