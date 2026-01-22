@@ -45,12 +45,7 @@ fn add_tie_model_to_scene<'a>(
     distance: f32,
     mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
-    let point = track_section.sample_curve(
-        distance + (track_model_desc.length / 2.0),
-        track_model_desc.bank_angle,
-        offset_start,
-        offset_end,
-    );
+    let point = track_section.sample_curve(distance, track_model_desc.bank_angle, offset_start, offset_end);
     let rotation =
         glam::Quat::from_mat3(&glam::Mat3::from_cols(point.binormal, point.normal, point.tangent)).normalize();
     scene.add_model(tie_model, point.position, rotation, mesh_type, mesh_ids)
@@ -143,7 +138,7 @@ fn build_track_segment<'a>(
             track_model_desc,
             offset_start,
             offset_end,
-            distance,
+            distance + (track_model_desc.length / 2.0),
             mesh_ids,
         )?;
     }
