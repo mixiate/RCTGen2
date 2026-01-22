@@ -205,7 +205,7 @@ fn build_track_section<'a>(
     })
 }
 
-fn create_mask_scene<'a>(
+fn build_track_section_mask<'a>(
     render_device: &'a renderer::Device,
     models: &'a track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
@@ -288,7 +288,7 @@ fn render_track_section_view(
     let image = render_scene(&scene, &mesh_types, camera, lights, rotation);
 
     let mask_depth = if view.requires_track_mask {
-        let scene = create_mask_scene(
+        let scene = build_track_section_mask(
             render_device,
             models,
             track_section,
@@ -356,7 +356,7 @@ fn render_track_section_views(
     };
 
     let mask_depths = if views.iter().any(|x| x.requires_track_mask) {
-        let scene = create_mask_scene(render_device, models, track_section, model_desc, &offset, &offset)?;
+        let scene = build_track_section_mask(render_device, models, track_section, model_desc, &offset, &offset)?;
         views
             .into_par_iter()
             .enumerate()
