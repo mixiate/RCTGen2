@@ -50,19 +50,22 @@ pub struct ModelDesc {
     pub length: f32,
     pub tie_length: f32,
     pub bank_angle: f32,
+    pub extrusion_count: i32,
 }
 
 impl ModelDesc {
     pub fn new(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
         let mesh_count = (0.5 + track_section.length / track.length).floor() as i32;
         let scale = track_section.length / (mesh_count as f32 * track.length);
+        let length = scale * track.length;
 
         Self {
             mesh_count,
             scale,
-            length: scale * track.length,
+            length,
             tie_length: scale * track.tie_length,
             bank_angle: track.bank_angle(),
+            extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
         }
     }
 
@@ -74,14 +77,16 @@ impl ModelDesc {
             (0.5 + track_section.length / (track.length * 2.0)).floor() as i32 * 2
         };
         let scale = track_section.length / (mesh_count as f32 * track.length);
+        let length = scale * track.length;
 
         if scale > 0.9 && scale < 1.11111 {
             Self {
                 mesh_count,
                 scale,
-                length: scale * track.length,
+                length,
                 tie_length: scale * track.tie_length,
                 bank_angle: track.bank_angle(),
+                extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
             }
         } else {
             Self::new(track, track_section)
@@ -226,30 +231,34 @@ pub fn build_track<'a>(
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
     let mut extrude_behind_mesh_ids = Vec::new();
-    build_track_segment(
-        scene,
-        models,
-        track_section,
-        model_desc,
-        offset_start,
-        offset_end,
-        -1,
-        renderer::MeshType::Ghost,
-        Some(&mut extrude_behind_mesh_ids),
-    )?;
+    for i in (-model_desc.extrusion_count)..0 {
+        build_track_segment(
+            scene,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+            i,
+            renderer::MeshType::Ghost,
+            Some(&mut extrude_behind_mesh_ids),
+        )?;
+    }
 
     let mut extrude_ahead_mesh_ids = Vec::new();
-    build_track_segment(
-        scene,
-        models,
-        track_section,
-        model_desc,
-        offset_start,
-        offset_end,
-        model_desc.mesh_count,
-        renderer::MeshType::Ghost,
-        Some(&mut extrude_ahead_mesh_ids),
-    )?;
+    for i in model_desc.mesh_count..(model_desc.mesh_count + model_desc.extrusion_count) {
+        build_track_segment(
+            scene,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+            i,
+            renderer::MeshType::Ghost,
+            Some(&mut extrude_ahead_mesh_ids),
+        )?;
+    }
 
     for i in 0..model_desc.mesh_count {
         build_track_segment(
@@ -280,9 +289,10 @@ pub fn build_track_boundary_tie<'a>(
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
     let mesh_count = model_desc.mesh_count * 2;
+    let extrusion_count = model_desc.extrusion_count * 2;
 
     let mut extrude_behind_mesh_ids = Vec::new();
-    for i in -2..0 {
+    for i in -extrusion_count..0 {
         build_track_segment_boundary_tie(
             scene,
             models,
@@ -297,7 +307,7 @@ pub fn build_track_boundary_tie<'a>(
     }
 
     let mut extrude_ahead_mesh_ids = Vec::new();
-    for i in mesh_count..(mesh_count + 2) {
+    for i in mesh_count..(mesh_count + extrusion_count) {
         build_track_segment_boundary_tie(
             scene,
             models,
