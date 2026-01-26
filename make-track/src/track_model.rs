@@ -32,7 +32,7 @@ fn scene_add_track_model<'a>(
     track_section: &track_sections::TrackSection,
     tie_model: &'a renderer::model::Model,
     mesh_type: renderer::MeshType,
-    track_model_desc: &TrackModelDesc,
+    track_model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
     distance: f32,
@@ -44,14 +44,14 @@ fn scene_add_track_model<'a>(
     scene.add_model(tie_model, point.position, rotation, mesh_type, mesh_ids)
 }
 
-pub struct TrackModelDesc {
+pub struct ModelDesc {
     pub mesh_count: i32,
     pub scale: f32,
     pub length: f32,
     pub bank_angle: f32,
 }
 
-impl TrackModelDesc {
+impl ModelDesc {
     pub fn new(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
         let mesh_count = (0.5 + track_section.length / track.length).floor() as i32;
         let scale = track_section.length / (mesh_count as f32 * track.length);
@@ -91,7 +91,7 @@ fn build_track_segment<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &'a track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    track_model_desc: &TrackModelDesc,
+    track_model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
     segment_index: i32,
@@ -148,7 +148,7 @@ pub fn build<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &'a track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    track_model_desc: &TrackModelDesc,
+    track_model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
@@ -202,7 +202,7 @@ pub fn build_mask<'a>(
     render_device: &'a renderer::Device,
     models: &'a track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    track_model_desc: &TrackModelDesc,
+    track_model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<renderer::Scene<'a>> {

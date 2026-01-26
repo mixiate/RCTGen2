@@ -39,7 +39,7 @@ fn render_track_section_view(
     lights: &[renderer::Light],
     models: &track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    model_desc: &track_model::TrackModelDesc,
+    model_desc: &track_model::ModelDesc,
     view: &mask::View,
     rotation: usize,
     offset_start: &glam::Vec3,
@@ -88,7 +88,7 @@ fn render_track_section_views(
     lights: &[renderer::Light],
     models: &track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    model_desc: &track_model::TrackModelDesc,
+    model_desc: &track_model::ModelDesc,
     views: &[mask::View],
 ) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
@@ -161,9 +161,9 @@ fn render_track_section(
     use rayon::prelude::*;
 
     let model_desc = if track.models.track_alt.is_some() {
-        track_model::TrackModelDesc::new_alternating(track, track_section)
+        track_model::ModelDesc::new_alternating(track, track_section)
     } else {
-        track_model::TrackModelDesc::new(track, track_section)
+        track_model::ModelDesc::new(track, track_section)
     };
 
     Ok(if let Some(offsets) = offsets {
