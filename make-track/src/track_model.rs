@@ -144,11 +144,11 @@ pub struct TrackSectionMeshIds {
     pub extrude_ahead_mesh_ids: Vec<usize>,
 }
 
-pub fn build<'a>(
+pub fn build_track<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &'a track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
-    track_model_desc: &ModelDesc,
+    model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
@@ -157,7 +157,7 @@ pub fn build<'a>(
         scene,
         models,
         track_section,
-        track_model_desc,
+        model_desc,
         offset_start,
         offset_end,
         -1,
@@ -170,20 +170,20 @@ pub fn build<'a>(
         scene,
         models,
         track_section,
-        track_model_desc,
+        model_desc,
         offset_start,
         offset_end,
-        track_model_desc.mesh_count,
+        model_desc.mesh_count,
         renderer::MeshType::Ghost,
         Some(&mut extrude_ahead_mesh_ids),
     )?;
 
-    for i in 0..track_model_desc.mesh_count {
+    for i in 0..model_desc.mesh_count {
         build_track_segment(
             scene,
             models,
             track_section,
-            track_model_desc,
+            model_desc,
             offset_start,
             offset_end,
             i,
@@ -196,6 +196,17 @@ pub fn build<'a>(
         extrude_behind_mesh_ids,
         extrude_ahead_mesh_ids,
     })
+}
+
+pub fn build<'a>(
+    scene: &mut renderer::SceneBuilder<'a>,
+    models: &'a track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    model_desc: &ModelDesc,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+) -> anyhow::Result<TrackSectionMeshIds> {
+    build_track(scene, models, track_section, model_desc, offset_start, offset_end)
 }
 
 pub fn build_mask<'a>(
