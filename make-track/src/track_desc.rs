@@ -133,8 +133,8 @@ pub struct Track {
     #[expect(unused)]
     #[serde(default = "float_1")]
     pub brake_length: f32,
-    #[expect(unused)]
-    pub tie_length: Option<f32>,
+    #[serde(default)]
+    pub tie_length: f32,
     pub z_offset: f32,
     #[expect(unused)]
     #[serde(default = "float_1")]

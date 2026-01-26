@@ -48,6 +48,7 @@ pub struct ModelDesc {
     pub mesh_count: i32,
     pub scale: f32,
     pub length: f32,
+    pub tie_length: f32,
     pub bank_angle: f32,
 }
 
@@ -60,6 +61,7 @@ impl ModelDesc {
             mesh_count,
             scale,
             length: scale * track.length,
+            tie_length: scale * track.tie_length,
             bank_angle: track.bank_angle(),
         }
     }
@@ -78,6 +80,7 @@ impl ModelDesc {
                 mesh_count,
                 scale,
                 length: scale * track.length,
+                tie_length: scale * track.tie_length,
                 bank_angle: track.bank_angle(),
             }
         } else {
@@ -132,6 +135,76 @@ fn build_track_segment<'a>(
             offset_start,
             offset_end,
             distance + (track_model_desc.length / 2.0),
+            mesh_ids,
+        )?;
+    }
+
+    Ok(())
+}
+
+#[expect(clippy::too_many_arguments)]
+fn build_track_segment_boundary_tie<'a>(
+    scene: &mut renderer::SceneBuilder<'a>,
+    models: &'a track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    model_desc: &ModelDesc,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+    segment_index: i32,
+    mesh_type: renderer::MeshType,
+    mut mesh_ids: Option<&mut Vec<usize>>,
+) -> anyhow::Result<()> {
+    let distance = segment_index.div_euclid(2) as f32 * model_desc.length;
+
+    if segment_index % 2 == 0 {
+        if let Some(track_tie_model) = &models.track_tie {
+            scene_add_track_model_transformed(
+                scene,
+                track_tie_model,
+                mesh_type,
+                track_section,
+                model_desc.scale,
+                model_desc.bank_angle,
+                offset_start,
+                offset_end,
+                distance,
+                mesh_ids.as_deref_mut(),
+            )?;
+        }
+
+        if let Some(tie_model) = &models.tie {
+            scene_add_track_model(
+                scene,
+                track_section,
+                tie_model,
+                mesh_type,
+                model_desc,
+                offset_start,
+                offset_end,
+                distance + (model_desc.tie_length / 2.0),
+                mesh_ids,
+            )?;
+        }
+    } else {
+        let remainder = if track_section.invert_alt_mesh { 0 } else { 1 };
+        let track_model = if (segment_index / 2) % 2 == remainder
+            && let Some(track_alt) = &models.track_alt
+        {
+            track_alt
+        } else {
+            &models.track
+        };
+
+        scene_add_track_model_transformed(
+            scene,
+            track_model,
+            mesh_type,
+            track_section,
+            model_desc.scale,
+            model_desc.bank_angle,
+            offset_start,
+            offset_end,
+            distance + model_desc.tie_length,
             mesh_ids,
         )?;
     }
@@ -198,6 +271,66 @@ pub fn build_track<'a>(
     })
 }
 
+pub fn build_track_boundary_tie<'a>(
+    scene: &mut renderer::SceneBuilder<'a>,
+    models: &'a track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    model_desc: &ModelDesc,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+) -> anyhow::Result<TrackSectionMeshIds> {
+    let mesh_count = model_desc.mesh_count * 2;
+
+    let mut extrude_behind_mesh_ids = Vec::new();
+    for i in -2..0 {
+        build_track_segment_boundary_tie(
+            scene,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+            i,
+            renderer::MeshType::Ghost,
+            Some(&mut extrude_behind_mesh_ids),
+        )?;
+    }
+
+    let mut extrude_ahead_mesh_ids = Vec::new();
+    for i in mesh_count..(mesh_count + 2) {
+        build_track_segment_boundary_tie(
+            scene,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+            i,
+            renderer::MeshType::Ghost,
+            Some(&mut extrude_ahead_mesh_ids),
+        )?;
+    }
+
+    for i in 0..mesh_count {
+        build_track_segment_boundary_tie(
+            scene,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+            i,
+            renderer::MeshType::Normal,
+            None,
+        )?;
+    }
+
+    Ok(TrackSectionMeshIds {
+        extrude_behind_mesh_ids,
+        extrude_ahead_mesh_ids,
+    })
+}
+
 pub fn build<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &'a track_desc::Models<renderer::model::Model>,
@@ -206,7 +339,11 @@ pub fn build<'a>(
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
-    build_track(scene, models, track_section, model_desc, offset_start, offset_end)
+    if models.track_tie.is_some() {
+        build_track_boundary_tie(scene, models, track_section, model_desc, offset_start, offset_end)
+    } else {
+        build_track(scene, models, track_section, model_desc, offset_start, offset_end)
+    }
 }
 
 pub fn build_mask<'a>(
