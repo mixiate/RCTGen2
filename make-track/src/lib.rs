@@ -160,11 +160,7 @@ fn render_track_section(
 ) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
 
-    let model_desc = if track.models.track_alt.is_some() {
-        track_model::ModelDesc::new_alternating(track, track_section)
-    } else {
-        track_model::ModelDesc::new(track, track_section)
-    };
+    let model_desc = track_model::ModelDesc::new(track, models, track_section);
 
     Ok(if let Some(offsets) = offsets {
         views

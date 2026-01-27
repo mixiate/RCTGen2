@@ -54,7 +54,19 @@ pub struct ModelDesc {
 }
 
 impl ModelDesc {
-    pub fn new(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
+    pub fn new(
+        track: &track_desc::Track,
+        models: &track_desc::Models<renderer::model::Model>,
+        track_section: &track_sections::TrackSection,
+    ) -> Self {
+        if models.track_alt.is_some() {
+            ModelDesc::new_alternating(track, track_section)
+        } else {
+            ModelDesc::new_non_alternating(track, track_section)
+        }
+    }
+
+    fn new_non_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
         let mesh_count = (0.5 + track_section.length / track.length).floor() as i32;
         let scale = track_section.length / (mesh_count as f32 * track.length);
         let length = scale * track.length;
@@ -70,7 +82,7 @@ impl ModelDesc {
     }
 
     /// Attempts to use an even number of alternating track meshes if it doesn't cause too much distortion
-    pub fn new_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
+    fn new_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
         let mesh_count = if track_section.prefer_odd_alt_mesh_count {
             (track_section.length / (track.length * 2.0)).floor() as i32 * 2 + 1
         } else {
@@ -89,7 +101,7 @@ impl ModelDesc {
                 extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
             }
         } else {
-            Self::new(track, track_section)
+            Self::new_non_alternating(track, track_section)
         }
     }
 }
