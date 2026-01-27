@@ -156,12 +156,20 @@ fn build_track_segment_boundary_tie<'a>(
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
     segment_index: i32,
+    track_even: bool,
     mesh_type: renderer::MeshType,
     mut mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
     let distance = segment_index.div_euclid(2) as f32 * model_desc.length;
 
-    if segment_index % 2 == 0 {
+    let remainder = if track_even { 1 } else { 0 };
+    if segment_index % 2 == remainder {
+        let distance = if track_even {
+            distance + model_desc.length - model_desc.tie_length
+        } else {
+            distance
+        };
+
         if let Some(track_tie_model) = &models.track_tie {
             scene_add_track_model_transformed(
                 scene,
@@ -192,7 +200,7 @@ fn build_track_segment_boundary_tie<'a>(
         }
     } else {
         let remainder = if track_section.invert_alt_mesh { 0 } else { 1 };
-        let track_model = if (segment_index / 2) % 2 == remainder
+        let track_model = if segment_index.div_euclid(2) % 2 == remainder
             && let Some(track_alt) = &models.track_alt
         {
             track_alt
@@ -200,6 +208,11 @@ fn build_track_segment_boundary_tie<'a>(
             &models.track
         };
 
+        let distance = if track_even {
+            distance
+        } else {
+            distance + model_desc.tie_length
+        };
         scene_add_track_model_transformed(
             scene,
             track_model,
@@ -209,7 +222,7 @@ fn build_track_segment_boundary_tie<'a>(
             model_desc.bank_angle,
             offset_start,
             offset_end,
-            distance + model_desc.tie_length,
+            distance,
             mesh_ids,
         )?;
     }
@@ -301,6 +314,7 @@ pub fn build_track_boundary_tie<'a>(
             offset_start,
             offset_end,
             i,
+            false,
             renderer::MeshType::Ghost,
             Some(&mut extrude_behind_mesh_ids),
         )?;
@@ -316,6 +330,7 @@ pub fn build_track_boundary_tie<'a>(
             offset_start,
             offset_end,
             i,
+            false,
             renderer::MeshType::Ghost,
             Some(&mut extrude_ahead_mesh_ids),
         )?;
@@ -330,6 +345,7 @@ pub fn build_track_boundary_tie<'a>(
             offset_start,
             offset_end,
             i,
+            false,
             renderer::MeshType::Normal,
             None,
         )?;
