@@ -57,3 +57,8 @@ fn test_track_alt() {
     // this only tests the flat track because the alt track mesh system is quite flawed
     test_make_track("test-track-alt");
 }
+
+#[test]
+fn test_track_boundary_tie() {
+    test_make_track("test-track-boundary-tie");
+}
