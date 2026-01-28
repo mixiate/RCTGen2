@@ -123,7 +123,7 @@ impl ModelDesc {
         rotation: usize,
     ) -> Self {
         let tie_start = rotation < 2;
-        let tie_end = rotation >= 2;
+        let tie_end = (rotation + usize::from(track_section.exit_angle_offset)) % 4 >= 2;
 
         let (full_length, mesh_count) = {
             let mut full_length = track.length * self.mesh_count as f32;
