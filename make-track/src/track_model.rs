@@ -52,6 +52,7 @@ pub struct ModelDesc {
     pub tie_length: f32,
     pub bank_angle: f32,
     pub extrusion_count: i32,
+    pub track_even: bool,
 }
 
 impl ModelDesc {
@@ -67,7 +68,7 @@ impl ModelDesc {
         };
 
         if models.track_tie.is_some() {
-            model_desc.boundary_tie()
+            model_desc.boundary_tie(track, track_section)
         } else {
             model_desc
         }
@@ -85,6 +86,7 @@ impl ModelDesc {
             tie_length: scale * track.tie_length,
             bank_angle: track.bank_angle(),
             extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
+            track_even: false,
         }
     }
 
@@ -106,17 +108,41 @@ impl ModelDesc {
                 tie_length: scale * track.tie_length,
                 bank_angle: track.bank_angle(),
                 extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
+                track_even: false,
             }
         } else {
             Self::new_non_alternating(track, track_section)
         }
     }
 
-    fn boundary_tie(&self) -> Self {
-        let mut model_desc = *self;
-        model_desc.mesh_count *= 2;
-        model_desc.extrusion_count *= 2;
-        model_desc
+    fn boundary_tie(&self, track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
+        let tie_start = true;
+        let tie_end = false;
+
+        let (full_length, mesh_count) = {
+            let mut full_length = track.length * self.mesh_count as f32;
+            let mut mesh_count = self.mesh_count * 2;
+            if !tie_start {
+                full_length -= track.tie_length;
+                mesh_count -= 1;
+            }
+            if tie_end {
+                full_length += track.tie_length;
+                mesh_count += 1;
+            }
+            (full_length, mesh_count)
+        };
+        let scale = track_section.length / full_length;
+
+        Self {
+            mesh_count,
+            scale,
+            length: scale * track.length,
+            tie_length: scale * track.tie_length,
+            bank_angle: self.bank_angle,
+            extrusion_count: self.extrusion_count * 2,
+            track_even: !tie_start,
+        }
     }
 }
 
@@ -182,15 +208,14 @@ fn build_track_segment_boundary_tie<'a>(
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
     segment_index: i32,
-    track_even: bool,
     mesh_type: renderer::MeshType,
     mut mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
     let distance = segment_index.div_euclid(2) as f32 * model_desc.length;
 
-    let remainder = if track_even { 1 } else { 0 };
+    let remainder = if model_desc.track_even { 1 } else { 0 };
     if segment_index % 2 == remainder {
-        let distance = if track_even {
+        let distance = if model_desc.track_even {
             distance + model_desc.length - model_desc.tie_length
         } else {
             distance
@@ -234,7 +259,7 @@ fn build_track_segment_boundary_tie<'a>(
             &models.track
         };
 
-        let distance = if track_even {
+        let distance = if model_desc.track_even {
             distance
         } else {
             distance + model_desc.tie_length
@@ -337,7 +362,6 @@ pub fn build_track_boundary_tie<'a>(
             offset_start,
             offset_end,
             i,
-            false,
             renderer::MeshType::Ghost,
             Some(&mut extrude_behind_mesh_ids),
         )?;
@@ -353,7 +377,6 @@ pub fn build_track_boundary_tie<'a>(
             offset_start,
             offset_end,
             i,
-            false,
             renderer::MeshType::Ghost,
             Some(&mut extrude_ahead_mesh_ids),
         )?;
@@ -368,7 +391,6 @@ pub fn build_track_boundary_tie<'a>(
             offset_start,
             offset_end,
             i,
-            false,
             renderer::MeshType::Normal,
             None,
         )?;
