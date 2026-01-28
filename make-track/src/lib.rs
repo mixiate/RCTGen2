@@ -160,21 +160,25 @@ fn render_track_section(
 ) -> anyhow::Result<Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>> {
     use rayon::prelude::*;
 
-    let model_desc = track_model::ModelDesc::new(track, models, track_section);
-
-    Ok(if let Some(offsets) = offsets {
+    Ok(if offsets.is_some() || models.track_tie.is_some() {
         views
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
-                let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
-                let offset_end = offset::calculate(
-                    offsets,
-                    track_section,
-                    model_desc.bank_angle,
-                    track_section.length,
-                    rotation,
-                );
+                let model_desc = track_model::ModelDesc::new(track, models, track_section);
+                let (offset_start, offset_end) = if let Some(offsets) = offsets {
+                    let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
+                    let offset_end = offset::calculate(
+                        offsets,
+                        track_section,
+                        model_desc.bank_angle,
+                        track_section.length,
+                        rotation,
+                    );
+                    (offset_start, offset_end)
+                } else {
+                    (glam::Vec3::ZERO, glam::Vec3::ZERO)
+                };
                 render_track_section_view(
                     render_device,
                     camera,
@@ -190,6 +194,7 @@ fn render_track_section(
             })
             .collect::<anyhow::Result<Vec<_>>>()?
     } else {
+        let model_desc = track_model::ModelDesc::new(track, models, track_section);
         render_track_section_views(render_device, camera, lights, models, track_section, &model_desc, views)?
     })
 }
