@@ -13,7 +13,8 @@ pub struct TrackSection {
     pub mask_offset_y: bool,
     pub prefer_odd_alt_mesh_count: bool,
     pub invert_alt_mesh: bool,
-    pub exit_angle_offset: u8, // used for boundary tie tracks, but might be able to be merged with offsets calculation
+    pub entry_angle_offset: u8, // used for boundary tie tracks, but might be able to be merged with offsets calculation
+    pub exit_angle_offset: u8,  // same as entry ^
 }
 
 impl TrackSection {
@@ -58,6 +59,7 @@ pub const FLAT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -69,6 +71,7 @@ pub const FLAT_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -80,6 +83,7 @@ pub const GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -91,6 +95,7 @@ pub const GENTLE_TO_FLAT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -102,6 +107,7 @@ pub const GENTLE_TO_STEEP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -113,6 +119,7 @@ pub const STEEP_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -124,6 +131,7 @@ pub const STEEP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -135,6 +143,7 @@ pub const STEEP_TO_VERTICAL: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -146,6 +155,7 @@ pub const VERTICAL_TO_STEEP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -157,6 +167,7 @@ pub const VERTICAL: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -168,6 +179,7 @@ pub const SMALL_FLAT_TO_STEEP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -179,6 +191,7 @@ pub const SMALL_STEEP_TO_FLAT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -190,6 +203,7 @@ pub const FLAT_TO_STEEP: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -201,6 +215,7 @@ pub const STEEP_TO_FLAT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -212,6 +227,7 @@ pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -223,6 +239,7 @@ pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -234,6 +251,7 @@ pub const LARGE_TURN_LEFT_TO_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -245,6 +263,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -256,7 +275,8 @@ pub const FLAT_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -267,7 +287,8 @@ pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -278,7 +299,8 @@ pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_DIAG: TrackSection = TrackSection {
@@ -289,7 +311,8 @@ pub const GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -300,7 +323,8 @@ pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -311,7 +335,8 @@ pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const STEEP_DIAG: TrackSection = TrackSection {
@@ -322,7 +347,8 @@ pub const STEEP_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -333,7 +359,8 @@ pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -344,7 +371,8 @@ pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -355,7 +383,8 @@ pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -366,7 +395,8 @@ pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
@@ -377,6 +407,7 @@ pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -388,6 +419,7 @@ pub const FLAT_TO_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -399,6 +431,7 @@ pub const LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -410,6 +443,7 @@ pub const RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -421,6 +455,7 @@ pub const GENTLE_TO_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -432,6 +467,7 @@ pub const GENTLE_TO_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -443,6 +479,7 @@ pub const LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -454,6 +491,7 @@ pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -465,6 +503,7 @@ pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -476,6 +515,7 @@ pub const LARGE_TURN_LEFT_TO_DIAG_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -487,6 +527,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -498,7 +539,8 @@ pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -509,7 +551,8 @@ pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -520,7 +563,8 @@ pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -531,7 +575,8 @@ pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -542,7 +587,8 @@ pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -553,7 +599,8 @@ pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -564,7 +611,8 @@ pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
@@ -575,6 +623,7 @@ pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -586,6 +635,7 @@ pub const SMALL_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -597,6 +647,7 @@ pub const MEDIUM_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -608,6 +659,7 @@ pub const MEDIUM_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -619,6 +671,7 @@ pub const LARGE_TURN_LEFT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -630,6 +683,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -641,6 +695,7 @@ pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 1,
     exit_angle_offset: 0,
 };
 
@@ -652,6 +707,7 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 1,
     exit_angle_offset: 1,
 };
 
@@ -663,6 +719,7 @@ pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -674,6 +731,7 @@ pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -685,6 +743,7 @@ pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -696,6 +755,7 @@ pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -707,6 +767,7 @@ pub const GENTLE_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -718,6 +779,7 @@ pub const GENTLE_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -729,6 +791,7 @@ pub const GENTLE_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -740,6 +803,7 @@ pub const GENTLE_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -751,6 +815,7 @@ pub const LEFT_BANK_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -762,6 +827,7 @@ pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -773,6 +839,7 @@ pub const GENTLE_LEFT_BANK_TO_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -784,6 +851,7 @@ pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -795,6 +863,7 @@ pub const GENTLE_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -806,6 +875,7 @@ pub const GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -817,6 +887,7 @@ pub const FLAT_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -828,6 +899,7 @@ pub const FLAT_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -839,6 +911,7 @@ pub const GENTLE_LEFT_BANK_TO_FLAT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -850,6 +923,7 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -861,7 +935,8 @@ pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -872,7 +947,8 @@ pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -883,7 +959,8 @@ pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -894,7 +971,8 @@ pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -905,7 +983,8 @@ pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -916,7 +995,8 @@ pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -927,7 +1007,8 @@ pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -938,7 +1019,8 @@ pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -949,7 +1031,8 @@ pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -960,7 +1043,8 @@ pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -971,7 +1055,8 @@ pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -982,7 +1067,8 @@ pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -993,7 +1079,8 @@ pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -1004,7 +1091,8 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
 };
 
 pub const SMALL_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
@@ -1015,6 +1103,7 @@ pub const SMALL_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1026,6 +1115,7 @@ pub const SMALL_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1037,6 +1127,7 @@ pub const MEDIUM_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1048,6 +1139,7 @@ pub const MEDIUM_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1059,6 +1151,7 @@ pub const LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1070,6 +1163,7 @@ pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1081,6 +1175,7 @@ pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 1,
     exit_angle_offset: 0,
 };
 
@@ -1092,6 +1187,7 @@ pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSectio
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 1,
     exit_angle_offset: 1,
 };
 
@@ -1103,6 +1199,7 @@ pub const S_BEND_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1114,6 +1211,7 @@ pub const S_BEND_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1125,6 +1223,7 @@ pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1136,6 +1235,7 @@ pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1147,6 +1247,7 @@ pub const MEDIUM_HELIX_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1158,6 +1259,7 @@ pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1169,6 +1271,7 @@ pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1180,6 +1283,7 @@ pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1191,6 +1295,7 @@ pub const BARREL_ROLL_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1202,6 +1307,7 @@ pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1213,6 +1319,7 @@ pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1224,6 +1331,7 @@ pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1235,6 +1343,7 @@ pub const HALF_LOOP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1246,6 +1355,7 @@ pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1257,6 +1367,7 @@ pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1268,6 +1379,7 @@ pub const QUARTER_LOOP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1279,6 +1391,7 @@ pub const CORKSCREW_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1290,6 +1403,7 @@ pub const CORKSCREW_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1301,6 +1415,7 @@ pub const LARGE_CORKSCREW_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 3,
 };
 
@@ -1312,6 +1427,7 @@ pub const LARGE_CORKSCREW_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 1,
 };
 
@@ -1323,6 +1439,7 @@ pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1334,6 +1451,7 @@ pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1345,6 +1463,7 @@ pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1356,6 +1475,7 @@ pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 2,
 };
 
@@ -1367,6 +1487,7 @@ pub const ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1378,6 +1499,7 @@ pub const ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1389,6 +1511,7 @@ pub const LARGE_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1400,6 +1523,7 @@ pub const LARGE_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
+    entry_angle_offset: 0,
     exit_angle_offset: 0,
 };
 
@@ -1411,6 +1535,7 @@ pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 1,
     exit_angle_offset: 0,
 };
 
@@ -1422,5 +1547,6 @@ pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
+    entry_angle_offset: 1,
     exit_angle_offset: 1,
 };

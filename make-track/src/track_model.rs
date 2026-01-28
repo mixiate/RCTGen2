@@ -122,7 +122,7 @@ impl ModelDesc {
         track_section: &track_sections::TrackSection,
         rotation: usize,
     ) -> Self {
-        let tie_start = rotation < 2;
+        let tie_start = (rotation + usize::from(track_section.entry_angle_offset)) % 4 < 2;
         let tie_end = (rotation + usize::from(track_section.exit_angle_offset)) % 4 >= 2;
 
         let (full_length, mesh_count) = {
