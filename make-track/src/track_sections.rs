@@ -245,7 +245,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_DIAG: TrackSection = TrackSection {
@@ -487,7 +487,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
 
 pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -630,7 +630,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
 
 pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -1070,7 +1070,7 @@ pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
 
 pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
