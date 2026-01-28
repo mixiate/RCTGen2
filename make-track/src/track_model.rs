@@ -60,6 +60,7 @@ impl ModelDesc {
         track: &track_desc::Track,
         models: &track_desc::Models<renderer::model::Model>,
         track_section: &track_sections::TrackSection,
+        rotation: usize,
     ) -> Self {
         let model_desc = if models.track_alt.is_some() {
             ModelDesc::new_alternating(track, track_section)
@@ -68,7 +69,7 @@ impl ModelDesc {
         };
 
         if models.track_tie.is_some() {
-            model_desc.boundary_tie(track, track_section)
+            model_desc.boundary_tie(track, track_section, rotation)
         } else {
             model_desc
         }
@@ -115,9 +116,14 @@ impl ModelDesc {
         }
     }
 
-    fn boundary_tie(&self, track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
-        let tie_start = true;
-        let tie_end = false;
+    fn boundary_tie(
+        &self,
+        track: &track_desc::Track,
+        track_section: &track_sections::TrackSection,
+        rotation: usize,
+    ) -> Self {
+        let tie_start = rotation < 2;
+        let tie_end = rotation >= 2;
 
         let (full_length, mesh_count) = {
             let mut full_length = track.length * self.mesh_count as f32;

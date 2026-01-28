@@ -165,7 +165,7 @@ fn render_track_section(
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
-                let model_desc = track_model::ModelDesc::new(track, models, track_section);
+                let model_desc = track_model::ModelDesc::new(track, models, track_section, rotation);
                 let (offset_start, offset_end) = if let Some(offsets) = offsets {
                     let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
                     let offset_end = offset::calculate(
@@ -194,7 +194,7 @@ fn render_track_section(
             })
             .collect::<anyhow::Result<Vec<_>>>()?
     } else {
-        let model_desc = track_model::ModelDesc::new(track, models, track_section);
+        let model_desc = track_model::ModelDesc::new(track, models, track_section, 0);
         render_track_section_views(render_device, camera, lights, models, track_section, &model_desc, views)?
     })
 }
