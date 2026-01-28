@@ -1235,7 +1235,7 @@ pub const HALF_LOOP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
@@ -1246,7 +1246,7 @@ pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
@@ -1257,7 +1257,7 @@ pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const QUARTER_LOOP: TrackSection = TrackSection {
@@ -1268,7 +1268,7 @@ pub const QUARTER_LOOP: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const CORKSCREW_LEFT: TrackSection = TrackSection {
@@ -1323,7 +1323,7 @@ pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
@@ -1334,7 +1334,7 @@ pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
@@ -1345,7 +1345,7 @@ pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
@@ -1356,7 +1356,7 @@ pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 2,
 };
 
 pub const ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
