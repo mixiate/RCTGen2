@@ -211,10 +211,11 @@ fn build_track_segment_boundary_tie<'a>(
     mesh_type: renderer::MeshType,
     mut mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
-    let distance = segment_index.div_euclid(2) as f32 * model_desc.length;
+    let segment_index_halved = segment_index.div_euclid(2);
+    let distance = segment_index_halved as f32 * model_desc.length;
 
     let remainder = if model_desc.track_even { 1 } else { 0 };
-    if segment_index % 2 == remainder {
+    if segment_index.rem_euclid(2) == remainder {
         let distance = if model_desc.track_even {
             distance + model_desc.length - model_desc.tie_length
         } else {
@@ -251,7 +252,7 @@ fn build_track_segment_boundary_tie<'a>(
         }
     } else {
         let remainder = if track_section.invert_alt_mesh { 0 } else { 1 };
-        let track_model = if segment_index.div_euclid(2) % 2 == remainder
+        let track_model = if segment_index_halved.rem_euclid(2) == remainder
             && let Some(track_alt) = &models.track_alt
         {
             track_alt
