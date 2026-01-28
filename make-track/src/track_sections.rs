@@ -1422,5 +1422,5 @@ pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
