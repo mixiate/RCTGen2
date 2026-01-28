@@ -44,6 +44,7 @@ fn scene_add_track_model<'a>(
     scene.add_model(tie_model, point.position, rotation, mesh_type, mesh_ids)
 }
 
+#[derive(Clone, Copy, Debug)]
 pub struct ModelDesc {
     pub mesh_count: i32,
     pub scale: f32,
@@ -59,10 +60,16 @@ impl ModelDesc {
         models: &track_desc::Models<renderer::model::Model>,
         track_section: &track_sections::TrackSection,
     ) -> Self {
-        if models.track_alt.is_some() {
+        let model_desc = if models.track_alt.is_some() {
             ModelDesc::new_alternating(track, track_section)
         } else {
             ModelDesc::new_non_alternating(track, track_section)
+        };
+
+        if models.track_tie.is_some() {
+            model_desc.boundary_tie()
+        } else {
+            model_desc
         }
     }
 
@@ -103,6 +110,13 @@ impl ModelDesc {
         } else {
             Self::new_non_alternating(track, track_section)
         }
+    }
+
+    fn boundary_tie(&self) -> Self {
+        let mut model_desc = *self;
+        model_desc.mesh_count *= 2;
+        model_desc.extrusion_count *= 2;
+        model_desc
     }
 }
 
@@ -313,11 +327,8 @@ pub fn build_track_boundary_tie<'a>(
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
-    let mesh_count = model_desc.mesh_count * 2;
-    let extrusion_count = model_desc.extrusion_count * 2;
-
     let mut extrude_behind_mesh_ids = Vec::new();
-    for i in -extrusion_count..0 {
+    for i in -model_desc.extrusion_count..0 {
         build_track_segment_boundary_tie(
             scene,
             models,
@@ -333,7 +344,7 @@ pub fn build_track_boundary_tie<'a>(
     }
 
     let mut extrude_ahead_mesh_ids = Vec::new();
-    for i in mesh_count..(mesh_count + extrusion_count) {
+    for i in model_desc.mesh_count..(model_desc.mesh_count + model_desc.extrusion_count) {
         build_track_segment_boundary_tie(
             scene,
             models,
@@ -348,7 +359,7 @@ pub fn build_track_boundary_tie<'a>(
         )?;
     }
 
-    for i in 0..mesh_count {
+    for i in 0..model_desc.mesh_count {
         build_track_segment_boundary_tie(
             scene,
             models,
