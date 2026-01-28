@@ -652,7 +652,7 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
 
 pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
@@ -1092,7 +1092,7 @@ pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSectio
     mask_offset_y: false,
     prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: false,
-    exit_angle_offset: 0,
+    exit_angle_offset: 1,
 };
 
 pub const S_BEND_LEFT: TrackSection = TrackSection {
