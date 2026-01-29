@@ -1,0 +1,40 @@
+{
+    "tracks": [
+        {
+            "name": "test-track-semi-flat-shaded",
+            "sections": [
+                "corkscrews",
+                "large_corkscrews",
+                "medium_half_loops",
+                "large_half_loops",
+                "zero_g_rolls"
+            ],
+            "z_offset": 8,
+            "length": 0.33333333,
+            "masks": "default",
+            "models": {
+                "track": "track.obj",
+                "tie": "tie.obj",
+                "mask": "mask.obj"
+            }
+        }
+    ],
+    "lights": [
+        { "type": "specular", "shadow": true, "direction": [ 1, 0.66666, 1 ], "strength": 1.0 },
+        { "type": "diffuse", "shadow": true, "direction": [ 1, 0.66666, 1 ], "strength": 1.0 },
+
+        { "type": "diffuse", "shadow": false, "direction": [ -1.0, 0.5, 0.0 ], "strength": 0.09 },
+        { "type": "diffuse", "shadow": false, "direction": [ 1.0, 0.5, 0.0 ], "strength": 0.09 },
+        { "type": "diffuse", "shadow": false, "direction": [ 0.0, 0.5, 1.0 ], "strength": 0.09 },
+        { "type": "diffuse", "shadow": false, "direction": [ 0.0, 0.5, -1.0 ], "strength": 0.09 },
+
+        { "type": "diffuse", "shadow": false, "direction": [ -1.0, 0.5, -1.0 ], "strength": 0.09 },
+        { "type": "diffuse", "shadow": false, "direction": [ -1.0, 0.5, 1.0 ], "strength": 0.09 },
+        { "type": "diffuse", "shadow": false, "direction": [ 1.0, 0.5, -1.0 ], "strength": 0.09 },
+        { "type": "diffuse", "shadow": false, "direction": [ 1.0, 0.5, 1.0 ], "strength": 0.09 },
+
+        { "type": "diffuse", "shadow": false, "direction": [ 0.0, 1.0, 0.0 ], "strength": 0.05 },
+        { "type": "diffuse", "shadow": false, "direction": [ 0.0, -1.0, 0.0 ], "strength": 0.15 }
+    ],
+    "dither": false
+}
