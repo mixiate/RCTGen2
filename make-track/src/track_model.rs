@@ -13,12 +13,21 @@ fn scene_add_track_model_transformed<'a>(
     distance: f32,
     mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
-    let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
-        let distance = (position.z * model_desc.scale) + distance;
-        let point = track_section.sample_curve(distance, model_desc.bank_angle, offset_start, offset_end);
+    let transform = |position: &glam::Vec3, normal: &glam::Vec3, semi_flat_shaded: bool| {
+        let vertex_distance = (position.z * model_desc.scale) + distance;
+        let point = track_section.sample_curve(vertex_distance, model_desc.bank_angle, offset_start, offset_end);
 
         let position = point.position + (point.normal * position.y) + (point.binormal * position.x);
-        let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
+
+        let normal = {
+            let point = if semi_flat_shaded {
+                let mid_distance = distance + (model_desc.length / 2.0);
+                track_section.sample_curve(mid_distance, model_desc.bank_angle, offset_start, offset_end)
+            } else {
+                point
+            };
+            (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x)
+        };
 
         (position, normal)
     };

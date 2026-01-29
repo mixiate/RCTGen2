@@ -67,17 +67,17 @@ impl<'a> SceneBuilder<'a> {
         mesh_ids: Option<&mut Vec<usize>>,
     ) -> anyhow::Result<()>
     where
-        F: Fn((&glam::Vec3, &glam::Vec3)) -> (glam::Vec3, glam::Vec3),
+        F: Fn(&glam::Vec3, &glam::Vec3, bool) -> (glam::Vec3, glam::Vec3),
     {
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
             let mut normals = Vec::with_capacity(mesh.normals.len());
-            for (vertex, geometry_position) in
+            for ((position, normal), geometry_position) in
                 mesh.positions.iter().zip(mesh.normals.iter()).zip(geometry.positions().iter_mut())
             {
-                let vertex = transform(vertex);
-                *geometry_position = vertex.0.into();
-                normals.push(vertex.1.normalize());
+                let (position, normal) = transform(position, normal, mesh.semi_flat_shaded);
+                *geometry_position = position.into();
+                normals.push(normal.normalize());
             }
             self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
 

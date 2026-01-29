@@ -90,6 +90,7 @@ pub struct Mesh {
     pub uvs: Vec<glam::Vec2>,
     pub indices: Vec<[u32; 3]>,
     pub material: Material,
+    pub semi_flat_shaded: bool,
 }
 
 pub struct Model {
@@ -179,12 +180,15 @@ impl Model {
                     indices.push(new_indices);
                 }
 
+                let semi_flat_shaded = object.name.split('_').any(|x| x == "SemiFlatShaded");
+
                 meshes.push(Mesh {
                     positions: vertices.iter().map(|x| x.position.into()).collect(),
                     normals: vertices.iter().map(|x| x.normal.into()).collect(),
                     uvs: vertices.iter().map(|x| x.uv.into()).collect(),
                     indices,
                     material,
+                    semi_flat_shaded,
                 });
             }
         }
