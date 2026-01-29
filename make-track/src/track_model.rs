@@ -7,16 +7,15 @@ fn scene_add_track_model_transformed<'a>(
     model: &'a renderer::model::Model,
     mesh_type: renderer::MeshType,
     track_section: &track_sections::TrackSection,
-    scale: f32,
-    bank_angle: f32,
+    model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
     distance: f32,
     mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
     let transform = |(position, normal): (&glam::Vec3, &glam::Vec3)| {
-        let distance = (position.z * scale) + distance;
-        let point = track_section.sample_curve(distance, bank_angle, offset_start, offset_end);
+        let distance = (position.z * model_desc.scale) + distance;
+        let point = track_section.sample_curve(distance, model_desc.bank_angle, offset_start, offset_end);
 
         let position = point.position + (point.normal * position.y) + (point.binormal * position.x);
         let normal = (point.tangent * normal.z) + (point.normal * normal.y) + (point.binormal * normal.x);
@@ -180,8 +179,7 @@ fn build_track_segment<'a>(
         track_model,
         mesh_type,
         track_section,
-        track_model_desc.scale,
-        track_model_desc.bank_angle,
+        track_model_desc,
         offset_start,
         offset_end,
         distance,
@@ -234,8 +232,7 @@ fn build_track_segment_boundary_tie<'a>(
                 track_tie_model,
                 mesh_type,
                 track_section,
-                model_desc.scale,
-                model_desc.bank_angle,
+                model_desc,
                 offset_start,
                 offset_end,
                 distance,
@@ -276,8 +273,7 @@ fn build_track_segment_boundary_tie<'a>(
             track_model,
             mesh_type,
             track_section,
-            model_desc.scale,
-            model_desc.bank_angle,
+            model_desc,
             offset_start,
             offset_end,
             distance,
@@ -439,8 +435,7 @@ pub fn build_mask<'a>(
             &models.mask,
             renderer::MeshType::Normal,
             track_section,
-            track_model_desc.scale,
-            track_model_desc.bank_angle,
+            track_model_desc,
             offset_start,
             offset_end,
             i as f32 * track_model_desc.length,
