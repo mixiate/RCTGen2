@@ -1,0 +1,43 @@
+{
+    "tracks": [
+        {
+            "name": "test-track-supports",
+            "sections": [
+                "flat",
+                "turns",
+                "gentle_slopes",
+                "steep_slopes",
+                "diagonals",
+                "sloped_turns",
+                "gentle_sloped_turns",
+                "banked_turns",
+                "banked_sloped_turns",
+                "large_sloped_turns",
+                "large_banked_sloped_turns",
+                "s_bends",
+                "helices",
+                "small_slope_transitions",
+                "large_slope_transitions",
+                "turn_bank_transitions"
+            ],
+            "z_offset": 13,
+            "length": 0.5,
+            "support_spacing": 0.8,
+            "pivot": 0.116897727273,
+            "masks": "default",
+            "models": {
+                "track": "track.obj",
+                "mask": "mask.obj",
+                "support_base": "support_base.obj",
+                "support_flat": "support_flat.obj",
+                "support_bank_third": "support_bank_third.obj",
+                "support_bank_half": "support_bank_half.obj",
+                "support_bank_two_thirds": "support_bank_two_thirds.obj",
+                "support_bank": "support_bank.obj"
+            }
+        }
+    ],
+    "lights": [
+        { "type": "diffuse", "shadow": false, "direction": [ 1, 0.6666, 1 ], "strength": 1.0 }
+    ]
+}

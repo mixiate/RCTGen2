@@ -67,3 +67,8 @@ fn test_track_boundary_tie() {
 fn test_track_semi_flat_shaded() {
     test_make_track("test-track-semi-flat-shaded");
 }
+
+#[test]
+fn test_track_supports() {
+    test_make_track("test-track-supports");
+}
