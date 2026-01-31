@@ -514,15 +514,17 @@ pub fn build<'a>(
         build_track(scene, models, track_section, model_desc, offset_start, offset_end)?
     };
 
-    build_supports(
-        scene,
-        models,
-        track_section,
-        model_desc,
-        offset_start,
-        offset_end,
-        &mut mesh_ids,
-    )?;
+    if track_section.has_supports {
+        build_supports(
+            scene,
+            models,
+            track_section,
+            model_desc,
+            offset_start,
+            offset_end,
+            &mut mesh_ids,
+        )?;
+    }
 
     Ok(mesh_ids)
 }
