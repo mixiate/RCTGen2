@@ -5,6 +5,19 @@ pub struct TrackPoint {
     pub binormal: glam::Vec3,
 }
 
+impl TrackPoint {
+    pub fn only_yaw(&self) -> Self {
+        let normal = glam::Vec3::new(0.0, 1.0, 0.0);
+        let binormal = normal.cross(self.tangent).normalize();
+        Self {
+            position: self.position,
+            normal,
+            tangent: binormal.cross(normal).normalize(),
+            binormal,
+        }
+    }
+}
+
 pub struct TrackSection {
     pub name: &'static str,
     curve: fn(f32, f32) -> TrackPoint,

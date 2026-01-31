@@ -93,6 +93,8 @@ pub struct ModelDesc {
     pub bank_angle: f32,
     pub extrusion_count: i32,
     pub track_even: bool,
+    pub support_spacing: f32,
+    pub support_pivot: f32,
 }
 
 impl ModelDesc {
@@ -128,6 +130,8 @@ impl ModelDesc {
             bank_angle: track.bank_angle(),
             extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
             track_even: false,
+            support_spacing: track.support_spacing,
+            support_pivot: track.pivot,
         }
     }
 
@@ -150,6 +154,8 @@ impl ModelDesc {
                 bank_angle: track.bank_angle(),
                 extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
                 track_even: false,
+                support_spacing: track.support_spacing,
+                support_pivot: track.pivot,
             }
         } else {
             Self::new_non_alternating(track, track_section)
@@ -188,6 +194,8 @@ impl ModelDesc {
             bank_angle: self.bank_angle,
             extrusion_count: self.extrusion_count * 2,
             track_even: !tie_start,
+            support_spacing: track.support_spacing,
+            support_pivot: track.pivot,
         }
     }
 }
@@ -494,6 +502,52 @@ fn build_supports<'a>(
                 i as f32 * model_desc.length,
                 None,
             )?;
+        }
+    }
+
+    let support_count = (0.5 + track_section.length / model_desc.support_spacing).floor() as usize;
+    let support_step = track_section.length / support_count as f32;
+
+    for i in 0..(support_count + 1) {
+        let distance = i as f32 * support_step;
+        let point_unbanked = track_section.sample_curve(distance, 0.0, offset_start, offset_end);
+        let point = track_section.sample_curve(distance, model_desc.bank_angle, offset_start, offset_end);
+
+        let support_index = {
+            let angle = point_unbanked.normal.angle_between(point.normal);
+            let support_angle_interval = model_desc.bank_angle / 4.0;
+            (angle / support_angle_interval).round() as usize
+        };
+
+        let support_model = match support_index {
+            0 => models.support_flat.as_ref(),
+            1 => models.support_bank_third.as_ref(),
+            2 => models.support_bank_half.as_ref(),
+            3 => models.support_bank_two_thirds.as_ref(),
+            4 => models.support_bank.as_ref(),
+            _ => None,
+        };
+
+        if let Some(support_model) = &support_model {
+            let position = {
+                let y_offset = model_desc.support_pivot
+                    / (point.tangent.x * point.tangent.x + point.tangent.z * point.tangent.z).sqrt()
+                    - model_desc.support_pivot;
+                point.position + glam::Vec3::new(0.0, -y_offset, 0.0)
+            };
+            let banked_right = point.binormal.y.is_sign_negative();
+            let rotation = {
+                let point = point.only_yaw();
+                let rotation =
+                    glam::Quat::from_mat3(&glam::Mat3::from_cols(point.binormal, point.normal, point.tangent))
+                        .normalize();
+                if banked_right {
+                    rotation * glam::Quat::from_rotation_y(180.0_f32.to_radians())
+                } else {
+                    rotation
+                }
+            };
+            scene.add_model(support_model, position, rotation, renderer::MeshType::Normal, None)?;
         }
     }
 
