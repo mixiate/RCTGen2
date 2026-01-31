@@ -35,6 +35,38 @@ fn scene_add_track_model_transformed<'a>(
 }
 
 #[expect(clippy::too_many_arguments)]
+fn scene_add_support_base_model_transformed<'a>(
+    scene: &mut renderer::SceneBuilder<'a>,
+    model: &'a renderer::model::Model,
+    mesh_type: renderer::MeshType,
+    track_section: &track_sections::TrackSection,
+    model_desc: &ModelDesc,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+    distance: f32,
+    mesh_ids: Option<&mut Vec<usize>>,
+) -> anyhow::Result<()> {
+    let transform = |position: &glam::Vec3, normal: &glam::Vec3, _semi_flat_shaded: bool| {
+        let vertex_distance = (position.z * model_desc.scale) + distance;
+        let track_sections::TrackPoint {
+            position: track_position,
+            tangent: track_tangent,
+            normal: _,
+            binormal: _,
+        } = track_section.sample_curve(vertex_distance, model_desc.bank_angle, offset_start, offset_end);
+
+        let track_binormal = glam::Vec3::new(0.0, 1.0, 0.0).cross(track_tangent).normalize();
+        let track_normal = track_tangent.cross(track_binormal).normalize();
+
+        let position = track_position + (glam::Vec3::new(0.0, 1.0, 0.0) * position.y) + (track_binormal * position.x);
+        let normal = (track_tangent * normal.z) + (track_normal * normal.y) + (track_binormal * normal.x);
+
+        (position, normal)
+    };
+    scene.add_model_transform(model, transform, mesh_type, mesh_ids)
+}
+
+#[expect(clippy::too_many_arguments)]
 fn scene_add_track_model<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     track_section: &track_sections::TrackSection,
@@ -414,6 +446,60 @@ pub fn build_track_boundary_tie<'a>(
     })
 }
 
+fn build_supports<'a>(
+    scene: &mut renderer::SceneBuilder<'a>,
+    models: &'a track_desc::Models<renderer::model::Model>,
+    track_section: &track_sections::TrackSection,
+    model_desc: &ModelDesc,
+    offset_start: &glam::Vec3,
+    offset_end: &glam::Vec3,
+    mesh_ids: &mut TrackSectionMeshIds,
+) -> anyhow::Result<()> {
+    if let Some(support_base_model) = &models.support_base {
+        for i in -model_desc.extrusion_count..0 {
+            scene_add_support_base_model_transformed(
+                scene,
+                support_base_model,
+                renderer::MeshType::Ghost,
+                track_section,
+                model_desc,
+                offset_start,
+                offset_end,
+                i as f32 * model_desc.length,
+                Some(&mut mesh_ids.extrude_behind_mesh_ids),
+            )?;
+        }
+        for i in model_desc.mesh_count..(model_desc.mesh_count + model_desc.extrusion_count) {
+            scene_add_support_base_model_transformed(
+                scene,
+                support_base_model,
+                renderer::MeshType::Ghost,
+                track_section,
+                model_desc,
+                offset_start,
+                offset_end,
+                i as f32 * model_desc.length,
+                Some(&mut mesh_ids.extrude_ahead_mesh_ids),
+            )?;
+        }
+        for i in 0..model_desc.mesh_count {
+            scene_add_support_base_model_transformed(
+                scene,
+                support_base_model,
+                renderer::MeshType::Normal,
+                track_section,
+                model_desc,
+                offset_start,
+                offset_end,
+                i as f32 * model_desc.length,
+                None,
+            )?;
+        }
+    }
+
+    Ok(())
+}
+
 pub fn build<'a>(
     scene: &mut renderer::SceneBuilder<'a>,
     models: &'a track_desc::Models<renderer::model::Model>,
@@ -422,11 +508,23 @@ pub fn build<'a>(
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
 ) -> anyhow::Result<TrackSectionMeshIds> {
-    if models.track_tie.is_some() {
-        build_track_boundary_tie(scene, models, track_section, model_desc, offset_start, offset_end)
+    let mut mesh_ids = if models.track_tie.is_some() {
+        build_track_boundary_tie(scene, models, track_section, model_desc, offset_start, offset_end)?
     } else {
-        build_track(scene, models, track_section, model_desc, offset_start, offset_end)
-    }
+        build_track(scene, models, track_section, model_desc, offset_start, offset_end)?
+    };
+
+    build_supports(
+        scene,
+        models,
+        track_section,
+        model_desc,
+        offset_start,
+        offset_end,
+        &mut mesh_ids,
+    )?;
+
+    Ok(mesh_ids)
 }
 
 pub fn build_mask<'a>(
