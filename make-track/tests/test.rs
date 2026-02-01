@@ -10,8 +10,8 @@ fn test_make_track(track_name: &str) {
 
     make_track::make_track(&data_directory, &track_description_file_path, output_directory.path()).unwrap();
 
-    let output_directory = output_directory.path().join(track_name);
-    let expected_directory = test_files_directory.join("output").join(track_name);
+    let output_directory = output_directory.path().join("track").join(track_name);
+    let expected_directory = test_files_directory.join("output").join(track_name).join("track").join(track_name);
 
     {
         let output_file_count = std::fs::read_dir(&output_directory).unwrap().count();

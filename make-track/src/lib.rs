@@ -472,7 +472,7 @@ fn render(
 
         let masks = mask::Masks::load(&data_directory.join("masks").join(&track.masks).with_extension("json"))?;
 
-        let output_directory = output_directory.join(&track.name);
+        let output_directory = output_directory.join("track").join(&track.name);
         std::fs::create_dir_all(&output_directory)?;
 
         let track_sections = list_track_sections(&track.sections);
