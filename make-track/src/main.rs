@@ -23,9 +23,7 @@ fn main() -> anyhow::Result<()> {
         .canonicalize()
         .with_context(|| format!("Invalid file path {}", cli.track_description_file_path.display()))?;
 
-    let output_directory = cli
-        .output_directory
-        .canonicalize()
+    let output_directory = std::path::absolute(&cli.output_directory)
         .with_context(|| format!("Invalid file path {}", cli.output_directory.display()))?;
 
     make_track::make_track(&data_directory, &track_description_file_path, &output_directory)?;
