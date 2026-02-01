@@ -7,26 +7,27 @@ fn test_make_track(track_name: &str) {
     let track_description_file_path = track_description_directory.join("track").with_extension("json");
 
     let output_directory = tempfile::tempdir().unwrap();
+    let expected_directory = test_files_directory.join("output").join(track_name);
 
     make_track::make_track(&data_directory, &track_description_file_path, output_directory.path()).unwrap();
 
-    let output_directory = output_directory.path().join("track").join(track_name);
-    let expected_directory = test_files_directory.join("output").join(track_name).join("track").join(track_name);
+    let output_sprites_directory = output_directory.path().join("track").join(track_name);
+    let expected_sprites_directory = expected_directory.join("track").join(track_name);
 
     {
-        let output_file_count = std::fs::read_dir(&output_directory).unwrap().count();
-        let expected_file_count = std::fs::read_dir(&output_directory).unwrap().count();
+        let output_file_count = std::fs::read_dir(&output_sprites_directory).unwrap().count();
+        let expected_file_count = std::fs::read_dir(&output_sprites_directory).unwrap().count();
         assert!(output_file_count == expected_file_count);
     }
 
-    for entry in std::fs::read_dir(&output_directory).unwrap() {
+    for entry in std::fs::read_dir(&output_sprites_directory).unwrap() {
         let entry = entry.unwrap();
 
         let output_file_path = entry.path();
         let output_file = renderer::image::IndexedImage::load(&output_file_path, &renderer::palette::PALETTE_FLAT)
             .expect(&format!("Could not open {output_file_path:?}"));
 
-        let expected_file_path = expected_directory.join(entry.file_name());
+        let expected_file_path = expected_sprites_directory.join(entry.file_name());
         let expected_file = renderer::image::IndexedImage::load(&expected_file_path, &renderer::palette::PALETTE_FLAT)
             .expect(&format!("Could not open {expected_file_path:?}"));
 
@@ -35,6 +36,13 @@ fn test_make_track(track_name: &str) {
             "{output_file_path:?} != {expected_file_path:?}"
         );
     }
+
+    let output_sprites_json = std::fs::read(output_directory.path().join("sprites").with_extension("json")).unwrap();
+    let output_sprites_json: serde_json::Value = serde_json::from_slice(&output_sprites_json).unwrap();
+    let expected_sprites_json = std::fs::read(expected_directory.join("sprites").with_extension("json")).unwrap();
+    let expected_sprites_json: serde_json::Value = serde_json::from_slice(&expected_sprites_json).unwrap();
+
+    assert!(output_sprites_json == expected_sprites_json);
 }
 
 #[test]

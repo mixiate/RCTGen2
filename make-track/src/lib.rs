@@ -2,6 +2,7 @@ mod curves;
 mod mask;
 mod offset;
 mod split;
+mod sprites_json;
 mod track_curves;
 mod track_desc;
 mod track_model;
@@ -205,8 +206,10 @@ fn split_track_section(
     dither: bool,
     track_section: &track_sections::TrackSection,
     track_z_offset: i32,
+    track_name: &str,
     output_directory: &std::path::Path,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<Vec<sprites_json::Sprite>> {
+    let mut sprite_descs = Vec::new();
     for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images) {
         let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track_z_offset);
         let mask_y_offset = if track_section.mask_offset_y {
@@ -236,11 +239,14 @@ fn split_track_section(
             } else {
                 format!("{}_{view_index}", track_section.name)
             };
-            image.save(&output_directory.join(image_name).with_extension("png"))?;
+            image.save(&output_directory.join(&image_name).with_extension("png"))?;
+
+            let relative_file_path = format!("track/{}/{image_name}.png", track_name);
+            sprite_descs.push(sprites_json::Sprite::new(&relative_file_path, image.offset));
         }
     }
 
-    Ok(())
+    Ok(sprite_descs)
 }
 
 fn list_track_sections(
@@ -450,7 +456,7 @@ fn render(
     data_directory: &std::path::Path,
     base_directory: &std::path::Path,
     output_directory: &std::path::Path,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<Vec<sprites_json::Sprite>> {
     use anyhow::Context as _;
     use rayon::prelude::*;
 
@@ -467,6 +473,7 @@ fn render(
 
     let lights = track_desc.get_lights();
 
+    let mut sprite_descs = Vec::new();
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
 
@@ -477,7 +484,7 @@ fn render(
 
         let track_sections = list_track_sections(&track.sections);
 
-        track_sections
+        let track_section_sprite_descs = track_sections
             .into_par_iter()
             .map(|track_section| {
                 if let Some(views) = masks.get_views(track_section.name) {
@@ -498,17 +505,22 @@ fn render(
                             track_desc.dither,
                             track_section,
                             track.z_offset as i32,
+                            &track.name,
                             &output_directory,
                         )
                     })
                 } else {
-                    Ok(())
+                    Ok(Vec::new())
                 }
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
+
+        for sprite_desc in track_section_sprite_descs.into_iter().flatten() {
+            sprite_descs.push(sprite_desc);
+        }
     }
 
-    Ok(())
+    Ok(sprite_descs)
 }
 
 pub fn make_track(
@@ -527,7 +539,13 @@ pub fn make_track(
         )
     })?;
 
-    render(&desc, data_directory, base_directory, output_directory)?;
+    let sprite_descs = render(&desc, data_directory, base_directory, output_directory)?;
+
+    let sprites_json_file_path = output_directory.join("sprites").with_extension("json");
+    if !sprites_json_file_path.exists() {
+        let sprite_descs = sprites_json::Sprites { sprites: sprite_descs };
+        sprite_descs.save(&sprites_json_file_path)?;
+    }
 
     Ok(())
 }
