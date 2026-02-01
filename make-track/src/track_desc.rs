@@ -188,6 +188,7 @@ pub struct Desc {
     pub lights: Vec<Light>,
     #[serde(default = "bool_true")]
     pub dither: bool,
+    pub edge_distance: Option<f32>,
 }
 
 impl Desc {

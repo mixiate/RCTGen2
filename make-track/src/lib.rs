@@ -15,6 +15,7 @@ fn render_scene(
     mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    edge_distance: f32,
     rotation: usize,
 ) -> renderer::Framebuffer {
     let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
@@ -23,8 +24,7 @@ fn render_scene(
     let view_rotation_inverse = view_rotation.inverse();
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
-    const EDGE_DISTANCE: f32 = 0.088_388_346;
-    renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE)
+    renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, edge_distance)
 }
 
 fn render_scene_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation: usize) -> renderer::DepthBuffer {
@@ -38,6 +38,7 @@ fn render_track_section_view(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
     model_desc: &track_model::ModelDesc,
@@ -64,7 +65,7 @@ fn render_track_section_view(
         }
     }
 
-    let image = render_scene(&scene, &mesh_types, camera, lights, rotation);
+    let image = render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation);
 
     let mask_depth = if view.requires_track_mask {
         let scene = track_model::build_mask(
@@ -83,10 +84,12 @@ fn render_track_section_view(
     Ok((image, mask_depth))
 }
 
+#[expect(clippy::too_many_arguments)]
 fn render_track_section_views(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
     model_desc: &track_model::ModelDesc,
@@ -125,12 +128,12 @@ fn render_track_section_views(
         view_mesh_types
             .into_par_iter()
             .enumerate()
-            .map(|(rotation, mesh_types)| render_scene(&scene, &mesh_types, camera, lights, rotation))
+            .map(|(rotation, mesh_types)| render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation))
             .collect::<Vec<_>>()
     } else {
         (0..views.len())
             .into_par_iter()
-            .map(|rotation| render_scene(&scene, &mesh_types, camera, lights, rotation))
+            .map(|rotation| render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation))
             .collect::<Vec<_>>()
     };
 
@@ -153,6 +156,7 @@ fn render_track_section(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
     track: &track_desc::Track,
     offsets: Option<&track_desc::Offsets>,
@@ -184,6 +188,7 @@ fn render_track_section(
                     render_device,
                     camera,
                     lights,
+                    edge_distance,
                     models,
                     track_section,
                     &model_desc,
@@ -196,7 +201,16 @@ fn render_track_section(
             .collect::<anyhow::Result<Vec<_>>>()?
     } else {
         let model_desc = track_model::ModelDesc::new(track, models, track_section, 0);
-        render_track_section_views(render_device, camera, lights, models, track_section, &model_desc, views)?
+        render_track_section_views(
+            render_device,
+            camera,
+            lights,
+            edge_distance,
+            models,
+            track_section,
+            &model_desc,
+            views,
+        )?
     })
 }
 
@@ -473,6 +487,8 @@ fn render(
 
     let lights = track_desc.get_lights();
 
+    let edge_distance = track_desc.edge_distance.unwrap_or(0.088_388_346);
+
     let mut sprite_descs = Vec::new();
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
@@ -492,6 +508,7 @@ fn render(
                         &render_device,
                         &camera,
                         &lights,
+                        edge_distance,
                         &models,
                         track,
                         track_desc.offsets.as_ref(),
