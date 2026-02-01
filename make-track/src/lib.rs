@@ -542,9 +542,19 @@ pub fn make_track(
     let sprite_descs = render(&desc, data_directory, base_directory, output_directory)?;
 
     let sprites_json_file_path = output_directory.join("sprites").with_extension("json");
-    if !sprites_json_file_path.exists() {
-        let sprite_descs = sprites_json::Sprites { sprites: sprite_descs };
-        sprite_descs.save(&sprites_json_file_path)?;
+    if let Ok(json_string) = std::fs::read_to_string(&sprites_json_file_path) {
+        let mut sprites_json = serde_json::from_str::<sprites_json::Sprites>(&json_string)
+            .with_context(|| format!("Could not parse json in file {}", sprites_json_file_path.display()))?;
+        for sprite_desc in &mut sprites_json.sprites {
+            if let Some(output_sprite_desc) = sprite_descs.iter().find(|x| x.path == sprite_desc.path) {
+                sprite_desc.x = output_sprite_desc.x;
+                sprite_desc.y = output_sprite_desc.y;
+            }
+        }
+        sprites_json.save(&sprites_json_file_path)?;
+    } else {
+        let sprites_json = sprites_json::Sprites { sprites: sprite_descs };
+        sprites_json.save(&sprites_json_file_path)?;
     }
 
     Ok(())

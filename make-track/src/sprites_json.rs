@@ -6,10 +6,13 @@ pub enum PaletteType {
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Sprite {
-    path: String,
-    x: Option<i32>,
-    y: Option<i32>,
-    palette: Option<PaletteType>,
+    pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub x: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub y: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub palette: Option<PaletteType>,
 }
 
 impl Sprite {
@@ -24,6 +27,7 @@ impl Sprite {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
 pub struct Sprites {
     pub sprites: Vec<Sprite>,
 }
