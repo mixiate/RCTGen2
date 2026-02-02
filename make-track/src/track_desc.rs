@@ -28,6 +28,8 @@ pub enum TrackGroup {
     LargeBankedSlopedTurns,
     SBends,
     Helices,
+    MediumQuarterHelices,
+    MediumBankedQuarterHelices,
     SmallSlopeTransitions,
     LargeSlopeTransitions,
     BarrelRolls,

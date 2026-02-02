@@ -436,3 +436,25 @@ pub fn roll_left(length: f32, radius: f32, distance: f32) -> crate::track_sectio
         binormal,
     }
 }
+
+pub fn flatten_ends(point: crate::track_sections::TrackPoint, percentage: f32) -> crate::track_sections::TrackPoint {
+    const FLAT_PERCENTAGE: f32 = 0.05;
+    let percentage = if percentage <= FLAT_PERCENTAGE {
+        1.0 - (percentage / FLAT_PERCENTAGE)
+    } else if percentage >= (1.0 - FLAT_PERCENTAGE) {
+        (percentage - (1.0 - FLAT_PERCENTAGE)) / FLAT_PERCENTAGE
+    } else {
+        return point;
+    };
+
+    let percentage = percentage * percentage;
+
+    let normal = point.normal.lerp(glam::Vec3::Y, percentage);
+    let binormal = normal.cross(point.tangent).normalize();
+    crate::track_sections::TrackPoint {
+        position: point.position,
+        normal,
+        tangent: binormal.cross(normal).normalize(),
+        binormal,
+    }
+}

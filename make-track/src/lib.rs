@@ -387,6 +387,14 @@ fn list_track_sections(
         track_sections.push(&track_sections::MEDIUM_HELIX_LEFT);
         track_sections.push(&track_sections::MEDIUM_HELIX_RIGHT);
     }
+    if sections.contains(&TrackGroup::MediumQuarterHelices) {
+        track_sections.push(&track_sections::MEDIUM_QUARTER_HELIX_LEFT);
+        track_sections.push(&track_sections::MEDIUM_QUARTER_HELIX_RIGHT);
+    }
+    if sections.contains(&TrackGroup::MediumBankedQuarterHelices) {
+        track_sections.push(&track_sections::MEDIUM_QUARTER_HELIX_LEFT_BANK);
+        track_sections.push(&track_sections::MEDIUM_QUARTER_HELIX_RIGHT_BANK);
+    }
     if sections.contains(&TrackGroup::TurnBankTransitions) {
         track_sections.push(&track_sections::SMALL_TURN_LEFT_BANK_TO_GENTLE);
         track_sections.push(&track_sections::SMALL_TURN_RIGHT_BANK_TO_GENTLE);

@@ -1378,6 +1378,58 @@ pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
     has_supports: true,
 };
 
+pub const MEDIUM_QUARTER_HELIX_LEFT: TrackSection = TrackSection {
+    name: "medium_quarter_helix_left",
+    curve: crate::track_curves::medium_quarter_helix_left,
+    length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 3,
+    has_supports: true,
+};
+
+pub const MEDIUM_QUARTER_HELIX_RIGHT: TrackSection = TrackSection {
+    name: "medium_quarter_helix_right",
+    curve: crate::track_curves::medium_quarter_helix_right,
+    length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 1,
+    has_supports: true,
+};
+
+pub const MEDIUM_QUARTER_HELIX_LEFT_BANK: TrackSection = TrackSection {
+    name: "medium_quarter_helix_left_bank",
+    curve: crate::track_curves::medium_quarter_helix_left_bank,
+    length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 3,
+    has_supports: true,
+};
+
+pub const MEDIUM_QUARTER_HELIX_RIGHT_BANK: TrackSection = TrackSection {
+    name: "medium_quarter_helix_right_bank",
+    curve: crate::track_curves::medium_quarter_helix_right_bank,
+    length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 1,
+    has_supports: true,
+};
+
 pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "small_turn_left_bank_to_gentle",
     curve: crate::track_curves::small_turn_left_bank_to_gentle,

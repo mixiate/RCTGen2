@@ -39,6 +39,8 @@ pub const S_BEND_LENGTH: f32 = 3.240_75;
 pub const SMALL_HELIX_LENGTH: f32 = 2.365_02;
 pub const MEDIUM_HELIX_LENGTH: f32 = 3.932292;
 
+pub const MEDIUM_QUARTER_HELIX_LENGTH: f32 = 3.948154;
+
 pub const SMALL_TURN_BANK_TO_GENTLE_LENGTH: f32 = 2.442_29;
 
 pub const BARREL_ROLL_LENGTH: f32 = 3.091882;
@@ -1019,6 +1021,36 @@ pub fn medium_helix_right(distance: f32, bank_angle: f32) -> crate::track_sectio
         &crate::curves::sloped_turn_right(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
         bank_angle,
     )
+}
+
+pub fn medium_quarter_helix_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flatten_ends(
+        crate::curves::sloped_turn_left(
+            MEDIUM_TURN_RADIUS,
+            2.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
+            distance,
+        ),
+        distance / MEDIUM_QUARTER_HELIX_LENGTH,
+    )
+}
+
+pub fn medium_quarter_helix_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::flatten_ends(
+        crate::curves::sloped_turn_right(
+            MEDIUM_TURN_RADIUS,
+            2.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
+            distance,
+        ),
+        distance / MEDIUM_QUARTER_HELIX_LENGTH,
+    )
+}
+
+pub fn medium_quarter_helix_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&medium_quarter_helix_left(distance, 0.0), -bank_angle)
+}
+
+pub fn medium_quarter_helix_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::banked_curve(&medium_quarter_helix_right(distance, 0.0), bank_angle)
 }
 
 pub fn small_turn_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
