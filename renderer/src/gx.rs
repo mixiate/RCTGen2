@@ -119,6 +119,30 @@ impl Archive {
         self.data.extend(encoded_sprite.data);
     }
 
+    pub fn add_encoded_sprite(
+        &mut self,
+        encoded_sprite: &EncodedSprite,
+        width: usize,
+        height: usize,
+        offset: glam::IVec2,
+    ) {
+        self.entries.push(Entry {
+            data_offset: u32::try_from(self.data.len()).unwrap(),
+            width: i16::try_from(width).unwrap(),
+            height: i16::try_from(height).unwrap(),
+            offset_x: i16::try_from(offset.x).unwrap(),
+            offset_y: i16::try_from(offset.y).unwrap(),
+            flags: ENTRY_FLAG_TRANSPARENT | ENTRY_FLAG_RLE,
+            zoom_offset: 0,
+        });
+
+        for row_offset in &encoded_sprite.row_offsets {
+            self.data.extend(row_offset.to_le_bytes());
+        }
+
+        self.data.extend(&encoded_sprite.data);
+    }
+
     pub fn len(&self) -> usize {
         self.entries.len()
     }

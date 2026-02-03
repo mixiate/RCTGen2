@@ -1,0 +1,18 @@
+[package]
+name = "sprite-build"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.56", features = ["derive"] }
+glam = "0.30.9"
+image = { version = "0.25.9", default-features = false, features = ["png"] }
+make-track = { path = "../make-track" }
+png = "0.18.0"
+rayon = "1.11.0"
+renderer = { path = "../renderer" }
+serde_json = "1.0.149"
+
+[lints]
+workspace = true

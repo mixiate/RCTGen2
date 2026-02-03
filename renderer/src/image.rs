@@ -52,6 +52,16 @@ impl IndexedImage {
         }
     }
 
+    pub fn with_buffer(pixels: Vec<u8>, width: usize, height: usize) -> Self {
+        assert!(pixels.len() == width * height);
+        Self {
+            pixels,
+            width,
+            height,
+            offset: glam::IVec2::new(0, 0),
+        }
+    }
+
     pub fn get_pixel(&self, x: usize, y: usize) -> u8 {
         self.pixels[x + (y * self.width)]
     }

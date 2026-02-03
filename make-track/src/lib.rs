@@ -2,7 +2,7 @@ mod curves;
 mod mask;
 mod offset;
 mod split;
-mod sprites_json;
+pub mod sprites_json;
 mod track_curves;
 mod track_desc;
 mod track_model;
