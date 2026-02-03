@@ -148,6 +148,11 @@ impl IndexedImage {
         buffer.truncate(info.buffer_size());
 
         anyhow::ensure!(
+            info.bit_depth == png::BitDepth::Eight,
+            "Error reading {}, image bit depth is not 8",
+            path.display()
+        );
+        anyhow::ensure!(
             info.color_type == png::ColorType::Indexed,
             "Error reading {}, image is not indexed",
             path.display()
