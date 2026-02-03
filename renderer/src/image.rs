@@ -118,7 +118,7 @@ impl IndexedImage {
         }
     }
 
-    pub fn as_raw(&self) -> &Vec<u8> {
+    pub fn as_raw(&self) -> &[u8] {
         &self.pixels
     }
 

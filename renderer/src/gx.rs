@@ -14,6 +14,65 @@ const ENTRY_FLAG_TRANSPARENT: u16 = 1;
 
 const ENTRY_FLAG_RLE: u16 = 4;
 
+pub struct EncodedSprite {
+    row_offsets: Vec<i16>,
+    data: Vec<u8>,
+}
+
+impl EncodedSprite {
+    pub fn new(pixels: &[u8], width: usize, height: usize) -> Self {
+        let mut row_offsets = Vec::with_capacity(height);
+        let mut data = Vec::new();
+
+        for y in 0..height {
+            row_offsets.push(i16::try_from((height * 2) + data.len()).unwrap());
+
+            let mut last_count_index = None;
+            let mut x_offset = 0;
+            let mut pixel_count = 0;
+
+            let mut push_run = |last_count_index: &mut Option<usize>, x_offset: &mut usize, pixel_count: &mut usize| {
+                *last_count_index = Some(data.len());
+                data.push(u8::try_from(*pixel_count).unwrap());
+                data.push(u8::try_from(*x_offset).unwrap());
+                for i in 0..*pixel_count {
+                    let x = *x_offset + i;
+                    data.push(pixels[x + y * width]);
+                }
+                *x_offset = 0;
+                *pixel_count = 0;
+            };
+
+            for x in 0..width {
+                if pixels[x + y * width] == 0 {
+                    if pixel_count != 0 {
+                        push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
+                    }
+                } else {
+                    if pixel_count == 0 {
+                        x_offset = x;
+                    }
+                    pixel_count += 1;
+                }
+
+                if pixel_count == 127 {
+                    push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
+                }
+            }
+
+            if pixel_count > 0 || last_count_index.is_none() {
+                push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
+            }
+
+            if let Some(last_count_index) = last_count_index {
+                data[last_count_index] |= 0b1000_0000;
+            }
+        }
+
+        Self { row_offsets, data }
+    }
+}
+
 pub struct Archive {
     entries: Vec<Entry>,
     data: Vec<u8>,
@@ -51,58 +110,13 @@ impl Archive {
             zoom_offset: 0,
         });
 
-        let mut row_offsets = Vec::with_capacity(image.height());
-        let mut rle_data = Vec::new();
+        let encoded_sprite = EncodedSprite::new(image.as_raw(), image.width(), image.height());
 
-        for y in 0..image.height() {
-            row_offsets.push(i16::try_from((image.height() * 2) + rle_data.len()).unwrap());
-
-            let mut last_count_index = None;
-            let mut x_offset = 0;
-            let mut pixel_count = 0;
-
-            let mut push_run = |last_count_index: &mut Option<usize>, x_offset: &mut usize, pixel_count: &mut usize| {
-                *last_count_index = Some(rle_data.len());
-                rle_data.push(u8::try_from(*pixel_count).unwrap());
-                rle_data.push(u8::try_from(*x_offset).unwrap());
-                for i in 0..*pixel_count {
-                    rle_data.push(image.get_pixel(*x_offset + i, y));
-                }
-                *x_offset = 0;
-                *pixel_count = 0;
-            };
-
-            for x in 0..image.width() {
-                if image.get_pixel(x, y) == 0 {
-                    if pixel_count != 0 {
-                        push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
-                    }
-                } else {
-                    if pixel_count == 0 {
-                        x_offset = x;
-                    }
-                    pixel_count += 1;
-                }
-
-                if pixel_count == 127 {
-                    push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
-                }
-            }
-
-            if pixel_count > 0 || last_count_index.is_none() {
-                push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
-            }
-
-            if let Some(last_count_index) = last_count_index {
-                rle_data[last_count_index] |= 0b1000_0000;
-            }
-        }
-
-        for row_offset in row_offsets {
+        for row_offset in encoded_sprite.row_offsets {
             self.data.extend(row_offset.to_le_bytes());
         }
 
-        self.data.extend(rle_data);
+        self.data.extend(encoded_sprite.data);
     }
 
     pub fn len(&self) -> usize {
