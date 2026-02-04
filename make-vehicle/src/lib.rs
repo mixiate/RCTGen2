@@ -626,7 +626,8 @@ pub fn make_vehicle(
 
             for images in &images {
                 for image in images {
-                    archive.add_indexed_image_rle(image);
+                    let sprite = renderer::gx::EncodedSprite::new(image.as_raw(), image.width(), image.height());
+                    archive.add_encoded_sprite(&sprite, image.width(), image.height(), image.offset.x, image.offset.y);
                 }
             }
 
