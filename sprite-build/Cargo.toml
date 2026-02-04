@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.100"
 clap = { version = "4.5.56", features = ["derive"] }
-glam = "0.30.9"
 image = { version = "0.25.9", default-features = false, features = ["png"] }
 make-track = { path = "../make-track" }
 png = "0.18.0"

@@ -46,7 +46,8 @@ struct Sprite {
     encoded_sprite: renderer::gx::EncodedSprite,
     width: usize,
     height: usize,
-    offset: glam::IVec2,
+    x: i32,
+    y: i32,
 }
 
 fn encode_sprite(
@@ -71,7 +72,8 @@ fn encode_sprite(
         encoded_sprite: renderer::gx::EncodedSprite::new(image.as_raw(), image.width(), image.height()),
         width: image.width(),
         height: image.height(),
-        offset: image.offset,
+        x: image.offset.x,
+        y: image.offset.y,
     })
 }
 
@@ -96,7 +98,7 @@ pub fn build(sprites_json_path: &std::path::Path, output_file_path: &std::path::
 
     let mut sprite_archive = renderer::gx::Archive::with_capacity(sprites.len());
     for sprite in sprites {
-        sprite_archive.add_encoded_sprite(&sprite.encoded_sprite, sprite.width, sprite.height, sprite.offset);
+        sprite_archive.add_encoded_sprite(&sprite.encoded_sprite, sprite.width, sprite.height, sprite.x, sprite.y);
     }
 
     sprite_archive
