@@ -465,12 +465,18 @@ fn list_track_sections(
     track_sections
 }
 
+struct TrackSectionSprites {
+    track_name: String,
+    track_section_name: &'static str,
+    sprites: Vec<sprites_json::Sprite>,
+}
+
 fn render(
     track_desc: &track_desc::Desc,
     data_directory: &std::path::Path,
     base_directory: &std::path::Path,
     output_directory: &std::path::Path,
-) -> anyhow::Result<Vec<sprites_json::Sprite>> {
+) -> anyhow::Result<Vec<TrackSectionSprites>> {
     use anyhow::Context as _;
     use rayon::prelude::*;
 
@@ -516,7 +522,7 @@ fn render(
                         views,
                     )
                     .and_then(|images| {
-                        split_track_section(
+                        let sprites = split_track_section(
                             images,
                             views,
                             track_desc.dither,
@@ -524,20 +530,84 @@ fn render(
                             track.z_offset as i32,
                             &track.name,
                             &output_directory,
-                        )
+                        )?;
+                        Ok(TrackSectionSprites {
+                            track_name: track.name.to_owned(),
+                            track_section_name: track_section.name,
+                            sprites,
+                        })
                     })
                 } else {
-                    Ok(Vec::new())
+                    Ok(TrackSectionSprites {
+                        track_name: track.name.to_owned(),
+                        track_section_name: track_section.name,
+                        sprites: Vec::new(),
+                    })
                 }
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
 
-        for sprite_desc in track_section_sprite_descs.into_iter().flatten() {
+        for sprite_desc in track_section_sprite_descs.into_iter() {
             sprite_descs.push(sprite_desc);
         }
     }
 
     Ok(sprite_descs)
+}
+
+fn is_track_section_sprite(sprite_path: &str, path_prefix: &str, track_section_name: &str) -> bool {
+    if let Some(sprite_name) = sprite_path.strip_prefix(path_prefix)
+        && sprite_name.starts_with(track_section_name)
+        && let Some(character) = sprite_name.get((track_section_name.len() + 1)..(track_section_name.len() + 2))
+        && character.parse::<i32>().is_ok()
+    {
+        true
+    } else {
+        false
+    }
+}
+
+fn output_sprites_json(sprites: Vec<TrackSectionSprites>, output_directory: &std::path::Path) -> anyhow::Result<()> {
+    use anyhow::Context as _;
+
+    let sprites_json_file_path = output_directory.join("sprites").with_extension("json");
+    if let Ok(json_string) = std::fs::read_to_string(&sprites_json_file_path) {
+        let mut sprites_json = serde_json::from_str::<sprites_json::Sprites>(&json_string)
+            .with_context(|| format!("Could not parse json in file {}", sprites_json_file_path.display()))?;
+
+        for track_section_sprites in sprites {
+            if track_section_sprites.sprites.is_empty() {
+                continue;
+            }
+
+            let path_prefix = format!("track/{}/", track_section_sprites.track_name);
+            let track_section_name = &track_section_sprites.track_section_name;
+
+            if let Some(index) = sprites_json
+                .sprites
+                .iter()
+                .position(|sprite| is_track_section_sprite(&sprite.path, &path_prefix, track_section_name))
+            {
+                sprites_json
+                    .sprites
+                    .retain(|sprite| !is_track_section_sprite(&sprite.path, &path_prefix, track_section_name));
+                sprites_json.sprites.splice(index..index, track_section_sprites.sprites);
+            } else if let Some(index) =
+                sprites_json.sprites.iter().rev().position(|sprite| sprite.path.starts_with(&path_prefix))
+            {
+                let index = sprites_json.sprites.len() - index;
+                sprites_json.sprites.splice(index..index, track_section_sprites.sprites);
+            } else {
+                sprites_json.sprites.extend(track_section_sprites.sprites);
+            }
+        }
+        sprites_json.save(&sprites_json_file_path)?;
+    } else {
+        let sprites = sprites.into_iter().flat_map(|x| x.sprites).collect();
+        let sprites_json = sprites_json::Sprites { sprites };
+        sprites_json.save(&sprites_json_file_path)?;
+    }
+    Ok(())
 }
 
 pub fn make_track(
@@ -556,23 +626,8 @@ pub fn make_track(
         )
     })?;
 
-    let sprite_descs = render(&desc, data_directory, base_directory, output_directory)?;
-
-    let sprites_json_file_path = output_directory.join("sprites").with_extension("json");
-    if let Ok(json_string) = std::fs::read_to_string(&sprites_json_file_path) {
-        let mut sprites_json = serde_json::from_str::<sprites_json::Sprites>(&json_string)
-            .with_context(|| format!("Could not parse json in file {}", sprites_json_file_path.display()))?;
-        for sprite_desc in &mut sprites_json.sprites {
-            if let Some(output_sprite_desc) = sprite_descs.iter().find(|x| x.path == sprite_desc.path) {
-                sprite_desc.x = output_sprite_desc.x;
-                sprite_desc.y = output_sprite_desc.y;
-            }
-        }
-        sprites_json.save(&sprites_json_file_path)?;
-    } else {
-        let sprites_json = sprites_json::Sprites { sprites: sprite_descs };
-        sprites_json.save(&sprites_json_file_path)?;
-    }
+    let sprites = render(&desc, data_directory, base_directory, output_directory)?;
+    output_sprites_json(sprites, output_directory)?;
 
     Ok(())
 }
