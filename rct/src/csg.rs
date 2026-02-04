@@ -87,6 +87,7 @@ impl Archive {
     }
 
     pub fn add_sprite(&mut self, pixels: &[u8], width: usize, height: usize, x: i32, y: i32) {
+        assert!(pixels.len() == width * height);
         self.entries.push(Entry {
             data_offset: u32::try_from(self.data.len()).unwrap(),
             width: i16::try_from(width).unwrap(),
@@ -158,13 +159,14 @@ mod tests {
     #[test]
     fn test_archive() {
         let test_files_directory = std::path::PathBuf::from(std::env!("CARGO_MANIFEST_DIR"));
-        let test_files_directory = test_files_directory.join("tests").join("files").join("gx archive");
+        let test_files_directory = test_files_directory.join("tests").join("files").join("csg");
 
         let expected_file_path = test_files_directory.join("images").with_extension("dat");
 
         let test_image_path = test_files_directory.join("rle_test").with_extension("png");
-        let test_image = crate::image::IndexedImage::load(&test_image_path, &crate::palette::PALETTE_FLAT).unwrap();
-        let mut archive = crate::gx::Archive::with_capacity(2);
+        let test_image =
+            renderer::image::IndexedImage::load(&test_image_path, &renderer::palette::PALETTE_FLAT).unwrap();
+        let mut archive = crate::csg::Archive::with_capacity(2);
         archive.add_sprite(
             test_image.as_raw(),
             test_image.width(),
@@ -173,7 +175,7 @@ mod tests {
             test_image.offset.y,
         );
         let encoded_sprite =
-            crate::gx::EncodedSprite::new(test_image.as_raw(), test_image.width(), test_image.height());
+            crate::csg::EncodedSprite::new(test_image.as_raw(), test_image.width(), test_image.height());
         archive.add_encoded_sprite(
             &encoded_sprite,
             test_image.width(),

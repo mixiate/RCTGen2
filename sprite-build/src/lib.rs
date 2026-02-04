@@ -43,7 +43,7 @@ fn load_image_keep_palette(path: &std::path::Path) -> anyhow::Result<renderer::i
 }
 
 struct Sprite {
-    encoded_sprite: renderer::gx::EncodedSprite,
+    encoded_sprite: rct::csg::EncodedSprite,
     width: usize,
     height: usize,
     x: i32,
@@ -69,7 +69,7 @@ fn encode_sprite(
     image.crop();
 
     Ok(Sprite {
-        encoded_sprite: renderer::gx::EncodedSprite::new(image.as_raw(), image.width(), image.height()),
+        encoded_sprite: rct::csg::EncodedSprite::new(image.as_raw(), image.width(), image.height()),
         width: image.width(),
         height: image.height(),
         x: image.offset.x,
@@ -96,7 +96,7 @@ pub fn build(sprites_json_path: &std::path::Path, output_file_path: &std::path::
         .map(|sprite| encode_sprite(&sprite, base_directory))
         .collect::<anyhow::Result<Vec<_>>>()?;
 
-    let mut sprite_archive = renderer::gx::Archive::with_capacity(sprites.len());
+    let mut sprite_archive = rct::csg::Archive::with_capacity(sprites.len());
     for sprite in sprites {
         sprite_archive.add_encoded_sprite(&sprite.encoded_sprite, sprite.width, sprite.height, sprite.x, sprite.y);
     }

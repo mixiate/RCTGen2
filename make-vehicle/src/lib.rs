@@ -618,7 +618,7 @@ pub fn make_vehicle(
 
     let object_images = match image_output_type {
         ImageOutputType::Dat => {
-            let mut archive = renderer::gx::Archive::with_capacity(images.len() + 3);
+            let mut archive = rct::csg::Archive::with_capacity(images.len() + 3);
 
             archive.add_sprite(preview_image.as_raw(), preview_image.width(), preview_image.height(), 0, 0);
 
@@ -629,7 +629,7 @@ pub fn make_vehicle(
 
             for images in &images {
                 for image in images {
-                    let sprite = renderer::gx::EncodedSprite::new(image.as_raw(), image.width(), image.height());
+                    let sprite = rct::csg::EncodedSprite::new(image.as_raw(), image.width(), image.height());
                     archive.add_encoded_sprite(&sprite, image.width(), image.height(), image.offset.x, image.offset.y);
                 }
             }

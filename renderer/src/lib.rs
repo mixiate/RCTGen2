@@ -1,5 +1,4 @@
 mod framebuffer;
-pub mod gx;
 pub mod image;
 pub mod model;
 pub mod pack;

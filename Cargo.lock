@@ -677,6 +677,7 @@ dependencies = [
  "glam",
  "heapless",
  "rayon",
+ "rct",
  "renderer",
  "serde",
  "serde_json",
@@ -691,6 +692,7 @@ dependencies = [
  "clap",
  "glam",
  "rayon",
+ "rct",
  "renderer",
  "serde",
  "serde_json",
@@ -875,6 +877,14 @@ checksum = "22e18b0f0062d30d4230b2e85ff77fdfe4326feb054b9783a3460d8435c8ab91"
 dependencies = [
  "crossbeam-deque",
  "crossbeam-utils",
+]
+
+[[package]]
+name = "rct"
+version = "0.1.0"
+dependencies = [
+ "renderer",
+ "tempfile",
 ]
 
 [[package]]
@@ -1105,6 +1115,7 @@ dependencies = [
  "make-track",
  "png",
  "rayon",
+ "rct",
  "renderer",
  "serde_json",
 ]
