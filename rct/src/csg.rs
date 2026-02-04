@@ -15,6 +15,8 @@ const ENTRY_FLAG_TRANSPARENT: u16 = 1;
 const ENTRY_FLAG_RLE: u16 = 4;
 
 pub struct EncodedSprite {
+    width: i16,
+    height: i16,
     row_offsets: Vec<i16>,
     data: Vec<u8>,
 }
@@ -69,7 +71,12 @@ impl EncodedSprite {
             }
         }
 
-        Self { row_offsets, data }
+        Self {
+            width: i16::try_from(width).unwrap(),
+            height: i16::try_from(height).unwrap(),
+            row_offsets,
+            data,
+        }
     }
 }
 
@@ -100,11 +107,11 @@ impl Archive {
         self.data.extend(pixels);
     }
 
-    pub fn add_encoded_sprite(&mut self, encoded_sprite: &EncodedSprite, width: usize, height: usize, x: i32, y: i32) {
+    pub fn add_encoded_sprite(&mut self, encoded_sprite: &EncodedSprite, x: i32, y: i32) {
         self.entries.push(Entry {
             data_offset: u32::try_from(self.data.len()).unwrap(),
-            width: i16::try_from(width).unwrap(),
-            height: i16::try_from(height).unwrap(),
+            width: encoded_sprite.width,
+            height: encoded_sprite.height,
             offset_x: i16::try_from(x).unwrap(),
             offset_y: i16::try_from(y).unwrap(),
             flags: ENTRY_FLAG_TRANSPARENT | ENTRY_FLAG_RLE,
@@ -176,13 +183,7 @@ mod tests {
         );
         let encoded_sprite =
             crate::csg::EncodedSprite::new(test_image.as_raw(), test_image.width(), test_image.height());
-        archive.add_encoded_sprite(
-            &encoded_sprite,
-            test_image.width(),
-            test_image.height(),
-            test_image.offset.x,
-            test_image.offset.y,
-        );
+        archive.add_encoded_sprite(&encoded_sprite, test_image.offset.x, test_image.offset.y);
 
         let temp_dir = tempfile::tempdir().unwrap();
         let temp_file_path = temp_dir.path().join("images").with_extension("dat");

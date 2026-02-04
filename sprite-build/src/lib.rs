@@ -44,8 +44,6 @@ fn load_image_keep_palette(path: &std::path::Path) -> anyhow::Result<renderer::i
 
 struct Sprite {
     encoded_sprite: rct::csg::EncodedSprite,
-    width: usize,
-    height: usize,
     x: i32,
     y: i32,
 }
@@ -70,8 +68,6 @@ fn encode_sprite(
 
     Ok(Sprite {
         encoded_sprite: rct::csg::EncodedSprite::new(image.as_raw(), image.width(), image.height()),
-        width: image.width(),
-        height: image.height(),
         x: image.offset.x,
         y: image.offset.y,
     })
@@ -98,7 +94,7 @@ pub fn build(sprites_json_path: &std::path::Path, output_file_path: &std::path::
 
     let mut sprite_archive = rct::csg::Archive::with_capacity(sprites.len());
     for sprite in sprites {
-        sprite_archive.add_encoded_sprite(&sprite.encoded_sprite, sprite.width, sprite.height, sprite.x, sprite.y);
+        sprite_archive.add_encoded_sprite(&sprite.encoded_sprite, sprite.x, sprite.y);
     }
 
     sprite_archive

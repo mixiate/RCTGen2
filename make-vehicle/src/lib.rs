@@ -630,7 +630,7 @@ pub fn make_vehicle(
             for images in &images {
                 for image in images {
                     let sprite = rct::csg::EncodedSprite::new(image.as_raw(), image.width(), image.height());
-                    archive.add_encoded_sprite(&sprite, image.width(), image.height(), image.offset.x, image.offset.y);
+                    archive.add_encoded_sprite(&sprite, image.offset.x, image.offset.y);
                 }
             }
 
