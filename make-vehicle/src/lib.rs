@@ -620,9 +620,12 @@ pub fn make_vehicle(
         ImageOutputType::Dat => {
             let mut archive = renderer::gx::Archive::with_capacity(images.len() + 3);
 
-            archive.add_indexed_image(&preview_image);
-            archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
-            archive.add_indexed_image(&renderer::image::IndexedImage::new(1, 1));
+            archive.add_sprite(preview_image.as_raw(), preview_image.width(), preview_image.height(), 0, 0);
+
+            // previews 2 and 3, currently unimplemented
+            let empty_image = renderer::image::IndexedImage::new(1, 1);
+            archive.add_sprite(empty_image.as_raw(), empty_image.width(), empty_image.height(), 0, 0);
+            archive.add_sprite(empty_image.as_raw(), empty_image.width(), empty_image.height(), 0, 0);
 
             for images in &images {
                 for image in images {

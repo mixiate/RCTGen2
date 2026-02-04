@@ -86,17 +86,17 @@ impl Archive {
         }
     }
 
-    pub fn add_indexed_image(&mut self, image: &crate::image::IndexedImage) {
+    pub fn add_sprite(&mut self, pixels: &[u8], width: usize, height: usize, x: i32, y: i32) {
         self.entries.push(Entry {
             data_offset: u32::try_from(self.data.len()).unwrap(),
-            width: i16::try_from(image.width()).unwrap(),
-            height: i16::try_from(image.height()).unwrap(),
-            offset_x: i16::try_from(image.offset.x).unwrap(),
-            offset_y: i16::try_from(image.offset.y).unwrap(),
+            width: i16::try_from(width).unwrap(),
+            height: i16::try_from(height).unwrap(),
+            offset_x: i16::try_from(x).unwrap(),
+            offset_y: i16::try_from(y).unwrap(),
             flags: ENTRY_FLAG_TRANSPARENT,
             zoom_offset: 0,
         });
-        self.data.extend(image.as_raw());
+        self.data.extend(pixels);
     }
 
     pub fn add_encoded_sprite(&mut self, encoded_sprite: &EncodedSprite, width: usize, height: usize, x: i32, y: i32) {
@@ -165,7 +165,13 @@ mod tests {
         let test_image_path = test_files_directory.join("rle_test").with_extension("png");
         let test_image = crate::image::IndexedImage::load(&test_image_path, &crate::palette::PALETTE_FLAT).unwrap();
         let mut archive = crate::gx::Archive::with_capacity(2);
-        archive.add_indexed_image(&test_image);
+        archive.add_sprite(
+            test_image.as_raw(),
+            test_image.width(),
+            test_image.height(),
+            test_image.offset.x,
+            test_image.offset.y,
+        );
         let encoded_sprite =
             crate::gx::EncodedSprite::new(test_image.as_raw(), test_image.width(), test_image.height());
         archive.add_encoded_sprite(
