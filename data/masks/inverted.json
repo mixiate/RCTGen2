@@ -42,5 +42,45 @@
             "mask": "default/medium_turn_left_3.png",
             "offset": [[0, 0], [32, 16], [64, 0], [96, 16], [128, 0]]
         }
+    ],
+    "large_turn_left_to_diag": [
+        {
+            "mask": "inverted/large_turn_left_to_diag_0.png",
+            "offset": [[0, 0], [-32, 16], [0, 32], [-32, 48]]
+        },
+        {
+            "mask": "default/large_turn_left_to_diag_1.png",
+            "offset": [[0, 0], [-32, -16], [-64, 0], [-96, -16]]
+        },
+        {
+            "mask": "default/large_turn_left_to_diag_2.png",
+            "offset": [[0, 0], [32, -16], [0, -32], [32, -48]]
+        },
+        {
+            "mask": "default/large_turn_left_to_diag_3.png",
+            "offset": [[0, 0], [32, 16], [64, 0], [96, 16]]
+        }
+    ],
+    "large_turn_right_to_diag": [
+        {
+            "mirror": true,
+            "mask": "default/large_turn_left_to_diag_3.png",
+            "offset": [[0, 0], [-32, 16], [-64, 0], [-96, 16]]
+        },
+        {
+            "mirror": true,
+            "mask": "default/large_turn_left_to_diag_2.png",
+            "offset": [[0, 0], [-32, -16], [0, -32], [-32, -48]]
+        },
+        {
+            "mirror": true,
+            "mask": "default/large_turn_left_to_diag_1.png",
+            "offset": [[0, 0], [32, -16], [64, 0], [96, -16]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/large_turn_left_to_diag_0.png",
+            "offset": [[0, 0], [32, 16], [0, 32], [32, 48]]
+        }
     ]
 }
