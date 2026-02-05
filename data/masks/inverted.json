@@ -49,6 +49,56 @@
             "mask": "default/single_tile.png"
         }
     ],
+    "gentle_to_steep": [
+        {
+            "mask": "default/single_tile.png",
+            "mask_end": true
+        },
+        {
+            "mask": "inverted/gentle_to_steep_1.png",
+            "transfer": [true, false]
+        },
+        {
+            "mask": "inverted/gentle_to_steep_2.png",
+            "transfer": [true, false]
+        },
+        {
+            "mask": "default/single_tile.png",
+            "mask_end": true
+        }
+    ],
+    "steep_to_gentle": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "steep": [
+        {
+            "mask": "default/single_tile.png",
+            "mask_end": true
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png",
+            "mask_end": true
+        }
+    ],
     "small_turn_left": [
         {
             "mask": "default/small_turn_left_0.png",
