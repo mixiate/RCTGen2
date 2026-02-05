@@ -7,6 +7,48 @@
             "mask": "default/single_tile.png"
         }
     ],
+    "flat_to_gentle": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_to_flat": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
     "small_turn_left": [
         {
             "mask": "default/small_turn_left_0.png",
