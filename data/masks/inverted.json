@@ -6,5 +6,23 @@
         {
             "mask": "default/single_tile.png"
         }
+    ],
+    "small_turn_left": [
+        {
+            "mask": "default/small_turn_left_0.png",
+            "offset": [[0, 0], [-32, 16], [0, 32]]
+        },
+        {
+            "mask": "default/small_turn_left_1.png",
+            "offset": [[0, 0], [-32, -16], [-64, 0]]
+        },
+        {
+            "mask": "default/small_turn_left_2.png",
+            "offset": [[0, 0], [32, -16], [0, -32]]
+        },
+        {
+            "mask": "default/small_turn_left_3.png",
+            "offset": [[0, 0], [32, 16], [64, 0]]
+        }
     ]
 }
