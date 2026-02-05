@@ -24,5 +24,23 @@
             "mask": "default/small_turn_left_3.png",
             "offset": [[0, 0], [32, 16], [64, 0]]
         }
+    ],
+    "medium_turn_left": [
+        {
+            "mask": "inverted/medium_turn_left_0.png",
+            "offset": [[0, 0], [-32, 16], [0, 32], [-32, 48], [0, 64]]
+        },
+        {
+            "mask": "default/medium_turn_left_1.png",
+            "offset": [[0, 0], [-32, -16], [-64, 0], [-96, -16], [-128, 0]]
+        },
+        {
+            "mask": "inverted/medium_turn_left_2.png",
+            "offset": [[0, 0], [32, -16], [0, -32], [32, -48], [0, -64]]
+        },
+        {
+            "mask": "default/medium_turn_left_3.png",
+            "offset": [[0, 0], [32, 16], [64, 0], [96, 16], [128, 0]]
+        }
     ]
 }
