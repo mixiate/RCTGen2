@@ -6,6 +6,7 @@ pub(crate) struct Fragment {
     pub(crate) edge_type: Option<crate::renderer::EdgeType>,
     pub(crate) palette_region_type: Option<crate::palette::RegionType>,
     pub(crate) is_mask: bool,
+    pub(crate) no_bleed: bool,
 }
 
 impl Default for Fragment {
@@ -17,6 +18,7 @@ impl Default for Fragment {
             edge_type: None,
             palette_region_type: None,
             is_mask: false,
+            no_bleed: false,
         }
     }
 }
@@ -105,6 +107,7 @@ impl Framebuffer {
         for y in min_y..max_y {
             for x in (min_x..max_x).rev() {
                 let fragment = &self.buffer[y * self.width + x];
+                let no_bleed = fragment.no_bleed;
                 if let Some(palette_region_type) = fragment.palette_region_type {
                     // not sure about this
                     let colour =
@@ -118,8 +121,10 @@ impl Framebuffer {
                         let weights: [f32; 4] = [7.0 / 16.0, 3.0 / 16.0, 5.0 / 16.0, 1.0 / 16.0];
 
                         for (point, weight) in points.iter().zip(weights) {
-                            self.buffer[point[1] * self.width + point[0]].colour +=
-                                nearest_colour.error * (0.3 * weight);
+                            let next_fragment_index = point[0] + (point[1] * self.width);
+                            if !no_bleed || self.buffer[next_fragment_index].no_bleed {
+                                self.buffer[next_fragment_index].colour += nearest_colour.error * (0.3 * weight);
+                            }
                         }
                     }
                 }

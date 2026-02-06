@@ -92,7 +92,7 @@ pub fn render_scene(
         for x in 0..framebuffer.width() {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
 
-            let (depth, ghost_depth, edge_type, palette_region_type, is_mask) = {
+            let (depth, ghost_depth, edge_type, palette_region_type, is_mask, no_bleed) = {
                 let ray_origin = camera_inverse.transform_vector3(ray_origin);
                 match scene.trace_ray(mesh_types, &ray_origin, &ray_direction) {
                     Some(crate::raytrace::RayHit::Mesh(hit)) => (
@@ -101,12 +101,13 @@ pub fn render_scene(
                         hit.mesh.material.edge_type,
                         Some(hit.mesh.material.palette_region_type),
                         false,
+                        hit.mesh.material.no_bleed,
                     ),
-                    Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, f32::INFINITY, None, None, true),
+                    Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, f32::INFINITY, None, None, true, false),
                     Some(crate::raytrace::RayHit::Ghost(ghost_depth)) => {
-                        (f32::INFINITY, ghost_depth, None, None, false)
+                        (f32::INFINITY, ghost_depth, None, None, false, false)
                     }
-                    _ => (f32::INFINITY, f32::INFINITY, None, None, false),
+                    _ => (f32::INFINITY, f32::INFINITY, None, None, false, false),
                 }
             };
 
@@ -130,6 +131,7 @@ pub fn render_scene(
                             fragment.ghost_depth = hit.ghost_depth;
                             fragment.edge_type = material.edge_type;
                             fragment.palette_region_type = Some(material.palette_region_type);
+                            fragment.no_bleed = material.no_bleed;
 
                             let uv = {
                                 let uvs = [
@@ -234,7 +236,9 @@ pub fn render_scene(
                     let mut weight = 0.0;
                     let mut total_weight = 0.0;
                     for sample in samples.iter().filter(|x| !x.is_mask) {
-                        if !(sample.ghost_depth <= depth + edge_distance && sample.depth > depth + edge_distance) {
+                        if (!sample.no_bleed || no_bleed)
+                            && !(sample.ghost_depth <= depth + edge_distance && sample.depth > depth + edge_distance)
+                        {
                             if sample.depth <= depth + edge_distance && sample.palette_region_type.is_some() {
                                 colour += sample.colour * sample_weight;
                                 weight += sample_weight;
@@ -252,7 +256,7 @@ pub fn render_scene(
                 } else {
                     let colour = samples
                         .iter()
-                        .filter(|x| x.palette_region_type.is_some())
+                        .filter(|x| x.palette_region_type.is_some() && (!x.no_bleed || no_bleed))
                         .map(|x| x.colour)
                         .sum::<glam::Vec3>();
                     let sample_count = samples.iter().filter(|x| x.palette_region_type.is_some()).count();

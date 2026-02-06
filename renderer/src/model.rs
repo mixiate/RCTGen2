@@ -25,6 +25,7 @@ pub struct Material {
     pub(crate) palette_region_type: crate::palette::RegionType,
     pub(crate) use_ao: bool,
     pub(crate) shadows: bool,
+    pub(crate) no_bleed: bool,
 }
 
 impl Material {
@@ -33,6 +34,7 @@ impl Material {
         let mut use_ao = true;
         let mut edge_type = None;
         let mut shadows = true;
+        let mut no_bleed = false;
         for segment in mtl.name.split('_') {
             match segment {
                 "Remap1" => palette_region_type = crate::palette::RegionType::Remap1,
@@ -44,6 +46,7 @@ impl Material {
                 "Edge" => edge_type = Some(crate::renderer::EdgeType::Light),
                 "DarkEdge" => edge_type = Some(crate::renderer::EdgeType::Dark),
                 "NoShadows" => shadows = false,
+                "NoBleed" => no_bleed = true,
                 _ => {}
             }
         }
@@ -80,6 +83,7 @@ impl Material {
             palette_region_type,
             use_ao,
             shadows,
+            no_bleed,
         })
     }
 }
