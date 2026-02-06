@@ -391,6 +391,112 @@
             "mask": "default/single_tile.png"
         }
     ],
+    "flat_to_left_bank_diag": [
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
+    "flat_to_right_bank_diag": [
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
+    "left_bank_to_gentle_diag": [
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_in_front": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_in_front": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
+    "right_bank_to_gentle_diag": [
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_in_front": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_in_front": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
+    "gentle_to_left_bank_diag": [
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_behind": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_behind": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
+    "gentle_to_right_bank_diag": [
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_behind": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png",
+            "extrude_behind": true
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
+    "left_bank_diag": [
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        },
+        {
+            "mask": "default/single_tile_diag.png"
+        }
+    ],
     "small_turn_left_bank": [
         {
             "mask": "default/small_turn_left_bank_0.png",
