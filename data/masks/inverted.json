@@ -965,5 +965,25 @@
             "mask": "inverted/medium_turn_left_gentle_0.png",
             "offset": [[6, -3], [32, 32], [16, 48], [16, 72], [-6, 109]]
         }
+    ],
+    "s_bend_left": [
+        {
+            "mask": "inverted/s_bend_left_0.png",
+            "offset": [[0, 0], [-32, 16], [0, 32], [-32, 48]]
+        },
+        {
+            "mask": "default/s_bend_left_1.png",
+            "offset": [[0, 0], [-32, -16], [-64, 0], [-96, -16]]
+        }
+    ],
+    "s_bend_right": [
+        {
+            "mask": "default/s_bend_right_0.png",
+            "offset": [[0, 0], [-32, 16], [-64, 0], [-96, 16]]
+        },
+        {
+            "mask": "inverted/s_bend_right_1.png",
+            "offset": [[0, 0], [-32, -16], [0, -32], [-32, -48]]
+        }
     ]
 }
