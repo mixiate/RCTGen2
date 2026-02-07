@@ -985,5 +985,45 @@
             "mask": "inverted/s_bend_right_1.png",
             "offset": [[0, 0], [-32, -16], [0, -32], [-32, -48]]
         }
+    ],
+    "inline_twist_left": [
+        {
+            "mask": "inverted/inline_twist_left_0.png",
+            "offset": [[-6, -3], [-38, 13], [-70, 45]]
+        },
+        {
+            "mask": "inverted/inline_twist_left_1.png",
+            "offset": [[6, -3], [-26, -19], [-58, -19]]
+        },
+        {
+            "mask": "inverted/inline_twist_left_2.png",
+            "offset": [[-6, -3], [26, -19], [58, -19]]
+        },
+        {
+            "mask": "inverted/inline_twist_left_3.png",
+            "offset": [[6, -3], [38, 13], [70, 45]]
+        }
+    ],
+    "inline_twist_right": [
+        {
+            "mirror": true,
+            "mask": "inverted/inline_twist_left_3.png",
+            "offset": [[-6, -3], [-38, 13], [-70, 45]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/inline_twist_left_2.png",
+            "offset": [[6, -3], [-26, -19], [-58, -19]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/inline_twist_left_1.png",
+            "offset": [[-6, -3], [26, -19], [58, -19]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/inline_twist_left_0.png",
+            "offset": [[6, -3], [38, 13], [70, 45]]
+        }
     ]
 }
