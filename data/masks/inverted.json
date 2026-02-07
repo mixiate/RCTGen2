@@ -689,5 +689,201 @@
             "mirror": true,
             "mask": "inverted/very_small_turn_left_steep_0.png"
         }
+    ],
+    "gentle_to_gentle_left_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_to_gentle_right_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_left_bank_to_gentle": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_right_bank_to_gentle": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "left_bank_to_gentle_left_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "right_bank_to_gentle_right_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_left_bank_to_left_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_right_bank_to_right_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_left_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_right_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "flat_to_gentle_left_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "flat_to_gentle_right_bank": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_left_bank_to_flat": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "gentle_right_bank_to_flat": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
     ]
 }
