@@ -652,5 +652,42 @@
             "mask": "inverted/medium_turn_left_gentle_0.png",
             "offset": [[6, -3], [32, 32], [16, 48], [16, 72], [-6, 109]]
         }
+    ],
+    "very_small_turn_left_steep": [
+        {
+            "mask": "inverted/very_small_turn_left_steep_0.png"
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [false, false]
+        },
+        {
+            "mask": "inverted/very_small_turn_left_steep_3.png",
+            "transfer": [true]
+        }
+    ],
+    "very_small_turn_right_steep": [
+        {
+            "mirror": true,
+            "mask": "inverted/very_small_turn_left_steep_3.png",
+            "transfer": [true]
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [false, false]
+        },
+        {
+            "mirror": true,
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/very_small_turn_left_steep_0.png"
+        }
     ]
 }
