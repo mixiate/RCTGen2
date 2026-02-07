@@ -1025,5 +1025,25 @@
             "mask": "inverted/inline_twist_left_0.png",
             "offset": [[6, -3], [38, 13], [70, 45]]
         }
+    ],
+    "half_loop": [
+        {
+            "mask": "inverted/half_loop_0.png",
+            "offset": [[-6, -3], [-32, 32], [-48, 56], [-32, 136]]
+        },
+        {
+            "mask": "inverted/half_loop_1.png",
+            "offset": [[6, -3], [-18, -7], [-76, -6], [-32, 104]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/half_loop_1.png",
+            "offset": [[-6, -3], [26, -3], [58, -13], [16, 96]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/half_loop_0.png",
+            "offset": [[6, -3], [38, 29], [64, 48], [48, 128]]
+        }
     ]
 }
