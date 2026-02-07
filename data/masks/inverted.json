@@ -1085,5 +1085,45 @@
             "mask": "default/vertical_loop_left_0.png",
             "offset": [[6, -3], [32, 32], [48, 56], [32, 136]]
         }
+    ],
+    "corkscrew_left": [
+        {
+            "mask": "inverted/corkscrew_left_0.png",
+            "offset": [[0, 0], [-32, 40], [0, 80]]
+        },
+        {
+            "mask": "inverted/corkscrew_left_1.png",
+            "offset": [[0, 0], [-32, 8], [-64, 48]]
+        },
+        {
+            "mask": "inverted/corkscrew_left_2.png",
+            "offset": [[0, 0], [32, 8], [0, 16]]
+        },
+        {
+            "mask": "inverted/corkscrew_left_3.png",
+            "offset": [[0, 0], [32, 40], [64, 48]]
+        }
+    ],
+    "corkscrew_right": [
+        {
+            "mirror": true,
+            "mask": "inverted/corkscrew_left_3.png",
+            "offset": [[0, 0], [-32, 40], [-64, 48]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/corkscrew_left_2.png",
+            "offset": [[0, 0], [-32, 8], [0, 16]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/corkscrew_left_1.png",
+            "offset": [[0, 0], [32, 8], [64, 48]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/corkscrew_left_0.png",
+            "offset": [[0, 0], [32, 40], [0, 80]]
+        }
     ]
 }
