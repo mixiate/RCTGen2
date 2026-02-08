@@ -1086,6 +1086,46 @@
             "offset": [[6, -3], [32, 32], [48, 56], [32, 136]]
         }
     ],
+    "large_half_loop_left": [
+        {
+            "mask": "inverted/large_half_loop_left_0.png",
+            "offset": [[0, 0], [-32, 32], [-64, 64], [-96, 112], [-96, 200], [-64, 128], [-32, 296]]
+        },
+        {
+            "mask": "default/large_half_loop_left_1.png",
+            "offset": [[0, 0], [-32, 0], [-64, 0], [-96, 16], [-160, 72], [-128, 32], [-96, 232]]
+        },
+        {
+            "mask": "inverted/large_half_loop_left_2.png",
+            "offset": [[0, 0], [32, 0], [64, 0], [96, 16], [96, 40], [64, 0], [32, 200]]
+        },
+        {
+            "mask": "default/large_half_loop_left_3.png",
+            "offset": [[0, 0], [32, 32], [64, 64], [96, 112], [160, 168], [128, 96], [96, 264]]
+        }
+    ],
+    "large_half_loop_right": [
+        {
+            "mirror": true,
+            "mask": "default/large_half_loop_left_3.png",
+            "offset": [[0, 0], [-32, 32], [-64, 64], [-96, 112], [-160, 168], [-128, 96], [-96, 264]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/large_half_loop_left_2.png",
+            "offset": [[0, 0], [-32, 0], [-64, 0], [-96, 16], [-96, 40], [-64, 0], [-32, 200]]
+        },
+        {
+            "mirror": true,
+            "mask": "default/large_half_loop_left_1.png",
+            "offset": [[0, 0], [32, 0], [64, 0], [96, 16], [160, 72], [128, 32], [96, 232]]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/large_half_loop_left_0.png",
+            "offset": [[0, 0], [32, 32], [64, 64], [96, 112], [96, 200], [64, 128], [32, 296]]
+        }
+    ],
     "corkscrew_left": [
         {
             "mask": "inverted/corkscrew_left_0.png",
