@@ -99,6 +99,50 @@
             "mask_end": true
         }
     ],
+    "steep_to_vertical": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
+    "vertical_to_steep": [
+        {
+            "mask": "default/single_tile.png",
+            "mask_end": true
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png",
+            "mask_end": true
+        }
+    ],
+    "vertical": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
     "small_turn_left": [
         {
             "mask": "default/small_turn_left_0.png",
@@ -688,6 +732,41 @@
         {
             "mirror": true,
             "mask": "inverted/very_small_turn_left_steep_0.png"
+        }
+    ],
+    "vertical_twist_left": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "inverted/vertical_twist_left_2.png",
+            "split": [false, false]
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        }
+    ],
+    "vertical_twist_right": [
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mirror": true,
+            "mask": "inverted/vertical_twist_left_2.png",
+            "split": [false, false]
+        },
+        {
+            "mask": "default/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "default/single_tile.png"
         }
     ],
     "gentle_to_gentle_left_bank": [
