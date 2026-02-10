@@ -1127,7 +1127,7 @@
     ],
     "vertical_loop_left": [
         {
-            "mask": "default/vertical_loop_left_0.png",
+            "mask": "inverted/vertical_loop_left_0.png",
             "offset": [[-6, -3], [-32, 32], [-48, 56], [-32, 136]]
         },
         {
@@ -1161,7 +1161,7 @@
         },
         {
             "mirror": true,
-            "mask": "default/vertical_loop_left_0.png",
+            "mask": "inverted/vertical_loop_left_0.png",
             "offset": [[6, -3], [32, 32], [48, 56], [32, 136]]
         }
     ],
