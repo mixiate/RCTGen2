@@ -1200,8 +1200,7 @@
             "offset": [[0, 0], [32, 0], [64, 0], [96, 16], [160, 72], [128, 32], [96, 232]]
         },
         {
-            "mirror": true,
-            "mask": "inverted/large_half_loop_left_0.png",
+            "mask": "inverted/large_half_loop_right_3.png",
             "offset": [[0, 0], [32, 32], [64, 64], [96, 112], [96, 200], [64, 128], [32, 296]]
         }
     ],
