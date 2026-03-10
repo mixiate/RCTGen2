@@ -2,6 +2,8 @@
 struct Cli {
     track_description_file_path: std::path::PathBuf,
     output_directory: std::path::PathBuf,
+    #[arg(long)]
+    skip_empty_sprites: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -26,7 +28,12 @@ fn main() -> anyhow::Result<()> {
     let output_directory = std::path::absolute(&cli.output_directory)
         .with_context(|| format!("Invalid file path {}", cli.output_directory.display()))?;
 
-    make_track::make_track(&data_directory, &track_description_file_path, &output_directory)?;
+    make_track::make_track(
+        &data_directory,
+        &track_description_file_path,
+        &output_directory,
+        cli.skip_empty_sprites,
+    )?;
 
     println!("Time taken: {} seconds", start_time.elapsed().as_secs_f32());
 

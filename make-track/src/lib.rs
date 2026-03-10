@@ -214,6 +214,11 @@ fn render_track_section(
     })
 }
 
+fn is_sprite_empty(image: &renderer::image::IndexedImage) -> bool {
+    image.width() == 1 && image.height() == 1 && image.get_pixel(0, 0) == 0
+}
+
+#[expect(clippy::too_many_arguments)]
 fn split_track_section(
     images: Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>,
     views: &[mask::View],
@@ -221,6 +226,7 @@ fn split_track_section(
     track_section: &track_sections::TrackSection,
     track_z_offset: i32,
     track_name: &str,
+    skip_empty_sprites: bool,
     output_directory: &std::path::Path,
 ) -> anyhow::Result<Vec<sprites_json::Sprite>> {
     let mut sprite_descs = Vec::new();
@@ -247,7 +253,11 @@ fn split_track_section(
             split::split_image(&image, view, mask_y_offset)
         };
 
-        for (sprite_index, image) in split_images.iter().enumerate() {
+        for (sprite_index, image) in split_images
+            .iter()
+            .filter(|x| if skip_empty_sprites { !is_sprite_empty(x) } else { true })
+            .enumerate()
+        {
             let image_name = if view.sprites.len() > 1 {
                 format!("{}_{view_index}_{sprite_index}", track_section.name)
             } else {
@@ -484,6 +494,7 @@ fn render(
     data_directory: &std::path::Path,
     base_directory: &std::path::Path,
     output_directory: &std::path::Path,
+    skip_empty_sprites: bool,
 ) -> anyhow::Result<Vec<TrackSectionSprites>> {
     use anyhow::Context as _;
     use rayon::prelude::*;
@@ -537,6 +548,7 @@ fn render(
                             track_section,
                             track.z_offset as i32,
                             &track.name,
+                            skip_empty_sprites,
                             &output_directory,
                         )?;
                         Ok(TrackSectionSprites {
@@ -622,6 +634,7 @@ pub fn make_track(
     data_directory: &std::path::Path,
     track_description_file_path: &std::path::Path,
     output_directory: &std::path::Path,
+    skip_empty_sprites: bool,
 ) -> anyhow::Result<()> {
     use anyhow::Context as _;
 
@@ -634,7 +647,13 @@ pub fn make_track(
         )
     })?;
 
-    let sprites = render(&desc, data_directory, base_directory, output_directory)?;
+    let sprites = render(
+        &desc,
+        data_directory,
+        base_directory,
+        output_directory,
+        skip_empty_sprites,
+    )?;
     output_sprites_json(sprites, output_directory)?;
 
     Ok(())
