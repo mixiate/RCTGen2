@@ -2357,7 +2357,7 @@
         },
         {
             "mask": "default/medium_quarter_helix_left_banked_1.png",
-            "offset": [[0, 0], [-32, -16], [-64, 0], [-96, -16], [-128, 0]]
+            "offset": [[0, 0], [-32, -16], [-96, -16], [-128, 0]]
         },
         {
             "mask": "default/medium_quarter_helix_left_banked_2.png",
@@ -2384,7 +2384,7 @@
         {
             "mirror": true,
             "mask": "default/medium_quarter_helix_left_banked_1.png",
-            "offset": [[0, 0], [32, -16], [64, 0], [96, -16], [128, 0]]
+            "offset": [[0, 0], [32, -16], [96, -16], [128, 0]]
         },
         {
             "mirror": true,
