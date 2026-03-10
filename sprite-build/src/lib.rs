@@ -1,12 +1,16 @@
 fn load_image(path: &std::path::Path) -> anyhow::Result<renderer::image::IndexedImage> {
-    let image = image::ImageReader::open(path)?.decode()?.to_rgb8();
+    let image = image::ImageReader::open(path)?.decode()?.to_rgba8();
     let width = usize::try_from(image.width())?;
     let height = usize::try_from(image.height())?;
 
     let pixels = {
         let mut pixels = vec![0; width * height];
         for (source, dest) in image.pixels().zip(pixels.iter_mut()) {
-            let dest_index = renderer::palette::PALETTE.iter().position(|x| *x == source.0).unwrap_or(0);
+            let dest_index = if source.0[3] == 255 {
+                renderer::palette::PALETTE.iter().position(|x| *x == source.0[0..3]).unwrap_or(0)
+            } else {
+                0
+            };
             *dest = u8::try_from(dest_index)?;
         }
         pixels
