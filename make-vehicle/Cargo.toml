@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0.100"
 clap = { version = "4.5.53", features = ["derive"] }
 glam = "0.30.9"
+openrct2 = { path = "../openrct2" }
 rayon = "1.11.0"
 rct = { path = "../rct" }
 renderer = { path = "../renderer" }

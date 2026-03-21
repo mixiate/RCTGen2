@@ -583,6 +583,7 @@ pub fn make_vehicle(
     image_output_type: ImageOutputType,
 ) -> anyhow::Result<()> {
     use anyhow::Context as _;
+    use openrct2::objects::image as object_image;
 
     let ride_description_path = ride_description_path
         .canonicalize()
@@ -639,7 +640,7 @@ pub fn make_vehicle(
             file_paths.push(file_path);
 
             let lgx_string = format!("$LGX:images.dat[0..{}]", archive.len() - 1);
-            vec![ride_object::Image::Gx(lgx_string)]
+            vec![object_image::Image::String(lgx_string)]
         }
         ImageOutputType::Atlas(atlas_type) => {
             let images_directory = output_directory.join("images");
@@ -654,19 +655,16 @@ pub fn make_vehicle(
             file_paths.push(preview_output_file_path);
 
             let mut object_images = vec![
-                ride_object::Image::ImageFile(ride_object::ImageFile {
+                object_image::Image::ImageFile(object_image::ImageFile {
                     path: "images/preview.png".to_string(),
-                    x: 0,
-                    y: 0,
-                    src_x: None,
-                    src_y: None,
-                    src_width: None,
-                    src_height: None,
-                    format: Some(ride_object::ImageFormat::Raw),
-                    palette: ride_object::ImagePaletteType::Keep,
+                    x: Some(0),
+                    y: Some(0),
+                    format: Some(object_image::Format::Raw),
+                    palette: Some(object_image::PaletteType::Keep),
+                    ..Default::default()
                 }),
-                ride_object::Image::Gx("".to_owned()),
-                ride_object::Image::Gx("".to_owned()),
+                object_image::Image::String("".to_owned()),
+                object_image::Image::String("".to_owned()),
             ];
 
             for (i, images) in images.iter().enumerate() {
@@ -679,16 +677,16 @@ pub fn make_vehicle(
                 atlas.image.save(&file_path)?;
 
                 for (image, coord) in images.iter().zip(atlas.coords.iter()) {
-                    object_images.push(ride_object::Image::ImageFile(ride_object::ImageFile {
+                    object_images.push(object_image::Image::ImageFile(object_image::ImageFile {
                         path: format!("images/car_{i}.png"),
-                        x: image.offset.x,
-                        y: image.offset.y,
+                        x: Some(image.offset.x),
+                        y: Some(image.offset.y),
                         src_x: Some(coord.x),
                         src_y: Some(coord.y),
                         src_width: Some(image.width().try_into().unwrap()),
                         src_height: Some(image.height().try_into().unwrap()),
                         format: None,
-                        palette: ride_object::ImagePaletteType::Keep,
+                        palette: Some(object_image::PaletteType::Keep),
                     }));
                 }
 

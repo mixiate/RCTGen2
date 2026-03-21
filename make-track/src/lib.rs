@@ -228,7 +228,7 @@ fn split_track_section(
     track_name: &str,
     skip_empty_sprites: bool,
     output_directory: &std::path::Path,
-) -> anyhow::Result<Vec<sprites_json::Sprite>> {
+) -> anyhow::Result<Vec<openrct2::objects::image::ImageFile>> {
     let mut sprite_descs = Vec::new();
     for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images) {
         let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track_z_offset);
@@ -266,7 +266,13 @@ fn split_track_section(
             image.save(&output_directory.join(&image_name).with_extension("png"))?;
 
             let relative_file_path = format!("track/{}/{image_name}.png", track_name);
-            sprite_descs.push(sprites_json::Sprite::new(&relative_file_path, image.offset));
+            sprite_descs.push(openrct2::objects::image::ImageFile {
+                path: relative_file_path.to_owned(),
+                x: Some(image.offset.x),
+                y: Some(image.offset.y),
+                palette: Some(openrct2::objects::image::PaletteType::Keep),
+                ..Default::default()
+            });
         }
     }
 
@@ -486,7 +492,7 @@ fn list_track_sections(
 struct TrackSectionSprites {
     track_name: String,
     track_section_name: &'static str,
-    sprites: Vec<sprites_json::Sprite>,
+    sprites: Vec<openrct2::objects::image::ImageFile>,
 }
 
 fn render(

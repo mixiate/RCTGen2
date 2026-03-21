@@ -1,35 +1,7 @@
-#[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum PaletteType {
-    Keep,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct Sprite {
-    pub path: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub x: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub y: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub palette: Option<PaletteType>,
-}
-
-impl Sprite {
-    pub fn new(path: &str, offset: glam::IVec2) -> Self {
-        Self {
-            path: path.to_owned(),
-            x: Some(offset.x),
-            y: Some(offset.y),
-            palette: Some(PaletteType::Keep),
-        }
-    }
-}
-
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(transparent)]
 pub struct Sprites {
-    pub sprites: Vec<Sprite>,
+    pub sprites: Vec<openrct2::objects::image::ImageFile>,
 }
 
 impl Sprites {

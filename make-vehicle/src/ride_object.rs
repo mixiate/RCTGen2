@@ -418,40 +418,6 @@ struct ObjectStrings {
     capacity: ObjectString,
 }
 
-#[derive(Clone, Copy, Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum ImageFormat {
-    Raw,
-}
-
-#[derive(Clone, Copy, Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum ImagePaletteType {
-    Keep,
-}
-
-#[serde_with::skip_serializing_none]
-#[derive(Clone, Debug, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageFile {
-    pub path: String,
-    pub x: i32,
-    pub y: i32,
-    pub src_x: Option<i32>,
-    pub src_y: Option<i32>,
-    pub src_width: Option<i32>,
-    pub src_height: Option<i32>,
-    pub format: Option<ImageFormat>,
-    pub palette: ImagePaletteType,
-}
-
-#[derive(Clone, Debug, serde::Serialize)]
-#[serde(untagged)]
-pub enum Image {
-    Gx(String),
-    ImageFile(ImageFile),
-}
-
 #[serde_with::skip_serializing_none]
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -463,11 +429,11 @@ pub struct RideObject {
     object_type: ObjectType,
     properties: Properties,
     strings: ObjectStrings,
-    images: Vec<Image>,
+    images: Vec<openrct2::objects::image::Image>,
 }
 
 impl RideObject {
-    pub fn new(ride_desc: &crate::ride_desc::Ride, images: Vec<Image>) -> Self {
+    pub fn new(ride_desc: &crate::ride_desc::Ride, images: Vec<openrct2::objects::image::Image>) -> Self {
         let head_cars: Vec<i32> =
             ride_desc.configuration.front.iter().chain(ride_desc.configuration.second.iter()).copied().collect();
 

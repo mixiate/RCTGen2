@@ -53,13 +53,13 @@ struct Sprite {
 }
 
 fn encode_sprite(
-    sprite: &make_track::sprites_json::Sprite,
+    sprite: &openrct2::objects::image::ImageFile,
     base_directory: &std::path::Path,
 ) -> anyhow::Result<Sprite> {
     use anyhow::Context as _;
 
     let image_file_path = base_directory.join(&sprite.path);
-    let image = if sprite.palette == Some(make_track::sprites_json::PaletteType::Keep) {
+    let image = if sprite.palette == Some(openrct2::objects::image::PaletteType::Keep) {
         load_image_keep_palette(&image_file_path)
     } else {
         load_image(&image_file_path)
@@ -77,6 +77,12 @@ fn encode_sprite(
     })
 }
 
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
+struct Sprites {
+    sprites: Vec<openrct2::objects::image::ImageFile>,
+}
+
 pub fn build(sprites_json_path: &std::path::Path, output_file_path: &std::path::Path) -> anyhow::Result<()> {
     use anyhow::Context as _;
     use rayon::prelude::*;
@@ -87,7 +93,7 @@ pub fn build(sprites_json_path: &std::path::Path, output_file_path: &std::path::
 
     let sprites = std::fs::read_to_string(sprites_json_path)
         .with_context(|| format!("Could not read file {}", sprites_json_path.display()))?;
-    let sprites = serde_json::from_str::<make_track::sprites_json::Sprites>(&sprites)
+    let sprites = serde_json::from_str::<Sprites>(&sprites)
         .with_context(|| format!("Could not parse json in file {}", sprites_json_path.display()))?;
 
     let sprites = sprites
