@@ -9,7 +9,13 @@ fn test_make_track(track_name: &str) {
     let output_directory = tempfile::tempdir().unwrap();
     let expected_directory = test_files_directory.join("output").join(track_name);
 
-    make_track::make_track(&data_directory, &track_description_file_path, output_directory.path()).unwrap();
+    make_track::make_track(
+        &data_directory,
+        &track_description_file_path,
+        output_directory.path(),
+        false,
+    )
+    .unwrap();
 
     let output_sprites_directory = output_directory.path().join("track").join(track_name);
     let expected_sprites_directory = expected_directory.join("track").join(track_name);
