@@ -1,0 +1,7 @@
+[target.'cfg(target_os = "macos")']
+rustflags = [
+    "-L",
+    "native=/opt/homebrew/lib",
+    "-L",
+    "native=/usr/local/lib",
+]
