@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-embree4-sys = "0.0.12"
+embree4-sys = { git = "https://github.com/mixiate/embree4-sys.git", rev = "0d97ff7542807fe6bc8361bc735281ccb673146d" }
 
 [lints]
 workspace = true
