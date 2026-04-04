@@ -4,20 +4,20 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.100"
-clap = { version = "4.5.53", features = ["derive"] }
-glam = "0.30.9"
+anyhow = "1.0.102"
+clap = { version = "4.6.0", features = ["derive"] }
+glam = "0.32.1"
 openrct2 = { path = "../openrct2" }
 rayon = "1.11.0"
 rct = { path = "../rct" }
 renderer = { path = "../renderer" }
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.145"
-serde_with = "3.16.1"
-zip = { version = "6.0.0", default-features = false, features = ["deflate"] }
+serde_json = "1.0.149"
+serde_with = "3.18.0"
+zip = { version = "8.5.0", default-features = false, features = ["deflate"] }
 
 [lints]
 workspace = true
 
 [dev-dependencies]
-tempfile = "3.23.0"
+tempfile = "3.27.0"

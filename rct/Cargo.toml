@@ -10,4 +10,4 @@ workspace = true
 
 [dev-dependencies]
 renderer = { path = "../renderer" }
-tempfile = "3.24.0"
+tempfile = "3.27.0"
