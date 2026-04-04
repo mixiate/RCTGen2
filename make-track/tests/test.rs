@@ -31,11 +31,11 @@ fn test_make_track(track_name: &str) {
 
         let output_file_path = entry.path();
         let output_file = renderer::image::IndexedImage::load(&output_file_path, &renderer::palette::PALETTE_FLAT)
-            .expect(&format!("Could not open {output_file_path:?}"));
+            .unwrap_or_else(|_| panic!("Could not open {output_file_path:?}"));
 
         let expected_file_path = expected_sprites_directory.join(entry.file_name());
         let expected_file = renderer::image::IndexedImage::load(&expected_file_path, &renderer::palette::PALETTE_FLAT)
-            .expect(&format!("Could not open {expected_file_path:?}"));
+            .unwrap_or_else(|_| panic!("Could not open {expected_file_path:?}"));
 
         assert!(
             output_file.as_raw() == expected_file.as_raw(),
