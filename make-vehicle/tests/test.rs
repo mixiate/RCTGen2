@@ -1,7 +1,7 @@
 struct RideObjectFiles {
     object_json: serde_json::Value,
-    car_0_image: Vec<u8>,
-    preview_image: Vec<u8>,
+    car_0_image: renderer::image::IndexedImage,
+    preview_image: renderer::image::IndexedImage,
 }
 
 fn read_ride_object_files(object_directory: &std::path::Path) -> RideObjectFiles {
@@ -10,10 +10,12 @@ fn read_ride_object_files(object_directory: &std::path::Path) -> RideObjectFiles
     let object_json = serde_json::from_slice(&object_json).unwrap();
 
     let car_0_image_file_path = object_directory.join("images").join("car_0").with_extension("png");
-    let car_0_image = std::fs::read(&car_0_image_file_path).unwrap();
+    let car_0_image = renderer::image::IndexedImage::load(&car_0_image_file_path, &renderer::palette::PALETTE_FLAT)
+        .unwrap_or_else(|_| panic!("Could not open {car_0_image_file_path:?}"));
 
     let preview_image_file_path = object_directory.join("images").join("preview").with_extension("png");
-    let preview_image = std::fs::read(&preview_image_file_path).unwrap();
+    let preview_image = renderer::image::IndexedImage::load(&preview_image_file_path, &renderer::palette::PALETTE_FLAT)
+        .unwrap_or_else(|_| panic!("Could not open {preview_image_file_path:?}"));
 
     RideObjectFiles {
         object_json,
@@ -46,6 +48,6 @@ fn test_make_vehicle() {
     let expected_files = read_ride_object_files(&expected_directory);
 
     assert!(output_files.object_json == expected_files.object_json);
-    assert!(output_files.car_0_image == expected_files.car_0_image);
-    assert!(output_files.preview_image == expected_files.preview_image);
+    assert!(output_files.car_0_image.as_raw() == expected_files.car_0_image.as_raw());
+    assert!(output_files.preview_image.as_raw() == expected_files.preview_image.as_raw());
 }
