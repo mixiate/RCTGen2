@@ -28,7 +28,7 @@ fn calculate_ao_factor(
     samples_y: u32,
     rng: &mut rand_pcg::Pcg32,
 ) -> f32 {
-    use rand_pcg::rand_core::RngCore as _;
+    use rand_pcg::rand_core::Rng as _;
 
     let tangent = if normal.x.abs() > normal.y.abs() {
         glam::Vec3::new(normal.z, 0.0, -normal.x) * (1.0 / (normal.x * normal.x + normal.z * normal.z).sqrt())

@@ -10,7 +10,7 @@ enum-map = "2.7.3"
 glam = "0.32.1"
 obj = "0.10.2"
 png = "0.18.1"
-rand_pcg = "0.9.0"
+rand_pcg = "0.10.1"
 rect_packer = "0.2.1"
 
 [lints]
