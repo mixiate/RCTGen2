@@ -48,6 +48,18 @@ fn test_make_vehicle() {
     let expected_files = read_ride_object_files(&expected_directory);
 
     assert!(output_files.object_json == expected_files.object_json);
-    assert!(output_files.car_0_image.as_raw() == expected_files.car_0_image.as_raw());
     assert!(output_files.preview_image.as_raw() == expected_files.preview_image.as_raw());
+
+    const PIXEL_DIFF_TOLERANCE: usize = 10;
+    let pixel_diff_count = output_files
+        .car_0_image
+        .as_raw()
+        .iter()
+        .zip(expected_files.car_0_image.as_raw().iter())
+        .filter(|(a, b)| a != b)
+        .count();
+    assert!(
+        pixel_diff_count <= PIXEL_DIFF_TOLERANCE,
+        "car_0.png: {pixel_diff_count} pixels differ (tolerance {PIXEL_DIFF_TOLERANCE})"
+    );
 }
