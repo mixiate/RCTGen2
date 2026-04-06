@@ -1507,7 +1507,7 @@
     },
     {
         "path": "track/test-track-supports/left_bank_to_gentle_diag_2.png",
-        "x": -54,
+        "x": -32,
         "y": -20,
         "palette": "keep"
     },
@@ -1519,7 +1519,7 @@
     },
     {
         "path": "track/test-track-supports/right_bank_to_gentle_diag_0.png",
-        "x": -34,
+        "x": -32,
         "y": -20,
         "palette": "keep"
     },

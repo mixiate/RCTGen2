@@ -1579,8 +1579,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/left_bank_to_gentle_diag_2.png",
-        "x": -56,
-        "y": -11,
+        "x": -32,
+        "y": -6,
         "palette": "keep"
     },
     {
@@ -1592,7 +1592,7 @@
     {
         "path": "track/test-track-boundary-tie/right_bank_to_gentle_diag_0.png",
         "x": -32,
-        "y": -11,
+        "y": -6,
         "palette": "keep"
     },
     {

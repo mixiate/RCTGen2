@@ -491,7 +491,7 @@
             "mask": "default/single_tile.png"
         },
         {
-            "mask": "default/single_tile.png",
+            "mask": "default/single_tile_diag.png",
             "extrude_in_front": true
         },
         {
@@ -500,7 +500,7 @@
     ],
     "right_bank_to_gentle_diag": [
         {
-            "mask": "default/single_tile.png",
+            "mask": "default/single_tile_diag.png",
             "extrude_in_front": true
         },
         {
