@@ -117,6 +117,11 @@ impl ModelDesc {
         }
     }
 
+    fn calculate_extrusion_count(length: f32) -> i32 {
+        const MINIMUM_LENGTH: f32 = 0.4;
+        ((MINIMUM_LENGTH / length).round() as i32).clamp(1, 4)
+    }
+
     fn new_non_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
         let mesh_count = (0.5 + track_section.length / track.length).floor() as i32;
         let scale = track_section.length / (mesh_count as f32 * track.length);
@@ -128,7 +133,7 @@ impl ModelDesc {
             length,
             tie_length: scale * track.tie_length,
             bank_angle: track.bank_angle(),
-            extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
+            extrusion_count: ModelDesc::calculate_extrusion_count(length),
             track_even: false,
             support_spacing: track.support_spacing,
             support_pivot: track.pivot,
@@ -152,7 +157,7 @@ impl ModelDesc {
                 length,
                 tie_length: scale * track.tie_length,
                 bank_angle: track.bank_angle(),
-                extrusion_count: ((0.25 / length).round() as i32).clamp(1, 4),
+                extrusion_count: ModelDesc::calculate_extrusion_count(length),
                 track_even: false,
                 support_spacing: track.support_spacing,
                 support_pivot: track.pivot,

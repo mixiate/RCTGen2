@@ -1579,8 +1579,8 @@
     },
     {
         "path": "track/test-track/left_bank_to_gentle_diag_2.png",
-        "x": -45,
-        "y": -10,
+        "x": -56,
+        "y": -12,
         "palette": "keep"
     },
     {
@@ -1592,7 +1592,7 @@
     {
         "path": "track/test-track/right_bank_to_gentle_diag_0.png",
         "x": -32,
-        "y": -10,
+        "y": -12,
         "palette": "keep"
     },
     {
