@@ -22,7 +22,7 @@ fn test_make_track(track_name: &str) {
 
     {
         let output_file_count = std::fs::read_dir(&output_sprites_directory).unwrap().count();
-        let expected_file_count = std::fs::read_dir(&output_sprites_directory).unwrap().count();
+        let expected_file_count = std::fs::read_dir(&expected_sprites_directory).unwrap().count();
         assert!(output_file_count == expected_file_count);
     }
 
