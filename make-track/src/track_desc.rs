@@ -4,15 +4,6 @@ fn bool_true() -> bool {
 
 #[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum Flag {
-    HasLift,
-    HasSupports,
-    SeparateTie,
-    TieAtBoundary,
-}
-
-#[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
 pub enum TrackGroup {
     Flat,
     Turns,
@@ -125,9 +116,6 @@ impl Models<std::path::PathBuf> {
 
 #[derive(Debug, serde::Deserialize)]
 pub struct Track {
-    #[expect(unused)]
-    #[serde(default)]
-    pub flags: std::collections::HashSet<Flag>,
     pub sections: std::collections::HashSet<TrackGroup>,
     pub masks: std::path::PathBuf,
     pub name: String,
