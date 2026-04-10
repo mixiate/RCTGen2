@@ -218,23 +218,20 @@ fn is_sprite_empty(image: &renderer::image::IndexedImage) -> bool {
     image.width() == 1 && image.height() == 1 && image.get_pixel(0, 0) == 0
 }
 
-#[expect(clippy::too_many_arguments)]
 fn split_track_section(
     images: Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>,
     views: &[mask::View],
     dither: bool,
     track_section: &track_sections::TrackSection,
-    track_z_offset: i32,
-    track_name: &str,
-    track_suffix: Option<&str>,
+    track: &track_desc::Track,
     skip_empty_sprites: bool,
     output_directory: &std::path::Path,
 ) -> anyhow::Result<Vec<openrct2::objects::image::ImageFile>> {
     let mut sprite_descs = Vec::new();
     for ((view_index, view), (image, mask_depth)) in views.iter().filter(|x| !x.optional).enumerate().zip(images) {
-        let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track_z_offset);
+        let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset);
         let mask_y_offset = if track_section.mask_offset_y {
-            track_z_offset - 8 // offset masks are presumably made for track z_offset of 8 by default
+            track.z_offset - 8 // offset masks are presumably made for track z_offset of 8 by default
         } else {
             0
         };
@@ -259,7 +256,7 @@ fn split_track_section(
             .filter(|x| if skip_empty_sprites { !is_sprite_empty(x) } else { true })
             .enumerate()
         {
-            let image_name = if let Some(suffix) = track_suffix {
+            let image_name = if let Some(suffix) = &track.suffix {
                 format!("{}_{suffix}_{view_index}", track_section.name)
             } else {
                 format!("{}_{view_index}", track_section.name)
@@ -271,7 +268,7 @@ fn split_track_section(
             };
             image.save(&output_directory.join(&image_name).with_extension("png"))?;
 
-            let relative_file_path = format!("track/{}/{image_name}.png", track_name);
+            let relative_file_path = format!("track/{}/{image_name}.png", track.name);
             sprite_descs.push(openrct2::objects::image::ImageFile {
                 path: relative_file_path.to_owned(),
                 x: Some(image.offset.x),
@@ -563,9 +560,7 @@ fn render(
                             views,
                             track_desc.dither,
                             track_section,
-                            track.z_offset,
-                            &track.name,
-                            track.suffix.as_deref(),
+                            track,
                             skip_empty_sprites,
                             &output_directory,
                         )?;
