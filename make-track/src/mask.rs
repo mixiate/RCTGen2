@@ -1,4 +1,3 @@
-const MAX_VIEW_COUNT: usize = 4;
 const MAX_SECTION_COUNT: usize = 7;
 
 #[derive(Debug, serde::Deserialize)]
@@ -28,11 +27,21 @@ struct ViewDesc {
     operation: Option<OperationDesc>,
 }
 
+#[expect(clippy::large_enum_variant)]
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+#[serde(rename_all = "snake_case")]
+#[serde(untagged)]
+enum ViewsDescType {
+    Two([ViewDesc; 2]),
+    Four([ViewDesc; 4]),
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(transparent)]
 struct MasksDesc {
-    track_sections: std::collections::HashMap<String, heapless::Vec<ViewDesc, MAX_VIEW_COUNT>>,
+    track_sections: std::collections::HashMap<String, ViewsDescType>,
 }
 
 impl MasksDesc {
@@ -254,6 +263,10 @@ impl Masks {
         let mut track_sections = std::collections::HashMap::new();
 
         for (name, views) in desc.track_sections {
+            let views = match &views {
+                ViewsDescType::Two(views) => views.as_slice(),
+                ViewsDescType::Four(views) => views.as_slice(),
+            };
             let views = views
                 .iter()
                 .map(|x| View::new(x, directory))
