@@ -563,7 +563,7 @@ fn render(
                             views,
                             track_desc.dither,
                             track_section,
-                            track.z_offset as i32,
+                            track.z_offset,
                             &track.name,
                             track.suffix.as_deref(),
                             skip_empty_sprites,

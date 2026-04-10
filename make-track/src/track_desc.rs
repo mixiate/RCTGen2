@@ -126,7 +126,7 @@ pub struct Track {
     pub brake_length: f32,
     #[serde(default)]
     pub tie_length: f32,
-    pub z_offset: f32,
+    pub z_offset: i32,
     #[serde(default = "float_1")]
     pub support_spacing: f32,
     #[serde(default)]
