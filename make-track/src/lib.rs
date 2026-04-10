@@ -226,6 +226,7 @@ fn split_track_section(
     track_section: &track_sections::TrackSection,
     track_z_offset: i32,
     track_name: &str,
+    track_suffix: Option<&str>,
     skip_empty_sprites: bool,
     output_directory: &std::path::Path,
 ) -> anyhow::Result<Vec<openrct2::objects::image::ImageFile>> {
@@ -258,10 +259,15 @@ fn split_track_section(
             .filter(|x| if skip_empty_sprites { !is_sprite_empty(x) } else { true })
             .enumerate()
         {
-            let image_name = if view.sprites.len() > 1 {
-                format!("{}_{view_index}_{sprite_index}", track_section.name)
+            let image_name = if let Some(suffix) = track_suffix {
+                format!("{}_{suffix}_{view_index}", track_section.name)
             } else {
                 format!("{}_{view_index}", track_section.name)
+            };
+            let image_name = if view.sprites.len() > 1 {
+                format!("{image_name}_{sprite_index}")
+            } else {
+                image_name
             };
             image.save(&output_directory.join(&image_name).with_extension("png"))?;
 
@@ -491,7 +497,7 @@ fn list_track_sections(
 
 struct TrackSectionSprites {
     track_name: String,
-    track_section_name: &'static str,
+    track_section_name: String,
     sprites: Vec<openrct2::objects::image::ImageFile>,
 }
 
@@ -534,6 +540,11 @@ fn render(
         let track_section_sprite_descs = track_sections
             .into_par_iter()
             .map(|track_section| {
+                let track_section_name = if let Some(suffix) = &track.suffix {
+                    format!("{}_{suffix}", track_section.name)
+                } else {
+                    track_section.name.to_owned()
+                };
                 if let Some(views) = masks.get_views(track_section.name) {
                     render_track_section(
                         &render_device,
@@ -554,19 +565,20 @@ fn render(
                             track_section,
                             track.z_offset as i32,
                             &track.name,
+                            track.suffix.as_deref(),
                             skip_empty_sprites,
                             &output_directory,
                         )?;
                         Ok(TrackSectionSprites {
                             track_name: track.name.to_owned(),
-                            track_section_name: track_section.name,
+                            track_section_name,
                             sprites,
                         })
                     })
                 } else {
                     Ok(TrackSectionSprites {
                         track_name: track.name.to_owned(),
-                        track_section_name: track_section.name,
+                        track_section_name,
                         sprites: Vec::new(),
                     })
                 }

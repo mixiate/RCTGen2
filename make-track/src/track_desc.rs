@@ -119,6 +119,7 @@ pub struct Track {
     pub sections: std::collections::HashSet<TrackGroup>,
     pub masks: std::path::PathBuf,
     pub name: String,
+    pub suffix: Option<String>,
     pub length: f32,
     #[expect(unused)]
     #[serde(default = "float_1")]
