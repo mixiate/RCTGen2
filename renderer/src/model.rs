@@ -42,6 +42,7 @@ impl Material {
                 "Remap3" => palette_region_type = crate::palette::RegionType::Remap3,
                 "Greyscale" => palette_region_type = crate::palette::RegionType::Greyscale,
                 "Peep" => palette_region_type = crate::palette::RegionType::Peep,
+                "Chain" => palette_region_type = crate::palette::RegionType::Chain,
                 "NoAO" => use_ao = false,
                 "Edge" => edge_type = Some(crate::renderer::EdgeType::Light),
                 "DarkEdge" => edge_type = Some(crate::renderer::EdgeType::Dark),

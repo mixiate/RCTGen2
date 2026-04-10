@@ -7,6 +7,7 @@ pub(crate) enum RegionType {
     Remap3,
     Greyscale,
     Peep,
+    Chain,
 }
 
 impl RegionType {
@@ -107,13 +108,14 @@ pub(crate) fn get_nearest_colour(colour: &glam::Vec3, region_type: RegionType) -
     }
 }
 
-const PALETTE_REGION_RANGES: [[Option<std::ops::Range<usize>>; 3]; 6] = [
+const PALETTE_REGION_RANGES: [[Option<std::ops::Range<usize>>; 3]; 7] = [
     [Some(10..202), Some(214..227), Some(240..243)],
     [Some(243..255), None, None],
     [Some(202..214), None, None],
     [Some(46..58), None, None],
     [Some(10..22), Some(226..227), Some(240..243)],
     [Some(10..11), Some(106..118), None],
+    [Some(1..2), None, None],
 ];
 
 // This is the palette from a sprite exported by OpenRCT2
