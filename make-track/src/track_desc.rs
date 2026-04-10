@@ -133,6 +133,8 @@ pub struct Track {
     pub pivot: f32,
     #[serde(default = "default_bank_angle")]
     bank_angle: f32,
+    #[serde(default)]
+    pub lift: bool,
     pub models: Models<std::path::PathBuf>,
 }
 
