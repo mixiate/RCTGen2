@@ -2,6 +2,14 @@ fn bool_true() -> bool {
     true
 }
 
+fn default_bank_angle() -> f32 {
+    45.0
+}
+
+fn float_1() -> f32 {
+    1.0
+}
+
 #[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TrackGroup {
@@ -35,14 +43,6 @@ pub enum TrackGroup {
     ZeroGRolls,
     DiveLoops,
     TurnBankTransitions,
-}
-
-fn default_bank_angle() -> f32 {
-    45.0
-}
-
-fn float_1() -> f32 {
-    1.0
 }
 
 #[derive(Debug, serde::Deserialize)]
