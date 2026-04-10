@@ -127,10 +127,11 @@ pub struct View {
     pub requires_track_mask: bool,
     pub extrude_behind_type: Option<renderer::MeshType>,
     pub extrude_ahead_type: Option<renderer::MeshType>,
+    pub optional: bool,
 }
 
 impl View {
-    fn new(view_desc: &ViewDesc, directory: &std::path::Path) -> anyhow::Result<View> {
+    fn new(view_desc: &ViewDesc, directory: &std::path::Path, optional: bool) -> anyhow::Result<View> {
         let image = MaskImage::new(&directory.join(&view_desc.mask))?;
 
         let sprites = match &view_desc.operation {
@@ -221,6 +222,7 @@ impl View {
             requires_track_mask: view_desc.operation.is_some(),
             extrude_behind_type,
             extrude_ahead_type,
+            optional,
         })
     }
 
@@ -248,7 +250,7 @@ impl View {
 }
 
 pub struct Masks {
-    track_sections: std::collections::HashMap<String, Vec<View>>,
+    track_sections: std::collections::HashMap<String, [View; 4]>,
 }
 
 impl Masks {
@@ -264,14 +266,19 @@ impl Masks {
 
         for (name, views) in desc.track_sections {
             let views = match &views {
-                ViewsDescType::Two(views) => views.as_slice(),
-                ViewsDescType::Four(views) => views.as_slice(),
+                ViewsDescType::Two(views) => [
+                    View::new(&views[0], directory, false)?,
+                    View::new(&views[1], directory, false)?,
+                    View::new(&views[0], directory, true)?,
+                    View::new(&views[1], directory, true)?,
+                ],
+                ViewsDescType::Four(views) => [
+                    View::new(&views[0], directory, false)?,
+                    View::new(&views[1], directory, false)?,
+                    View::new(&views[2], directory, false)?,
+                    View::new(&views[3], directory, false)?,
+                ],
             };
-            let views = views
-                .iter()
-                .map(|x| View::new(x, directory))
-                .collect::<anyhow::Result<Vec<View>>>()
-                .with_context(|| format!("{} {}", path.display(), name))?;
             track_sections.insert(name, views);
         }
 

@@ -231,7 +231,7 @@ fn split_track_section(
     output_directory: &std::path::Path,
 ) -> anyhow::Result<Vec<openrct2::objects::image::ImageFile>> {
     let mut sprite_descs = Vec::new();
-    for ((view_index, view), (image, mask_depth)) in views.iter().enumerate().zip(images) {
+    for ((view_index, view), (image, mask_depth)) in views.iter().filter(|x| !x.optional).enumerate().zip(images) {
         let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track_z_offset);
         let mask_y_offset = if track_section.mask_offset_y {
             track_z_offset - 8 // offset masks are presumably made for track z_offset of 8 by default
