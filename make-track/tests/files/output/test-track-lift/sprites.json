@@ -1,0 +1,290 @@
+[
+    {
+        "path": "track/test-track-lift/flat_lift_0.png",
+        "x": -24,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_lift_1.png",
+        "x": -24,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_lift_2.png",
+        "x": -24,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_lift_3.png",
+        "x": -24,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_steep_lift_0.png",
+        "x": -24,
+        "y": -37,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_steep_lift_1_0.png",
+        "x": -24,
+        "y": -7,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_steep_lift_1_1.png",
+        "x": -24,
+        "y": -21,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_steep_lift_2_0.png",
+        "x": -1,
+        "y": -7,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_steep_lift_2_1.png",
+        "x": -24,
+        "y": -21,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_steep_lift_3.png",
+        "x": -24,
+        "y": -37,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_to_gentle_lift_0.png",
+        "x": -24,
+        "y": -37,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_to_gentle_lift_1_0.png",
+        "x": -8,
+        "y": -22,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_to_gentle_lift_1_1.png",
+        "x": -25,
+        "y": -13,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_to_gentle_lift_2_0.png",
+        "x": -24,
+        "y": -22,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_to_gentle_lift_2_1.png",
+        "x": -12,
+        "y": -13,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_to_gentle_lift_3.png",
+        "x": -24,
+        "y": -37,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_lift_0.png",
+        "x": -24,
+        "y": -69,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_lift_1.png",
+        "x": -25,
+        "y": -53,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_lift_2.png",
+        "x": -24,
+        "y": -53,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/steep_lift_3.png",
+        "x": -24,
+        "y": -69,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_lift_0.png",
+        "x": -24,
+        "y": -13,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_lift_1.png",
+        "x": -24,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_lift_2.png",
+        "x": -24,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_lift_3.png",
+        "x": -24,
+        "y": -13,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_lift_0.png",
+        "x": -24,
+        "y": -13,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_lift_1.png",
+        "x": -24,
+        "y": -6,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_lift_2.png",
+        "x": -24,
+        "y": -6,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_lift_3.png",
+        "x": -24,
+        "y": -13,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_lift_0.png",
+        "x": -24,
+        "y": -21,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_lift_1.png",
+        "x": -24,
+        "y": -6,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_lift_2.png",
+        "x": -24,
+        "y": -6,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_lift_3.png",
+        "x": -24,
+        "y": -21,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_diag_lift_0.png",
+        "x": -32,
+        "y": 1,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_diag_lift_1.png",
+        "x": -12,
+        "y": -10,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_diag_lift_2.png",
+        "x": -32,
+        "y": 1,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_diag_lift_3.png",
+        "x": -12,
+        "y": -10,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_diag_lift_0.png",
+        "x": -32,
+        "y": -7,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_diag_lift_1.png",
+        "x": -12,
+        "y": -10,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_diag_lift_2.png",
+        "x": -32,
+        "y": -7,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/flat_to_gentle_diag_lift_3.png",
+        "x": -12,
+        "y": -17,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_diag_lift_0.png",
+        "x": -32,
+        "y": -7,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_diag_lift_1.png",
+        "x": -12,
+        "y": -10,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_diag_lift_2.png",
+        "x": -32,
+        "y": -7,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_to_flat_diag_lift_3.png",
+        "x": -12,
+        "y": -18,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_diag_lift_0.png",
+        "x": -32,
+        "y": -15,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_diag_lift_1.png",
+        "x": -12,
+        "y": -10,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_diag_lift_2.png",
+        "x": -32,
+        "y": -15,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-lift/gentle_diag_lift_3.png",
+        "x": -12,
+        "y": -25,
+        "palette": "keep"
+    }
+]

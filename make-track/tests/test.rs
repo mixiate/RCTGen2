@@ -119,3 +119,8 @@ fn test_track_semi_flat_shaded() {
 fn test_track_supports() {
     test_make_track("test-track-supports");
 }
+
+#[test]
+fn test_track_lift() {
+    test_make_track("test-track-lift");
+}
