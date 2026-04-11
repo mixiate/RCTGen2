@@ -1,10 +1,10 @@
 fn load_image(path: &std::path::Path) -> anyhow::Result<renderer::image::IndexedImage> {
     let image = image::ImageReader::open(path)?.decode()?.to_rgba8();
-    let width = usize::try_from(image.width())?;
-    let height = usize::try_from(image.height())?;
+    let width = u16::try_from(image.width())?;
+    let height = u16::try_from(image.height())?;
 
     let pixels = {
-        let mut pixels = vec![0; width * height];
+        let mut pixels = vec![0; usize::from(width) * usize::from(height)];
         for (source, dest) in image.pixels().zip(pixels.iter_mut()) {
             let dest_index = if source.0[3] == 255 {
                 renderer::palette::PALETTE.iter().position(|x| *x == source.0[0..3]).unwrap_or(0)
@@ -16,11 +16,7 @@ fn load_image(path: &std::path::Path) -> anyhow::Result<renderer::image::Indexed
         pixels
     };
 
-    Ok(renderer::image::IndexedImage::with_buffer(
-        pixels,
-        width.try_into().unwrap(),
-        height.try_into().unwrap(),
-    ))
+    Ok(renderer::image::IndexedImage::with_buffer(pixels, width, height))
 }
 
 fn load_image_keep_palette(path: &std::path::Path) -> anyhow::Result<renderer::image::IndexedImage> {
@@ -44,14 +40,10 @@ fn load_image_keep_palette(path: &std::path::Path) -> anyhow::Result<renderer::i
 
     anyhow::ensure!(info.bit_depth == png::BitDepth::Eight, "Image bit depth is not 1 or 8");
 
-    let width = usize::try_from(info.width)?;
-    let height = usize::try_from(info.height)?;
+    let width = u16::try_from(info.width)?;
+    let height = u16::try_from(info.height)?;
 
-    Ok(renderer::image::IndexedImage::with_buffer(
-        buffer,
-        width.try_into().unwrap(),
-        height.try_into().unwrap(),
-    ))
+    Ok(renderer::image::IndexedImage::with_buffer(buffer, width, height))
 }
 
 struct Sprite {
