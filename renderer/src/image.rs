@@ -28,32 +28,32 @@ impl Image {
 #[derive(Clone)]
 pub struct IndexedImage {
     pixels: Vec<u8>,
-    width: usize,
-    height: usize,
+    width: u16,
+    height: u16,
     pub offset: glam::IVec2,
 }
 
 impl IndexedImage {
-    pub fn new(width: usize, height: usize) -> Self {
+    pub fn new(width: u16, height: u16) -> Self {
         Self {
-            pixels: vec![0; width * height],
+            pixels: vec![0; usize::from(width) * usize::from(height)],
             width,
             height,
             offset: glam::IVec2::new(0, 0),
         }
     }
 
-    pub fn with_offset(width: usize, height: usize, offset: glam::IVec2) -> Self {
+    pub fn with_offset(width: u16, height: u16, offset: glam::IVec2) -> Self {
         Self {
-            pixels: vec![0; width * height],
+            pixels: vec![0; usize::from(width) * usize::from(height)],
             width,
             height,
             offset,
         }
     }
 
-    pub fn with_buffer(pixels: Vec<u8>, width: usize, height: usize) -> Self {
-        assert!(pixels.len() == width * height);
+    pub fn with_buffer(pixels: Vec<u8>, width: u16, height: u16) -> Self {
+        assert!(pixels.len() == usize::from(width) * usize::from(height));
         Self {
             pixels,
             width,
@@ -63,19 +63,19 @@ impl IndexedImage {
     }
 
     pub fn get_pixel(&self, x: usize, y: usize) -> u8 {
-        self.pixels[x + (y * self.width)]
+        self.pixels[x + (y * usize::from(self.width))]
     }
 
     pub fn set_pixel(&mut self, x: usize, y: usize, pixel: u8) {
-        self.pixels[x + (y * self.width)] = pixel;
+        self.pixels[x + (y * usize::from(self.width))] = pixel;
     }
 
     pub fn width(&self) -> usize {
-        self.width
+        self.width.into()
     }
 
     pub fn height(&self) -> usize {
-        self.height
+        self.height.into()
     }
 
     pub fn blit(&mut self, image: &IndexedImage, dest_x: i32, dest_y: i32) {
@@ -90,12 +90,12 @@ impl IndexedImage {
 
     pub fn crop(&mut self) {
         let (min_x, min_y, max_x, max_y) = {
-            let mut min_x = self.width;
-            let mut min_y = self.height;
+            let mut min_x = usize::from(self.width);
+            let mut min_y = usize::from(self.height);
             let mut max_x = 0;
             let mut max_y = 0;
-            for y in 0..self.height {
-                for x in 0..self.width {
+            for y in 0..usize::from(self.height) {
+                for x in 0..usize::from(self.width) {
                     if self.get_pixel(x, y) != 0 {
                         min_x = std::cmp::min(min_x, x);
                         min_y = std::cmp::min(min_y, y);
@@ -113,18 +113,18 @@ impl IndexedImage {
             self.offset = glam::IVec2::splat(0);
             self.pixels.truncate(1);
         } else {
-            let stride = self.width;
+            let stride = usize::from(self.width);
             self.offset += glam::IVec2::new(min_x.try_into().unwrap(), min_y.try_into().unwrap());
-            self.width = max_x - min_x;
-            self.height = max_y - min_y;
+            self.width = u16::try_from(max_x - min_x).unwrap();
+            self.height = u16::try_from(max_y - min_y).unwrap();
 
-            for y in 0..self.height {
-                for x in 0..self.width {
-                    self.pixels[x + y * self.width] = self.pixels[(x + min_x) + (y + min_y) * stride];
+            for y in 0..usize::from(self.height) {
+                for x in 0..usize::from(self.width) {
+                    self.pixels[x + y * usize::from(self.width)] = self.pixels[(x + min_x) + (y + min_y) * stride];
                 }
             }
 
-            self.pixels.truncate(self.width * self.height);
+            self.pixels.truncate(usize::from(self.width) * usize::from(self.height));
         }
     }
 
@@ -168,8 +168,8 @@ impl IndexedImage {
             path.display()
         );
 
-        let width = usize::try_from(info.width)?;
-        let height = usize::try_from(info.height)?;
+        let width = u16::try_from(info.width)?;
+        let height = u16::try_from(info.height)?;
 
         Ok(Self {
             pixels: buffer,
@@ -183,7 +183,7 @@ impl IndexedImage {
         let image_file = std::fs::File::create(path)?;
         let w = std::io::BufWriter::new(image_file);
 
-        let mut encoder = png::Encoder::new(w, self.width.try_into()?, self.height.try_into()?);
+        let mut encoder = png::Encoder::new(w, self.width.into(), self.height.into());
         encoder.set_color(png::ColorType::Indexed);
         encoder.set_depth(png::BitDepth::Eight);
         encoder.set_palette(&crate::palette::PALETTE_FLAT);

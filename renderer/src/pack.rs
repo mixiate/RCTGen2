@@ -1,10 +1,10 @@
 fn pack_rects_fixed(
     images: &[crate::image::IndexedImage],
-    width: usize,
-    height: usize,
+    width: u16,
+    height: u16,
     coords: &mut [glam::IVec2],
 ) -> bool {
-    let mut rect_packer = rect_packer::DensePacker::new(width.try_into().unwrap(), height.try_into().unwrap());
+    let mut rect_packer = rect_packer::DensePacker::new(width.into(), height.into());
     for (image, coord) in images.iter().zip(coords.iter_mut()) {
         if let Some(rect) = rect_packer.pack(
             image.width().try_into().unwrap(),
@@ -21,8 +21,8 @@ fn pack_rects_fixed(
 }
 
 struct PackedRects {
-    width: usize,
-    height: usize,
+    width: u16,
+    height: u16,
     coords: Vec<glam::IVec2>,
 }
 
@@ -138,8 +138,8 @@ pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas
     let rows = image_count / columns;
     let rows = if image_count % columns != 0 { rows + 1 } else { rows };
 
-    let width = usize::try_from(column_width * columns).unwrap();
-    let height = usize::try_from(row_height * rows).unwrap();
+    let width = u16::try_from(column_width * columns).unwrap();
+    let height = u16::try_from(row_height * rows).unwrap();
 
     let mut grid_image = crate::image::IndexedImage::new(width, height);
     let mut coords = vec![glam::IVec2::new(0, 0); images.len()];

@@ -102,7 +102,8 @@ impl Framebuffer {
             // ORIGINAL COMMENT: y - 1 compensates for error not sure why it's needed TODO work out why it's needed
             min_y as i32 + self.offset.y.floor() as i32 - 1,
         );
-        let mut image = crate::image::IndexedImage::with_offset(width, height, offset);
+        let mut image =
+            crate::image::IndexedImage::with_offset(width.try_into().unwrap(), height.try_into().unwrap(), offset);
 
         for y in min_y..max_y {
             for x in (min_x..max_x).rev() {

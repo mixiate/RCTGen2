@@ -16,7 +16,11 @@ fn load_image(path: &std::path::Path) -> anyhow::Result<renderer::image::Indexed
         pixels
     };
 
-    Ok(renderer::image::IndexedImage::with_buffer(pixels, width, height))
+    Ok(renderer::image::IndexedImage::with_buffer(
+        pixels,
+        width.try_into().unwrap(),
+        height.try_into().unwrap(),
+    ))
 }
 
 fn load_image_keep_palette(path: &std::path::Path) -> anyhow::Result<renderer::image::IndexedImage> {
@@ -43,7 +47,11 @@ fn load_image_keep_palette(path: &std::path::Path) -> anyhow::Result<renderer::i
     let width = usize::try_from(info.width)?;
     let height = usize::try_from(info.height)?;
 
-    Ok(renderer::image::IndexedImage::with_buffer(buffer, width, height))
+    Ok(renderer::image::IndexedImage::with_buffer(
+        buffer,
+        width.try_into().unwrap(),
+        height.try_into().unwrap(),
+    ))
 }
 
 struct Sprite {
