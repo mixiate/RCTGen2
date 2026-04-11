@@ -1,6 +1,8 @@
+use crate::mask;
+
 fn split_sprite(
-    view: &crate::mask::View,
-    sprite: &crate::mask::Sprite,
+    view: &mask::View,
+    sprite: &mask::Sprite,
     mut image: renderer::image::IndexedImage,
     y_offset: i32,
 ) -> renderer::image::IndexedImage {
@@ -18,8 +20,8 @@ fn split_sprite(
 }
 
 fn split_sprite_intersect(
-    view: &crate::mask::View,
-    sprite: &crate::mask::Sprite,
+    view: &mask::View,
+    sprite: &mask::Sprite,
     mut image: renderer::image::IndexedImage,
     y_offset: i32,
     track_depth: &renderer::DepthBuffer,
@@ -54,8 +56,8 @@ fn split_sprite_intersect(
 }
 
 fn split_sprite_difference(
-    view: &crate::mask::View,
-    sprite: &crate::mask::Sprite,
+    view: &mask::View,
+    sprite: &mask::Sprite,
     mut image: renderer::image::IndexedImage,
     y_offset: i32,
     track_depth: &renderer::DepthBuffer,
@@ -90,8 +92,8 @@ fn split_sprite_difference(
 }
 
 fn split_sprite_transfer_next(
-    view: &crate::mask::View,
-    sprite: &crate::mask::Sprite,
+    view: &mask::View,
+    sprite: &mask::Sprite,
     mut image: renderer::image::IndexedImage,
     y_offset: i32,
     track_depth: &renderer::DepthBuffer,
@@ -129,7 +131,7 @@ fn split_sprite_transfer_next(
 
 pub fn split_image(
     image: &renderer::image::IndexedImage,
-    view: &crate::mask::View,
+    view: &mask::View,
     y_offset: i32,
 ) -> Vec<renderer::image::IndexedImage> {
     view.sprites
@@ -145,7 +147,7 @@ pub fn split_image(
 
 pub fn split_image_depth(
     image: &renderer::image::IndexedImage,
-    view: &crate::mask::View,
+    view: &mask::View,
     y_offset: i32,
     track_depth: &renderer::DepthBuffer,
     mask_depth: &renderer::DepthBuffer,
@@ -155,13 +157,13 @@ pub fn split_image_depth(
         .map(|sprite| {
             let mut split_image = match sprite.operation {
                 None => split_sprite(view, sprite, image.clone(), y_offset),
-                Some(crate::mask::Operation::Difference) => {
+                Some(mask::Operation::Difference) => {
                     split_sprite_difference(view, sprite, image.clone(), y_offset, track_depth, mask_depth)
                 }
-                Some(crate::mask::Operation::Intersect) => {
+                Some(mask::Operation::Intersect) => {
                     split_sprite_intersect(view, sprite, image.clone(), y_offset, track_depth, mask_depth)
                 }
-                Some(crate::mask::Operation::TransferNext) => {
+                Some(mask::Operation::TransferNext) => {
                     split_sprite_transfer_next(view, sprite, image.clone(), y_offset, track_depth, mask_depth)
                 }
             };
