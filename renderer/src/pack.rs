@@ -90,7 +90,7 @@ pub fn create_atlas(images: &[crate::image::IndexedImage]) -> Atlas {
 
     let mut atlas_image = crate::image::IndexedImage::new(width, height);
     for (image, coord) in images.iter().zip(coords.iter()) {
-        atlas_image.blit(image, coord.x, coord.y);
+        atlas_image.blit(image, coord.x.try_into().unwrap(), coord.y.try_into().unwrap());
     }
 
     Atlas {
@@ -146,7 +146,7 @@ pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas
         coord.x = (column_width * column) - x_min + image.offset.x;
         coord.y = (row_height * row) - y_min + image.offset.y;
 
-        grid_image.blit(image, coord.x, coord.y);
+        grid_image.blit(image, coord.x.try_into().unwrap(), coord.y.try_into().unwrap());
     }
 
     Atlas {

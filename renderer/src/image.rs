@@ -78,9 +78,7 @@ impl IndexedImage {
         self.height
     }
 
-    pub fn blit(&mut self, image: &IndexedImage, dest_x: i32, dest_y: i32) {
-        let dest_x = usize::try_from(dest_x).unwrap();
-        let dest_y = usize::try_from(dest_y).unwrap();
+    pub fn blit(&mut self, image: &IndexedImage, dest_x: usize, dest_y: usize) {
         for y in 0..usize::from(image.height()) {
             for x in 0..usize::from(image.width()) {
                 self.set_pixel(dest_x + x, dest_y + y, image.get_pixel(x, y));
