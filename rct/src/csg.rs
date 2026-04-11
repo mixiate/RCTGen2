@@ -1,7 +1,7 @@
 struct Entry {
     data_offset: u32,
-    width: i16,
-    height: i16,
+    width: u16,
+    height: u16,
     offset_x: i16,
     offset_y: i16,
     flags: u16,
@@ -15,19 +15,19 @@ const ENTRY_FLAG_TRANSPARENT: u16 = 1;
 const ENTRY_FLAG_RLE: u16 = 4;
 
 pub struct EncodedSprite {
-    width: i16,
-    height: i16,
+    width: u16,
+    height: u16,
     row_offsets: Vec<i16>,
     data: Vec<u8>,
 }
 
 impl EncodedSprite {
-    pub fn new(pixels: &[u8], width: usize, height: usize) -> Self {
-        let mut row_offsets = Vec::with_capacity(height);
+    pub fn new(pixels: &[u8], width: u16, height: u16) -> Self {
+        let mut row_offsets = Vec::with_capacity(height.into());
         let mut data = Vec::new();
 
-        for y in 0..height {
-            row_offsets.push(i16::try_from((height * 2) + data.len()).unwrap());
+        for y in 0..usize::from(height) {
+            row_offsets.push(i16::try_from((usize::from(height) * 2) + data.len()).unwrap());
 
             let mut last_count_index = None;
             let mut x_offset = 0;
@@ -39,14 +39,14 @@ impl EncodedSprite {
                 data.push(u8::try_from(*x_offset).unwrap());
                 for i in 0..*pixel_count {
                     let x = *x_offset + i;
-                    data.push(pixels[x + y * width]);
+                    data.push(pixels[x + y * usize::from(width)]);
                 }
                 *x_offset = 0;
                 *pixel_count = 0;
             };
 
-            for x in 0..width {
-                if pixels[x + y * width] == 0 {
+            for x in 0..usize::from(width) {
+                if pixels[x + y * usize::from(width)] == 0 {
                     if pixel_count != 0 {
                         push_run(&mut last_count_index, &mut x_offset, &mut pixel_count);
                     }
@@ -72,8 +72,8 @@ impl EncodedSprite {
         }
 
         Self {
-            width: i16::try_from(width).unwrap(),
-            height: i16::try_from(height).unwrap(),
+            width,
+            height,
             row_offsets,
             data,
         }
@@ -93,12 +93,12 @@ impl Archive {
         }
     }
 
-    pub fn add_sprite(&mut self, pixels: &[u8], width: usize, height: usize, x: i32, y: i32) {
-        assert!(pixels.len() == width * height);
+    pub fn add_sprite(&mut self, pixels: &[u8], width: u16, height: u16, x: i32, y: i32) {
+        assert!(pixels.len() == usize::from(width) * usize::from(height));
         self.entries.push(Entry {
             data_offset: u32::try_from(self.data.len()).unwrap(),
-            width: i16::try_from(width).unwrap(),
-            height: i16::try_from(height).unwrap(),
+            width,
+            height,
             offset_x: i16::try_from(x).unwrap(),
             offset_y: i16::try_from(y).unwrap(),
             flags: ENTRY_FLAG_TRANSPARENT,
@@ -176,16 +176,13 @@ mod tests {
         let mut archive = crate::csg::Archive::with_capacity(2);
         archive.add_sprite(
             test_image.as_raw(),
-            test_image.width().into(),
-            test_image.height().into(),
+            test_image.width(),
+            test_image.height(),
             test_image.offset.x,
             test_image.offset.y,
         );
-        let encoded_sprite = crate::csg::EncodedSprite::new(
-            test_image.as_raw(),
-            test_image.width().into(),
-            test_image.height().into(),
-        );
+        let encoded_sprite =
+            crate::csg::EncodedSprite::new(test_image.as_raw(), test_image.width(), test_image.height());
         archive.add_encoded_sprite(&encoded_sprite, test_image.offset.x, test_image.offset.y);
 
         let temp_dir = tempfile::tempdir().unwrap();
