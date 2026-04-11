@@ -98,6 +98,7 @@ impl MaskImage {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Operation {
     Difference,
     Intersect,
