@@ -1,3 +1,5 @@
+use crate::chain;
+
 pub struct TrackPoint {
     pub position: glam::Vec3,
     pub normal: glam::Vec3,
@@ -29,6 +31,7 @@ pub struct TrackSection {
     pub entry_angle_offset: u8, // used for boundary tie tracks, but might be able to be merged with offsets calculation
     pub exit_angle_offset: u8,  // same as entry ^
     pub has_supports: bool,
+    pub chain_type: Option<chain::ChainType>,
 }
 
 impl TrackSection {
@@ -76,6 +79,7 @@ pub const FLAT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Flat),
 };
 
 pub const FLAT_TO_GENTLE: TrackSection = TrackSection {
@@ -89,6 +93,7 @@ pub const FLAT_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Flat),
 };
 
 pub const GENTLE: TrackSection = TrackSection {
@@ -102,6 +107,7 @@ pub const GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Gentle),
 };
 
 pub const GENTLE_TO_FLAT: TrackSection = TrackSection {
@@ -115,6 +121,7 @@ pub const GENTLE_TO_FLAT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Flat),
 };
 
 pub const GENTLE_TO_STEEP: TrackSection = TrackSection {
@@ -128,6 +135,7 @@ pub const GENTLE_TO_STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Gentle),
 };
 
 pub const STEEP_TO_GENTLE: TrackSection = TrackSection {
@@ -141,6 +149,7 @@ pub const STEEP_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Gentle),
 };
 
 pub const STEEP: TrackSection = TrackSection {
@@ -154,6 +163,7 @@ pub const STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: Some(chain::ChainType::Gentle),
 };
 
 pub const STEEP_TO_VERTICAL: TrackSection = TrackSection {
@@ -167,6 +177,7 @@ pub const STEEP_TO_VERTICAL: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const VERTICAL_TO_STEEP: TrackSection = TrackSection {
@@ -180,6 +191,7 @@ pub const VERTICAL_TO_STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const VERTICAL: TrackSection = TrackSection {
@@ -193,6 +205,7 @@ pub const VERTICAL: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const SMALL_FLAT_TO_STEEP: TrackSection = TrackSection {
@@ -206,6 +219,7 @@ pub const SMALL_FLAT_TO_STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_STEEP_TO_FLAT: TrackSection = TrackSection {
@@ -219,6 +233,7 @@ pub const SMALL_STEEP_TO_FLAT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_STEEP: TrackSection = TrackSection {
@@ -232,6 +247,7 @@ pub const FLAT_TO_STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_TO_FLAT: TrackSection = TrackSection {
@@ -245,6 +261,7 @@ pub const STEEP_TO_FLAT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
@@ -258,6 +275,7 @@ pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
@@ -271,6 +289,7 @@ pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG: TrackSection = TrackSection {
@@ -284,6 +303,7 @@ pub const LARGE_TURN_LEFT_TO_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
@@ -297,6 +317,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_DIAG: TrackSection = TrackSection {
@@ -310,6 +331,7 @@ pub const FLAT_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: Some(chain::ChainType::FlatDiag),
 };
 
 pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -323,6 +345,7 @@ pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: Some(chain::ChainType::FlatDiag),
 };
 
 pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -336,6 +359,7 @@ pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: Some(chain::ChainType::FlatDiag),
 };
 
 pub const GENTLE_DIAG: TrackSection = TrackSection {
@@ -349,6 +373,7 @@ pub const GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: Some(chain::ChainType::FlatDiag),
 };
 
 pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -362,6 +387,7 @@ pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -375,6 +401,7 @@ pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_DIAG: TrackSection = TrackSection {
@@ -388,6 +415,7 @@ pub const STEEP_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -401,6 +429,7 @@ pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -414,6 +443,7 @@ pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -427,6 +457,7 @@ pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -440,6 +471,7 @@ pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
@@ -453,6 +485,7 @@ pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_RIGHT_BANK: TrackSection = TrackSection {
@@ -466,6 +499,7 @@ pub const FLAT_TO_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
@@ -479,6 +513,7 @@ pub const LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
@@ -492,6 +527,7 @@ pub const RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_LEFT_BANK: TrackSection = TrackSection {
@@ -505,6 +541,7 @@ pub const GENTLE_TO_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_RIGHT_BANK: TrackSection = TrackSection {
@@ -518,6 +555,7 @@ pub const GENTLE_TO_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK: TrackSection = TrackSection {
@@ -531,6 +569,7 @@ pub const LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
@@ -544,6 +583,7 @@ pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
@@ -557,6 +597,7 @@ pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG_BANK: TrackSection = TrackSection {
@@ -570,6 +611,7 @@ pub const LARGE_TURN_LEFT_TO_DIAG_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
@@ -583,6 +625,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -596,6 +639,7 @@ pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -609,6 +653,7 @@ pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -622,6 +667,7 @@ pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -635,6 +681,7 @@ pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -648,6 +695,7 @@ pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -661,6 +709,7 @@ pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -674,6 +723,7 @@ pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
@@ -687,6 +737,7 @@ pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
@@ -700,6 +751,7 @@ pub const SMALL_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT_GENTLE: TrackSection = TrackSection {
@@ -713,6 +765,7 @@ pub const MEDIUM_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
@@ -726,6 +779,7 @@ pub const MEDIUM_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG_GENTLE: TrackSection = TrackSection {
@@ -739,6 +793,7 @@ pub const LARGE_TURN_LEFT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
@@ -752,6 +807,7 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -765,6 +821,7 @@ pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -778,6 +835,7 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
@@ -791,6 +849,7 @@ pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
@@ -804,6 +863,7 @@ pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
@@ -817,6 +877,7 @@ pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
@@ -830,6 +891,7 @@ pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
@@ -843,6 +905,7 @@ pub const GENTLE_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
@@ -856,6 +919,7 @@ pub const GENTLE_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
@@ -869,6 +933,7 @@ pub const GENTLE_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
@@ -882,6 +947,7 @@ pub const GENTLE_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
@@ -895,6 +961,7 @@ pub const LEFT_BANK_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
@@ -908,6 +975,7 @@ pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_LEFT_BANK: TrackSection = TrackSection {
@@ -921,6 +989,7 @@ pub const GENTLE_LEFT_BANK_TO_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK: TrackSection = TrackSection {
@@ -934,6 +1003,7 @@ pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK: TrackSection = TrackSection {
@@ -947,6 +1017,7 @@ pub const GENTLE_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK: TrackSection = TrackSection {
@@ -960,6 +1031,7 @@ pub const GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
@@ -973,6 +1045,7 @@ pub const FLAT_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
@@ -986,6 +1059,7 @@ pub const FLAT_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_FLAT: TrackSection = TrackSection {
@@ -999,6 +1073,7 @@ pub const GENTLE_LEFT_BANK_TO_FLAT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_FLAT: TrackSection = TrackSection {
@@ -1012,6 +1087,7 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -1025,6 +1101,7 @@ pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -1038,6 +1115,7 @@ pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -1051,6 +1129,7 @@ pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -1064,6 +1143,7 @@ pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -1077,6 +1157,7 @@ pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -1090,6 +1171,7 @@ pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -1103,6 +1185,7 @@ pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -1116,6 +1199,7 @@ pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -1129,6 +1213,7 @@ pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -1142,6 +1227,7 @@ pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -1155,6 +1241,7 @@ pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -1168,6 +1255,7 @@ pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -1181,6 +1269,7 @@ pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -1194,6 +1283,7 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
@@ -1207,6 +1297,7 @@ pub const SMALL_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
@@ -1220,6 +1311,7 @@ pub const SMALL_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
@@ -1233,6 +1325,7 @@ pub const MEDIUM_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
@@ -1246,6 +1339,7 @@ pub const MEDIUM_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
@@ -1259,6 +1353,7 @@ pub const LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
@@ -1272,6 +1367,7 @@ pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -1285,6 +1381,7 @@ pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection
     entry_angle_offset: 1,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -1298,6 +1395,7 @@ pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSectio
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const S_BEND_LEFT: TrackSection = TrackSection {
@@ -1311,6 +1409,7 @@ pub const S_BEND_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const S_BEND_RIGHT: TrackSection = TrackSection {
@@ -1324,6 +1423,7 @@ pub const S_BEND_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
@@ -1337,6 +1437,7 @@ pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
@@ -1350,6 +1451,7 @@ pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_HELIX_LEFT: TrackSection = TrackSection {
@@ -1363,6 +1465,7 @@ pub const MEDIUM_HELIX_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
@@ -1376,6 +1479,7 @@ pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_LEFT: TrackSection = TrackSection {
@@ -1389,6 +1493,7 @@ pub const MEDIUM_QUARTER_HELIX_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_RIGHT: TrackSection = TrackSection {
@@ -1402,6 +1507,7 @@ pub const MEDIUM_QUARTER_HELIX_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_LEFT_BANK: TrackSection = TrackSection {
@@ -1415,6 +1521,7 @@ pub const MEDIUM_QUARTER_HELIX_LEFT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_RIGHT_BANK: TrackSection = TrackSection {
@@ -1428,6 +1535,7 @@ pub const MEDIUM_QUARTER_HELIX_RIGHT_BANK: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
@@ -1441,6 +1549,7 @@ pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
@@ -1454,6 +1563,7 @@ pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: true,
+    chain_type: None,
 };
 
 pub const BARREL_ROLL_LEFT: TrackSection = TrackSection {
@@ -1467,6 +1577,7 @@ pub const BARREL_ROLL_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
@@ -1480,6 +1591,7 @@ pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
@@ -1493,6 +1605,7 @@ pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
@@ -1506,6 +1619,7 @@ pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const HALF_LOOP: TrackSection = TrackSection {
@@ -1519,6 +1633,7 @@ pub const HALF_LOOP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
@@ -1532,6 +1647,7 @@ pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
@@ -1545,6 +1661,7 @@ pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const QUARTER_LOOP: TrackSection = TrackSection {
@@ -1558,6 +1675,7 @@ pub const QUARTER_LOOP: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const CORKSCREW_LEFT: TrackSection = TrackSection {
@@ -1571,6 +1689,7 @@ pub const CORKSCREW_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const CORKSCREW_RIGHT: TrackSection = TrackSection {
@@ -1584,6 +1703,7 @@ pub const CORKSCREW_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const LARGE_CORKSCREW_LEFT: TrackSection = TrackSection {
@@ -1597,6 +1717,7 @@ pub const LARGE_CORKSCREW_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 3,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const LARGE_CORKSCREW_RIGHT: TrackSection = TrackSection {
@@ -1610,6 +1731,7 @@ pub const LARGE_CORKSCREW_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 1,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
@@ -1623,6 +1745,7 @@ pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
@@ -1636,6 +1759,7 @@ pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
@@ -1649,6 +1773,7 @@ pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
@@ -1662,6 +1787,7 @@ pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 2,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
@@ -1675,6 +1801,7 @@ pub const ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
@@ -1688,6 +1815,7 @@ pub const ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const LARGE_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
@@ -1701,6 +1829,7 @@ pub const LARGE_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const LARGE_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
@@ -1714,6 +1843,7 @@ pub const LARGE_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 0,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
@@ -1727,6 +1857,7 @@ pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 0,
     has_supports: false,
+    chain_type: None,
 };
 
 pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
@@ -1740,4 +1871,5 @@ pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
     entry_angle_offset: 1,
     exit_angle_offset: 1,
     has_supports: false,
+    chain_type: None,
 };

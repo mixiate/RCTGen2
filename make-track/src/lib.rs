@@ -1,3 +1,4 @@
+mod chain;
 mod curves;
 mod mask;
 mod offset;
@@ -241,6 +242,11 @@ fn split_track_section(
         let split_images = if let Some(mut mask_depth) = mask_depth {
             let track_depth = image.to_cropped_depth();
             let mut image = image.into_cropped_indexed_image(dither);
+            if track.lift
+                && let Some(chain_type) = track_section.chain_type
+            {
+                chain::apply_chain(&mut image, chain_type, view_index);
+            }
 
             image.offset += offset_offset;
             mask_depth.offset += offset_offset;
@@ -248,6 +254,11 @@ fn split_track_section(
             split::split_image_depth(&image, view, mask_y_offset, &track_depth, &mask_depth)
         } else {
             let mut image = image.into_cropped_indexed_image(dither);
+            if track.lift
+                && let Some(chain_type) = track_section.chain_type
+            {
+                chain::apply_chain(&mut image, chain_type, view_index);
+            }
             image.offset += offset_offset;
 
             split::split_image(&image, view, mask_y_offset)
