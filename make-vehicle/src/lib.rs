@@ -621,16 +621,23 @@ pub fn make_vehicle(
         ImageOutputType::Dat => {
             let mut archive = rct::csg::Archive::with_capacity(images.len() + 3);
 
-            archive.add_sprite(preview_image.as_raw(), preview_image.width(), preview_image.height(), 0, 0);
+            archive.add_sprite(
+                preview_image.as_raw(),
+                preview_image.width().into(),
+                preview_image.height().into(),
+                0,
+                0,
+            );
 
             // previews 2 and 3, currently unimplemented
             let empty_image = renderer::image::IndexedImage::new(1, 1);
-            archive.add_sprite(empty_image.as_raw(), empty_image.width(), empty_image.height(), 0, 0);
-            archive.add_sprite(empty_image.as_raw(), empty_image.width(), empty_image.height(), 0, 0);
+            archive.add_sprite(empty_image.as_raw(), empty_image.width().into(), empty_image.height().into(), 0, 0);
+            archive.add_sprite(empty_image.as_raw(), empty_image.width().into(), empty_image.height().into(), 0, 0);
 
             for images in &images {
                 for image in images {
-                    let sprite = rct::csg::EncodedSprite::new(image.as_raw(), image.width(), image.height());
+                    let sprite =
+                        rct::csg::EncodedSprite::new(image.as_raw(), image.width().into(), image.height().into());
                     archive.add_encoded_sprite(&sprite, image.offset.x, image.offset.y);
                 }
             }
@@ -683,8 +690,8 @@ pub fn make_vehicle(
                         y: Some(image.offset.y),
                         src_x: Some(coord.x),
                         src_y: Some(coord.y),
-                        src_width: Some(image.width().try_into().unwrap()),
-                        src_height: Some(image.height().try_into().unwrap()),
+                        src_width: Some(image.width().into()),
+                        src_height: Some(image.height().into()),
                         format: None,
                         palette: Some(object_image::PaletteType::Keep),
                     }));

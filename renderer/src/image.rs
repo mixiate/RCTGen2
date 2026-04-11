@@ -70,19 +70,19 @@ impl IndexedImage {
         self.pixels[x + (y * usize::from(self.width))] = pixel;
     }
 
-    pub fn width(&self) -> usize {
-        self.width.into()
+    pub fn width(&self) -> u16 {
+        self.width
     }
 
-    pub fn height(&self) -> usize {
-        self.height.into()
+    pub fn height(&self) -> u16 {
+        self.height
     }
 
     pub fn blit(&mut self, image: &IndexedImage, dest_x: i32, dest_y: i32) {
         let dest_x = usize::try_from(dest_x).unwrap();
         let dest_y = usize::try_from(dest_y).unwrap();
-        for y in 0..image.height() {
-            for x in 0..image.width() {
+        for y in 0..usize::from(image.height()) {
+            for x in 0..usize::from(image.width()) {
                 self.set_pixel(dest_x + x, dest_y + y, image.get_pixel(x, y));
             }
         }
@@ -199,8 +199,8 @@ impl IndexedImage {
         const WATER_FIRST_INDEX: u8 = 230;
         const WATER_LAST_INDEX: u8 = 239;
 
-        for y in 0..self.height() {
-            for x in 0..self.width() {
+        for y in 0..usize::from(self.height()) {
+            for x in 0..usize::from(self.width()) {
                 let pixel = self.get_pixel(x, y);
                 if (WATER_FIRST_INDEX..=WATER_LAST_INDEX).contains(&pixel) {
                     let colour = crate::palette::srgb_to_linear_rgb(&crate::palette::PALETTE[usize::from(pixel)]);

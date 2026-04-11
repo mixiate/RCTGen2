@@ -73,13 +73,13 @@ impl MaskImage {
         let mut origin = None;
         for y in 0..image.height() {
             for x in 0..image.width() {
-                let pixel = image.get_pixel(x, y);
+                let pixel = image.get_pixel(x.into(), y.into());
                 section_count = std::cmp::max(section_count, pixel & PRIMARY_INDEX_MASK);
                 section_count = std::cmp::max(section_count, (pixel & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT);
 
                 if pixel & ORIGIN_MASK != 0 {
                     if origin.is_none() {
-                        origin = Some(glam::IVec2::new(x.try_into().unwrap(), y.try_into().unwrap()));
+                        origin = Some(glam::IVec2::new(x.into(), y.into()));
                     } else {
                         anyhow::bail!("More than one origin in {}", path.display());
                     }
@@ -233,8 +233,8 @@ impl View {
         let y = y + self.image.image.offset.y;
 
         (
-            x.clamp(0, self.image.image.width() as i32 - 1) as usize,
-            y.clamp(0, self.image.image.height() as i32 - 1) as usize,
+            x.clamp(0, i32::from(self.image.image.width()) - 1) as usize,
+            y.clamp(0, i32::from(self.image.image.height()) - 1) as usize,
         )
     }
 

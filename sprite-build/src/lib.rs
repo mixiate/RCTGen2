@@ -79,7 +79,7 @@ fn encode_sprite(
     image.crop();
 
     Ok(Sprite {
-        encoded_sprite: rct::csg::EncodedSprite::new(image.as_raw(), image.width(), image.height()),
+        encoded_sprite: rct::csg::EncodedSprite::new(image.as_raw(), image.width().into(), image.height().into()),
         x: image.offset.x,
         y: image.offset.y,
     })

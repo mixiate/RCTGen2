@@ -16,15 +16,15 @@ pub fn apply_chain(image: &mut renderer::image::IndexedImage, chain_type: ChainT
 
     for y in 0..image.height() {
         for x in 0..image.width() {
-            if image.get_pixel(x, y) == CHAIN_PALETTE_INDEX_START {
-                let chain_x = i32::try_from(x).unwrap();
-                let chain_y = i32::try_from(y).unwrap();
+            if image.get_pixel(x.into(), y.into()) == CHAIN_PALETTE_INDEX_START {
+                let chain_x = i32::from(x);
+                let chain_y = i32::from(y);
                 let chain_x = (chain_x + image.offset.x - chain_image.x_offset).rem_euclid(chain_image.width);
                 let chain_y = (chain_y + image.offset.y - chain_image.y_offset).rem_euclid(chain_image.height);
 
                 let chain_index = usize::try_from(chain_x + chain_y * chain_image.width).unwrap();
 
-                image.set_pixel(x, y, chain_image.pixels[chain_index]);
+                image.set_pixel(x.into(), y.into(), chain_image.pixels[chain_index]);
             }
         }
     }

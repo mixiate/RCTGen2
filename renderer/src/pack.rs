@@ -6,11 +6,7 @@ fn pack_rects_fixed(
 ) -> bool {
     let mut rect_packer = rect_packer::DensePacker::new(width.into(), height.into());
     for (image, coord) in images.iter().zip(coords.iter_mut()) {
-        if let Some(rect) = rect_packer.pack(
-            image.width().try_into().unwrap(),
-            image.height().try_into().unwrap(),
-            false,
-        ) {
+        if let Some(rect) = rect_packer.pack(image.width().into(), image.height().into(), false) {
             coord.x = rect.x;
             coord.y = rect.y;
         } else {
@@ -112,7 +108,7 @@ pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas
 
         for image in images {
             let x_neg = image.offset.x;
-            let x_pos = i32::try_from(image.width()).unwrap() + image.offset.x;
+            let x_pos = i32::from(image.width()) + image.offset.x;
             if x_neg < x_min {
                 x_min = x_neg;
             }
@@ -120,7 +116,7 @@ pub fn create_grid(images: &[crate::image::IndexedImage], columns: i32) -> Atlas
                 x_max = x_pos;
             }
             let y_neg = image.offset.y;
-            let y_pos = i32::try_from(image.height()).unwrap() + image.offset.y;
+            let y_pos = i32::from(image.height()) + image.offset.y;
             if y_neg < y_min {
                 y_min = y_neg;
             }

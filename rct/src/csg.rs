@@ -176,13 +176,16 @@ mod tests {
         let mut archive = crate::csg::Archive::with_capacity(2);
         archive.add_sprite(
             test_image.as_raw(),
-            test_image.width(),
-            test_image.height(),
+            test_image.width().into(),
+            test_image.height().into(),
             test_image.offset.x,
             test_image.offset.y,
         );
-        let encoded_sprite =
-            crate::csg::EncodedSprite::new(test_image.as_raw(), test_image.width(), test_image.height());
+        let encoded_sprite = crate::csg::EncodedSprite::new(
+            test_image.as_raw(),
+            test_image.width().into(),
+            test_image.height().into(),
+        );
         archive.add_encoded_sprite(&encoded_sprite, test_image.offset.x, test_image.offset.y);
 
         let temp_dir = tempfile::tempdir().unwrap();

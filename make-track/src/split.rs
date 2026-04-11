@@ -6,11 +6,11 @@ fn split_sprite(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset.x + i32::try_from(x).unwrap();
-            let mask_y = image.offset.y + i32::try_from(y).unwrap() + y_offset;
+            let mask_x = image.offset.x + i32::from(x);
+            let mask_y = image.offset.y + i32::from(y) + y_offset;
 
             if !view.sample_primary(mask_x, mask_y, sprite.index) {
-                image.set_pixel(x, y, 0);
+                image.set_pixel(x.into(), y.into(), 0);
             }
         }
     }
@@ -27,10 +27,10 @@ fn split_sprite_intersect(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset.x + i32::try_from(x).unwrap();
-            let mask_y = image.offset.y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::from(x);
+            let mask_y = image.offset.y + i32::from(y);
 
-            let track_depth = track_depth.get_depth(x, y);
+            let track_depth = track_depth.get_depth(x.into(), y.into());
             let mask_depth = {
                 let x = mask_x - mask_depth.offset.x;
                 let y = mask_y - mask_depth.offset.y;
@@ -46,7 +46,7 @@ fn split_sprite_intersect(
             };
 
             if !view.sample_primary(mask_x, mask_y + y_offset, sprite.index) || track_depth < mask_depth {
-                image.set_pixel(x, y, 0);
+                image.set_pixel(x.into(), y.into(), 0);
             }
         }
     }
@@ -63,10 +63,10 @@ fn split_sprite_difference(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset.x + i32::try_from(x).unwrap();
-            let mask_y = image.offset.y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::from(x);
+            let mask_y = image.offset.y + i32::from(y);
 
-            let track_depth = track_depth.get_depth(x, y);
+            let track_depth = track_depth.get_depth(x.into(), y.into());
             let mask_depth = {
                 let x = mask_x - mask_depth.offset.x;
                 let y = mask_y - mask_depth.offset.y;
@@ -82,7 +82,7 @@ fn split_sprite_difference(
             };
 
             if !view.sample_secondary(mask_x, mask_y + y_offset, sprite.index) || track_depth >= mask_depth {
-                image.set_pixel(x, y, 0);
+                image.set_pixel(x.into(), y.into(), 0);
             }
         }
     }
@@ -99,10 +99,10 @@ fn split_sprite_transfer_next(
 ) -> renderer::image::IndexedImage {
     for y in 0..image.height() {
         for x in 0..image.width() {
-            let mask_x = image.offset.x + i32::try_from(x).unwrap();
-            let mask_y = image.offset.y + i32::try_from(y).unwrap();
+            let mask_x = image.offset.x + i32::from(x);
+            let mask_y = image.offset.y + i32::from(y);
 
-            let track_depth = track_depth.get_depth(x, y);
+            let track_depth = track_depth.get_depth(x.into(), y.into());
             let mask_depth = {
                 let x = mask_x - mask_depth.offset.x;
                 let y = mask_y - mask_depth.offset.y;
@@ -120,7 +120,7 @@ fn split_sprite_transfer_next(
             if !(view.sample_primary(mask_x, mask_y + y_offset, sprite.index)
                 || view.sample_primary(mask_x, mask_y + y_offset, sprite.index + 1) && track_depth > mask_depth)
             {
-                image.set_pixel(x, y, 0);
+                image.set_pixel(x.into(), y.into(), 0);
             }
         }
     }
