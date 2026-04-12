@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.102"
 embree = { path = "../embree" }
-enum-map = "2.7.3"
 glam = "0.32.1"
 obj = "0.10.2"
 png = "0.18.1"
