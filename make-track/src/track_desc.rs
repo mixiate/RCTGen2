@@ -60,20 +60,6 @@ pub struct Models<T> {
     pub support_bank_five_sixths: Option<T>,
     pub support_bank: Option<T>,
     pub support_base: Option<T>,
-    pub brake: Option<T>,
-    pub block_brake: Option<T>,
-    pub booster: Option<T>,
-    pub magnetic_brake: Option<T>,
-    pub support_steep_to_vertical: Option<T>,
-    pub support_vertical_to_steep: Option<T>,
-    pub support_vertical: Option<T>,
-    pub support_vertical_twist: Option<T>,
-    pub support_barrel_roll: Option<T>,
-    pub support_half_loop: Option<T>,
-    pub support_quarter_loop: Option<T>,
-    pub support_corkscrew: Option<T>,
-    pub support_zero_g_roll: Option<T>,
-    pub support_large_zero_g_roll: Option<T>,
 }
 
 impl Models<std::path::PathBuf> {
@@ -96,20 +82,6 @@ impl Models<std::path::PathBuf> {
             support_bank_five_sixths: load_optional_model(&self.support_bank_five_sixths)?,
             support_bank: load_optional_model(&self.support_bank)?,
             support_base: load_optional_model(&self.support_base)?,
-            brake: load_optional_model(&self.brake)?,
-            block_brake: load_optional_model(&self.block_brake)?,
-            booster: load_optional_model(&self.booster)?,
-            magnetic_brake: load_optional_model(&self.magnetic_brake)?,
-            support_steep_to_vertical: load_optional_model(&self.support_steep_to_vertical)?,
-            support_vertical_to_steep: load_optional_model(&self.support_vertical_to_steep)?,
-            support_vertical: load_optional_model(&self.support_vertical)?,
-            support_vertical_twist: load_optional_model(&self.support_vertical_twist)?,
-            support_barrel_roll: load_optional_model(&self.support_barrel_roll)?,
-            support_half_loop: load_optional_model(&self.support_half_loop)?,
-            support_quarter_loop: load_optional_model(&self.support_quarter_loop)?,
-            support_corkscrew: load_optional_model(&self.support_corkscrew)?,
-            support_zero_g_roll: load_optional_model(&self.support_zero_g_roll)?,
-            support_large_zero_g_roll: load_optional_model(&self.support_large_zero_g_roll)?,
         })
     }
 }
