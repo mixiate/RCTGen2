@@ -46,6 +46,7 @@ pub enum TrackGroup {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Models<T> {
     pub track: T,
     pub mask: T,
@@ -87,6 +88,7 @@ impl Models<std::path::PathBuf> {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Track {
     pub sections: std::collections::HashSet<TrackGroup>,
     pub masks: std::path::PathBuf,
@@ -117,6 +119,7 @@ impl Track {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Offsets {
     pub flat: [[f32; 2]; 4],
     pub gentle: [[f32; 2]; 4],
@@ -139,6 +142,7 @@ pub enum LightType {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Light {
     pub r#type: LightType,
     pub shadow: bool,
@@ -147,6 +151,7 @@ pub struct Light {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Desc {
     pub tracks: Vec<Track>,
     pub offsets: Option<Offsets>,
