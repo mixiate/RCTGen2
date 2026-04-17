@@ -7642,5 +7642,29 @@
         "x": -24,
         "y": -23,
         "palette": "keep"
+    },
+    {
+        "path": "track/test-track-boundary-tie/very_small_turn_left_0.png",
+        "x": -22,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-boundary-tie/very_small_turn_left_1.png",
+        "x": -22,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-boundary-tie/very_small_turn_left_2.png",
+        "x": 2,
+        "y": -5,
+        "palette": "keep"
+    },
+    {
+        "path": "track/test-track-boundary-tie/very_small_turn_left_3.png",
+        "x": -22,
+        "y": 7,
+        "palette": "keep"
     }
 ]

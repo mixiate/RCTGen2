@@ -18,7 +18,8 @@
                 "helices",
                 "small_slope_transitions",
                 "large_slope_transitions",
-                "turn_bank_transitions"
+                "turn_bank_transitions",
+                "very_small_turns"
             ],
             "z_offset": 13,
             "length": 0.5,
