@@ -43,6 +43,7 @@ pub enum TrackGroup {
     ZeroGRolls,
     DiveLoops,
     TurnBankTransitions,
+    VerySmallTurns,
 }
 
 #[derive(Debug, serde::Deserialize)]

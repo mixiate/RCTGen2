@@ -143,6 +143,20 @@
             "mask": "default/single_tile.png"
         }
     ],
+    "very_small_turn_left": [
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        },
+        {
+            "mask": "default/single_tile.png"
+        }
+    ],
     "small_turn_left": [
         {
             "mask": "default/small_turn_left_0.png",

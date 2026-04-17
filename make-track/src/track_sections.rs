@@ -264,6 +264,20 @@ pub const STEEP_TO_FLAT: TrackSection = TrackSection {
     chain_type: None,
 };
 
+pub const VERY_SMALL_TURN_LEFT: TrackSection = TrackSection {
+    name: "very_small_turn_left",
+    curve: crate::track_curves::very_small_turn_left,
+    length: crate::track_curves::VERY_SMALL_TURN_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 3,
+    has_supports: true,
+    chain_type: None,
+};
+
 pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
     name: "small_turn_left",
     curve: crate::track_curves::small_turn_left,

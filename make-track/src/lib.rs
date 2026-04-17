@@ -501,6 +501,9 @@ fn list_track_sections(
         track_sections.push(&track_sections::LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE);
         track_sections.push(&track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE);
     }
+    if sections.contains(&TrackGroup::VerySmallTurns) {
+        track_sections.push(&track_sections::VERY_SMALL_TURN_LEFT);
+    }
 
     track_sections
 }

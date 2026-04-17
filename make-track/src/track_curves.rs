@@ -317,6 +317,10 @@ pub fn steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::
     )
 }
 
+pub fn very_small_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+    crate::curves::turn_left(distance, VERY_SMALL_TURN_RADIUS)
+}
+
 pub fn small_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::turn_left(distance, SMALL_TURN_RADIUS)
 }
