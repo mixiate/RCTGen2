@@ -75,8 +75,8 @@ fn orientation_to_quat(orientation: &[f32; 3]) -> glam::Quat {
     glam::Quat::from_euler(
         glam::EulerRot::XYZ,
         orientation[0].to_radians(),
-        orientation[2].to_radians(), // Y and Z are swapped. Fix?
         orientation[1].to_radians(),
+        orientation[2].to_radians(),
     )
 }
 
