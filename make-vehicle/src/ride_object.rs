@@ -347,7 +347,7 @@ impl Car {
             .iter()
             .flatten()
             .flat_map(|rider| {
-                let position = (32.0 * rider.position[0] / crate::TILE_SIZE).round() as i32;
+                let position = (32.0 * rider.position[2]).round() as i32;
                 if num_seats > 1 {
                     vec![position - 1, position + 1]
                 } else {
@@ -358,7 +358,7 @@ impl Car {
 
         Car {
             rotation_frame_mask,
-            spacing: ((vehicle.spacing * 278912.0) / crate::TILE_SIZE) as i32,
+            spacing: (vehicle.spacing * 278912.0) as i32,
             mass: vehicle.mass,
             num_seats,
             num_seat_rows,

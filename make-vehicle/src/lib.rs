@@ -1,8 +1,6 @@
 mod ride_desc;
 mod ride_object;
 
-const TILE_SIZE: f32 = 3.3;
-
 struct VehicleRotation {
     pitch: f32,
     roll: f32,
@@ -428,14 +426,14 @@ fn render_rotation(
     lights: &[renderer::Light],
     rotation: &VehicleRotation,
 ) -> renderer::image::IndexedImage {
-    let view_rotation = glam::Mat4::from_euler(glam::EulerRot::YZX, rotation.yaw, rotation.pitch, rotation.roll);
+    let view_rotation = glam::Mat4::from_euler(glam::EulerRot::YXZ, rotation.yaw, -rotation.pitch, rotation.roll);
 
     let camera = camera * view_rotation;
 
     let view_rotation_inverse = view_rotation.inverse();
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
-    const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // ?
+    const EDGE_DISTANCE: f32 = 0.088_388_346; // ?
     let framebuffer = renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
     framebuffer.into_cropped_indexed_image(true)
 }
@@ -515,13 +513,9 @@ fn render(
 
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
-            glam::Vec3::new(32.0 / TILE_SIZE, 0.0, -32.0 / TILE_SIZE),
-            glam::Vec3::new(-16.0 / TILE_SIZE, -16.0 * 6.0_f32.sqrt() / TILE_SIZE, -16.0 / TILE_SIZE),
-            glam::Vec3::new(
-                16.0 * 3.0_f32.sqrt() / TILE_SIZE,
-                -16.0 * 2.0_f32.sqrt() / TILE_SIZE,
-                16.0 * 3.0_f32.sqrt() / TILE_SIZE,
-            ),
+            glam::Vec3::new(32.0, 0.0, 32.0),
+            glam::Vec3::new(16.0, -16.0 * 6.0_f32.sqrt(), -16.0),
+            glam::Vec3::new(-16.0 * 3.0_f32.sqrt(), -16.0 * 2.0_f32.sqrt(), 16.0 * 3.0_f32.sqrt()),
         )
         .transpose(),
     );
