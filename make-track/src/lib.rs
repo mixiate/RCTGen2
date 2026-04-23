@@ -9,7 +9,7 @@ mod track_desc;
 mod track_model;
 mod track_sections;
 
-const CLEARANCE_HEIGHT: f32 = 0.204_124_15; // 1.0 / (2.0 * 6.0.sqrt())
+const CLEARANCE_HEIGHT: f32 = 0.20412415; // 1.0 / (2.0 * 6.0.sqrt())
 
 fn render_scene(
     scene: &renderer::Scene,
@@ -537,7 +537,7 @@ fn render(
 
     let lights = track_desc.get_lights();
 
-    let edge_distance = track_desc.edge_distance.unwrap_or(0.088_388_346);
+    let edge_distance = track_desc.edge_distance.unwrap_or(0.088388346);
 
     let mut sprite_descs = Vec::new();
     for track in &track_desc.tracks {

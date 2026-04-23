@@ -61,7 +61,7 @@ struct VehicleAngles {
 impl VehicleAngles {
     fn new() -> Self {
         const FRAC_PI_12: f32 = std::f32::consts::PI / 12.0;
-        const SQRT_6: f32 = 2.449_489_8;
+        const SQRT_6: f32 = 2.4494898;
         const TILE_SLOPE: f32 = 1.0 / SQRT_6;
 
         const CORKSCREW_ANGLES: [f32; 5] = [
@@ -433,7 +433,7 @@ fn render_rotation(
     let view_rotation_inverse = view_rotation.inverse();
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
-    const EDGE_DISTANCE: f32 = 0.088_388_346; // ?
+    const EDGE_DISTANCE: f32 = 0.088388346; // ?
     let framebuffer = renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
     framebuffer.into_cropped_indexed_image(true)
 }

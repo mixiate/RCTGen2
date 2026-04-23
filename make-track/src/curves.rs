@@ -356,13 +356,13 @@ pub fn large_turn_to_diag_gentle(
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
     let u = reparameterize(
-        1.751_793e-5,
-        -1.076_157_3e-4,
-        3.104_037e-4,
-        6.329_133_6e-5,
-        1.046_596_3e-3,
-        -3.471_377e-4,
-        3.091_829_4e-1,
+        1.751793e-5,
+        -1.0761573e-4,
+        3.104037e-4,
+        6.3291336e-5,
+        1.0465963e-3,
+        -3.471377e-4,
+        3.0918294e-1,
         distance,
     );
     let mut point = cubic_curve_horizontal(
@@ -391,13 +391,13 @@ pub fn large_turn_to_orthogonal_gentle(
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
     let u = reparameterize(
-        1.751_793e-5,
-        -1.076_157_3e-4,
-        3.104_037e-4,
-        6.329_133_6e-5,
-        1.046_596_3e-3,
-        -3.471_377e-4,
-        3.091_829_4e-1,
+        1.751793e-5,
+        -1.0761573e-4,
+        3.104037e-4,
+        6.3291336e-5,
+        1.0465963e-3,
+        -3.471377e-4,
+        3.0918294e-1,
         distance,
     );
     let mut point = cubic_curve_horizontal(

@@ -36,7 +36,7 @@ struct TestDesc {
     sprite_directory: std::path::PathBuf,
 }
 
-const SQRT_6: f32 = 2.449_489_8;
+const SQRT_6: f32 = 2.4494898;
 const TILE_SIZE: f32 = 3.3;
 const CLEARANCE_HEIGHT: f32 = 0.5 * TILE_SIZE / SQRT_6;
 
@@ -164,7 +164,7 @@ fn main() -> anyhow::Result<()> {
                     })
                     .collect();
 
-                const EDGE_DISTANCE: f32 = 4.0 / 13.713_586; // ?
+                const EDGE_DISTANCE: f32 = 4.0 / 13.713586; // ?
                 let framebuffer = renderer::render_scene(&scene, &mesh_types, &camera, &lights, 4, 4, EDGE_DISTANCE);
 
                 let image = framebuffer.to_image();
