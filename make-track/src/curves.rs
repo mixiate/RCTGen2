@@ -10,9 +10,8 @@ fn cubic_second_derivative(a: f32, b: f32, x: f32) -> f32 {
     6.0 * x * a + 2.0 * b
 }
 
-#[expect(clippy::too_many_arguments)]
-pub fn reparameterize(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, x: f32) -> f32 {
-    x * (x * (x * (x * (x * (x * (x * a + b) + c) + d) + e) + f) + g)
+pub fn reparameterize(c: &[f32; 7], x: f32) -> f32 {
+    x * (x * (x * (x * (x * (x * (x * c[0] + c[1]) + c[2]) + c[3]) + c[4]) + c[5]) + c[6])
 }
 
 pub fn plane_curve_vertical(position: &glam::Vec3, tangent: &glam::Vec3) -> crate::track_sections::TrackPoint {
@@ -33,40 +32,26 @@ pub fn plane_curve_horizontal(position: &glam::Vec3, tangent: &glam::Vec3) -> cr
     }
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn cubic_curve_vertical(
     x: &[f32; 4],
     y: &[f32; 4],
-    p_a: f32,
-    p_b: f32,
-    p_c: f32,
-    p_d: f32,
-    p_e: f32,
-    p_f: f32,
-    p_g: f32,
+    reparam_coeffs: &[f32; 7],
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
-    let u = reparameterize(p_a, p_b, p_c, p_d, p_e, p_f, p_g, distance);
+    let u = reparameterize(reparam_coeffs, distance);
     plane_curve_vertical(
         &glam::Vec3::new(0.0, cubic(y, u), cubic(x, u)),
         &glam::Vec3::new(0.0, cubic_derivative(y, u), cubic_derivative(x, u)).normalize(),
     )
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn cubic_curve_horizontal(
     x: &[f32; 4],
     y: &[f32; 4],
-    p_a: f32,
-    p_b: f32,
-    p_c: f32,
-    p_d: f32,
-    p_e: f32,
-    p_f: f32,
-    p_g: f32,
+    reparam_coeffs: &[f32; 7],
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
-    let u = reparameterize(p_a, p_b, p_c, p_d, p_e, p_f, p_g, distance);
+    let u = reparameterize(reparam_coeffs, distance);
     plane_curve_horizontal(
         &glam::Vec3::new(cubic(y, u), 0.0, cubic(x, u)),
         &glam::Vec3::new(cubic_derivative(y, u), 0.0, cubic_derivative(x, u)).normalize(),
@@ -111,21 +96,14 @@ pub fn plane_curve_vertical_diagonal(position: &glam::Vec3, tangent: &glam::Vec3
     }
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn cubic_curve_vertical_diagonal(
     x: &[f32; 4],
     y: &[f32; 4],
-    p_a: f32,
-    p_b: f32,
-    p_c: f32,
-    p_d: f32,
-    p_e: f32,
-    p_f: f32,
-    p_g: f32,
+    reparam_coeffs: &[f32; 7],
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
     use std::f32::consts::SQRT_2;
-    let u = reparameterize(p_a, p_b, p_c, p_d, p_e, p_f, p_g, distance);
+    let u = reparameterize(reparam_coeffs, distance);
     let c_x = cubic(x, u);
     let c_y = cubic(y, u);
     let d_x = cubic_derivative(x, u);
@@ -136,22 +114,15 @@ pub fn cubic_curve_vertical_diagonal(
     )
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn bezier3d(
     x: &[f32; 4],
     y: &[f32; 4],
     z: &[f32; 4],
     roll: &[f32; 4],
-    pa: f32,
-    pb: f32,
-    pc: f32,
-    pd: f32,
-    pe: f32,
-    pf: f32,
-    pg: f32,
+    reparam_coeffs: &[f32; 7],
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
-    let u = reparameterize(pa, pb, pc, pd, pe, pf, pg, distance);
+    let u = reparameterize(reparam_coeffs, distance);
 
     let position = glam::Vec3::new(cubic(x, u), cubic(y, u), cubic(z, u));
     let tangent = glam::Vec3::new(cubic_derivative(x, u), cubic_derivative(y, u), cubic_derivative(z, u)).normalize();
@@ -174,22 +145,15 @@ pub fn bezier3d(
     }
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn zero_g_roll(
     radius: f32,
     x: &[f32; 4],
     y: &[f32; 4],
     roll: &[f32; 4],
-    pa: f32,
-    pb: f32,
-    pc: f32,
-    pd: f32,
-    pe: f32,
-    pf: f32,
-    pg: f32,
+    reparam_coeffs: &[f32; 7],
     distance: f32,
 ) -> crate::track_sections::TrackPoint {
-    let u = reparameterize(pa, pb, pc, pd, pe, pf, pg, distance);
+    let u = reparameterize(reparam_coeffs, distance);
 
     let unbanked_point = plane_curve_vertical(
         &glam::Vec3::new(0.0, cubic(y, u), cubic(x, u)),
@@ -287,16 +251,18 @@ pub fn sloped_turn_right(radius: f32, gradient: f32, distance: f32) -> crate::tr
 
 pub fn large_turn_to_diag_gentle(x: &[f32; 4], y: &[f32; 4], distance: f32) -> crate::track_sections::TrackPoint {
     let u = reparameterize(
-        1.751793e-5,
-        -1.0761573e-4,
-        3.104037e-4,
-        6.3291336e-5,
-        1.0465963e-3,
-        -3.471377e-4,
-        3.0918294e-1,
+        &[
+            1.751793e-5,
+            -1.0761573e-4,
+            3.104037e-4,
+            6.3291336e-5,
+            1.0465963e-3,
+            -3.471377e-4,
+            3.0918294e-1,
+        ],
         distance,
     );
-    let mut point = cubic_curve_horizontal(x, y, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, u);
+    let mut point = cubic_curve_horizontal(x, y, &[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], u);
 
     point.position.y += 6.0 * crate::CLEARANCE_HEIGHT * u - 1.5 * crate::CLEARANCE_HEIGHT * u * u * (u - 1.0);
     point.tangent.y +=
@@ -309,16 +275,18 @@ pub fn large_turn_to_diag_gentle(x: &[f32; 4], y: &[f32; 4], distance: f32) -> c
 
 pub fn large_turn_to_orthogonal_gentle(x: &[f32; 4], y: &[f32; 4], distance: f32) -> crate::track_sections::TrackPoint {
     let u = reparameterize(
-        1.751793e-5,
-        -1.0761573e-4,
-        3.104037e-4,
-        6.3291336e-5,
-        1.0465963e-3,
-        -3.471377e-4,
-        3.0918294e-1,
+        &[
+            1.751793e-5,
+            -1.0761573e-4,
+            3.104037e-4,
+            6.3291336e-5,
+            1.0465963e-3,
+            -3.471377e-4,
+            3.0918294e-1,
+        ],
         distance,
     );
-    let mut point = cubic_curve_horizontal(x, y, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, u);
+    let mut point = cubic_curve_horizontal(x, y, &[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0], u);
 
     point.position.y += 6.0 * crate::CLEARANCE_HEIGHT * u - 1.5 * crate::CLEARANCE_HEIGHT * u * (u * u - 2.0 * u + 1.0);
     point.tangent.y +=
