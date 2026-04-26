@@ -89,14 +89,8 @@ pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoin
 
 pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        0.0,
-        0.0,
-        1.0,
-        0.0,
-        0.0,
-        CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[0.0, 0.0, 1.0, 0.0],
+        &[0.0, CLEARANCE_HEIGHT, 0.0, 0.0],
         1.3920753e-5,
         -9.1366813e-4,
         3.8269162e-3,
@@ -110,14 +104,8 @@ pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections:
 
 pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        0.0,
-        0.0,
-        1.0,
-        0.0,
-        0.0,
-        -CLEARANCE_HEIGHT,
-        2.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[0.0, 0.0, 1.0, 0.0],
+        &[0.0, -CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, 0.0],
         1.3920822e-5,
         8.135797e-4,
         -1.4953648e-3,
@@ -139,14 +127,8 @@ pub fn gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPo
 
 pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        -0.5,
-        1.0,
-        0.5,
-        0.0,
-        CLEARANCE_HEIGHT,
-        2.0 * CLEARANCE_HEIGHT,
-        CLEARANCE_HEIGHT,
-        0.0,
+        &[-0.5, 1.0, 0.5, 0.0],
+        &[CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 0.0],
         9.3843585e-1,
         -4.9362073,
         1.0667583e1,
@@ -160,14 +142,8 @@ pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections
 
 pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        -0.5,
-        0.5,
-        1.0,
-        0.0,
-        CLEARANCE_HEIGHT,
-        -5.0 * CLEARANCE_HEIGHT,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[-0.5, 0.5, 1.0, 0.0],
+        &[CLEARANCE_HEIGHT, -5.0 * CLEARANCE_HEIGHT, 8.0 * CLEARANCE_HEIGHT, 0.0],
         9.3843585e-1,
         -3.696703,
         5.78079,
@@ -189,14 +165,13 @@ pub fn steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoi
 
 pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        -1.0 / 6.0,
-        -1.0 / 6.0,
-        5.0 / 6.0,
-        -1.0 / 2.0,
-        2.0 * CLEARANCE_HEIGHT / 3.0,
-        -CLEARANCE_HEIGHT / 3.0,
-        20.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
+        &[-1.0 / 6.0, -1.0 / 6.0, 5.0 / 6.0, -1.0 / 2.0],
+        &[
+            2.0 * CLEARANCE_HEIGHT / 3.0,
+            -CLEARANCE_HEIGHT / 3.0,
+            20.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
         5.185948e-4,
         1.0548112e-3,
         -9.063116e-3,
@@ -210,14 +185,13 @@ pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> crate::track_sectio
 
 pub fn vertical_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        -1.0 / 6.0,
-        2.0 / 3.0,
-        0.0,
-        0.0,
-        -2.0 * CLEARANCE_HEIGHT / 3.0,
-        CLEARANCE_HEIGHT,
-        20.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
+        &[-1.0 / 6.0, 2.0 / 3.0, 0.0, 0.0],
+        &[
+            -2.0 * CLEARANCE_HEIGHT / 3.0,
+            CLEARANCE_HEIGHT,
+            20.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
         -1.1517829e-3,
         8.245657e-3,
         -2.3461025e-2,
@@ -235,14 +209,13 @@ pub fn vertical(distance: f32, _bank_angle: f32) -> crate::track_sections::Track
 
 pub fn small_flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        2.0 * CLEARANCE_HEIGHT - 1.0,
-        2.0 - 4.0 * CLEARANCE_HEIGHT,
-        2.0 * CLEARANCE_HEIGHT,
-        0.0,
-        2.0 * CLEARANCE_HEIGHT,
-        1.0 * CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[
+            2.0 * CLEARANCE_HEIGHT - 1.0,
+            2.0 - 4.0 * CLEARANCE_HEIGHT,
+            2.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
+        &[2.0 * CLEARANCE_HEIGHT, 1.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         2.7488382,
         -1.3277029e1,
         2.6213465e1,
@@ -256,14 +229,13 @@ pub fn small_flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sect
 
 pub fn small_steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        2.0 * CLEARANCE_HEIGHT - 1.0,
-        1.0 - 2.0 * CLEARANCE_HEIGHT,
-        1.0,
-        0.0,
-        2.0 * CLEARANCE_HEIGHT,
-        -7.0 * CLEARANCE_HEIGHT,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[2.0 * CLEARANCE_HEIGHT - 1.0, 1.0 - 2.0 * CLEARANCE_HEIGHT, 1.0, 0.0],
+        &[
+            2.0 * CLEARANCE_HEIGHT,
+            -7.0 * CLEARANCE_HEIGHT,
+            8.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
         2.7488382,
         -1.021498e1,
         1.4998282e1,
@@ -277,14 +249,8 @@ pub fn small_steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sect
 
 pub fn flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        -0.5,
-        -0.5,
-        5.0,
-        0.0,
-        -2.0 * CLEARANCE_HEIGHT,
-        13.0 * CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[-0.5, -0.5, 5.0, 0.0],
+        &[-2.0 * CLEARANCE_HEIGHT, 13.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         8.279922e-8,
         -1.8801596e-6,
         1.2841849e-5,
@@ -298,14 +264,13 @@ pub fn flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::
 
 pub fn steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        -0.5,
-        2.0,
-        2.5,
-        0.0,
-        -2.0 * CLEARANCE_HEIGHT,
-        -7.0 * CLEARANCE_HEIGHT,
-        20.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[-0.5, 2.0, 2.5, 0.0],
+        &[
+            -2.0 * CLEARANCE_HEIGHT,
+            -7.0 * CLEARANCE_HEIGHT,
+            20.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
         8.279922e-8,
         -8.975044e-7,
         -1.2860592e-6,
@@ -331,14 +296,13 @@ pub fn medium_turn_left(distance: f32, _bank_angle: f32) -> crate::track_section
 
 pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_horizontal(
-        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
-        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
-        44.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        2.0 - 8.0 * CLEARANCE_HEIGHT,
-        8.0 * CLEARANCE_HEIGHT - 3.0,
-        0.0,
-        0.0,
+        &[
+            68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+            7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+            44.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
+        &[2.0 - 8.0 * CLEARANCE_HEIGHT, 8.0 * CLEARANCE_HEIGHT - 3.0, 0.0, 0.0],
         1.7624916e-5,
         -8.695496e-5,
         2.0639959e-4,
@@ -352,14 +316,13 @@ pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> crate::track_
 
 pub fn large_turn_right_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_horizontal(
-        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
-        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
-        44.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        8.0 * CLEARANCE_HEIGHT - 2.0,
-        3.0 - 8.0 * CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[
+            68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+            7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+            44.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
+        &[8.0 * CLEARANCE_HEIGHT - 2.0, 3.0 - 8.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         1.7624916e-5,
         -8.695496e-5,
         2.0639959e-4,
@@ -382,14 +345,8 @@ pub fn flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
 
 pub fn flat_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical_diagonal(
-        0.0,
-        0.0,
-        FLAT_DIAG_LENGTH,
-        0.0,
-        0.0,
-        CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[0.0, 0.0, FLAT_DIAG_LENGTH, 0.0],
+        &[0.0, CLEARANCE_HEIGHT, 0.0, 0.0],
         -1.7384193e-6,
         -9.544348e-6,
         1.45493e-4,
@@ -403,14 +360,8 @@ pub fn flat_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sect
 
 pub fn gentle_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical_diagonal(
-        0.0,
-        0.0,
-        FLAT_DIAG_LENGTH,
-        0.0,
-        0.0,
-        -CLEARANCE_HEIGHT,
-        2.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[0.0, 0.0, FLAT_DIAG_LENGTH, 0.0],
+        &[0.0, -CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, 0.0],
         -1.7384158e-6,
         2.6989921e-5,
         -1.1635489e-5,
@@ -433,14 +384,8 @@ pub fn gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::Tr
 
 pub fn gentle_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical_diagonal(
-        -0.5 * FLAT_DIAG_LENGTH,
-        FLAT_DIAG_LENGTH,
-        0.5 * FLAT_DIAG_LENGTH,
-        0.0,
-        CLEARANCE_HEIGHT,
-        2.0 * CLEARANCE_HEIGHT,
-        CLEARANCE_HEIGHT,
-        0.0,
+        &[-0.5 * FLAT_DIAG_LENGTH, FLAT_DIAG_LENGTH, 0.5 * FLAT_DIAG_LENGTH, 0.0],
+        &[CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 0.0],
         1.614862e-1,
         -1.0725589,
         2.9278903,
@@ -454,14 +399,8 @@ pub fn gentle_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sec
 
 pub fn steep_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical_diagonal(
-        -0.5 * FLAT_DIAG_LENGTH,
-        0.5 * FLAT_DIAG_LENGTH,
-        FLAT_DIAG_LENGTH,
-        0.0,
-        CLEARANCE_HEIGHT,
-        -5.0 * CLEARANCE_HEIGHT,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[-0.5 * FLAT_DIAG_LENGTH, 0.5 * FLAT_DIAG_LENGTH, FLAT_DIAG_LENGTH, 0.0],
+        &[CLEARANCE_HEIGHT, -5.0 * CLEARANCE_HEIGHT, 8.0 * CLEARANCE_HEIGHT, 0.0],
         1.614862e-1,
         -7.996634e-1,
         1.5719471,
@@ -484,14 +423,13 @@ pub fn steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::Tra
 pub fn small_flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     use std::f32::consts::SQRT_2;
     crate::curves::cubic_curve_vertical_diagonal(
-        SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
-        SQRT_2 * (2.0 - 4.0 * CLEARANCE_HEIGHT),
-        SQRT_2 * (2.0 * CLEARANCE_HEIGHT),
-        0.0,
-        2.0 * CLEARANCE_HEIGHT,
-        CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[
+            SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
+            SQRT_2 * (2.0 - 4.0 * CLEARANCE_HEIGHT),
+            SQRT_2 * (2.0 * CLEARANCE_HEIGHT),
+            0.0,
+        ],
+        &[2.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 0.0, 0.0],
         3.9151412e-1,
         -2.4569545,
         6.3028965,
@@ -506,14 +444,18 @@ pub fn small_flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track
 pub fn small_steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     use std::f32::consts::SQRT_2;
     crate::curves::cubic_curve_vertical_diagonal(
-        SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
-        SQRT_2 * (1.0 - 2.0 * CLEARANCE_HEIGHT),
-        SQRT_2,
-        0.0,
-        2.0 * CLEARANCE_HEIGHT,
-        -7.0 * CLEARANCE_HEIGHT,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[
+            SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
+            SQRT_2 * (1.0 - 2.0 * CLEARANCE_HEIGHT),
+            SQRT_2,
+            0.0,
+        ],
+        &[
+            2.0 * CLEARANCE_HEIGHT,
+            -7.0 * CLEARANCE_HEIGHT,
+            8.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
         3.9151412e-1,
         -1.8850533,
         3.5846596,
@@ -527,14 +469,8 @@ pub fn small_steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track
 
 pub fn flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical_diagonal(
-        0.0,
-        -FLAT_DIAG_LENGTH,
-        4.0 * FLAT_DIAG_LENGTH,
-        0.0,
-        -6.0 * CLEARANCE_HEIGHT,
-        17.0 * CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[0.0, -FLAT_DIAG_LENGTH, 4.0 * FLAT_DIAG_LENGTH, 0.0],
+        &[-6.0 * CLEARANCE_HEIGHT, 17.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         8.7120867e-7,
         -1.5215153e-5,
         1.2006658e-4,
@@ -548,14 +484,8 @@ pub fn flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_secti
 
 pub fn steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical_diagonal(
-        0.0,
-        FLAT_DIAG_LENGTH,
-        2.0 * FLAT_DIAG_LENGTH,
-        0.0,
-        -6.0 * CLEARANCE_HEIGHT,
-        CLEARANCE_HEIGHT,
-        16.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[0.0, FLAT_DIAG_LENGTH, 2.0 * FLAT_DIAG_LENGTH, 0.0],
+        &[-6.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 16.0 * CLEARANCE_HEIGHT, 0.0],
         8.7120867e-7,
         -1.5013254e-5,
         1.17064288e-04,
@@ -689,56 +619,62 @@ pub fn medium_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track
 
 pub fn large_turn_left_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::large_turn_to_diag_gentle(
-        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
-        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
-        44.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        2.0 - 8.0 * CLEARANCE_HEIGHT,
-        8.0 * CLEARANCE_HEIGHT - 3.0,
-        0.0,
-        0.0,
+        &[
+            68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+            7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+            44.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
+        &[2.0 - 8.0 * CLEARANCE_HEIGHT, 8.0 * CLEARANCE_HEIGHT - 3.0, 0.0, 0.0],
         distance,
     )
 }
 
 pub fn large_turn_right_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::large_turn_to_diag_gentle(
-        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
-        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
-        44.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        8.0 * CLEARANCE_HEIGHT - 2.0,
-        3.0 - 8.0 * CLEARANCE_HEIGHT,
-        0.0,
-        0.0,
+        &[
+            68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+            7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+            44.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
+        &[8.0 * CLEARANCE_HEIGHT - 2.0, 3.0 - 8.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         distance,
     )
 }
 
 pub fn large_turn_left_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::large_turn_to_orthogonal_gentle(
-        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
-        7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
-        24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
-        3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[
+            68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+            7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
+            8.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
+        &[
+            24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
+            3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
+            8.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
         distance,
     )
 }
 
 pub fn large_turn_right_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::large_turn_to_orthogonal_gentle(
-        24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
-        3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
-        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
-        7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
-        8.0 * CLEARANCE_HEIGHT,
-        0.0,
+        &[
+            24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
+            3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
+            8.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
+        &[
+            68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+            7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
+            8.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
         distance,
     )
 }
@@ -959,14 +895,13 @@ pub fn large_turn_right_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32
 
 pub fn s_bend_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_horizontal(
-        152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
-        9.0 - 76.0 * CLEARANCE_HEIGHT,
-        76.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        2.0,
-        -3.0,
-        0.0,
-        0.0,
+        &[
+            152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
+            9.0 - 76.0 * CLEARANCE_HEIGHT,
+            76.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
+        &[2.0, -3.0, 0.0, 0.0],
         -1.6356732e-3,
         1.8552829e-2,
         -7.5233884e-2,
@@ -980,14 +915,13 @@ pub fn s_bend_left(distance: f32, _bank_angle: f32) -> crate::track_sections::Tr
 
 pub fn s_bend_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_horizontal(
-        152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
-        9.0 - 76.0 * CLEARANCE_HEIGHT,
-        76.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        -2.0,
-        3.0,
-        0.0,
-        0.0,
+        &[
+            152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
+            9.0 - 76.0 * CLEARANCE_HEIGHT,
+            76.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
+        &[-2.0, 3.0, 0.0, 0.0],
         -1.6356732e-3,
         1.8552829e-2,
         -7.5233884e-2,
@@ -1125,14 +1059,18 @@ pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
         )
     } else if distance < HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH {
         crate::curves::cubic_curve_vertical(
-            3.0 - 32.0 * CLEARANCE_HEIGHT / 3.0,
-            16.0 * CLEARANCE_HEIGHT - 6.5,
-            4.0,
-            0.5,
-            -14.0 * CLEARANCE_HEIGHT / 3.0,
-            19.0 * CLEARANCE_HEIGHT / 3.0,
-            8.0 * CLEARANCE_HEIGHT,
-            CLEARANCE_HEIGHT,
+            &[
+                3.0 - 32.0 * CLEARANCE_HEIGHT / 3.0,
+                16.0 * CLEARANCE_HEIGHT - 6.5,
+                4.0,
+                0.5,
+            ],
+            &[
+                -14.0 * CLEARANCE_HEIGHT / 3.0,
+                19.0 * CLEARANCE_HEIGHT / 3.0,
+                8.0 * CLEARANCE_HEIGHT,
+                CLEARANCE_HEIGHT,
+            ],
             2.3570517e-3,
             -1.826351e-2,
             5.676165e-2,
@@ -1144,14 +1082,18 @@ pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
         )
     } else {
         crate::curves::cubic_curve_vertical(
-            0.0,
-            -16.0 * CLEARANCE_HEIGHT / 3.0,
-            0.0,
-            16.0 * CLEARANCE_HEIGHT / 3.0 + 1.0,
-            -8.0 * CLEARANCE_HEIGHT / 3.0,
-            -4.0 * CLEARANCE_HEIGHT / 3.0,
-            32.0 * CLEARANCE_HEIGHT / 3.0,
-            32.0 * CLEARANCE_HEIGHT / 3.0,
+            &[
+                0.0,
+                -16.0 * CLEARANCE_HEIGHT / 3.0,
+                0.0,
+                16.0 * CLEARANCE_HEIGHT / 3.0 + 1.0,
+            ],
+            &[
+                -8.0 * CLEARANCE_HEIGHT / 3.0,
+                -4.0 * CLEARANCE_HEIGHT / 3.0,
+                32.0 * CLEARANCE_HEIGHT / 3.0,
+                32.0 * CLEARANCE_HEIGHT / 3.0,
+            ],
             4.5068464e-3,
             -2.1917358e-2,
             3.1167552e-2,
@@ -1181,14 +1123,13 @@ pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_secti
         let distance = (proj_distance - VERTICAL_LOOP_SEGMENT_1_LENGTH) * 3.3;
         let distance = 3.6742346 * distance / 3.3;
         crate::curves::cubic_curve_vertical(
-            1.0,
-            -3.5,
-            4.0,
-            0.5,
-            -20.0 * CLEARANCE_HEIGHT / 3.0,
-            26.0 * CLEARANCE_HEIGHT / 3.0,
-            8.0 * CLEARANCE_HEIGHT,
-            CLEARANCE_HEIGHT,
+            &[1.0, -3.5, 4.0, 0.5],
+            &[
+                -20.0 * CLEARANCE_HEIGHT / 3.0,
+                26.0 * CLEARANCE_HEIGHT / 3.0,
+                8.0 * CLEARANCE_HEIGHT,
+                CLEARANCE_HEIGHT,
+            ],
             2.6073596e-7,
             -7.4230593e-6,
             8.476578e-5,
@@ -1200,14 +1141,13 @@ pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_secti
         )
     } else {
         crate::curves::cubic_curve_vertical(
-            0.0,
-            -1.0,
-            0.0,
-            2.0,
-            -11.0 * CLEARANCE_HEIGHT / 3.0,
-            9.0 * CLEARANCE_HEIGHT / 6.0,
-            8.0 * CLEARANCE_HEIGHT,
-            33.0 * CLEARANCE_HEIGHT / 3.0,
+            &[0.0, -1.0, 0.0, 2.0],
+            &[
+                -11.0 * CLEARANCE_HEIGHT / 3.0,
+                9.0 * CLEARANCE_HEIGHT / 6.0,
+                8.0 * CLEARANCE_HEIGHT,
+                33.0 * CLEARANCE_HEIGHT / 3.0,
+            ],
             0.0,
             0.0,
             0.0,
@@ -1237,14 +1177,18 @@ pub fn vertical_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sect
 
 pub fn quarter_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::cubic_curve_vertical(
-        5.0 - 64.0 * CLEARANCE_HEIGHT / 3.0,
-        -7.5 + 64.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
-        0.0,
-        -22.0 * CLEARANCE_HEIGHT / 3.0,
-        CLEARANCE_HEIGHT / 3.0,
-        64.0 * CLEARANCE_HEIGHT / 3.0,
-        0.0,
+        &[
+            5.0 - 64.0 * CLEARANCE_HEIGHT / 3.0,
+            -7.5 + 64.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+            0.0,
+        ],
+        &[
+            -22.0 * CLEARANCE_HEIGHT / 3.0,
+            CLEARANCE_HEIGHT / 3.0,
+            64.0 * CLEARANCE_HEIGHT / 3.0,
+            0.0,
+        ],
         6.498695e-6,
         -9.73333e-5,
         4.5362636e-4,
@@ -1263,22 +1207,10 @@ pub fn corkscrew_left(distance: f32, _bank_angle: f32) -> crate::track_sections:
 pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     if distance < CORKSCREW_SEGMENT_1_LENGTH {
         crate::curves::bezier3d(
-            0.31237242,
-            -0.16237243,
-            0.0,
-            0.0,
-            -0.4762897,
-            1.326807,
-            0.0,
-            0.0,
-            0.16237243,
-            -1.0623724,
-            2.25,
-            0.0,
-            0.104345,
-            -0.906517,
-            0.5,
-            0.121773,
+            &[0.31237242, -0.16237243, 0.0, 0.0],
+            &[-0.4762897, 1.326807, 0.0, 0.0],
+            &[0.16237243, -1.0623724, 2.25, 0.0],
+            &[0.104345, -0.906517, 0.5, 0.121773],
             8.822436e-8,
             2.23255e-6,
             -4.1811447e-5,
@@ -1290,22 +1222,10 @@ pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections
         )
     } else {
         crate::curves::bezier3d(
-            0.16237243,
-            0.57525516,
-            0.6123724,
-            0.15,
-            -0.4762897,
-            0.10206212,
-            1.2247448,
-            0.8505173,
-            0.31237242,
-            -0.77474487,
-            0.6123724,
-            1.35,
-            0.729345,
-            -0.031517,
-            -1.0,
-            0.180399,
+            &[0.16237243, 0.57525516, 0.6123724, 0.15],
+            &[-0.4762897, 0.10206212, 1.2247448, 0.8505173],
+            &[0.31237242, -0.77474487, 0.6123724, 1.35],
+            &[0.729345, -0.031517, -1.0, 0.180399],
             -8.843227e-7,
             1.946593e-5,
             -1.4881507e-4,
@@ -1325,22 +1245,10 @@ pub fn large_corkscrew_left(distance: f32, _bank_angle: f32) -> crate::track_sec
 pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     if distance < LARGE_CORKSCREW_SEGMENT_LENGTH {
         crate::curves::bezier3d(
-            0.28291696,
-            0.06708303,
-            0.0,
-            0.0,
-            -0.7482803,
-            2.007046,
-            0.0,
-            0.0,
-            0.13291697,
-            -1.432917,
-            3.45,
-            0.0,
-            0.474996,
-            -0.837494,
-            0.250000,
-            -0.033411,
+            &[0.28291696, 0.06708303, 0.0, 0.0],
+            &[-0.7482803, 2.007046, 0.0, 0.0],
+            &[0.13291697, -1.432917, 3.45, 0.0],
+            &[0.474996, -0.837494, 0.250000, -0.033411],
             -9.074917e-5,
             7.445654e-4,
             -1.8782483e-3,
@@ -1352,22 +1260,10 @@ pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_se
         )
     } else {
         crate::curves::bezier3d(
-            0.13291697,
-            1.0341657,
-            0.98291695,
-            0.35,
-            -0.7482803,
-            0.23779514,
-            1.7692506,
-            1.2587655,
-            0.28291696,
-            -0.91583425,
-            0.98291695,
-            2.15,
-            1.3764,
-            -1.314599,
-            0.0,
-            -0.028389,
+            &[0.13291697, 1.0341657, 0.98291695, 0.35],
+            &[-0.7482803, 0.23779514, 1.7692506, 1.2587655],
+            &[0.28291696, -0.91583425, 0.98291695, 2.15],
+            &[1.3764, -1.314599, 0.0, -0.028389],
             -9.07493e-5,
             9.485533e-4,
             -3.5093115e-3,
@@ -1389,14 +1285,13 @@ pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_se
 
     let mut point = if proj_distance < MEDIUM_HALF_LOOP_SEGMENT_1_LENGTH {
         crate::curves::cubic_curve_vertical(
-            1.2,
-            -5.3,
-            7.0,
-            0.0,
-            -22.0 * CLEARANCE_HEIGHT / 3.0,
-            28.0 * CLEARANCE_HEIGHT / 3.0,
-            14.0 * CLEARANCE_HEIGHT,
-            0.0,
+            &[1.2, -5.3, 7.0, 0.0],
+            &[
+                -22.0 * CLEARANCE_HEIGHT / 3.0,
+                28.0 * CLEARANCE_HEIGHT / 3.0,
+                14.0 * CLEARANCE_HEIGHT,
+                0.0,
+            ],
             6.510708e-5,
             -8.7324856e-4,
             4.688747e-3,
@@ -1408,14 +1303,13 @@ pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_se
         )
     } else {
         crate::curves::cubic_curve_vertical(
-            0.65,
-            -2.55,
-            0.0,
-            2.9,
-            -56.0 * CLEARANCE_HEIGHT / 3.0 + 3.15,
-            28.0 * CLEARANCE_HEIGHT - 1.0 * 6.3,
-            3.15,
-            16.0 * CLEARANCE_HEIGHT,
+            &[0.65, -2.55, 0.0, 2.9],
+            &[
+                -56.0 * CLEARANCE_HEIGHT / 3.0 + 3.15,
+                28.0 * CLEARANCE_HEIGHT - 1.0 * 6.3,
+                3.15,
+                16.0 * CLEARANCE_HEIGHT,
+            ],
             3.056875e-5,
             -3.1669016e-4,
             1.0755464e-3,
@@ -1453,14 +1347,8 @@ pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sec
         gentle(proj_distance, 0.0)
     } else if proj_distance < LARGE_HALF_LOOP_SEGMENT_2_LENGTH {
         crate::curves::cubic_curve_vertical(
-            -3.6,
-            4.65,
-            1.5,
-            1.5,
-            -0.122179694,
-            3.252083,
-            0.6123724,
-            0.6123724,
+            &[-3.6, 4.65, 1.5, 1.5],
+            &[-0.122179694, 3.252083, 0.6123724, 0.6123724],
             2.0991832e-4,
             -3.942224e-3,
             3.0215306e-2,
@@ -1472,14 +1360,8 @@ pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sec
         )
     } else {
         crate::curves::cubic_curve_vertical(
-            2.6,
-            -4.65,
-            0.0,
-            4.05,
-            1.1010206,
-            -4.6515307,
-            6.0,
-            4.3546486,
+            &[2.6, -4.65, 0.0, 4.05],
+            &[1.1010206, -4.6515307, 6.0, 4.3546486],
             8.508348e-4,
             -8.953556e-3,
             3.7601534e-2,
@@ -1523,18 +1405,14 @@ pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_section
 
     crate::curves::zero_g_roll(
         7.0 * CLEARANCE_HEIGHT / 6.0,
-        -0.5,
-        -1.5,
-        5.0,
-        0.0,
-        4.0 * CLEARANCE_HEIGHT,
-        -11.0 * CLEARANCE_HEIGHT,
-        10.0 * CLEARANCE_HEIGHT,
-        0.0,
-        a,
-        b,
-        c,
-        0.0,
+        &[-0.5, -1.5, 5.0, 0.0],
+        &[
+            4.0 * CLEARANCE_HEIGHT,
+            -11.0 * CLEARANCE_HEIGHT,
+            10.0 * CLEARANCE_HEIGHT,
+            0.0,
+        ],
+        &[a, b, c, 0.0],
         1.1611509e-2,
         -1.1114208e-1,
         4.179097e-1,
@@ -1573,18 +1451,9 @@ pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_s
 
     crate::curves::zero_g_roll(
         4.0 * CLEARANCE_HEIGHT / 6.0,
-        0.0,
-        1.0,
-        3.0,
-        0.0,
-        -8.0 * CLEARANCE_HEIGHT,
-        0.0,
-        24.0 * CLEARANCE_HEIGHT,
-        0.0,
-        a,
-        b,
-        c,
-        0.0,
+        &[0.0, 1.0, 3.0, 0.0],
+        &[-8.0 * CLEARANCE_HEIGHT, 0.0, 24.0 * CLEARANCE_HEIGHT, 0.0],
+        &[a, b, c, 0.0],
         1.9446561e-7,
         -1.2736247e-5,
         1.2071638e-4,
@@ -1611,22 +1480,10 @@ pub fn large_zero_g_roll_right(distance: f32, _bank_angle: f32) -> crate::track_
 
 pub fn dive_loop_45_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     crate::curves::bezier3d(
-        1.0,
-        -3.0,
-        3.0,
-        0.0,
-        -2.177324,
-        0.81649655,
-        4.898979,
-        0.0,
-        0.5,
-        0.0,
-        3.0,
-        0.0,
-        2.2951088,
-        -3.7003796,
-        6.238097e-1,
-        7.814611e-1,
+        &[1.0, -3.0, 3.0, 0.0],
+        &[-2.177324, 0.81649655, 4.898979, 0.0],
+        &[0.5, 0.0, 3.0, 0.0],
+        &[2.2951088, -3.7003796, 6.238097e-1, 7.814611e-1],
         -6.201532e-6,
         7.9620135e-5,
         -3.9349165e-4,
