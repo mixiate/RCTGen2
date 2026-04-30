@@ -596,7 +596,7 @@ fn render(
             })
             .collect::<anyhow::Result<Vec<_>>>()?;
 
-        for sprite_desc in track_section_sprite_descs.into_iter() {
+        for sprite_desc in track_section_sprite_descs {
             sprite_descs.push(sprite_desc);
         }
     }
