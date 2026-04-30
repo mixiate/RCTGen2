@@ -283,7 +283,7 @@ fn split_track_section(
 
             let relative_file_path = format!("track/{}/{image_name}.png", track.name);
             sprite_descs.push(openrct2::objects::image::ImageFile {
-                path: relative_file_path.to_owned(),
+                path: relative_file_path.clone(),
                 x: Some(image.offset.x),
                 y: Some(image.offset.y),
                 palette: Some(openrct2::objects::image::PaletteType::Keep),
@@ -581,14 +581,14 @@ fn render(
                             &output_directory,
                         )?;
                         Ok(TrackSectionSprites {
-                            track_name: track.name.to_owned(),
+                            track_name: track.name.clone(),
                             track_section_name,
                             sprites,
                         })
                     })
                 } else {
                     Ok(TrackSectionSprites {
-                        track_name: track.name.to_owned(),
+                        track_name: track.name.clone(),
                         track_section_name,
                         sprites: Vec::new(),
                     })
