@@ -35,7 +35,7 @@ impl<'a> SceneBuilder<'a> {
         translation: glam::Vec3,
         rotation: glam::Quat,
         mesh_type: MeshType,
-        mesh_ids: Option<&mut Vec<usize>>,
+        mut mesh_ids: Option<&mut Vec<usize>>,
     ) -> anyhow::Result<()> {
         let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
         for mesh in &model.meshes {
@@ -45,9 +45,9 @@ impl<'a> SceneBuilder<'a> {
             }
             let normals = mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
 
-            self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
+            self.embree_scene.add_geometry(&geometry, mesh_type == MeshType::Ghost)?;
 
-            if let Some(&mut ref mut mesh_ids) = mesh_ids {
+            if let Some(mesh_ids) = mesh_ids.as_mut() {
                 mesh_ids.push(self.meshes.len());
             }
 
@@ -64,7 +64,7 @@ impl<'a> SceneBuilder<'a> {
         model: &'a crate::model::Model,
         transform: F,
         mesh_type: MeshType,
-        mesh_ids: Option<&mut Vec<usize>>,
+        mut mesh_ids: Option<&mut Vec<usize>>,
     ) -> anyhow::Result<()>
     where
         F: Fn(&glam::Vec3, &glam::Vec3, bool) -> (glam::Vec3, glam::Vec3),
@@ -79,9 +79,9 @@ impl<'a> SceneBuilder<'a> {
                 *geometry_position = position.into();
                 normals.push(normal.normalize());
             }
-            self.embree_scene.add_geometry(geometry, mesh_type == MeshType::Ghost)?;
+            self.embree_scene.add_geometry(&geometry, mesh_type == MeshType::Ghost)?;
 
-            if let Some(&mut ref mut mesh_ids) = mesh_ids {
+            if let Some(mesh_ids) = mesh_ids.as_mut() {
                 mesh_ids.push(self.meshes.len());
             }
 

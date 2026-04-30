@@ -52,7 +52,7 @@ impl Scene<'_> {
         }
     }
 
-    pub fn add_geometry(&self, geometry: TriangleGeometry, cull_back_faces: bool) -> Result<(), Error> {
+    pub fn add_geometry(&self, geometry: &TriangleGeometry, cull_back_faces: bool) -> Result<(), Error> {
         if cull_back_faces {
             unsafe { embree4_sys::rtcSetGeometryIntersectFilterFunction(geometry.handle, Some(filter_back_faces)) };
         }
