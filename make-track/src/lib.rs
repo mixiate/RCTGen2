@@ -559,7 +559,7 @@ fn render(
                     track_section.name.to_owned()
                 };
                 if let Some(views) = masks.get_views(track_section.name) {
-                    render_track_section(
+                    let images = render_track_section(
                         &render_device,
                         &camera,
                         &lights,
@@ -569,22 +569,20 @@ fn render(
                         track_desc.offsets.as_ref(),
                         track_section,
                         views,
-                    )
-                    .and_then(|images| {
-                        let sprites = split_track_section(
-                            images,
-                            views,
-                            track_desc.dither,
-                            track_section,
-                            track,
-                            skip_empty_sprites,
-                            &output_directory,
-                        )?;
-                        Ok(TrackSectionSprites {
-                            track_name: track.name.clone(),
-                            track_section_name,
-                            sprites,
-                        })
+                    )?;
+                    let sprites = split_track_section(
+                        images,
+                        views,
+                        track_desc.dither,
+                        track_section,
+                        track,
+                        skip_empty_sprites,
+                        &output_directory,
+                    )?;
+                    Ok(TrackSectionSprites {
+                        track_name: track.name.clone(),
+                        track_section_name,
+                        sprites,
                     })
                 } else {
                     Ok(TrackSectionSprites {
