@@ -638,7 +638,7 @@ pub fn small_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_s
 }
 
 pub fn small_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_right(SMALL_TURN_RADIUS, 4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance)
+    crate::curves::flip_x_axis(small_turn_left_gentle(distance, 0.0))
 }
 
 pub fn medium_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -650,11 +650,7 @@ pub fn medium_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_
 }
 
 pub fn medium_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_right(
-        MEDIUM_TURN_RADIUS,
-        8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
-        distance,
-    )
+    crate::curves::flip_x_axis(medium_turn_left_gentle(distance, 0.0))
 }
 
 pub fn large_turn_left_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -728,11 +724,7 @@ pub fn very_small_turn_left_steep(distance: f32, _bank_angle: f32) -> crate::tra
 }
 
 pub fn very_small_turn_right_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_right(
-        VERY_SMALL_TURN_RADIUS,
-        8.0 * CLEARANCE_HEIGHT / VERY_SMALL_TURN_LENGTH,
-        distance,
-    )
+    crate::curves::flip_x_axis(very_small_turn_left_steep(distance, 0.0))
 }
 
 pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -985,10 +977,7 @@ pub fn small_helix_left(distance: f32, bank_angle: f32) -> crate::track_sections
 }
 
 pub fn small_helix_right(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
-        &crate::curves::sloped_turn_right(SMALL_TURN_RADIUS, CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance),
-        bank_angle,
-    )
+    crate::curves::flip_x_axis(small_helix_left(distance, bank_angle))
 }
 
 pub fn medium_helix_left(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -999,10 +988,7 @@ pub fn medium_helix_left(distance: f32, bank_angle: f32) -> crate::track_section
 }
 
 pub fn medium_helix_right(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
-        &crate::curves::sloped_turn_right(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
-        bank_angle,
-    )
+    crate::curves::flip_x_axis(medium_helix_left(distance, bank_angle))
 }
 
 pub fn medium_quarter_helix_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
@@ -1017,14 +1003,7 @@ pub fn medium_quarter_helix_left(distance: f32, _bank_angle: f32) -> crate::trac
 }
 
 pub fn medium_quarter_helix_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flatten_ends(
-        crate::curves::sloped_turn_right(
-            MEDIUM_TURN_RADIUS,
-            2.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
-            distance,
-        ),
-        distance / MEDIUM_QUARTER_HELIX_LENGTH,
-    )
+    crate::curves::flip_x_axis(medium_quarter_helix_left(distance, 0.0))
 }
 
 pub fn medium_quarter_helix_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
