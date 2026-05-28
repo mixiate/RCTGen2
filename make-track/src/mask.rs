@@ -98,6 +98,15 @@ impl MaskImage {
     }
 }
 
+impl Default for MaskImage {
+    fn default() -> Self {
+        MaskImage {
+            image: renderer::image::IndexedImage::new(0, 0),
+            section_count: 0,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Operation {
     Difference,
@@ -121,6 +130,7 @@ impl Sprite {
     }
 }
 
+#[derive(Default)]
 pub struct View {
     image: MaskImage,
     mirror: bool,

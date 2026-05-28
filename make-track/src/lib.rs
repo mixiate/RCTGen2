@@ -219,6 +219,27 @@ fn is_sprite_empty(image: &renderer::image::IndexedImage) -> bool {
     image.width() == 1 && image.height() == 1 && image.get_pixel(0, 0) == 0
 }
 
+fn output_track_section(
+    images: Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>,
+    dither: bool,
+    track_section: &track_sections::TrackSection,
+    track: &track_desc::Track,
+    output_directory: &std::path::Path,
+) -> anyhow::Result<()> {
+    for (index, (image, _)) in images.into_iter().enumerate() {
+        let image = image.into_cropped_indexed_image(dither);
+
+        let image_name = if let Some(suffix) = &track.suffix {
+            format!("{}_{suffix}_{index}", track_section.name)
+        } else {
+            format!("{}_{index}", track_section.name)
+        };
+        image.save(&output_directory.join(&image_name).with_extension("png"))?;
+    }
+
+    Ok(())
+}
+
 fn split_track_section(
     images: Vec<(renderer::Framebuffer, Option<renderer::DepthBuffer>)>,
     views: &[mask::View],
@@ -585,9 +606,28 @@ fn render(
                         sprites,
                     })
                 } else {
+                    println!("No mask found for {}.", track_section.name);
+                    let views = [
+                        mask::View::default(),
+                        mask::View::default(),
+                        mask::View::default(),
+                        mask::View::default(),
+                    ];
+                    let images = render_track_section(
+                        &render_device,
+                        &camera,
+                        &lights,
+                        edge_distance,
+                        &models,
+                        track,
+                        track_desc.offsets.as_ref(),
+                        track_section,
+                        &views,
+                    )?;
+                    output_track_section(images, track_desc.dither, track_section, track, &output_directory)?;
                     Ok(TrackSectionSprites {
-                        track_name: track.name.clone(),
-                        track_section_name,
+                        track_name: String::new(),
+                        track_section_name: String::new(),
                         sprites: Vec::new(),
                     })
                 }
