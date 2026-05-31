@@ -124,7 +124,7 @@ pub struct Ride {
     pub author: String,
     pub version: Option<String>,
     pub preview: Option<std::path::PathBuf>,
-    pub ride_type: crate::ride_object::RideType,
+    pub ride_type: openrct2::objects::ride::RideType,
     pub flags: Option<std::collections::HashSet<Flag>>,
     pub sprites: std::collections::HashSet<SpriteGroup>,
     pub zero_cars: i32,
@@ -136,10 +136,10 @@ pub struct Ride {
     pub max_cars_per_train: i32,
     #[serde(default)]
     pub limit_air_time_bonus: bool,
-    pub rating_multipliers: Option<crate::ride_object::RatingMultipliers>,
+    pub rating_multipliers: Option<openrct2::objects::ride::RatingMultipliers>,
     pub max_height: Option<i32>,
     pub configuration: Configuration,
-    pub default_colors: Vec<[crate::ride_object::ColourType; 3]>,
+    pub default_colors: Vec<[openrct2::objects::ride::Colour; 3]>,
     pub meshes: Vec<std::path::PathBuf>,
     pub vehicles: Vec<Vehicle>,
     pub lights: Vec<Light>,
@@ -208,7 +208,7 @@ impl Ride {
                     .collect::<anyhow::Result<Vec<_>>>()?;
 
                 vehicles.push(VehicleRenderType::Regular(VehicleRenderDesc {
-                    sprite_groups: crate::ride_object::SpriteGroups::new(self, vehicle),
+                    sprite_groups: crate::ride_object::create_sprite_groups(self, vehicle),
                     models: vehicle_models,
                     riders,
                 }));
@@ -256,7 +256,7 @@ impl ModelRenderDesc<'_> {
 }
 
 pub struct VehicleRenderDesc<'a> {
-    pub sprite_groups: crate::ride_object::SpriteGroups,
+    pub sprite_groups: openrct2::objects::ride::SpriteGroups,
     pub models: Vec<ModelRenderDesc<'a>>,
     pub riders: Vec<ModelRenderDesc<'a>>,
 }

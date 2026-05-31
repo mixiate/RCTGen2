@@ -148,7 +148,10 @@ fn add_rotations_to_list(rots: &mut Vec<VehicleRotation>, count: i32, pitch: f32
     }
 }
 
-fn list_vehicle_rotations(sprite_groups: &ride_object::SpriteGroups, angles: &VehicleAngles) -> Vec<VehicleRotation> {
+fn list_vehicle_rotations(
+    sprite_groups: &openrct2::objects::ride::SpriteGroups,
+    angles: &VehicleAngles,
+) -> Vec<VehicleRotation> {
     use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8, PI};
 
     const FRAC_PI_12: f32 = PI / 12.0;
@@ -691,9 +694,9 @@ pub fn make_vehicle(
         }
     };
 
-    let object = ride_object::RideObject::new(&ride_description, object_images);
+    let object = ride_object::create_ride_object(&ride_description, object_images);
     let object_json_file_path = output_directory.join("object").with_extension("json");
-    object.save(&object_json_file_path)?;
+    ride_object::save_ride_object(&object, &object_json_file_path)?;
 
     file_paths.push(object_json_file_path);
 
