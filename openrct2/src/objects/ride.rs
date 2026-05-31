@@ -102,67 +102,6 @@ pub enum RideType {
     WoodenWildMouse,
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Colour {
-    Black,
-    Grey,
-    White,
-    DarkPurple,
-    LightPurple,
-    BrightPurple,
-    DarkBlue,
-    LightBlue,
-    IcyBlue,
-    Teal,
-    Aquamarine,
-    SaturatedGreen,
-    DarkGreen,
-    MossGreen,
-    BrightGreen,
-    OliveGreen,
-    DarkOliveGreen,
-    BrightYellow,
-    Yellow,
-    DarkYellow,
-    LightOrange,
-    DarkOrange,
-    LightBrown,
-    SaturatedBrown,
-    DarkBrown,
-    SalmonPink,
-    BordeauxRed,
-    SaturatedRed,
-    BrightRed,
-    DarkPink,
-    BrightPink,
-    LightPink,
-    DarkOliveDark,
-    DarkOliveLight,
-    SaturatedBrownLight,
-    BordeauxRedDark,
-    BordeauxRedLight,
-    GrassGreenDark,
-    GrassGreenLight,
-    OliveDark,
-    OliveLight,
-    SaturatedGreenLight,
-    TanDark,
-    TanLight,
-    DullPurpleLight,
-    DullGreenDark,
-    DullGreenLight,
-    SaturatedPurpleDark,
-    SaturatedPurpleLight,
-    OrangeLight,
-    AquaDark,
-    MagentaLight,
-    DullBrownDark,
-    DullBrownLight,
-    Invisible,
-    Void,
-}
-
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Category {
@@ -274,7 +213,7 @@ pub struct Properties {
     pub max_height: Option<i32>,
     #[serde(rename = "ratingMultipler")] // Typo in OpenRCT2
     pub rating_multipliers: Option<RatingMultipliers>,
-    pub car_colours: Vec<Vec<[Colour; 3]>>,
+    pub car_colours: Vec<Vec<[crate::colour::Colour; 3]>>,
     pub cars: Vec<Car>,
 }
 

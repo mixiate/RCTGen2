@@ -139,7 +139,7 @@ pub struct Ride {
     pub rating_multipliers: Option<openrct2::objects::ride::RatingMultipliers>,
     pub max_height: Option<i32>,
     pub configuration: Configuration,
-    pub default_colors: Vec<[openrct2::objects::ride::Colour; 3]>,
+    pub default_colors: Vec<[openrct2::colour::Colour; 3]>,
     pub meshes: Vec<std::path::PathBuf>,
     pub vehicles: Vec<Vehicle>,
     pub lights: Vec<Light>,
