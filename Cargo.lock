@@ -1150,17 +1150,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "test-render"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "glam",
- "renderer",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "time"
 version = "0.3.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
