@@ -1,3 +1,6 @@
+#![expect(clippy::map_err_ignore)]
+
+#[binrw::binrw]
 struct Entry {
     data_offset: u32,
     width: u16,
@@ -80,8 +83,15 @@ impl EncodedSprite {
     }
 }
 
+#[binrw::binrw]
 pub struct Archive {
+    #[bw(try_calc(u32::try_from(entries.len())))]
+    entry_count: u32,
+    #[bw(try_calc(u32::try_from(data.len())))]
+    data_size: u32,
+    #[br(count = entry_count)]
     entries: Vec<Entry>,
+    #[br(count = data_size)]
     data: Vec<u8>,
 }
 
@@ -133,29 +143,11 @@ impl Archive {
         self.entries.is_empty()
     }
 
-    pub fn save(&self, path: &std::path::Path) -> std::io::Result<()> {
-        use std::io::Write as _;
+    pub fn save(&self, path: &std::path::Path) -> binrw::BinResult<()> {
+        use binrw::BinWriterExt as _;
 
-        let file = std::fs::File::create(path)?;
-        let mut writer = std::io::BufWriter::new(file);
-
-        let entry_count = u32::try_from(self.entries.len()).unwrap();
-        let data_size = u32::try_from(self.data.len()).unwrap();
-
-        writer.write_all(&entry_count.to_le_bytes())?;
-        writer.write_all(&data_size.to_le_bytes())?;
-
-        for entry in &self.entries {
-            writer.write_all(&entry.data_offset.to_le_bytes())?;
-            writer.write_all(&entry.width.to_le_bytes())?;
-            writer.write_all(&entry.height.to_le_bytes())?;
-            writer.write_all(&entry.offset_x.to_le_bytes())?;
-            writer.write_all(&entry.offset_y.to_le_bytes())?;
-            writer.write_all(&entry.flags.to_le_bytes())?;
-            writer.write_all(&entry.zoom_offset.to_le_bytes())?;
-        }
-
-        writer.write_all(&self.data)?;
+        let mut file = std::fs::File::create(path)?;
+        file.write_le(self)?;
 
         Ok(())
     }
