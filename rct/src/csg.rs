@@ -143,6 +143,14 @@ impl Archive {
         self.entries.is_empty()
     }
 
+    pub fn load(path: &std::path::Path) -> binrw::BinResult<Self> {
+        use binrw::BinReaderExt as _;
+
+        let file = std::fs::File::open(path)?;
+        let mut reader = binrw::io::BufReader::new(&file);
+        reader.read_le()
+    }
+
     pub fn save(&self, path: &std::path::Path) -> binrw::BinResult<()> {
         use binrw::BinWriterExt as _;
 
@@ -185,5 +193,8 @@ mod tests {
         let expected_file_bytes = std::fs::read(&expected_file_path).unwrap();
 
         assert_eq!(output_file_bytes, expected_file_bytes);
+
+        let output_archive = crate::csg::Archive::load(&temp_file_path).unwrap();
+        assert_eq!(output_archive.entries.len(), 2);
     }
 }
