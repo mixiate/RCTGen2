@@ -1,13 +1,13 @@
 #![expect(clippy::map_err_ignore)]
 
 #[binrw::binrw]
-struct Entry {
+pub struct Entry {
     data_offset: u32,
-    width: u16,
-    height: u16,
-    offset_x: i16,
-    offset_y: i16,
-    flags: u16,
+    pub width: u16,
+    pub height: u16,
+    pub offset_x: i16,
+    pub offset_y: i16,
+    pub flags: u16,
     zoom_offset: u16,
 }
 
@@ -83,6 +83,11 @@ impl EncodedSprite {
     }
 }
 
+pub enum Pixels<'a> {
+    Uncompressed(&'a [u8]),
+    Compressed(Vec<u8>),
+}
+
 #[binrw::binrw]
 pub struct Archive {
     #[bw(try_calc(u32::try_from(entries.len())))]
@@ -133,6 +138,63 @@ impl Archive {
         }
 
         self.data.extend(&encoded_sprite.data);
+    }
+
+    pub fn decode_sprite(&self, entry: &Entry) -> Option<Vec<u8>> {
+        use byteorder::ReadBytesExt as _;
+        use std::io::Read as _;
+
+        assert!(entry.flags & ENTRY_FLAG_RLE != 0);
+
+        let width = usize::from(entry.width);
+        let height = usize::from(entry.height);
+        let data_index = usize::try_from(entry.data_offset).ok()?;
+        let mut row_offsets = {
+            let size = height * std::mem::size_of::<u16>();
+            self.data.get(data_index..(data_index + size))?
+        };
+
+        let mut pixels = vec![0; width * height];
+        for y in 0..height {
+            let row_offset = usize::from(row_offsets.read_u16::<byteorder::LittleEndian>().ok()?);
+            let mut data = self.data.get(data_index + row_offset..)?;
+
+            loop {
+                let (pixel_count, end) = {
+                    let byte = data.read_u8().ok()?;
+                    (byte & 0b0111_1111, (byte & 0b1000_0000) != 0)
+                };
+                let x = usize::from(data.read_u8().ok()?);
+
+                let pixel_buffer = {
+                    let index = (y * width) + x;
+                    pixels.get_mut(index..(index + usize::from(pixel_count)))?
+                };
+                data.read_exact(pixel_buffer).ok()?;
+
+                if end {
+                    break;
+                }
+            }
+        }
+
+        Some(pixels)
+    }
+
+    pub fn entries(&self) -> &[Entry] {
+        &self.entries
+    }
+
+    pub fn get_pixels(&'_ self, entry: &Entry) -> Option<Pixels<'_>> {
+        if entry.flags & ENTRY_FLAG_RLE != 0 {
+            Some(Pixels::Compressed(self.decode_sprite(entry)?))
+        } else if entry.flags & ENTRY_FLAG_TRANSPARENT != 0 {
+            let index = usize::try_from(entry.data_offset).ok()?;
+            let data_size = usize::from(entry.width * entry.height);
+            Some(Pixels::Uncompressed(self.data.get(index..(index + data_size))?))
+        } else {
+            None
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -196,5 +258,17 @@ mod tests {
 
         let output_archive = crate::csg::Archive::load(&temp_file_path).unwrap();
         assert_eq!(output_archive.entries.len(), 2);
+
+        let entries = output_archive.entries();
+        if let crate::csg::Pixels::Uncompressed(pixels) = output_archive.get_pixels(&entries[0]).unwrap() {
+            assert_eq!(pixels, test_image.as_raw());
+        } else {
+            panic!();
+        }
+        if let crate::csg::Pixels::Compressed(pixels) = output_archive.get_pixels(&entries[1]).unwrap() {
+            assert_eq!(pixels, test_image.as_raw());
+        } else {
+            panic!();
+        }
     }
 }

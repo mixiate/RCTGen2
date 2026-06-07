@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 binrw = "0.15.1"
+byteorder = "1.5.0"
 
 [lints]
 workspace = true

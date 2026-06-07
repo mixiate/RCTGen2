@@ -906,6 +906,7 @@ name = "rct"
 version = "0.1.0"
 dependencies = [
  "binrw",
+ "byteorder",
  "renderer",
  "tempfile",
 ]
