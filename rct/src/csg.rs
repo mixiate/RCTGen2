@@ -20,7 +20,7 @@ const ENTRY_FLAG_PALETTE: u16 = 0b1000;
 pub struct EncodedSprite {
     width: u16,
     height: u16,
-    row_offsets: Vec<i16>,
+    row_offsets: Vec<u16>,
     data: Vec<u8>,
 }
 
@@ -30,7 +30,7 @@ impl EncodedSprite {
         let mut data = Vec::new();
 
         for y in 0..usize::from(height) {
-            row_offsets.push(i16::try_from((usize::from(height) * 2) + data.len()).unwrap());
+            row_offsets.push(u16::try_from((usize::from(height) * 2) + data.len()).unwrap());
 
             let mut last_count_index = None;
             let mut x_offset = 0;
