@@ -11,11 +11,11 @@ pub struct Entry {
     zoom_offset: u16,
 }
 
-// This should be added to all non palette sprites, as is the case for all vanilla sprites.
-// It's not actually used in OpenRCT2 to signify transparency. It's either vestigial or incorrectly named.
-const ENTRY_FLAG_TRANSPARENT: u16 = 1;
-
-const ENTRY_FLAG_RLE: u16 = 4;
+// OpenRCT2 calls the first flag transparent but it's on every non palette entry and is not used for transparency
+const ENTRY_FLAG_SPRITE: u16 = 0b0001;
+const ENTRY_FLAG_COMPRESSED: u16 = 0b0100;
+#[expect(unused)]
+const ENTRY_FLAG_PALETTE: u16 = 0b1000;
 
 pub struct EncodedSprite {
     width: u16,
@@ -116,7 +116,7 @@ impl Archive {
             height,
             offset_x: i16::try_from(x).unwrap(),
             offset_y: i16::try_from(y).unwrap(),
-            flags: ENTRY_FLAG_TRANSPARENT,
+            flags: ENTRY_FLAG_SPRITE,
             zoom_offset: 0,
         });
         self.data.extend(pixels);
@@ -129,7 +129,7 @@ impl Archive {
             height: encoded_sprite.height,
             offset_x: i16::try_from(x).unwrap(),
             offset_y: i16::try_from(y).unwrap(),
-            flags: ENTRY_FLAG_TRANSPARENT | ENTRY_FLAG_RLE,
+            flags: ENTRY_FLAG_SPRITE | ENTRY_FLAG_COMPRESSED,
             zoom_offset: 0,
         });
 
@@ -144,7 +144,7 @@ impl Archive {
         use byteorder::ReadBytesExt as _;
         use std::io::Read as _;
 
-        assert!(entry.flags & ENTRY_FLAG_RLE != 0);
+        assert!(entry.flags & ENTRY_FLAG_COMPRESSED != 0);
 
         let width = usize::from(entry.width);
         let height = usize::from(entry.height);
@@ -186,9 +186,9 @@ impl Archive {
     }
 
     pub fn get_pixels(&'_ self, entry: &Entry) -> Option<Pixels<'_>> {
-        if entry.flags & ENTRY_FLAG_RLE != 0 {
+        if entry.flags & (ENTRY_FLAG_SPRITE | ENTRY_FLAG_COMPRESSED) == (ENTRY_FLAG_SPRITE | ENTRY_FLAG_COMPRESSED) {
             Some(Pixels::Compressed(self.decode_sprite(entry)?))
-        } else if entry.flags & ENTRY_FLAG_TRANSPARENT != 0 {
+        } else if entry.flags & ENTRY_FLAG_SPRITE != 0 {
             let index = usize::try_from(entry.data_offset).ok()?;
             let data_size = usize::from(entry.width * entry.height);
             Some(Pixels::Uncompressed(self.data.get(index..(index + data_size))?))
