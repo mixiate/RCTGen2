@@ -1,13 +1,13 @@
 mod chain;
 mod curves;
-mod mask;
-mod offset;
+pub mod mask;
+pub mod offset;
 mod split;
 mod sprites_json;
 mod track_curves;
-mod track_desc;
-mod track_model;
-mod track_sections;
+pub mod track_desc;
+pub mod track_model;
+pub mod track_sections;
 
 const CLEARANCE_HEIGHT: f32 = 0.20412415; // 1.0 / (2.0 * 6.0.sqrt())
 

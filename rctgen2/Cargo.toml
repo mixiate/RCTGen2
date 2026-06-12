@@ -1,0 +1,16 @@
+[package]
+name = "rctgen2"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.103"
+eframe = "0.35.0"
+egui-wgpu = "0.35.0"
+glam = "0.33.2"
+make-track = { path = "../make-track" }
+renderer = { path = "../renderer" }
+rfd = "0.17.2"
+
+[lints]
+workspace = true

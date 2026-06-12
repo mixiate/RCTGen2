@@ -10,7 +10,7 @@ fn float_1() -> f32 {
     1.0
 }
 
-#[derive(Debug, Eq, Hash, PartialEq, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TrackGroup {
     Flat,
@@ -62,7 +62,7 @@ pub struct AdditionalModel<T> {
     pub mirror: bool,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Models<T> {
     pub track: T,
@@ -118,7 +118,7 @@ impl Models<std::path::PathBuf> {
     }
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Track {
     pub name: String,
@@ -145,7 +145,7 @@ impl Track {
     }
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Offsets {
     pub flat: [[f32; 2]; 2],
@@ -162,7 +162,7 @@ pub struct Offsets {
     pub vertical: [[f32; 2]; 4],
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Light {
     pub direction: [f32; 3],
@@ -171,7 +171,7 @@ pub struct Light {
     pub shadow: bool,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Desc {
     pub tracks: Vec<Track>,
