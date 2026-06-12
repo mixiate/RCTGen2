@@ -6,8 +6,20 @@ pub struct Image {
 
 impl Image {
     pub fn from_raw(width: usize, height: usize, pixels: Vec<u8>) -> Self {
-        assert!(pixels.len() == width * height * 3);
+        assert!(pixels.len() == width * height * 4);
         Self { pixels, width, height }
+    }
+
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
+    pub fn as_raw(&self) -> &[u8] {
+        &self.pixels
     }
 
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
@@ -15,7 +27,7 @@ impl Image {
         let w = std::io::BufWriter::new(image_file);
 
         let mut encoder = png::Encoder::new(w, self.width.try_into()?, self.height.try_into()?);
-        encoder.set_color(png::ColorType::Rgb);
+        encoder.set_color(png::ColorType::Rgba);
         encoder.set_depth(png::BitDepth::Eight);
 
         let mut writer = encoder.write_header()?;

@@ -84,9 +84,10 @@ impl Framebuffer {
             .iter()
             .flat_map(|x| {
                 if x.palette_region_type.is_some() {
-                    crate::palette::linear_to_srgb_rgb(&x.colour)
+                    let colour = crate::palette::linear_to_srgb_rgb(&x.colour);
+                    [colour[0], colour[1], colour[2], 255]
                 } else {
-                    [255; 3]
+                    [0; 4]
                 }
             })
             .collect::<Vec<u8>>();
