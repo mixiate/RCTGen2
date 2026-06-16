@@ -117,13 +117,13 @@ impl Framebuffer {
 
                     image.set_pixel(x - min_x, y - min_y, nearest_colour.index);
 
-                    if dither {
+                    if dither && !no_bleed {
                         let points = [[x - 1, y], [x + 1, y + 1], [x, y + 1], [x - 1, y + 1]];
                         let weights: [f32; 4] = [7.0 / 16.0, 3.0 / 16.0, 5.0 / 16.0, 1.0 / 16.0];
 
                         for (point, weight) in points.iter().zip(weights) {
                             let next_fragment_index = point[0] + (point[1] * self.width);
-                            if !no_bleed || self.buffer[next_fragment_index].no_bleed {
+                            if !self.buffer[next_fragment_index].no_bleed {
                                 self.buffer[next_fragment_index].colour += nearest_colour.error * (0.3 * weight);
                             }
                         }
