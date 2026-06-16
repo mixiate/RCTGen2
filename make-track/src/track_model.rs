@@ -595,7 +595,7 @@ pub fn build_mask<'a>(
     track_model_desc: &ModelDesc,
     offset_start: &glam::Vec3,
     offset_end: &glam::Vec3,
-) -> anyhow::Result<renderer::Scene<'a>> {
+) -> anyhow::Result<(renderer::Scene<'a>, Vec<renderer::MeshType>)> {
     let mut scene = renderer::SceneBuilder::new(render_device)?;
     for i in -1..(track_model_desc.mesh_count + 1) {
         scene_add_track_model_transformed(
@@ -610,5 +610,5 @@ pub fn build_mask<'a>(
             None,
         )?;
     }
-    Ok(scene.build().0)
+    Ok(scene.build())
 }

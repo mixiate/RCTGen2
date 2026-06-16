@@ -28,10 +28,15 @@ fn render_scene(
     renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, edge_distance)
 }
 
-fn render_scene_depth(scene: &renderer::Scene, camera: &glam::Mat4, rotation: usize) -> renderer::DepthBuffer {
+fn render_scene_depth(
+    scene: &renderer::Scene,
+    mesh_types: &[renderer::MeshType],
+    camera: &glam::Mat4,
+    rotation: usize,
+) -> renderer::DepthBuffer {
     let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
     let camera = camera * view_rotation;
-    renderer::render_scene_depth(scene, &camera, 4, 4)
+    renderer::render_scene_depth(scene, mesh_types, &camera, 4, 4)
 }
 
 #[expect(clippy::too_many_arguments)]
@@ -69,7 +74,7 @@ fn render_track_section_view(
     let image = render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation);
 
     let mask_depth = if view.requires_track_mask {
-        let scene = track_model::build_mask(
+        let (scene, mesh_types) = track_model::build_mask(
             render_device,
             models,
             track_section,
@@ -77,7 +82,7 @@ fn render_track_section_view(
             offset_start,
             offset_end,
         )?;
-        Some(render_scene_depth(&scene, camera, rotation))
+        Some(render_scene_depth(&scene, &mesh_types, camera, rotation))
     } else {
         None
     };
@@ -139,11 +144,14 @@ fn render_track_section_views(
     };
 
     let mask_depths = if views.iter().any(|x| x.requires_track_mask) {
-        let scene = track_model::build_mask(render_device, models, track_section, model_desc, &offset, &offset)?;
+        let (scene, mesh_types) =
+            track_model::build_mask(render_device, models, track_section, model_desc, &offset, &offset)?;
         views
             .into_par_iter()
             .enumerate()
-            .map(|(rotation, view)| view.requires_track_mask.then(|| render_scene_depth(&scene, camera, rotation)))
+            .map(|(rotation, view)| {
+                view.requires_track_mask.then(|| render_scene_depth(&scene, &mesh_types, camera, rotation))
+            })
             .collect::<Vec<_>>()
     } else {
         vec![None, None, None, None] // ehh

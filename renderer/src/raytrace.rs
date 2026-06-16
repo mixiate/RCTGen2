@@ -1,5 +1,6 @@
 struct SceneMesh<'a> {
     mesh: &'a crate::model::Mesh,
+    geometry: embree::TriangleGeometry<'a>,
     normals: Vec<glam::Vec3>,
 }
 
@@ -51,7 +52,11 @@ impl<'a> SceneBuilder<'a> {
                 mesh_ids.push(self.meshes.len());
             }
 
-            self.meshes.push(SceneMesh { mesh, normals });
+            self.meshes.push(SceneMesh {
+                mesh,
+                geometry,
+                normals,
+            });
 
             self.mesh_types.push(mesh_type);
         }
@@ -85,7 +90,11 @@ impl<'a> SceneBuilder<'a> {
                 mesh_ids.push(self.meshes.len());
             }
 
-            self.meshes.push(SceneMesh { mesh, normals });
+            self.meshes.push(SceneMesh {
+                mesh,
+                geometry,
+                normals,
+            });
 
             self.mesh_types.push(mesh_type);
         }
@@ -210,6 +219,31 @@ impl Scene<'_> {
                 screen_bounds[2].max(screen_bound.x.ceil() as i32 + 1),
                 screen_bounds[3].max(screen_bound.y.ceil() as i32 + 1),
             ];
+        }
+
+        screen_bounds
+    }
+
+    pub fn get_vertices_screen_bounds(
+        &self,
+        camera: &glam::Mat4,
+        mesh_types: &[crate::raytrace::MeshType],
+    ) -> [i32; 4] {
+        let mut screen_bounds = [i32::MAX, i32::MAX, i32::MIN, i32::MIN];
+
+        for (mesh, mesh_type) in self.meshes.iter().zip(mesh_types.iter()) {
+            if *mesh_type != MeshType::Normal {
+                continue;
+            }
+            for vertex in mesh.geometry.positions() {
+                let screen_bound = camera.transform_point3((*vertex).into());
+                screen_bounds = [
+                    screen_bounds[0].min(screen_bound.x.floor() as i32 - 1),
+                    screen_bounds[1].min(screen_bound.y.floor() as i32 - 1),
+                    screen_bounds[2].max(screen_bound.x.ceil() as i32 + 1),
+                    screen_bounds[3].max(screen_bound.y.ceil() as i32 + 1),
+                ];
+            }
         }
 
         screen_bounds
