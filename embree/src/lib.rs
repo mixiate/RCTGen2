@@ -226,6 +226,10 @@ impl TriangleGeometry<'_> {
         })
     }
 
+    pub fn positions(&self) -> &[[f32; 3]] {
+        self.positions
+    }
+
     pub fn positions_mut(&mut self) -> &mut [[f32; 3]] {
         self.positions
     }
@@ -236,6 +240,8 @@ impl Drop for TriangleGeometry<'_> {
         unsafe { embree4_sys::rtcReleaseGeometry(self.handle) }
     }
 }
+
+unsafe impl Sync for TriangleGeometry<'_> {}
 
 pub struct RayHit {
     pub geometry_id: u32,
