@@ -226,7 +226,7 @@ impl TriangleGeometry<'_> {
         })
     }
 
-    pub fn positions(&mut self) -> &mut [[f32; 3]] {
+    pub fn positions_mut(&mut self) -> &mut [[f32; 3]] {
         self.positions
     }
 }
