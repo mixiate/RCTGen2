@@ -40,7 +40,7 @@ impl<'a> SceneBuilder<'a> {
         let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
-            for (position, geom_position) in mesh.positions.iter().zip(geometry.positions().iter_mut()) {
+            for (position, geom_position) in mesh.positions.iter().zip(geometry.positions_mut().iter_mut()) {
                 *geom_position = transform.transform_point3(*position).into();
             }
             let normals = mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
@@ -73,7 +73,7 @@ impl<'a> SceneBuilder<'a> {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
             let mut normals = Vec::with_capacity(mesh.normals.len());
             for ((position, normal), geometry_position) in
-                mesh.positions.iter().zip(mesh.normals.iter()).zip(geometry.positions().iter_mut())
+                mesh.positions.iter().zip(mesh.normals.iter()).zip(geometry.positions_mut().iter_mut())
             {
                 let (position, normal) = transform(position, normal, mesh.semi_flat_shaded);
                 *geometry_position = position.into();
