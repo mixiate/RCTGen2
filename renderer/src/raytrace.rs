@@ -196,11 +196,7 @@ impl Scene<'_> {
         hit.map_or(f32::INFINITY, |x| x.distance)
     }
 
-    pub fn get_vertices_screen_bounds(
-        &self,
-        camera: &glam::Mat4,
-        mesh_types: &[crate::raytrace::MeshType],
-    ) -> [i32; 4] {
+    pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4, mesh_types: &[crate::raytrace::MeshType]) -> [i32; 4] {
         let mut screen_bounds = [i32::MAX, i32::MAX, i32::MIN, i32::MIN];
 
         for (mesh, mesh_type) in self.meshes.iter().zip(mesh_types.iter()) {
