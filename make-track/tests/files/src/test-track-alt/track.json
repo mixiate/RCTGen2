@@ -7,7 +7,7 @@
             ],
             "z_offset": 8,
             "length": 0.5,
-            "masks": "default",
+            "masks": "upright",
             "models": {
                 "track": "track.obj",
                 "track_alt": "track_alt.obj",

@@ -37,7 +37,7 @@
             ],
             "z_offset": 8,
             "length": 0.25,
-            "masks": "default",
+            "masks": "upright",
             "models": {
                 "track": "track.obj",
                 "mask": "mask.obj"
