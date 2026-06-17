@@ -361,6 +361,9 @@ fn list_track_sections(
         track_sections.push(&track_sections::FLAT_TO_STEEP_DIAG);
         track_sections.push(&track_sections::STEEP_TO_FLAT_DIAG);
     }
+    if sections.contains(&TrackGroup::VerySmallTurns) {
+        track_sections.push(&track_sections::VERY_SMALL_TURN_LEFT);
+    }
     if sections.contains(&TrackGroup::Turns) {
         track_sections.push(&track_sections::SMALL_TURN_LEFT);
         track_sections.push(&track_sections::MEDIUM_TURN_LEFT);
@@ -529,9 +532,6 @@ fn list_track_sections(
         track_sections.push(&track_sections::LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE);
         track_sections.push(&track_sections::LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE);
         track_sections.push(&track_sections::LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE);
-    }
-    if sections.contains(&TrackGroup::VerySmallTurns) {
-        track_sections.push(&track_sections::VERY_SMALL_TURN_LEFT);
     }
 
     track_sections
