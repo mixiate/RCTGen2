@@ -98,9 +98,6 @@ pub struct Track {
     pub name: String,
     pub suffix: Option<String>,
     pub length: f32,
-    #[expect(unused)]
-    #[serde(default = "float_1")]
-    pub brake_length: f32,
     #[serde(default)]
     pub tie_length: f32,
     pub z_offset: i32,
