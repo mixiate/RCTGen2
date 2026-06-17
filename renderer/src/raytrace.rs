@@ -196,34 +196,6 @@ impl Scene<'_> {
         hit.map_or(f32::INFINITY, |x| x.distance)
     }
 
-    pub fn get_scene_screen_bounds(&self, camera: &glam::Mat4) -> [i32; 4] {
-        let scene_bounds = self.embree_scene.bounds();
-        let scene_bounds = [
-            glam::Vec3::new(scene_bounds.lower_x, scene_bounds.lower_y, scene_bounds.lower_z),
-            glam::Vec3::new(scene_bounds.upper_x, scene_bounds.lower_y, scene_bounds.lower_z),
-            glam::Vec3::new(scene_bounds.lower_x, scene_bounds.upper_y, scene_bounds.lower_z),
-            glam::Vec3::new(scene_bounds.upper_x, scene_bounds.upper_y, scene_bounds.lower_z),
-            glam::Vec3::new(scene_bounds.lower_x, scene_bounds.lower_y, scene_bounds.upper_z),
-            glam::Vec3::new(scene_bounds.upper_x, scene_bounds.lower_y, scene_bounds.upper_z),
-            glam::Vec3::new(scene_bounds.lower_x, scene_bounds.upper_y, scene_bounds.upper_z),
-            glam::Vec3::new(scene_bounds.upper_x, scene_bounds.upper_y, scene_bounds.upper_z),
-        ];
-
-        let mut screen_bounds = [i32::MAX, i32::MAX, i32::MIN, i32::MIN];
-
-        for scene_bound in scene_bounds {
-            let screen_bound = camera.transform_point3(scene_bound);
-            screen_bounds = [
-                screen_bounds[0].min(screen_bound.x.floor() as i32 - 1),
-                screen_bounds[1].min(screen_bound.y.floor() as i32 - 1),
-                screen_bounds[2].max(screen_bound.x.ceil() as i32 + 1),
-                screen_bounds[3].max(screen_bound.y.ceil() as i32 + 1),
-            ];
-        }
-
-        screen_bounds
-    }
-
     pub fn get_vertices_screen_bounds(
         &self,
         camera: &glam::Mat4,
