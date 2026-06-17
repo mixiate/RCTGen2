@@ -10,7 +10,6 @@
                 "zero_g_rolls"
             ],
             "z_offset": 8,
-            "length": 0.33333333,
             "masks": "upright",
             "models": {
                 "track": "track.obj",

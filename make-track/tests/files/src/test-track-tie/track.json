@@ -11,7 +11,6 @@
                 "corkscrews"
             ],
             "z_offset": 8,
-            "length": 0.25,
             "masks": "upright",
             "models": {
                 "track": "track.obj",

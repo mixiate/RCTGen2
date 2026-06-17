@@ -84,6 +84,38 @@ fn scene_add_track_model<'a>(
     scene.add_model(tie_model, point.position, rotation, mesh_type, mesh_ids)
 }
 
+pub struct ModelLengths {
+    track: f32,
+    track_tie: f32,
+}
+
+impl ModelLengths {
+    pub fn calculate(track: &track_desc::Track, models: &track_desc::Models<renderer::model::Model>) -> ModelLengths {
+        let track_tie = track.tie_length.unwrap_or_else(|| {
+            if let Some(track_tie) = &models.track_tie {
+                ModelLengths::calculate_model_length(track_tie)
+            } else {
+                0.0
+            }
+        });
+        let track = track.length.unwrap_or_else(|| ModelLengths::calculate_model_length(&models.track)) + track_tie;
+
+        ModelLengths { track, track_tie }
+    }
+
+    fn calculate_model_length(model: &renderer::model::Model) -> f32 {
+        let mut max_z = 0.0;
+        for mesh in &model.meshes {
+            for vertex in &mesh.positions {
+                if vertex.z > max_z {
+                    max_z = vertex.z;
+                }
+            }
+        }
+        max_z
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct ModelDesc {
     pub mesh_count: i32,
@@ -101,17 +133,18 @@ impl ModelDesc {
     pub fn new(
         track: &track_desc::Track,
         models: &track_desc::Models<renderer::model::Model>,
+        lengths: &ModelLengths,
         track_section: &track_sections::TrackSection,
         rotation: usize,
     ) -> Self {
         let model_desc = if models.track_alt.is_some() {
-            ModelDesc::new_alternating(track, track_section)
+            ModelDesc::new_alternating(track, lengths, track_section)
         } else {
-            ModelDesc::new_non_alternating(track, track_section)
+            ModelDesc::new_non_alternating(track, lengths, track_section)
         };
 
         if models.track_tie.is_some() {
-            model_desc.boundary_tie(track, track_section, rotation)
+            model_desc.boundary_tie(track, lengths, track_section, rotation)
         } else {
             model_desc
         }
@@ -122,16 +155,20 @@ impl ModelDesc {
         ((MINIMUM_LENGTH / length).round() as i32).clamp(1, 4)
     }
 
-    fn new_non_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
-        let mesh_count = (0.5 + track_section.length / track.length).floor() as i32;
-        let scale = track_section.length / (mesh_count as f32 * track.length);
-        let length = scale * track.length;
+    fn new_non_alternating(
+        track: &track_desc::Track,
+        lengths: &ModelLengths,
+        track_section: &track_sections::TrackSection,
+    ) -> Self {
+        let mesh_count = (0.5 + track_section.length / lengths.track).floor() as i32;
+        let scale = track_section.length / (mesh_count as f32 * lengths.track);
+        let length = scale * lengths.track;
 
         Self {
             mesh_count,
             scale,
             length,
-            tie_length: scale * track.tie_length,
+            tie_length: scale * lengths.track_tie,
             bank_angle: track.bank_angle(),
             extrusion_count: ModelDesc::calculate_extrusion_count(length),
             track_even: false,
@@ -141,21 +178,25 @@ impl ModelDesc {
     }
 
     /// Attempts to use an even number of alternating track meshes if it doesn't cause too much distortion
-    fn new_alternating(track: &track_desc::Track, track_section: &track_sections::TrackSection) -> Self {
+    fn new_alternating(
+        track: &track_desc::Track,
+        lengths: &ModelLengths,
+        track_section: &track_sections::TrackSection,
+    ) -> Self {
         let mesh_count = if track_section.prefer_odd_alt_mesh_count {
-            (track_section.length / (track.length * 2.0)).floor() as i32 * 2 + 1
+            (track_section.length / (lengths.track * 2.0)).floor() as i32 * 2 + 1
         } else {
-            (0.5 + track_section.length / (track.length * 2.0)).floor() as i32 * 2
+            (0.5 + track_section.length / (lengths.track * 2.0)).floor() as i32 * 2
         };
-        let scale = track_section.length / (mesh_count as f32 * track.length);
-        let length = scale * track.length;
+        let scale = track_section.length / (mesh_count as f32 * lengths.track);
+        let length = scale * lengths.track;
 
         if scale > 0.9 && scale < 1.11111 {
             Self {
                 mesh_count,
                 scale,
                 length,
-                tie_length: scale * track.tie_length,
+                tie_length: scale * lengths.track_tie,
                 bank_angle: track.bank_angle(),
                 extrusion_count: ModelDesc::calculate_extrusion_count(length),
                 track_even: false,
@@ -163,13 +204,14 @@ impl ModelDesc {
                 support_pivot: track.pivot,
             }
         } else {
-            Self::new_non_alternating(track, track_section)
+            Self::new_non_alternating(track, lengths, track_section)
         }
     }
 
     fn boundary_tie(
         &self,
         track: &track_desc::Track,
+        lengths: &ModelLengths,
         track_section: &track_sections::TrackSection,
         rotation: usize,
     ) -> Self {
@@ -177,14 +219,14 @@ impl ModelDesc {
         let tie_end = (rotation + usize::from(track_section.exit_angle_offset)) % 4 >= 2;
 
         let (full_length, mesh_count) = {
-            let mut full_length = track.length * self.mesh_count as f32;
+            let mut full_length = lengths.track * self.mesh_count as f32;
             let mut mesh_count = self.mesh_count * 2;
             if !tie_start {
-                full_length -= track.tie_length;
+                full_length -= lengths.track_tie;
                 mesh_count -= 1;
             }
             if tie_end {
-                full_length += track.tie_length;
+                full_length += lengths.track_tie;
                 mesh_count += 1;
             }
             (full_length, mesh_count)
@@ -194,8 +236,8 @@ impl ModelDesc {
         Self {
             mesh_count,
             scale,
-            length: scale * track.length,
-            tie_length: scale * track.tie_length,
+            length: scale * lengths.track,
+            tie_length: scale * lengths.track_tie,
             bank_angle: self.bank_angle,
             extrusion_count: self.extrusion_count * 2,
             track_even: !tie_start,

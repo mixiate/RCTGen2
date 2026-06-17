@@ -36,8 +36,6 @@
                 "very_small_turns"
             ],
             "z_offset": 9,
-            "length": 0.25,
-            "tie_length": 0.0425,
             "masks": "upright",
             "models": {
                 "track": "track.obj",

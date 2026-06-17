@@ -6,7 +6,6 @@
                 "flat"
             ],
             "z_offset": 8,
-            "length": 0.5,
             "masks": "upright",
             "models": {
                 "track": "track.obj",

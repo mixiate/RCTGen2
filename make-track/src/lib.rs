@@ -167,6 +167,7 @@ fn render_track_section(
     lights: &[renderer::Light],
     edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
+    model_lengths: &track_model::ModelLengths,
     track: &track_desc::Track,
     offsets: Option<&track_desc::Offsets>,
     track_section: &track_sections::TrackSection,
@@ -179,7 +180,7 @@ fn render_track_section(
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
-                let model_desc = track_model::ModelDesc::new(track, models, track_section, rotation);
+                let model_desc = track_model::ModelDesc::new(track, models, model_lengths, track_section, rotation);
                 let (offset_start, offset_end) = if let Some(offsets) = offsets {
                     let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
                     let offset_end = offset::calculate(
@@ -209,7 +210,7 @@ fn render_track_section(
             })
             .collect::<anyhow::Result<Vec<_>>>()?
     } else {
-        let model_desc = track_model::ModelDesc::new(track, models, track_section, 0);
+        let model_desc = track_model::ModelDesc::new(track, models, model_lengths, track_section, 0);
         render_track_section_views(
             render_device,
             camera,
@@ -575,6 +576,7 @@ fn render(
     let mut sprite_descs = Vec::new();
     for track in &track_desc.tracks {
         let models = track.models.load(base_directory)?;
+        let model_lengths = track_model::ModelLengths::calculate(track, &models);
 
         let masks = mask::Masks::load(&data_directory.join("masks").join(&track.masks).with_extension("json"))?;
 
@@ -598,6 +600,7 @@ fn render(
                         &lights,
                         edge_distance,
                         &models,
+                        &model_lengths,
                         track,
                         track_desc.offsets.as_ref(),
                         track_section,
@@ -631,6 +634,7 @@ fn render(
                         &lights,
                         edge_distance,
                         &models,
+                        &model_lengths,
                         track,
                         track_desc.offsets.as_ref(),
                         track_section,

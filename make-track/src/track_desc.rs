@@ -97,9 +97,8 @@ pub struct Track {
     pub masks: std::path::PathBuf,
     pub name: String,
     pub suffix: Option<String>,
-    pub length: f32,
-    #[serde(default)]
-    pub tie_length: f32,
+    pub length: Option<f32>,
+    pub tie_length: Option<f32>,
     pub z_offset: i32,
     #[serde(default = "float_1")]
     pub support_spacing: f32,
