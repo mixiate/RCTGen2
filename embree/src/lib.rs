@@ -149,19 +149,6 @@ impl CommittedScene<'_> {
         unsafe { embree4_sys::rtcInterpolate(&raw const interpolate_arguments) }
         position
     }
-
-    pub fn bounds(&self) -> Bounds {
-        let mut bounds = embree4_sys::RTCBounds::default();
-        unsafe { embree4_sys::rtcGetSceneBounds(self.scene.handle, &raw mut bounds) }
-        Bounds {
-            lower_x: bounds.lower_x,
-            lower_y: bounds.lower_y,
-            lower_z: bounds.lower_z,
-            upper_x: bounds.upper_x,
-            upper_y: bounds.upper_y,
-            upper_z: bounds.upper_z,
-        }
-    }
 }
 
 unsafe impl Sync for CommittedScene<'_> {}
@@ -249,15 +236,6 @@ pub struct RayHit {
     pub u: f32,
     pub v: f32,
     pub distance: f32,
-}
-
-pub struct Bounds {
-    pub lower_x: f32,
-    pub lower_y: f32,
-    pub lower_z: f32,
-    pub upper_x: f32,
-    pub upper_y: f32,
-    pub upper_z: f32,
 }
 
 unsafe extern "C" fn filter_back_faces(args: *const embree4_sys::RTCFilterFunctionNArguments) {
