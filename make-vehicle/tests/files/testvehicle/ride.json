@@ -85,7 +85,6 @@
         }
     ],
     "lights": [
-        { "type": "diffuse", "shadow": false, "direction": [1.0, 1.0, 1.0], "strength": 1.0 },
-        { "type": "specular", "shadow": false, "direction": [1.0, 1.0, 1.0], "strength": 1.0 }
+        { "direction": [1.0, 1.0, 1.0], "diffuse_strength": 1.0, "specular_strength": 1.0, "shadow": false }
     ]
 }

@@ -137,20 +137,13 @@ pub struct Offsets {
     pub vertical: [[f32; 2]; 4],
 }
 
-#[derive(Debug, PartialEq, serde::Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum LightType {
-    Diffuse,
-    Specular,
-}
-
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Light {
-    pub r#type: LightType,
-    pub shadow: bool,
     pub direction: [f32; 3],
-    pub strength: f32,
+    pub diffuse_strength: f32,
+    pub specular_strength: f32,
+    pub shadow: bool,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -175,17 +168,9 @@ impl Desc {
         self.lights
             .iter()
             .map(|x| renderer::Light {
-                diffuse_strength: if x.r#type == LightType::Diffuse {
-                    x.strength
-                } else {
-                    0.0
-                },
-                specular_strength: if x.r#type == LightType::Specular {
-                    x.strength
-                } else {
-                    0.0
-                },
                 direction: glam::Vec3::from(x.direction).normalize(),
+                diffuse_strength: x.diffuse_strength,
+                specular_strength: x.specular_strength,
                 shadow: x.shadow,
             })
             .collect()

@@ -20,21 +20,20 @@
         }
     ],
     "lights": [
-        { "type": "specular", "shadow": true, "direction": [ 1, 0.66666, 1 ], "strength": 1.0 },
-        { "type": "diffuse", "shadow": true, "direction": [ 1, 0.66666, 1 ], "strength": 1.0 },
+        { "direction": [ 1, 0.66666, 1 ], "diffuse_strength": 1, "specular_strength": 1, "shadow": true },
 
-        { "type": "diffuse", "shadow": false, "direction": [ -1.0, 0.5, 0.0 ], "strength": 0.09 },
-        { "type": "diffuse", "shadow": false, "direction": [ 1.0, 0.5, 0.0 ], "strength": 0.09 },
-        { "type": "diffuse", "shadow": false, "direction": [ 0.0, 0.5, 1.0 ], "strength": 0.09 },
-        { "type": "diffuse", "shadow": false, "direction": [ 0.0, 0.5, -1.0 ], "strength": 0.09 },
+        { "direction": [ -1, 0.5, 0 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        { "direction": [ 1, 0.5, 0 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        { "direction": [ 0, 0.5, 1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        { "direction": [ 0, 0.5, -1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
 
-        { "type": "diffuse", "shadow": false, "direction": [ -1.0, 0.5, -1.0 ], "strength": 0.09 },
-        { "type": "diffuse", "shadow": false, "direction": [ -1.0, 0.5, 1.0 ], "strength": 0.09 },
-        { "type": "diffuse", "shadow": false, "direction": [ 1.0, 0.5, -1.0 ], "strength": 0.09 },
-        { "type": "diffuse", "shadow": false, "direction": [ 1.0, 0.5, 1.0 ], "strength": 0.09 },
+        { "direction": [ -1, 0.5, -1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        { "direction": [ -1, 0.5, 1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        { "direction": [ 1, 0.5, -1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        { "direction": [ 1, 0.5, 1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
 
-        { "type": "diffuse", "shadow": false, "direction": [ 0.0, 1.0, 0.0 ], "strength": 0.05 },
-        { "type": "diffuse", "shadow": false, "direction": [ 0.0, -1.0, 0.0 ], "strength": 0.15 }
+        { "direction": [ 0, 1, 0 ], "diffuse_strength": 0.05, "specular_strength": 0, "shadow": false },
+        { "direction": [ 0, -1, 0 ], "diffuse_strength": 0.15, "specular_strength": 0, "shadow": false }
     ],
     "dither": false
 }

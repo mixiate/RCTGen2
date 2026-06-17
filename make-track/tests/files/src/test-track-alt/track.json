@@ -16,6 +16,6 @@
         }
     ],
     "lights": [
-        { "type": "diffuse", "shadow": false, "direction": [ 1, 1, 1 ], "strength": 1.0 }
+        { "direction": [ 1, 1, 1 ], "diffuse_strength": 1, "specular_strength": 0, "shadow": false }
     ]
 }
