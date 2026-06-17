@@ -352,12 +352,16 @@ fn list_track_sections(
     if sections.contains(&TrackGroup::SmallSlopeTransitions) {
         track_sections.push(&track_sections::SMALL_FLAT_TO_STEEP);
         track_sections.push(&track_sections::SMALL_STEEP_TO_FLAT);
+    }
+    if sections.contains(&TrackGroup::SmallSlopeTransitionsDiagonal) {
         track_sections.push(&track_sections::SMALL_FLAT_TO_STEEP_DIAG);
         track_sections.push(&track_sections::SMALL_STEEP_TO_FLAT_DIAG);
     }
     if sections.contains(&TrackGroup::LargeSlopeTransitions) {
         track_sections.push(&track_sections::FLAT_TO_STEEP);
         track_sections.push(&track_sections::STEEP_TO_FLAT);
+    }
+    if sections.contains(&TrackGroup::LargeSlopeTransitionsDiagonal) {
         track_sections.push(&track_sections::FLAT_TO_STEEP_DIAG);
         track_sections.push(&track_sections::STEEP_TO_FLAT_DIAG);
     }
