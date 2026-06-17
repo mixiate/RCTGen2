@@ -73,7 +73,7 @@ pub fn render_scene(
     use rand_pcg::rand_core::SeedableRng as _;
     let mut rng = rand_pcg::Pcg32::seed_from_u64(1);
 
-    let scene_bounds = scene.get_vertices_screen_bounds(camera, mesh_types);
+    let scene_bounds = scene.get_scene_screen_bounds(camera, mesh_types);
     let framebuffer_offset = glam::Vec2::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32);
     let ray_origin_offset = framebuffer_offset.extend(0.0);
 
@@ -277,7 +277,7 @@ pub fn render_scene_depth(
     multi_samples_x: usize,
     multi_samples_y: usize,
 ) -> crate::DepthBuffer {
-    let scene_bounds = scene.get_vertices_screen_bounds(camera, mesh_types);
+    let scene_bounds = scene.get_scene_screen_bounds(camera, mesh_types);
     let offset = glam::Vec2::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32);
     let ray_origin_offset = offset.extend(0.0);
 
