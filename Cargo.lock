@@ -976,6 +976,7 @@ dependencies = [
  "obj",
  "png",
  "rand_pcg",
+ "rayon",
  "rect_packer",
  "tempfile",
 ]

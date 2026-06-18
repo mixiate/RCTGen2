@@ -50,12 +50,12 @@ impl Framebuffer {
         self.height
     }
 
-    pub(crate) fn get_fragment(&self, x: usize, y: usize) -> &Fragment {
-        &self.buffer[x + (y * self.width)]
+    pub(crate) fn buffer_mut(&mut self) -> &mut [Fragment] {
+        &mut self.buffer
     }
 
-    pub(crate) fn get_fragment_mut(&mut self, x: usize, y: usize) -> &mut Fragment {
-        &mut self.buffer[x + (y * self.width)]
+    pub(crate) fn get_fragment(&self, x: usize, y: usize) -> &Fragment {
+        &self.buffer[x + (y * self.width)]
     }
 
     fn bounds(&self) -> Option<[usize; 4]> {

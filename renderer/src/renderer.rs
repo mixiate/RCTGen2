@@ -266,7 +266,9 @@ pub fn render_scene(
     edge_distance: f32,
 ) -> crate::Framebuffer {
     use rand_pcg::rand_core::SeedableRng as _;
-    let mut rng = rand_pcg::Pcg32::seed_from_u64(1);
+    use rayon::prelude::*;
+
+    let rng = rand_pcg::Pcg32::seed_from_u64(1);
 
     let scene_bounds = scene.get_scene_screen_bounds(camera, mesh_types);
     let framebuffer_offset = glam::Vec2::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32);
@@ -281,9 +283,9 @@ pub fn render_scene(
         crate::Framebuffer::new(width, height, framebuffer_offset)
     };
 
-    for y in 0..framebuffer.height() {
-        for x in 0..framebuffer.width() {
-            let fragment = framebuffer.get_fragment_mut(x, y);
+    let width = framebuffer.width();
+    framebuffer.buffer_mut().par_chunks_mut(width).enumerate().for_each(|(y, fragments)| {
+        for (x, fragment) in fragments.iter_mut().enumerate() {
             sample_point(
                 scene,
                 mesh_types,
@@ -293,14 +295,14 @@ pub fn render_scene(
                 multi_samples_y,
                 edge_distance,
                 fragment,
-                &mut rng,
+                &mut rng.clone(),
                 &ray_origin_offset,
                 &ray_direction,
                 x,
                 y,
             );
         }
-    }
+    });
 
     framebuffer
 }
