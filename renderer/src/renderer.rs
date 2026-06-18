@@ -118,6 +118,144 @@ fn sample_mesh(
     }
 }
 
+#[expect(clippy::too_many_arguments)]
+fn sample_point(
+    scene: &crate::raytrace::Scene,
+    mesh_types: &[crate::raytrace::MeshType],
+    camera_inverse: &glam::Mat4,
+    lights: &[Light],
+    multi_samples_x: usize,
+    multi_samples_y: usize,
+    edge_distance: f32,
+    fragment: &mut crate::framebuffer::Fragment,
+    rng: &mut rand_pcg::Pcg32,
+    ray_origin_offset: &glam::Vec3,
+    ray_direction: &glam::Vec3,
+    x: usize,
+    y: usize,
+) {
+    let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
+
+    let (depth, ghost_depth, edge_type, palette_region_type, is_mask, no_bleed) = {
+        let ray_origin = camera_inverse.transform_vector3(ray_origin);
+        match scene.trace_ray(mesh_types, &ray_origin, ray_direction) {
+            Some(crate::raytrace::RayHit::Mesh(hit)) => (
+                hit.depth,
+                hit.ghost_depth,
+                hit.mesh.material.edge_type,
+                Some(hit.mesh.material.palette_region_type),
+                false,
+                hit.mesh.material.no_bleed,
+            ),
+            Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, f32::INFINITY, None, None, true, false),
+            Some(crate::raytrace::RayHit::Ghost(ghost_depth)) => (f32::INFINITY, ghost_depth, None, None, false, false),
+            _ => (f32::INFINITY, f32::INFINITY, None, None, false, false),
+        }
+    };
+
+    let mut samples = vec![crate::framebuffer::Fragment::default(); multi_samples_x * multi_samples_y];
+
+    for sub_x in 0..multi_samples_x {
+        for sub_y in 0..multi_samples_y {
+            let ray_origin = glam::Vec3::new(
+                (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
+                (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
+                0.0,
+            ) + ray_origin;
+            let ray_origin = camera_inverse.transform_vector3(ray_origin);
+
+            match scene.trace_ray(mesh_types, &ray_origin, ray_direction) {
+                Some(crate::raytrace::RayHit::Mesh(hit)) => {
+                    let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
+                    sample_mesh(scene, rng, ray_direction, &hit, lights, fragment);
+                }
+                Some(crate::raytrace::RayHit::Mask) => {
+                    let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
+                    fragment.is_mask = true;
+                }
+                Some(crate::raytrace::RayHit::Ghost(depth)) => {
+                    let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
+                    fragment.ghost_depth = depth;
+                }
+                _ => {}
+            }
+        }
+    }
+
+    let samples = samples;
+
+    let (closest_sample, min_depth) = {
+        let mut closest_sample = None;
+        let mut min_depth = f32::INFINITY;
+        for sample in samples.iter().filter(|x| x.edge_type.is_some()) {
+            if sample.depth < min_depth {
+                closest_sample = Some(sample);
+                min_depth = sample.depth;
+            }
+        }
+        (closest_sample, min_depth)
+    };
+
+    let (depth, edge_type, palette_region_type) = if let Some(closest_sample) = closest_sample
+        && (min_depth < ghost_depth - edge_distance && !is_mask)
+    {
+        let mut inside_count = 0;
+        for sample in samples.iter().filter(|x| !x.is_mask) {
+            if sample.depth <= min_depth + edge_distance && sample.palette_region_type.is_some() {
+                inside_count += 1;
+            }
+        }
+        if inside_count > 3 {
+            (min_depth, closest_sample.edge_type, closest_sample.palette_region_type)
+        } else {
+            (depth, edge_type, palette_region_type)
+        }
+    } else {
+        (depth, edge_type, palette_region_type)
+    };
+
+    if palette_region_type.is_some() {
+        fragment.palette_region_type = palette_region_type;
+
+        fragment.depth = samples.iter().fold(f32::INFINITY, |a, &b| a.min(b.depth));
+
+        if let Some(edge_type) = edge_type {
+            let sample_count = samples.iter().filter(|x| !x.is_mask).count();
+            let sample_weight = 1.0 / sample_count as f32;
+            let mut colour = glam::Vec3::new(0.0, 0.0, 0.0);
+            let mut weight = 0.0;
+            let mut total_weight = 0.0;
+            for sample in samples.iter().filter(|x| !x.is_mask) {
+                if (!sample.no_bleed || no_bleed)
+                    && !(sample.ghost_depth <= depth + edge_distance && sample.depth > depth + edge_distance)
+                {
+                    if sample.depth <= depth + edge_distance && sample.palette_region_type.is_some() {
+                        colour += sample.colour * sample_weight;
+                        weight += sample_weight;
+                    }
+                    total_weight += sample_weight;
+                }
+            }
+            colour *= 1.0 / total_weight;
+            match edge_type {
+                crate::renderer::EdgeType::Light => fragment.colour = colour,
+                crate::renderer::EdgeType::Dark => {
+                    fragment.colour = colour * (0.5 + (0.5 * (weight / total_weight)));
+                }
+            }
+        } else {
+            let colour = samples
+                .iter()
+                .filter(|x| x.palette_region_type.is_some() && (!x.no_bleed || no_bleed))
+                .map(|x| x.colour)
+                .sum::<glam::Vec3>();
+            let sample_count = samples.iter().filter(|x| x.palette_region_type.is_some()).count();
+
+            fragment.colour = colour / sample_count as f32;
+        }
+    }
+}
+
 pub fn render_scene(
     scene: &crate::raytrace::Scene,
     mesh_types: &[crate::raytrace::MeshType],
@@ -143,133 +281,24 @@ pub fn render_scene(
         crate::Framebuffer::new(width, height, framebuffer_offset)
     };
 
-    let multi_sample_count = multi_samples_x * multi_samples_y;
-
     for y in 0..framebuffer.height() {
         for x in 0..framebuffer.width() {
-            let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
-
-            let (depth, ghost_depth, edge_type, palette_region_type, is_mask, no_bleed) = {
-                let ray_origin = camera_inverse.transform_vector3(ray_origin);
-                match scene.trace_ray(mesh_types, &ray_origin, &ray_direction) {
-                    Some(crate::raytrace::RayHit::Mesh(hit)) => (
-                        hit.depth,
-                        hit.ghost_depth,
-                        hit.mesh.material.edge_type,
-                        Some(hit.mesh.material.palette_region_type),
-                        false,
-                        hit.mesh.material.no_bleed,
-                    ),
-                    Some(crate::raytrace::RayHit::Mask) => (f32::INFINITY, f32::INFINITY, None, None, true, false),
-                    Some(crate::raytrace::RayHit::Ghost(ghost_depth)) => {
-                        (f32::INFINITY, ghost_depth, None, None, false, false)
-                    }
-                    _ => (f32::INFINITY, f32::INFINITY, None, None, false, false),
-                }
-            };
-
-            let mut samples = vec![crate::framebuffer::Fragment::default(); multi_sample_count];
-
-            for sub_x in 0..multi_samples_x {
-                for sub_y in 0..multi_samples_y {
-                    let ray_origin = glam::Vec3::new(
-                        (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
-                        (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
-                        0.0,
-                    ) + ray_origin;
-                    let ray_origin = camera_inverse.transform_vector3(ray_origin);
-
-                    match scene.trace_ray(mesh_types, &ray_origin, &ray_direction) {
-                        Some(crate::raytrace::RayHit::Mesh(hit)) => {
-                            let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
-                            sample_mesh(scene, &mut rng, &ray_direction, &hit, lights, fragment);
-                        }
-                        Some(crate::raytrace::RayHit::Mask) => {
-                            let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
-                            fragment.is_mask = true;
-                        }
-                        Some(crate::raytrace::RayHit::Ghost(depth)) => {
-                            let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
-                            fragment.ghost_depth = depth;
-                        }
-                        _ => {}
-                    }
-                }
-            }
-
-            let samples = samples;
-
-            let (closest_sample, min_depth) = {
-                let mut closest_sample = None;
-                let mut min_depth = f32::INFINITY;
-                for sample in samples.iter().filter(|x| x.edge_type.is_some()) {
-                    if sample.depth < min_depth {
-                        closest_sample = Some(sample);
-                        min_depth = sample.depth;
-                    }
-                }
-                (closest_sample, min_depth)
-            };
-
-            let (depth, edge_type, palette_region_type) = if let Some(closest_sample) = closest_sample
-                && (min_depth < ghost_depth - edge_distance && !is_mask)
-            {
-                let mut inside_count = 0;
-                for sample in samples.iter().filter(|x| !x.is_mask) {
-                    if sample.depth <= min_depth + edge_distance && sample.palette_region_type.is_some() {
-                        inside_count += 1;
-                    }
-                }
-                if inside_count > 3 {
-                    (min_depth, closest_sample.edge_type, closest_sample.palette_region_type)
-                } else {
-                    (depth, edge_type, palette_region_type)
-                }
-            } else {
-                (depth, edge_type, palette_region_type)
-            };
-
-            if palette_region_type.is_some() {
-                let fragment = framebuffer.get_fragment_mut(x, y);
-                fragment.palette_region_type = palette_region_type;
-
-                fragment.depth = samples.iter().fold(f32::INFINITY, |a, &b| a.min(b.depth));
-
-                if let Some(edge_type) = edge_type {
-                    let sample_count = samples.iter().filter(|x| !x.is_mask).count();
-                    let sample_weight = 1.0 / sample_count as f32;
-                    let mut colour = glam::Vec3::new(0.0, 0.0, 0.0);
-                    let mut weight = 0.0;
-                    let mut total_weight = 0.0;
-                    for sample in samples.iter().filter(|x| !x.is_mask) {
-                        if (!sample.no_bleed || no_bleed)
-                            && !(sample.ghost_depth <= depth + edge_distance && sample.depth > depth + edge_distance)
-                        {
-                            if sample.depth <= depth + edge_distance && sample.palette_region_type.is_some() {
-                                colour += sample.colour * sample_weight;
-                                weight += sample_weight;
-                            }
-                            total_weight += sample_weight;
-                        }
-                    }
-                    colour *= 1.0 / total_weight;
-                    match edge_type {
-                        crate::renderer::EdgeType::Light => fragment.colour = colour,
-                        crate::renderer::EdgeType::Dark => {
-                            fragment.colour = colour * (0.5 + (0.5 * (weight / total_weight)));
-                        }
-                    }
-                } else {
-                    let colour = samples
-                        .iter()
-                        .filter(|x| x.palette_region_type.is_some() && (!x.no_bleed || no_bleed))
-                        .map(|x| x.colour)
-                        .sum::<glam::Vec3>();
-                    let sample_count = samples.iter().filter(|x| x.palette_region_type.is_some()).count();
-
-                    fragment.colour = colour / sample_count as f32;
-                }
-            }
+            let fragment = framebuffer.get_fragment_mut(x, y);
+            sample_point(
+                scene,
+                mesh_types,
+                &camera_inverse,
+                lights,
+                multi_samples_x,
+                multi_samples_y,
+                edge_distance,
+                fragment,
+                &mut rng,
+                &ray_origin_offset,
+                &ray_direction,
+                x,
+                y,
+            );
         }
     }
 
