@@ -61,6 +61,63 @@ fn calculate_ao_factor(
     not_occluded_samples as f32 / (samples_x * samples_y) as f32
 }
 
+fn sample_mesh(
+    scene: &crate::raytrace::Scene,
+    rng: &mut rand_pcg::Pcg32,
+    ray_direction: &glam::Vec3,
+    hit: &crate::raytrace::RayHitMesh,
+    lights: &[Light],
+    fragment: &mut crate::framebuffer::Fragment,
+) {
+    let material = &hit.mesh.material;
+
+    fragment.depth = hit.depth;
+    fragment.ghost_depth = hit.ghost_depth;
+    fragment.edge_type = material.edge_type;
+    fragment.palette_region_type = Some(material.palette_region_type);
+    fragment.no_bleed = material.no_bleed;
+
+    let uv = {
+        let uvs = [
+            hit.mesh.uvs[hit.indices[0] as usize] * (1.0 - hit.u - hit.v),
+            hit.mesh.uvs[hit.indices[1] as usize] * hit.u,
+            hit.mesh.uvs[hit.indices[2] as usize] * hit.v,
+        ];
+        uvs.iter().sum::<glam::Vec2>()
+    };
+
+    let diffuse = match &material.diffuse {
+        crate::model::MaterialColour::Colour(colour) => *colour,
+        crate::model::MaterialColour::Texture(texture) => texture.sample_wrapped(uv),
+    };
+
+    let specular = match &material.specular {
+        crate::model::MaterialColour::Colour(colour) => *colour,
+        crate::model::MaterialColour::Texture(texture) => texture.sample_wrapped(uv),
+    };
+
+    for light in lights {
+        if material.shadows && light.shadow && scene.trace_occlusion_ray(&hit.position, &light.direction) {
+            continue;
+        }
+        if light.diffuse_strength > 0.0 {
+            let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
+            fragment.colour += light * diffuse;
+        }
+        if light.specular_strength > 0.0 {
+            let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
+            let reflected_direction = reflected_direction - light.direction;
+            let angle = reflected_direction.dot(-ray_direction).max(0.0);
+            let specular_factor = light.specular_strength * angle.powf(material.specular_exponent);
+            fragment.colour += specular_factor * specular;
+        }
+    }
+
+    if material.use_ao {
+        fragment.colour *= calculate_ao_factor(scene, &hit.position, &hit.normal, 8, 4, rng);
+    }
+}
+
 pub fn render_scene(
     scene: &crate::raytrace::Scene,
     mesh_types: &[crate::raytrace::MeshType],
@@ -125,58 +182,7 @@ pub fn render_scene(
                     match scene.trace_ray(mesh_types, &ray_origin, &ray_direction) {
                         Some(crate::raytrace::RayHit::Mesh(hit)) => {
                             let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
-                            let material = &hit.mesh.material;
-
-                            fragment.depth = hit.depth;
-                            fragment.ghost_depth = hit.ghost_depth;
-                            fragment.edge_type = material.edge_type;
-                            fragment.palette_region_type = Some(material.palette_region_type);
-                            fragment.no_bleed = material.no_bleed;
-
-                            let uv = {
-                                let uvs = [
-                                    hit.mesh.uvs[hit.indices[0] as usize] * (1.0 - hit.u - hit.v),
-                                    hit.mesh.uvs[hit.indices[1] as usize] * hit.u,
-                                    hit.mesh.uvs[hit.indices[2] as usize] * hit.v,
-                                ];
-                                uvs.iter().sum::<glam::Vec2>()
-                            };
-
-                            let diffuse = match &material.diffuse {
-                                crate::model::MaterialColour::Colour(colour) => *colour,
-                                crate::model::MaterialColour::Texture(texture) => texture.sample_wrapped(uv),
-                            };
-
-                            let specular = match &material.specular {
-                                crate::model::MaterialColour::Colour(colour) => *colour,
-                                crate::model::MaterialColour::Texture(texture) => texture.sample_wrapped(uv),
-                            };
-
-                            for light in lights {
-                                if material.shadows
-                                    && light.shadow
-                                    && scene.trace_occlusion_ray(&hit.position, &light.direction)
-                                {
-                                    continue;
-                                }
-                                if light.diffuse_strength > 0.0 {
-                                    let light = hit.normal.dot(light.direction).max(0.0) * light.diffuse_strength;
-                                    fragment.colour += light * diffuse;
-                                }
-                                if light.specular_strength > 0.0 {
-                                    let reflected_direction = hit.normal * (2.0 * light.direction.dot(hit.normal));
-                                    let reflected_direction = reflected_direction - light.direction;
-                                    let angle = reflected_direction.dot(-ray_direction).max(0.0);
-                                    let specular_factor =
-                                        light.specular_strength * angle.powf(material.specular_exponent);
-                                    fragment.colour += specular_factor * specular;
-                                }
-                            }
-
-                            if material.use_ao {
-                                fragment.colour *=
-                                    calculate_ao_factor(scene, &hit.position, &hit.normal, 8, 4, &mut rng);
-                            }
+                            sample_mesh(scene, &mut rng, &ray_direction, &hit, lights, fragment);
                         }
                         Some(crate::raytrace::RayHit::Mask) => {
                             let fragment = &mut samples[sub_y * multi_samples_x + sub_x];
