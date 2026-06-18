@@ -1,8 +1,7 @@
 #[derive(Clone, Copy, clap::ValueEnum)]
 enum ImageOutputType {
     Dat,
-    Packed,
-    Grid,
+    Atlas,
 }
 
 #[derive(clap::Parser)]
@@ -23,8 +22,7 @@ fn main() -> anyhow::Result<()> {
 
     let image_output_type = match cli.image_output_type {
         ImageOutputType::Dat => make_vehicle::ImageOutputType::Dat,
-        ImageOutputType::Packed => make_vehicle::ImageOutputType::Atlas(make_vehicle::AtlasType::Packed),
-        ImageOutputType::Grid => make_vehicle::ImageOutputType::Atlas(make_vehicle::AtlasType::Grid),
+        ImageOutputType::Atlas => make_vehicle::ImageOutputType::Atlas,
     };
     make_vehicle::make_vehicle(
         &cli.ride_description_file_path,

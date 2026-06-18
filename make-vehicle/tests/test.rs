@@ -37,7 +37,7 @@ fn test_make_vehicle() {
         &ride_description_file_path,
         temp_dir.path(),
         temp_dir.path(),
-        make_vehicle::ImageOutputType::Atlas(make_vehicle::AtlasType::Grid),
+        make_vehicle::ImageOutputType::Atlas,
     )
     .unwrap();
 

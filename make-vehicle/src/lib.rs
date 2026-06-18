@@ -1,3 +1,4 @@
+mod atlas;
 mod ride_desc;
 mod ride_object;
 
@@ -563,14 +564,10 @@ fn create_parkobj(
     Ok(())
 }
 
-pub enum AtlasType {
-    Packed,
-    Grid,
-}
-
+#[derive(Copy, Clone)]
 pub enum ImageOutputType {
     Dat,
-    Atlas(AtlasType),
+    Atlas,
 }
 
 pub fn make_vehicle(
@@ -639,7 +636,7 @@ pub fn make_vehicle(
             let lgx_string = format!("$LGX:images.dat[0..{}]", archive.len() - 1);
             vec![object_image::Image::String(lgx_string)]
         }
-        ImageOutputType::Atlas(atlas_type) => {
+        ImageOutputType::Atlas => {
             let images_directory = output_directory.join("images");
             std::fs::create_dir_all(&images_directory)
                 .with_context(|| format!("Could not create directory {}", images_directory.display()))?;
@@ -666,10 +663,7 @@ pub fn make_vehicle(
 
             for (i, images) in images.iter().enumerate() {
                 let image_count = images.len().try_into().unwrap_or(32);
-                let atlas = match atlas_type {
-                    AtlasType::Packed => renderer::pack::create_atlas(images),
-                    AtlasType::Grid => renderer::pack::create_grid(images, std::cmp::min(image_count, 32)),
-                };
+                let atlas = atlas::create_atlas(images, std::cmp::min(image_count, 32));
                 let file_path = images_directory.join(format!("car_{i}")).with_extension("png");
                 atlas.image.save(&file_path)?;
 

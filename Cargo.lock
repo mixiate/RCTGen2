@@ -912,12 +912,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rect_packer"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8ffb4dfda4b01cc420847665dc480760d596ce186f2772a66ed32fe9acb1c45"
-
-[[package]]
 name = "ref-cast"
 version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -977,7 +971,6 @@ dependencies = [
  "png",
  "rand_pcg",
  "rayon",
- "rect_packer",
  "tempfile",
 ]
 
