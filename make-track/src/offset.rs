@@ -127,18 +127,28 @@ fn get_track_point(
     (point, banked)
 }
 
+fn get_mirrored_offset(offsets: &[[f32; 2]; 2], index: usize) -> [f32; 2] {
+    if index < 2 {
+        offsets[index]
+    } else {
+        let mut offset = offsets[index - 2];
+        offset[0] = -offset[0];
+        offset
+    }
+}
+
 fn get_offset(offsets: &crate::track_desc::Offsets, offset_desc: &OffsetDesc, rotation: usize) -> glam::Vec3 {
     let right_rotation_offset = if offset_desc.banked_right { 2 } else { 0 };
     let offset_index = (rotation + (VIEW_COUNT - offset_desc.rotation_offset) + right_rotation_offset) % VIEW_COUNT;
 
     let offset = match offset_desc.offset_type {
-        OffsetType::Flat => offsets.flat[offset_index],
+        OffsetType::Flat => get_mirrored_offset(&offsets.flat, offset_index),
         OffsetType::Gentle => offsets.gentle[offset_index],
         OffsetType::Steep => offsets.steep[offset_index],
         OffsetType::FlatBanked => offsets.flat_banked[offset_index],
         OffsetType::GentleBanked => offsets.gentle_banked[offset_index],
-        OffsetType::Inverted => offsets.inverted[offset_index],
-        OffsetType::Diagonal => offsets.diagonal[offset_index],
+        OffsetType::Inverted => get_mirrored_offset(&offsets.inverted, offset_index),
+        OffsetType::Diagonal => get_mirrored_offset(&offsets.diagonal, offset_index),
         OffsetType::DiagonalGentle => offsets.diagonal_gentle[offset_index],
         OffsetType::DiagonalSteep => offsets.diagonal_steep[offset_index],
         OffsetType::DiagonalBanked => offsets.diagonal_banked[offset_index],

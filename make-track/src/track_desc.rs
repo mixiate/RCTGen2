@@ -120,13 +120,13 @@ impl Track {
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Offsets {
-    pub flat: [[f32; 2]; 4],
+    pub flat: [[f32; 2]; 2],
     pub gentle: [[f32; 2]; 4],
     pub steep: [[f32; 2]; 4],
     pub flat_banked: [[f32; 2]; 4],
     pub gentle_banked: [[f32; 2]; 4],
-    pub inverted: [[f32; 2]; 4],
-    pub diagonal: [[f32; 2]; 4],
+    pub inverted: [[f32; 2]; 2],
+    pub diagonal: [[f32; 2]; 2],
     pub diagonal_gentle: [[f32; 2]; 4],
     pub diagonal_steep: [[f32; 2]; 4],
     pub diagonal_banked: [[f32; 2]; 4],
