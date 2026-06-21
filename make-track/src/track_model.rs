@@ -79,9 +79,13 @@ fn scene_add_track_model<'a>(
     mesh_ids: Option<&mut Vec<usize>>,
 ) -> anyhow::Result<()> {
     let point = track_section.sample_curve(distance, track_model_desc.bank_angle, offset_start, offset_end);
-    let rotation =
-        glam::Quat::from_mat3(&glam::Mat3::from_cols(point.binormal, point.normal, point.tangent)).normalize();
-    scene.add_model(tie_model, point.position, rotation, mesh_type, mesh_ids)
+    let rotation = glam::Quat::from_rotation_axes(point.binormal, point.normal, point.tangent).normalize();
+    scene.add_model(
+        tie_model,
+        &glam::Affine3::from_rotation_translation(rotation, point.position),
+        mesh_type,
+        mesh_ids,
+    )
 }
 
 pub struct ModelLengths {
@@ -594,7 +598,12 @@ fn build_supports<'a>(
                     rotation
                 }
             };
-            scene.add_model(support_model, position, rotation, renderer::MeshType::Normal, None)?;
+            scene.add_model(
+                support_model,
+                &glam::Affine3::from_rotation_translation(rotation, position),
+                renderer::MeshType::Normal,
+                None,
+            )?;
         }
     }
 

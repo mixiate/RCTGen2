@@ -33,12 +33,10 @@ impl<'a> SceneBuilder<'a> {
     pub fn add_model(
         &mut self,
         model: &'a crate::model::Model,
-        translation: glam::Vec3,
-        rotation: glam::Quat,
+        transform: &glam::Affine3,
         mesh_type: MeshType,
         mut mesh_ids: Option<&mut Vec<usize>>,
     ) -> anyhow::Result<()> {
-        let transform = glam::Mat4::from_translation(translation) * glam::Mat4::from_quat(rotation);
         for mesh in &model.meshes {
             let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
             for (position, geom_position) in mesh.positions.iter().zip(geometry.positions_mut().iter_mut()) {
