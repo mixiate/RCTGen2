@@ -24,7 +24,7 @@ pub struct TrackSection {
     pub name: &'static str,
     curve: fn(f32, f32) -> TrackPoint,
     pub length: f32,
-    position_offset: glam::Vec3,
+    pub position_offset: glam::Vec3,
     pub mask_offset_y: bool,
     pub prefer_odd_alt_mesh_count: bool,
     pub invert_alt_mesh: bool,

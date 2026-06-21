@@ -48,6 +48,14 @@ pub enum TrackGroup {
     VerySmallTurns,
 }
 
+#[derive(Clone, Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AdditionalModel<T> {
+    pub model: T,
+    #[serde(default)]
+    pub mirror: bool,
+}
+
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Models<T> {
@@ -64,6 +72,8 @@ pub struct Models<T> {
     pub support_bank_five_sixths: Option<T>,
     pub support_bank: Option<T>,
     pub support_base: Option<T>,
+    #[serde(default)]
+    pub additional: std::collections::HashMap<String, AdditionalModel<T>>,
 }
 
 impl Models<std::path::PathBuf> {
@@ -71,6 +81,17 @@ impl Models<std::path::PathBuf> {
         let load_optional_model = |path: &Option<std::path::PathBuf>| {
             path.as_ref().map(|x| renderer::model::Model::load(&base_directory.join(x))).transpose()
         };
+
+        let mut additional = std::collections::HashMap::with_capacity(self.additional.len());
+        for (track_piece_name, additional_model) in &self.additional {
+            additional.insert(
+                track_piece_name.clone(),
+                AdditionalModel {
+                    model: renderer::model::Model::load(&base_directory.join(&additional_model.model))?,
+                    mirror: additional_model.mirror,
+                },
+            );
+        }
 
         Ok(Models::<renderer::model::Model> {
             track: renderer::model::Model::load(&base_directory.join(&self.track))?,
@@ -86,6 +107,7 @@ impl Models<std::path::PathBuf> {
             support_bank_five_sixths: load_optional_model(&self.support_bank_five_sixths)?,
             support_bank: load_optional_model(&self.support_bank)?,
             support_base: load_optional_model(&self.support_base)?,
+            additional,
         })
     }
 }

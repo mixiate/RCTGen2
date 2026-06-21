@@ -636,6 +636,20 @@ pub fn build<'a>(
         )?;
     }
 
+    if let Some(model) = models.additional.get(track_section.name) {
+        let scale = if model.mirror {
+            glam::Vec3::new(-1.0, 1.0, 1.0)
+        } else {
+            glam::Vec3::ONE
+        };
+        scene.add_model(
+            &model.model,
+            &glam::Affine3::from_scale_rotation_translation(scale, glam::Quat::IDENTITY, track_section.position_offset),
+            renderer::MeshType::Normal,
+            None,
+        )?;
+    }
+
     Ok(mesh_ids)
 }
 
