@@ -1,0 +1,35 @@
+{
+    "tracks": [
+        {
+            "name": "test-track-additional-models",
+            "sections": [
+                "zero_g_rolls"
+            ],
+            "z_offset": 0,
+            "masks": "upright",
+            "models": {
+                "track": "models/track.obj",
+                "mask": "models/mask.obj",
+                "additional": {
+                    "zero_g_roll_left": {
+                        "model": "models/support_zero_g_roll.obj"
+                    },
+                    "zero_g_roll_right": {
+                        "model": "models/support_zero_g_roll.obj",
+                        "mirror": true
+                    },
+                    "large_zero_g_roll_left": {
+                        "model": "models/support_large_zero_g_roll.obj"
+                    },
+                    "large_zero_g_roll_right": {
+                        "model": "models/support_large_zero_g_roll.obj",
+                        "mirror": true
+                    }
+                }
+            }
+        }
+    ],
+    "lights": [
+        { "direction": [ 1, 1, 1 ], "diffuse_strength": 1, "specular_strength": 0, "shadow": false }
+    ]
+}

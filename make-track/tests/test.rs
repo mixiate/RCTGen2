@@ -124,3 +124,8 @@ fn test_track_supports() {
 fn test_track_lift() {
     test_make_track("test-track-lift");
 }
+
+#[test]
+fn test_track_additional_models() {
+    test_make_track("test-track-additional-models");
+}
