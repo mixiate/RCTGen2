@@ -161,6 +161,76 @@ impl eframe::App for RctGen2App {
             });
         });
 
+        if let Some(track_desc) = self.track_desc.as_mut() {
+            egui::Panel::right("Lights").resizable(false).show(ui, |ui| {
+                let mut deleted_index = None;
+                ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
+                let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
+                egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
+                    for (i, light) in track_desc.lights.iter_mut().enumerate() {
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                            ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
+                            if ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked() {
+                                deleted_index = Some(i);
+                                queue_render = true;
+                            }
+                        });
+                        ui.columns_const(|[col_0, col_1]| {
+                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.direction[0], "X", None) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.direction[1], "Y", None) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.direction[2], "Z", None) {
+                                    queue_render = true;
+                                }
+                            });
+
+                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_1.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                                if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
+                                    queue_render = true;
+                                }
+                            });
+                        });
+
+                        ui.separator();
+                    }
+                    ui.vertical_centered(|ui| {
+                        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
+                        if ui.add(egui::Button::new("Add light").fill(egui::Color32::LIGHT_GREEN)).clicked() {
+                            track_desc.lights.push(make_track::track_desc::Light {
+                                direction: [1.0, 0.5, 1.0],
+                                diffuse_strength: 1.0,
+                                specular_strength: 1.0,
+                                shadow: true,
+                            });
+                            queue_render = true;
+                        }
+                    });
+                });
+                if let Some(i) = deleted_index {
+                    track_desc.lights.remove(i);
+                    queue_render = true;
+                }
+            });
+        }
+
         if update_model {
             self.update_model();
         }
@@ -205,4 +275,31 @@ impl eframe::App for RctGen2App {
     fn on_exit(&mut self) {
         let _result = self.render_tx.send(RenderMessage::Exit);
     }
+}
+
+fn drag_value(ui: &mut egui::Ui, value: &mut f32, label: &str, range: Option<core::ops::RangeInclusive<f32>>) -> bool {
+    let mut changed = false;
+    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+        ui.scope(|ui| {
+            ui.style_mut().spacing.item_spacing = egui::vec2(0.0, 0.0);
+            if ui.button("+").clicked() {
+                *value += 0.01;
+                changed = true;
+            }
+            let mut drag_value = egui::DragValue::new(value).speed(0.01);
+            if let Some(range) = range {
+                drag_value = drag_value.clamp_existing_to_range(false).range(range);
+            }
+            if ui.add_sized(egui::vec2(75.0, 10.0), drag_value).changed() {
+                changed = true;
+            }
+            if ui.button("-").clicked() {
+                *value -= 0.01;
+                changed = true;
+            }
+        });
+
+        ui.label(label);
+    });
+    changed
 }
