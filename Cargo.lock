@@ -2187,6 +2187,7 @@ dependencies = [
  "clap",
  "glam",
  "heapless",
+ "indexmap 2.14.0",
  "openrct2",
  "rayon",
  "rct",
