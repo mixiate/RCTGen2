@@ -115,10 +115,9 @@ impl Models<std::path::PathBuf> {
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Track {
-    pub sections: std::collections::HashSet<TrackGroup>,
-    pub masks: std::path::PathBuf,
     pub name: String,
     pub suffix: Option<String>,
+    pub sections: std::collections::HashSet<TrackGroup>,
     pub length: Option<f32>,
     pub tie_length: Option<f32>,
     pub z_offset: i32,
@@ -130,6 +129,7 @@ pub struct Track {
     bank_angle: f32,
     #[serde(default)]
     pub lift: bool,
+    pub masks: std::path::PathBuf,
     pub models: Models<std::path::PathBuf>,
 }
 
