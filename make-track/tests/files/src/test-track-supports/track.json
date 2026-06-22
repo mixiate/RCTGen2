@@ -25,7 +25,7 @@
             ],
             "z_offset": 13,
             "support_spacing": 0.8,
-            "pivot": 0.116897727273,
+            "support_pivot": 0.116897727273,
             "masks": "upright",
             "models": {
                 "track": "track.obj",

@@ -124,7 +124,7 @@ pub struct Track {
     #[serde(default = "float_1")]
     pub support_spacing: f32,
     #[serde(default)]
-    pub pivot: f32,
+    pub support_pivot: f32,
     #[serde(default = "default_bank_angle")]
     bank_angle: f32,
     #[serde(default)]

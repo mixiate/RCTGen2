@@ -177,7 +177,7 @@ impl ModelDesc {
             extrusion_count: ModelDesc::calculate_extrusion_count(length),
             track_even: false,
             support_spacing: track.support_spacing,
-            support_pivot: track.pivot,
+            support_pivot: track.support_pivot,
         }
     }
 
@@ -205,7 +205,7 @@ impl ModelDesc {
                 extrusion_count: ModelDesc::calculate_extrusion_count(length),
                 track_even: false,
                 support_spacing: track.support_spacing,
-                support_pivot: track.pivot,
+                support_pivot: track.support_pivot,
             }
         } else {
             Self::new_non_alternating(track, lengths, track_section)
@@ -246,7 +246,7 @@ impl ModelDesc {
             extrusion_count: self.extrusion_count * 2,
             track_even: !tie_start,
             support_spacing: track.support_spacing,
-            support_pivot: track.pivot,
+            support_pivot: track.support_pivot,
         }
     }
 }
