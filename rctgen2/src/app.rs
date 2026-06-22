@@ -119,6 +119,12 @@ impl eframe::App for RctGen2App {
                     } else {
                         ui.add_enabled(false, egui::Button::new("Save"));
                     }
+
+                    ui.separator();
+
+                    if ui.button("Exit").clicked() {
+                        ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
                 });
                 if ui.add(egui::DragValue::new(&mut self.samples).prefix("Samples: ").range(1..=4)).changed() {
                     queue_render = true;
