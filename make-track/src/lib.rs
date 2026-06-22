@@ -325,9 +325,7 @@ fn split_track_section(
     Ok(sprite_descs)
 }
 
-fn list_track_sections(
-    sections: &std::collections::HashSet<track_desc::TrackGroup>,
-) -> Vec<&track_sections::TrackSection> {
+fn list_track_sections(sections: &indexmap::IndexSet<track_desc::TrackGroup>) -> Vec<&track_sections::TrackSection> {
     use track_desc::TrackGroup;
 
     let mut track_sections = Vec::new();
