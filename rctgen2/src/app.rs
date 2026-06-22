@@ -12,6 +12,7 @@ pub struct RctGen2App {
     render_tx: Sender<RenderMessage>,
     render_texture: SharedTexture,
     errors: Vec<String>,
+    track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
     samples: usize,
@@ -28,6 +29,7 @@ impl RctGen2App {
             render_tx,
             render_texture,
             errors: Vec::new(),
+            track_desc_path: None,
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
             samples: 4,
@@ -55,6 +57,7 @@ impl RctGen2App {
             })));
             self.update_model();
             self.dither = track_desc.dither;
+            self.track_desc_path = Some(file_path);
             self.track_desc = Some(track_desc);
             self.queue_render(egui_context);
         }
@@ -98,11 +101,25 @@ impl eframe::App for RctGen2App {
 
         egui::Panel::top("Top Menu").show(ui, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
-                if ui.add(egui::Button::new("Open")).clicked()
-                    && let Err(error) = self.load_track(ui.ctx().clone())
-                {
-                    self.errors.extend(error.chain().map(|x| x.to_string()));
-                }
+                ui.menu_button("File", |ui| {
+                    if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
+                        && let Err(error) = self.load_track(ui.ctx().clone())
+                    {
+                        self.errors.extend(error.chain().map(|x| x.to_string()));
+                    }
+
+                    if let Some(path) = &self.track_desc_path
+                        && let Some(track_desc) = &self.track_desc
+                    {
+                        if ui.button("Save").clicked()
+                            && let Err(error) = track_desc.save(path)
+                        {
+                            self.errors.extend(error.chain().map(|x| x.to_string()));
+                        }
+                    } else {
+                        ui.add_enabled(false, egui::Button::new("Save"));
+                    }
+                });
                 if ui.add(egui::DragValue::new(&mut self.samples).prefix("Samples: ").range(1..=4)).changed() {
                     queue_render = true;
                 }
