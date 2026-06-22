@@ -93,8 +93,8 @@ pub struct Models<T> {
     pub support_bank_two_thirds: Option<T>,
     pub support_bank_five_sixths: Option<T>,
     pub support_bank: Option<T>,
-    #[serde(default, skip_serializing_if = "std::collections::HashMap::is_empty")]
-    pub additional: std::collections::HashMap<String, AdditionalModel<T>>,
+    #[serde(default, skip_serializing_if = "indexmap::IndexMap::is_empty")]
+    pub additional: indexmap::IndexMap<String, AdditionalModel<T>>,
 }
 
 impl Models<std::path::PathBuf> {
@@ -103,7 +103,7 @@ impl Models<std::path::PathBuf> {
             path.as_ref().map(|x| renderer::model::Model::load(&base_directory.join(x))).transpose()
         };
 
-        let mut additional = std::collections::HashMap::with_capacity(self.additional.len());
+        let mut additional = indexmap::IndexMap::with_capacity(self.additional.len());
         for (track_piece_name, additional_model) in &self.additional {
             additional.insert(
                 track_piece_name.clone(),
@@ -139,7 +139,7 @@ impl Models<std::path::PathBuf> {
 pub struct Track {
     pub name: String,
     pub suffix: Option<String>,
-    pub sections: std::collections::HashSet<TrackGroup>,
+    pub sections: indexmap::IndexSet<TrackGroup>,
     pub length: Option<f32>,
     pub tie_length: Option<f32>,
     pub z_offset: i32,
