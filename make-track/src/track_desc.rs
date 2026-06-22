@@ -6,11 +6,25 @@ fn default_bank_angle() -> f32 {
     45.0
 }
 
+#[expect(clippy::float_cmp)]
+fn is_default_bank_angle(bank_angle: &f32) -> bool {
+    *bank_angle == 45.0
+}
+
 fn float_1() -> f32 {
     1.0
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Deserialize)]
+fn is_float_0(float: &f32) -> bool {
+    *float == 0.0
+}
+
+#[expect(clippy::float_cmp)]
+fn is_float_1(float: &f32) -> bool {
+    *float == 1.0
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TrackGroup {
     Flat,
@@ -54,22 +68,24 @@ pub enum TrackGroup {
     BankedZeroGRolls,
 }
 
-#[derive(Clone, Debug, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct AdditionalModel<T> {
     pub model: T,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub mirror: bool,
 }
 
-#[derive(Clone, Debug, serde::Deserialize)]
+#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Models<T> {
     pub track: T,
     pub mask: T,
     pub tie: Option<T>,
-    pub track_tie: Option<T>,
     pub track_alt: Option<T>,
+    pub track_tie: Option<T>,
+    pub support_base: Option<T>,
     pub support_flat: Option<T>,
     pub support_bank_sixth: Option<T>,
     pub support_bank_third: Option<T>,
@@ -77,8 +93,7 @@ pub struct Models<T> {
     pub support_bank_two_thirds: Option<T>,
     pub support_bank_five_sixths: Option<T>,
     pub support_bank: Option<T>,
-    pub support_base: Option<T>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "std::collections::HashMap::is_empty")]
     pub additional: std::collections::HashMap<String, AdditionalModel<T>>,
 }
 
@@ -118,7 +133,8 @@ impl Models<std::path::PathBuf> {
     }
 }
 
-#[derive(Clone, Debug, serde::Deserialize)]
+#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Track {
     pub name: String,
@@ -127,13 +143,13 @@ pub struct Track {
     pub length: Option<f32>,
     pub tie_length: Option<f32>,
     pub z_offset: i32,
-    #[serde(default = "float_1")]
+    #[serde(default = "float_1", skip_serializing_if = "is_float_1")]
     pub support_spacing: f32,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "is_float_0")]
     pub support_pivot: f32,
-    #[serde(default = "default_bank_angle")]
+    #[serde(default = "default_bank_angle", skip_serializing_if = "is_default_bank_angle")]
     bank_angle: f32,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub lift: bool,
     pub masks: std::path::PathBuf,
     pub models: Models<std::path::PathBuf>,
@@ -145,7 +161,7 @@ impl Track {
     }
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Offsets {
     pub flat: [[f32; 2]; 2],
@@ -162,7 +178,7 @@ pub struct Offsets {
     pub vertical: [[f32; 2]; 4],
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Light {
     pub direction: [f32; 3],
@@ -171,13 +187,14 @@ pub struct Light {
     pub shadow: bool,
 }
 
-#[derive(Clone, Debug, serde::Deserialize)]
+#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Desc {
     pub tracks: Vec<Track>,
     pub offsets: Option<Offsets>,
     pub lights: Vec<Light>,
-    #[serde(default = "bool_true")]
+    #[serde(default = "bool_true", skip_serializing_if = "Clone::clone")]
     pub dither: bool,
     pub edge_distance: Option<f32>,
 }
@@ -187,6 +204,19 @@ impl Desc {
         use anyhow::Context as _;
         let json = std::fs::read_to_string(path).with_context(|| format!("Could not read file {}", path.display()))?;
         serde_json::from_str::<Desc>(&json).with_context(|| format!("Could not parse json in file {}", path.display()))
+    }
+
+    pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
+        use anyhow::Context as _;
+        use serde::Serialize as _;
+
+        let mut buffer = Vec::new();
+        let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
+        let mut serializer = serde_json::Serializer::with_formatter(&mut buffer, formatter);
+        self.serialize(&mut serializer).unwrap();
+        buffer.push(b'\n');
+
+        std::fs::write(path, buffer).with_context(|| format!("Could not save file {}", path.display()))
     }
 
     pub fn get_lights(&self) -> Vec<renderer::Light> {
