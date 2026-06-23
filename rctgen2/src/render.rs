@@ -20,7 +20,7 @@ pub struct RenderArgs {
     pub samples: usize,
     pub dither: bool,
     pub indexed: bool,
-    pub lights: Vec<make_track::track_desc::Light>,
+    pub lights: Vec<renderer::Light>,
 }
 
 pub enum RenderMessage {
@@ -98,7 +98,7 @@ fn update_model<'a>(
     Ok(Scene { scene, mesh_types })
 }
 
-fn render(track: &Track, scene: &Scene, args: &RenderArgs, render_texture: &SharedTexture) {
+fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &SharedTexture) {
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
             glam::Vec3::new(32.0, 0.0, 32.0),
@@ -112,16 +112,10 @@ fn render(track: &Track, scene: &Scene, args: &RenderArgs, render_texture: &Shar
     let camera = camera * view_rotation;
 
     let view_rotation_inverse = view_rotation.inverse();
-    let lights = args
-        .lights
-        .iter()
-        .map(|light| renderer::Light {
-            diffuse_strength: light.diffuse_strength,
-            specular_strength: light.specular_strength,
-            direction: view_rotation_inverse.transform_vector3(light.direction.into()).normalize(),
-            shadow: light.shadow,
-        })
-        .collect::<Vec<renderer::Light>>();
+    let mut lights = args.lights;
+    for light in &mut lights {
+        light.direction = view_rotation_inverse.transform_vector3(light.direction).normalize();
+    }
     let framebuffer = renderer::render_scene(
         &scene.scene,
         &scene.mesh_types,
@@ -215,7 +209,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
             && let Some(track) = &current_track
             && let Some(scene) = &current_scene
         {
-            render(track, scene, &args, render_texture);
+            render(track, scene, args, render_texture);
             let _result = app_tx.send(AppMessage::NewFrame);
         }
     }
