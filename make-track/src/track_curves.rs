@@ -972,6 +972,20 @@ pub fn s_bend_right(distance: f32, _bank_angle: f32) -> TrackPoint {
     )
 }
 
+pub fn s_bend_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &s_bend_left(distance, 0.0),
+        -bank_angle * (1.0 - 2.0 * distance / S_BEND_LENGTH),
+    )
+}
+
+pub fn s_bend_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &s_bend_right(distance, 0.0),
+        bank_angle * (1.0 - 2.0 * distance / S_BEND_LENGTH),
+    )
+}
+
 pub fn small_helix_left(distance: f32, bank_angle: f32) -> TrackPoint {
     curves::banked_curve(
         &curves::sloped_turn_left(SMALL_TURN_RADIUS, CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance),

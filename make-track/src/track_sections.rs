@@ -1440,6 +1440,34 @@ pub const S_BEND_RIGHT: TrackSection = TrackSection {
     chain_type: None,
 };
 
+pub const S_BEND_LEFT_BANK: TrackSection = TrackSection {
+    name: "s_bend_left_bank",
+    curve: crate::track_curves::s_bend_left_bank,
+    length: crate::track_curves::S_BEND_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: true,
+    chain_type: None,
+};
+
+pub const S_BEND_RIGHT_BANK: TrackSection = TrackSection {
+    name: "s_bend_right_bank",
+    curve: crate::track_curves::s_bend_right_bank,
+    length: crate::track_curves::S_BEND_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: true,
+    chain_type: None,
+};
+
 pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
     name: "small_helix_left",
     curve: crate::track_curves::small_helix_left,

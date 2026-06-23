@@ -450,6 +450,10 @@ fn list_track_sections(
         track_sections.push(&track_sections::S_BEND_LEFT);
         track_sections.push(&track_sections::S_BEND_RIGHT);
     }
+    if sections.contains(&TrackGroup::BankedSBends) {
+        track_sections.push(&track_sections::S_BEND_LEFT_BANK);
+        track_sections.push(&track_sections::S_BEND_RIGHT_BANK);
+    }
     if sections.contains(&TrackGroup::Helices) {
         track_sections.push(&track_sections::SMALL_HELIX_LEFT);
         track_sections.push(&track_sections::SMALL_HELIX_RIGHT);

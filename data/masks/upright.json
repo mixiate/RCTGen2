@@ -1120,6 +1120,30 @@
             "offset": [[0, 0], [-32, -16], [0, -32], [-32, -48]]
         }
     ],
+    "s_bend_left_bank": [
+        {
+            "mask": "upright/s_bend_left_0.png",
+            "offset": [[0, 0], [-32, 16], [0, 32], [-32, 48]],
+            "split": [true, false, false, false]
+        },
+        {
+            "mask": "upright/s_bend_left_1.png",
+            "offset": [[0, 0], [-32, -16], [-64, 0], [-96, -16]],
+            "split": [true, false, false, false]
+        }
+    ],
+    "s_bend_right_bank": [
+        {
+            "mask": "upright/s_bend_right_0.png",
+            "offset": [[0, 0], [-32, 16], [-64, 0], [-96, 16]],
+            "split": [false, false, false, true]
+        },
+        {
+            "mask": "upright/s_bend_right_1.png",
+            "offset": [[0, 0], [-32, -16], [0, -32], [-32, -48]],
+            "split": [false, false, false, true]
+        }
+    ],
     "small_helix_left": [
         {
             "mask": "upright/small_helix_left_0.png",
