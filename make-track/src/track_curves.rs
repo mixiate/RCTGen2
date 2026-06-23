@@ -34,6 +34,7 @@ pub const SMALL_TURN_GENTLE_LENGTH: f32 = 2.493656;
 pub const MEDIUM_TURN_GENTLE_LENGTH: f32 = 4.25299;
 pub const LARGE_TURN_GENTLE_LENGTH: f32 = 3.017199;
 pub const VERY_SMALL_TURN_STEEP_LENGTH: f32 = 1.812048;
+pub const SMALL_TURN_STEEP_LENGTH: f32 = 4.027196;
 pub const VERTICAL_TWIST_LENGTH: f32 = CLEARANCE_HEIGHT * 12.0;
 
 pub const S_BEND_LENGTH: f32 = 3.24075;
@@ -728,6 +729,14 @@ pub fn very_small_turn_left_steep(distance: f32, _bank_angle: f32) -> TrackPoint
 
 pub fn very_small_turn_right_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
     curves::flip_x_axis(very_small_turn_left_steep(distance, 0.0))
+}
+
+pub fn small_turn_left_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::sloped_turn_left(SMALL_TURN_RADIUS, 16.0 * CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance)
+}
+
+pub fn small_turn_right_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(small_turn_left_steep(distance, 0.0))
 }
 
 pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> TrackPoint {

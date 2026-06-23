@@ -48,6 +48,7 @@ pub enum TrackGroup {
     TurnBankTransitions,
     VerySmallTurns,
     SteepBankTransitions,
+    LargeSteepSlopedTurns,
     BankedBarrelRolls,
     BankedInlineTwists,
     BankedZeroGRolls,
