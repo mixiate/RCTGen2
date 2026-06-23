@@ -1057,6 +1057,62 @@ pub fn small_turn_right_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackP
     curves::flip_x_axis(small_turn_left_bank_to_gentle(distance, bank_angle))
 }
 
+pub fn gentle_left_bank_to_steep(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &gentle_to_steep(distance, 0.0),
+        -bank_angle * (1.0 - distance / GENTLE_TO_STEEP_LENGTH),
+    )
+}
+
+pub fn gentle_right_bank_to_steep(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &gentle_to_steep(distance, 0.0),
+        bank_angle * (1.0 - distance / GENTLE_TO_STEEP_LENGTH),
+    )
+}
+
+pub fn steep_to_gentle_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &steep_to_gentle(distance, 0.0),
+        -bank_angle * (distance / GENTLE_TO_STEEP_LENGTH),
+    )
+}
+
+pub fn steep_to_gentle_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &steep_to_gentle(distance, 0.0),
+        bank_angle * (distance / GENTLE_TO_STEEP_LENGTH),
+    )
+}
+
+pub fn gentle_left_bank_to_steep_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &gentle_to_steep_diag(distance, 0.0),
+        -bank_angle * (1.0 - distance / GENTLE_TO_STEEP_DIAG_LENGTH),
+    )
+}
+
+pub fn gentle_right_bank_to_steep_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &gentle_to_steep_diag(distance, 0.0),
+        bank_angle * (1.0 - distance / GENTLE_TO_STEEP_DIAG_LENGTH),
+    )
+}
+
+pub fn steep_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &steep_to_gentle_diag(distance, 0.0),
+        -bank_angle * (distance / GENTLE_TO_STEEP_DIAG_LENGTH),
+    )
+}
+
+pub fn steep_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &steep_to_gentle_diag(distance, 0.0),
+        bank_angle * (distance / GENTLE_TO_STEEP_DIAG_LENGTH),
+    )
+}
+
 pub fn barrel_roll_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     let radius = 7.0 * CLEARANCE_HEIGHT / 6.0;
     curves::roll_left(BARREL_ROLL_LENGTH, radius, distance)

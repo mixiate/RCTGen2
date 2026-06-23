@@ -1580,6 +1580,118 @@ pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     chain_type: None,
 };
 
+pub const GENTLE_LEFT_BANK_TO_STEEP: TrackSection = TrackSection {
+    name: "gentle_left_bank_to_steep",
+    curve: crate::track_curves::gentle_left_bank_to_steep,
+    length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const GENTLE_RIGHT_BANK_TO_STEEP: TrackSection = TrackSection {
+    name: "gentle_right_bank_to_steep",
+    curve: crate::track_curves::gentle_right_bank_to_steep,
+    length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const STEEP_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
+    name: "steep_to_gentle_left_bank",
+    curve: crate::track_curves::steep_to_gentle_left_bank,
+    length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: true,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const STEEP_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
+    name: "steep_to_gentle_right_bank",
+    curve: crate::track_curves::steep_to_gentle_right_bank,
+    length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: true,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const GENTLE_LEFT_BANK_TO_STEEP_DIAG: TrackSection = TrackSection {
+    name: "gentle_left_bank_to_steep_diag",
+    curve: crate::track_curves::gentle_left_bank_to_steep_diag,
+    length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
+    position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const GENTLE_RIGHT_BANK_TO_STEEP_DIAG: TrackSection = TrackSection {
+    name: "gentle_right_bank_to_steep_diag",
+    curve: crate::track_curves::gentle_right_bank_to_steep_diag,
+    length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
+    position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const STEEP_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
+    name: "steep_to_gentle_left_bank_diag",
+    curve: crate::track_curves::steep_to_gentle_left_bank_diag,
+    length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
+    position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const STEEP_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
+    name: "steep_to_gentle_right_bank_diag",
+    curve: crate::track_curves::steep_to_gentle_right_bank_diag,
+    length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
+    position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
 pub const BARREL_ROLL_LEFT: TrackSection = TrackSection {
     name: "barrel_roll_left",
     curve: crate::track_curves::barrel_roll_left,

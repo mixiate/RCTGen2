@@ -2406,5 +2406,147 @@
             "offset": [[0, 0], [32, 16], [0, 32], [32, 48], [0, 64]],
             "split": [true, false, false, false, false]
         }
+    ],
+    "gentle_left_bank_to_steep": [
+        {
+            "mask": "upright/single_tile.png",
+            "mask_end": true
+        },
+        {
+            "mask": "upright/single_tile.png"
+        },
+        {
+            "mask": "upright/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile.png",
+            "mask_end": true
+        }
+    ],
+    "gentle_right_bank_to_steep": [
+        {
+            "mask": "upright/single_tile.png",
+            "mask_end": true
+        },
+        {
+            "mask": "upright/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile.png"
+        },
+        {
+            "mask": "upright/single_tile.png",
+            "mask_end": true
+        }
+    ],
+    "steep_to_gentle_left_bank": [
+        {
+            "mask": "upright/single_tile.png"
+        },
+        {
+            "mask": "upright/single_tile.png"
+        },
+        {
+            "mask": "upright/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile.png"
+        }
+    ],
+    "steep_to_gentle_right_bank": [
+        {
+            "mask": "upright/single_tile.png"
+        },
+        {
+            "mask": "upright/single_tile.png",
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile.png"
+        },
+        {
+            "mask": "upright/single_tile.png"
+        }
+    ],
+    "gentle_left_bank_to_steep_diag": [
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true,
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile_diag.png",
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true
+        },
+        {
+            "mask": "upright/single_tile_diag.png"
+        }
+    ],
+    "gentle_right_bank_to_steep_diag": [
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true
+        },
+        {
+            "mask": "upright/single_tile_diag.png",
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true,
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile_diag.png"
+        }
+    ],
+    "steep_to_gentle_left_bank_diag": [
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true,
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile_diag.png"
+        },
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true
+        },
+        {
+            "mask": "upright/single_tile_diag.png"
+        }
+    ],
+    "steep_to_gentle_right_bank_diag": [
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true
+        },
+        {
+            "mask": "upright/single_tile_diag.png"
+        },
+        {
+            "mask": "upright/single_tile_diag.png",
+            "extrude_behind": true,
+            "extrude_in_front": true,
+            "split": [true]
+        },
+        {
+            "mask": "upright/single_tile_diag.png"
+        }
     ]
 }
