@@ -486,9 +486,17 @@ fn list_track_sections(
         track_sections.push(&track_sections::BARREL_ROLL_LEFT);
         track_sections.push(&track_sections::BARREL_ROLL_RIGHT);
     }
+    if sections.contains(&TrackGroup::BankedBarrelRolls) {
+        track_sections.push(&track_sections::BANKED_BARREL_ROLL_LEFT);
+        track_sections.push(&track_sections::BANKED_BARREL_ROLL_RIGHT);
+    }
     if sections.contains(&TrackGroup::InlineTwists) {
         track_sections.push(&track_sections::INLINE_TWIST_LEFT);
         track_sections.push(&track_sections::INLINE_TWIST_RIGHT);
+    }
+    if sections.contains(&TrackGroup::BankedInlineTwists) {
+        track_sections.push(&track_sections::BANKED_INLINE_TWIST_LEFT);
+        track_sections.push(&track_sections::BANKED_INLINE_TWIST_RIGHT);
     }
     if sections.contains(&TrackGroup::HalfLoops) {
         track_sections.push(&track_sections::HALF_LOOP);
@@ -521,6 +529,10 @@ fn list_track_sections(
         track_sections.push(&track_sections::ZERO_G_ROLL_RIGHT);
         track_sections.push(&track_sections::LARGE_ZERO_G_ROLL_LEFT);
         track_sections.push(&track_sections::LARGE_ZERO_G_ROLL_RIGHT);
+    }
+    if sections.contains(&TrackGroup::BankedZeroGRolls) {
+        track_sections.push(&track_sections::BANKED_ZERO_G_ROLL_LEFT);
+        track_sections.push(&track_sections::BANKED_ZERO_G_ROLL_RIGHT);
     }
     if sections.contains(&TrackGroup::DiveLoops) {
         track_sections.push(&track_sections::DIVE_LOOP_45_LEFT);

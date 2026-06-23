@@ -48,6 +48,9 @@ pub enum TrackGroup {
     TurnBankTransitions,
     VerySmallTurns,
     SteepBankTransitions,
+    BankedBarrelRolls,
+    BankedInlineTwists,
+    BankedZeroGRolls,
 }
 
 #[derive(Clone, Debug, serde::Deserialize)]

@@ -2027,3 +2027,87 @@ pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
     has_supports: false,
     chain_type: None,
 };
+
+pub const BANKED_BARREL_ROLL_LEFT: TrackSection = TrackSection {
+    name: "banked_barrel_roll_left",
+    curve: crate::track_curves::banked_barrel_roll_left,
+    length: crate::track_curves::BARREL_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const BANKED_BARREL_ROLL_RIGHT: TrackSection = TrackSection {
+    name: "banked_barrel_roll_right",
+    curve: crate::track_curves::banked_barrel_roll_right,
+    length: crate::track_curves::BARREL_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const BANKED_INLINE_TWIST_LEFT: TrackSection = TrackSection {
+    name: "banked_inline_twist_left",
+    curve: crate::track_curves::banked_inline_twist_left,
+    length: crate::track_curves::INLINE_TWIST_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const BANKED_INLINE_TWIST_RIGHT: TrackSection = TrackSection {
+    name: "banked_inline_twist_right",
+    curve: crate::track_curves::banked_inline_twist_right,
+    length: crate::track_curves::INLINE_TWIST_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const BANKED_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
+    name: "banked_zero_g_roll_left",
+    curve: crate::track_curves::banked_zero_g_roll_left,
+    length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const BANKED_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
+    name: "banked_zero_g_roll_right",
+    curve: crate::track_curves::banked_zero_g_roll_right,
+    length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: false,
+    chain_type: None,
+};
