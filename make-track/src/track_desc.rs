@@ -185,6 +185,8 @@ pub struct Light {
     pub diffuse_strength: f32,
     pub specular_strength: f32,
     pub shadow: bool,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub disabled: bool,
 }
 
 #[serde_with::skip_serializing_none]
@@ -222,6 +224,7 @@ impl Desc {
     pub fn get_lights(&self) -> Vec<renderer::Light> {
         self.lights
             .iter()
+            .filter(|x| !x.disabled)
             .map(|x| renderer::Light {
                 direction: glam::Vec3::from(x.direction).normalize(),
                 diffuse_strength: x.diffuse_strength,

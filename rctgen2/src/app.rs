@@ -7,11 +7,17 @@ pub enum AppMessage {
     Error(Vec<String>),
 }
 
+#[derive(Clone, Copy, PartialEq)]
+enum SidePanelTab {
+    Lights,
+}
+
 pub struct RctGen2App {
     app_rx: Receiver<AppMessage>,
     render_tx: Sender<RenderMessage>,
     render_texture: SharedTexture,
     errors: Vec<String>,
+    side_panel_tab: Option<SidePanelTab>,
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
@@ -29,6 +35,7 @@ impl RctGen2App {
             render_tx,
             render_texture,
             errors: Vec::new(),
+            side_panel_tab: None,
             track_desc_path: None,
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
@@ -79,8 +86,98 @@ impl RctGen2App {
                 samples: self.samples,
                 dither: self.dither,
                 indexed: self.indexed,
-                lights: track_desc.lights.clone(),
+                lights: track_desc.get_lights(),
             }));
+        }
+    }
+
+    fn draw_lights_panel(&mut self, ui: &mut egui::Ui) {
+        let mut queue_render = false;
+        if let Some(track_desc) = self.track_desc.as_mut() {
+            egui::Panel::right("Lights").resizable(false).show(ui, |ui| {
+                let mut deleted_index = None;
+                ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
+                let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
+                egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
+                    for (i, light) in track_desc.lights.iter_mut().enumerate() {
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                            ui.scope(|ui| {
+                                ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
+                                if ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked() {
+                                    deleted_index = Some(i);
+                                    queue_render = true;
+                                }
+                            });
+
+                            if inverted_checkbox(ui, &mut light.disabled) {
+                                queue_render = true;
+                            }
+                        });
+                        ui.columns_const(|[col_0, col_1]| {
+                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.direction[0], "X", None) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.direction[1], "Y", None) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.direction[2], "Z", None) {
+                                    queue_render = true;
+                                }
+                            });
+
+                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                if drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
+                                    queue_render = true;
+                                }
+                            });
+                            col_1.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                                if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
+                                    queue_render = true;
+                                }
+                            });
+                        });
+
+                        ui.separator();
+                    }
+                    ui.vertical_centered(|ui| {
+                        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
+                        if ui.add(egui::Button::new("Add light").fill(egui::Color32::LIGHT_GREEN)).clicked() {
+                            track_desc.lights.push(make_track::track_desc::Light {
+                                direction: [1.0, 0.5, 1.0],
+                                diffuse_strength: 1.0,
+                                specular_strength: 1.0,
+                                shadow: true,
+                                disabled: false,
+                            });
+                            queue_render = true;
+                        }
+                    });
+                });
+                if let Some(i) = deleted_index {
+                    track_desc.lights.remove(i);
+                    queue_render = true;
+                }
+            });
+        }
+        if queue_render {
+            self.queue_render(ui.ctx().clone());
+        }
+    }
+
+    fn draw_side_panel(&mut self, ui: &mut egui::Ui) {
+        match self.side_panel_tab {
+            Some(SidePanelTab::Lights) => self.draw_lights_panel(ui),
+            None => {}
         }
     }
 }
@@ -161,75 +258,9 @@ impl eframe::App for RctGen2App {
             });
         });
 
-        if let Some(track_desc) = self.track_desc.as_mut() {
-            egui::Panel::right("Lights").resizable(false).show(ui, |ui| {
-                let mut deleted_index = None;
-                ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
-                let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
-                egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
-                    for (i, light) in track_desc.lights.iter_mut().enumerate() {
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                            ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-                            if ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked() {
-                                deleted_index = Some(i);
-                                queue_render = true;
-                            }
-                        });
-                        ui.columns_const(|[col_0, col_1]| {
-                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.direction[0], "X", None) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.direction[1], "Y", None) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.direction[2], "Z", None) {
-                                    queue_render = true;
-                                }
-                            });
+        side_panel_tabs(ui, &mut self.side_panel_tab);
 
-                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_1.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                                if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
-                                    queue_render = true;
-                                }
-                            });
-                        });
-
-                        ui.separator();
-                    }
-                    ui.vertical_centered(|ui| {
-                        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-                        if ui.add(egui::Button::new("Add light").fill(egui::Color32::LIGHT_GREEN)).clicked() {
-                            track_desc.lights.push(make_track::track_desc::Light {
-                                direction: [1.0, 0.5, 1.0],
-                                diffuse_strength: 1.0,
-                                specular_strength: 1.0,
-                                shadow: true,
-                            });
-                            queue_render = true;
-                        }
-                    });
-                });
-                if let Some(i) = deleted_index {
-                    track_desc.lights.remove(i);
-                    queue_render = true;
-                }
-            });
-        }
+        self.draw_side_panel(ui);
 
         if update_model {
             self.update_model();
@@ -302,4 +333,46 @@ fn drag_value(ui: &mut egui::Ui, value: &mut f32, label: &str, range: Option<cor
         ui.label(label);
     });
     changed
+}
+
+fn inverted_checkbox(ui: &mut egui::Ui, value: &mut bool) -> bool {
+    let mut inverse_value = !(*value);
+    if ui.checkbox(&mut inverse_value, "Enabled").clicked() {
+        *value = !inverse_value;
+        true
+    } else {
+        false
+    }
+}
+
+fn side_panel_tab(ui: &mut egui::Ui, text: &str, selected_tab: &mut Option<SidePanelTab>, tab: SidePanelTab) {
+    let selected = *selected_tab == Some(tab);
+    if ui
+        .add_sized(
+            [40.0, 40.0],
+            egui::Button::new(egui::RichText::new(text).size(25.0)).selected(selected).corner_radius(0.0),
+        )
+        .clicked()
+    {
+        if selected {
+            *selected_tab = None;
+        } else {
+            *selected_tab = Some(tab);
+        }
+    }
+}
+
+fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab>) {
+    let mut frame = egui::Frame::side_top_panel(ui.style());
+    frame.inner_margin = egui::Margin::ZERO;
+
+    egui::Panel::right("SidePanelTabs").resizable(false).exact_size(40.0).frame(frame).show(ui, |ui| {
+        egui::MenuBar::new().ui(ui, |ui| {
+            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                ui.style_mut().spacing.item_spacing = egui::vec2(0.0, 0.0);
+
+                side_panel_tab(ui, "💡", selected_tab, SidePanelTab::Lights);
+            });
+        });
+    });
 }
