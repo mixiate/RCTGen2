@@ -44,6 +44,7 @@ pub const MEDIUM_QUARTER_HELIX_LENGTH: f32 = 3.948154;
 pub const SMALL_TURN_BANK_TO_GENTLE_LENGTH: f32 = 2.44229;
 
 pub const BARREL_ROLL_LENGTH: f32 = 3.091882;
+pub const INLINE_TWIST_LENGTH: f32 = 3.001903;
 
 const HALF_LOOP_SEGMENT_1_LENGTH: f32 = 0.540062;
 const HALF_LOOP_SEGMENT_2_LENGTH: f32 = 2.685141;
@@ -1065,7 +1066,7 @@ pub fn barrel_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sectio
 
 pub fn inline_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
     let radius = CLEARANCE_HEIGHT / 6.0;
-    crate::curves::roll_left(BARREL_ROLL_LENGTH, radius, distance)
+    crate::curves::roll_left(INLINE_TWIST_LENGTH, radius, distance)
 }
 
 pub fn inline_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {

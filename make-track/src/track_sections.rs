@@ -1611,7 +1611,7 @@ pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
 pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
     name: "inline_twist_left",
     curve: crate::track_curves::inline_twist_left,
-    length: crate::track_curves::BARREL_ROLL_LENGTH,
+    length: crate::track_curves::INLINE_TWIST_LENGTH,
     position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
@@ -1625,7 +1625,7 @@ pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
 pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
     name: "inline_twist_right",
     curve: crate::track_curves::inline_twist_right,
-    length: crate::track_curves::BARREL_ROLL_LENGTH,
+    length: crate::track_curves::INLINE_TWIST_LENGTH,
     position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: false,
