@@ -1,4 +1,6 @@
 use crate::CLEARANCE_HEIGHT;
+use crate::curves;
+use crate::track_sections::TrackPoint;
 
 pub const FLAT_LENGTH: f32 = 1.0;
 pub const FLAT_TO_GENTLE_LENGTH: f32 = 1.027122;
@@ -84,12 +86,12 @@ pub const LARGE_ZERO_G_ROLL_LENGTH: f32 = 5.568162;
 
 pub const DIVE_LOOP_45_LENGTH: f32 = 5.335896;
 
-pub fn flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
+pub fn flat(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
 
-pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[0.0, 0.0, 1.0, 0.0],
         &[0.0, CLEARANCE_HEIGHT, 0.0, 0.0],
         &[
@@ -105,8 +107,8 @@ pub fn flat_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections:
     )
 }
 
-pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[0.0, 0.0, 1.0, 0.0],
         &[0.0, -CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, 0.0],
         &[
@@ -122,16 +124,16 @@ pub fn gentle_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections:
     )
 }
 
-pub fn gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
     let u = distance / GENTLE_LENGTH;
-    crate::curves::plane_curve_vertical(
+    curves::plane_curve_vertical(
         &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT * u, u),
         &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
     )
 }
 
-pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[-0.5, 1.0, 0.5, 0.0],
         &[CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 0.0],
         &[
@@ -147,8 +149,8 @@ pub fn gentle_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections
     )
 }
 
-pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[-0.5, 0.5, 1.0, 0.0],
         &[CLEARANCE_HEIGHT, -5.0 * CLEARANCE_HEIGHT, 8.0 * CLEARANCE_HEIGHT, 0.0],
         &[
@@ -164,16 +166,16 @@ pub fn steep_to_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections
     )
 }
 
-pub fn steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn steep(distance: f32, _bank_angle: f32) -> TrackPoint {
     let u = distance / STEEP_LENGTH;
-    crate::curves::plane_curve_vertical(
+    curves::plane_curve_vertical(
         &glam::Vec3::new(0.0, 8.0 * CLEARANCE_HEIGHT * u, u),
         &glam::Vec3::new(0.0, 8.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
     )
 }
 
-pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[-1.0 / 6.0, -1.0 / 6.0, 5.0 / 6.0, -1.0 / 2.0],
         &[
             2.0 * CLEARANCE_HEIGHT / 3.0,
@@ -194,8 +196,8 @@ pub fn steep_to_vertical(distance: f32, _bank_angle: f32) -> crate::track_sectio
     )
 }
 
-pub fn vertical_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn vertical_to_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[-1.0 / 6.0, 2.0 / 3.0, 0.0, 0.0],
         &[
             -2.0 * CLEARANCE_HEIGHT / 3.0,
@@ -216,12 +218,12 @@ pub fn vertical_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sectio
     )
 }
 
-pub fn vertical(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::plane_curve_vertical(&glam::Vec3::new(0.0, distance, 0.0), &glam::Vec3::new(0.0, 1.0, 0.0))
+pub fn vertical(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::plane_curve_vertical(&glam::Vec3::new(0.0, distance, 0.0), &glam::Vec3::new(0.0, 1.0, 0.0))
 }
 
-pub fn small_flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn small_flat_to_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[
             2.0 * CLEARANCE_HEIGHT - 1.0,
             2.0 - 4.0 * CLEARANCE_HEIGHT,
@@ -242,8 +244,8 @@ pub fn small_flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sect
     )
 }
 
-pub fn small_steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn small_steep_to_flat(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[2.0 * CLEARANCE_HEIGHT - 1.0, 1.0 - 2.0 * CLEARANCE_HEIGHT, 1.0, 0.0],
         &[
             2.0 * CLEARANCE_HEIGHT,
@@ -264,8 +266,8 @@ pub fn small_steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sect
     )
 }
 
-pub fn flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn flat_to_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[-0.5, -0.5, 5.0, 0.0],
         &[-2.0 * CLEARANCE_HEIGHT, 13.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         &[
@@ -281,8 +283,8 @@ pub fn flat_to_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::
     )
 }
 
-pub fn steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn steep_to_flat(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[-0.5, 2.0, 2.5, 0.0],
         &[
             -2.0 * CLEARANCE_HEIGHT,
@@ -303,20 +305,20 @@ pub fn steep_to_flat(distance: f32, _bank_angle: f32) -> crate::track_sections::
     )
 }
 
-pub fn very_small_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::turn_left(distance, VERY_SMALL_TURN_RADIUS)
+pub fn very_small_turn_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::turn_left(distance, VERY_SMALL_TURN_RADIUS)
 }
 
-pub fn small_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::turn_left(distance, SMALL_TURN_RADIUS)
+pub fn small_turn_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::turn_left(distance, SMALL_TURN_RADIUS)
 }
 
-pub fn medium_turn_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::turn_left(distance, MEDIUM_TURN_RADIUS)
+pub fn medium_turn_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::turn_left(distance, MEDIUM_TURN_RADIUS)
 }
 
-pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_horizontal(
+pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_horizontal(
         &[
             68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
             7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
@@ -337,8 +339,8 @@ pub fn large_turn_left_to_diag(distance: f32, _bank_angle: f32) -> crate::track_
     )
 }
 
-pub fn large_turn_right_to_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_horizontal(
+pub fn large_turn_right_to_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_horizontal(
         &[
             68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
             7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
@@ -359,17 +361,17 @@ pub fn large_turn_right_to_diag(distance: f32, _bank_angle: f32) -> crate::track
     )
 }
 
-pub fn flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn flat_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
     let position = distance / FLAT_DIAG_LENGTH;
     let tangent = 0.5_f32.sqrt();
-    crate::curves::plane_curve_horizontal(
+    curves::plane_curve_horizontal(
         &glam::Vec3::new(position, 0.0, position),
         &glam::Vec3::new(tangent, 0.0, tangent),
     )
 }
 
-pub fn flat_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical_diagonal(
+pub fn flat_to_gentle_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical_diagonal(
         &[0.0, 0.0, FLAT_DIAG_LENGTH, 0.0],
         &[0.0, CLEARANCE_HEIGHT, 0.0, 0.0],
         &[
@@ -385,8 +387,8 @@ pub fn flat_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sect
     )
 }
 
-pub fn gentle_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical_diagonal(
+pub fn gentle_to_flat_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical_diagonal(
         &[0.0, 0.0, FLAT_DIAG_LENGTH, 0.0],
         &[0.0, -CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, 0.0],
         &[
@@ -402,17 +404,17 @@ pub fn gentle_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sect
     )
 }
 
-pub fn gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn gentle_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
     use std::f32::consts::SQRT_2;
     let u = distance / GENTLE_DIAG_LENGTH;
-    crate::curves::plane_curve_vertical_diagonal(
+    curves::plane_curve_vertical_diagonal(
         &glam::Vec3::new(1.0 * u, 2.0 * CLEARANCE_HEIGHT * u, u),
         &glam::Vec3::new(1.0 / SQRT_2, 2.0 * CLEARANCE_HEIGHT / SQRT_2, 1.0 / SQRT_2).normalize(),
     )
 }
 
-pub fn gentle_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical_diagonal(
+pub fn gentle_to_steep_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical_diagonal(
         &[-0.5 * FLAT_DIAG_LENGTH, FLAT_DIAG_LENGTH, 0.5 * FLAT_DIAG_LENGTH, 0.0],
         &[CLEARANCE_HEIGHT, 2.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 0.0],
         &[
@@ -428,8 +430,8 @@ pub fn gentle_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sec
     )
 }
 
-pub fn steep_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical_diagonal(
+pub fn steep_to_gentle_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical_diagonal(
         &[-0.5 * FLAT_DIAG_LENGTH, 0.5 * FLAT_DIAG_LENGTH, FLAT_DIAG_LENGTH, 0.0],
         &[CLEARANCE_HEIGHT, -5.0 * CLEARANCE_HEIGHT, 8.0 * CLEARANCE_HEIGHT, 0.0],
         &[
@@ -445,17 +447,17 @@ pub fn steep_to_gentle_diag(distance: f32, _bank_angle: f32) -> crate::track_sec
     )
 }
 
-pub fn steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn steep_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
     let u = distance / STEEP_DIAG_LENGTH;
-    crate::curves::plane_curve_vertical_diagonal(
+    curves::plane_curve_vertical_diagonal(
         &glam::Vec3::new(u, 8.0 * CLEARANCE_HEIGHT * u, u),
         &glam::Vec3::new(1.0, 8.0 * CLEARANCE_HEIGHT, 1.0).normalize(),
     )
 }
 
-pub fn small_flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn small_flat_to_steep_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
     use std::f32::consts::SQRT_2;
-    crate::curves::cubic_curve_vertical_diagonal(
+    curves::cubic_curve_vertical_diagonal(
         &[
             SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
             SQRT_2 * (2.0 - 4.0 * CLEARANCE_HEIGHT),
@@ -476,9 +478,9 @@ pub fn small_flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track
     )
 }
 
-pub fn small_steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn small_steep_to_flat_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
     use std::f32::consts::SQRT_2;
-    crate::curves::cubic_curve_vertical_diagonal(
+    curves::cubic_curve_vertical_diagonal(
         &[
             SQRT_2 * (2.0 * CLEARANCE_HEIGHT - 1.0),
             SQRT_2 * (1.0 - 2.0 * CLEARANCE_HEIGHT),
@@ -504,8 +506,8 @@ pub fn small_steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track
     )
 }
 
-pub fn flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical_diagonal(
+pub fn flat_to_steep_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical_diagonal(
         &[0.0, -FLAT_DIAG_LENGTH, 4.0 * FLAT_DIAG_LENGTH, 0.0],
         &[-6.0 * CLEARANCE_HEIGHT, 17.0 * CLEARANCE_HEIGHT, 0.0, 0.0],
         &[
@@ -521,8 +523,8 @@ pub fn flat_to_steep_diag(distance: f32, _bank_angle: f32) -> crate::track_secti
     )
 }
 
-pub fn steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical_diagonal(
+pub fn steep_to_flat_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical_diagonal(
         &[0.0, FLAT_DIAG_LENGTH, 2.0 * FLAT_DIAG_LENGTH, 0.0],
         &[-6.0 * CLEARANCE_HEIGHT, CLEARANCE_HEIGHT, 16.0 * CLEARANCE_HEIGHT, 0.0],
         &[
@@ -538,124 +540,124 @@ pub fn steep_to_flat_diag(distance: f32, _bank_angle: f32) -> crate::track_secti
     )
 }
 
-pub fn flat_to_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat(distance, 0.0), -bank_angle * distance / FLAT_LENGTH)
+pub fn flat_to_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat(distance, 0.0), -bank_angle * distance / FLAT_LENGTH)
 }
 
-pub fn flat_to_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat(distance, 0.0), bank_angle * distance / FLAT_LENGTH)
+pub fn flat_to_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat(distance, 0.0), bank_angle * distance / FLAT_LENGTH)
 }
 
-pub fn left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn left_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle(distance, 0.0),
         -bank_angle * (1.0 - distance / FLAT_TO_GENTLE_LENGTH),
     )
 }
 
-pub fn right_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn right_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle(distance, 0.0),
         bank_angle * (1.0 - distance / FLAT_TO_GENTLE_LENGTH),
     )
 }
 
-pub fn gentle_to_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_to_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat(distance, 0.0),
         -bank_angle * distance / FLAT_TO_GENTLE_LENGTH,
     )
 }
 
-pub fn gentle_to_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_to_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat(distance, 0.0),
         bank_angle * distance / FLAT_TO_GENTLE_LENGTH,
     )
 }
 
-pub fn left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat(distance, 0.0), -bank_angle)
+pub fn left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat(distance, 0.0), -bank_angle)
 }
 
-pub fn small_turn_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&small_turn_left(distance, 0.0), -bank_angle)
+pub fn small_turn_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&small_turn_left(distance, 0.0), -bank_angle)
 }
 
-pub fn medium_turn_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&medium_turn_left(distance, 0.0), -bank_angle)
+pub fn medium_turn_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&medium_turn_left(distance, 0.0), -bank_angle)
 }
 
-pub fn large_turn_left_to_diag_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&large_turn_left_to_diag(distance, 0.0), -bank_angle)
+pub fn large_turn_left_to_diag_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&large_turn_left_to_diag(distance, 0.0), -bank_angle)
 }
 
-pub fn large_turn_right_to_diag_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&large_turn_right_to_diag(distance, 0.0), bank_angle)
+pub fn large_turn_right_to_diag_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&large_turn_right_to_diag(distance, 0.0), bank_angle)
 }
 
-pub fn flat_to_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_diag(distance, 0.0), -bank_angle * distance / FLAT_DIAG_LENGTH)
+pub fn flat_to_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_diag(distance, 0.0), -bank_angle * distance / FLAT_DIAG_LENGTH)
 }
 
-pub fn flat_to_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_diag(distance, 0.0), bank_angle * distance / FLAT_DIAG_LENGTH)
+pub fn flat_to_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_diag(distance, 0.0), bank_angle * distance / FLAT_DIAG_LENGTH)
 }
 
-pub fn left_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn left_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle_diag(distance, 0.0),
         -bank_angle * (1.0 - distance / FLAT_TO_GENTLE_DIAG_LENGTH),
     )
 }
 
-pub fn right_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn right_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle_diag(distance, 0.0),
         bank_angle * (1.0 - distance / FLAT_TO_GENTLE_DIAG_LENGTH),
     )
 }
 
-pub fn gentle_to_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_to_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat_diag(distance, 0.0),
         -bank_angle * distance / FLAT_TO_GENTLE_DIAG_LENGTH,
     )
 }
 
-pub fn gentle_to_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_to_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat_diag(distance, 0.0),
         bank_angle * distance / FLAT_TO_GENTLE_DIAG_LENGTH,
     )
 }
 
-pub fn left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_diag(distance, 0.0), -bank_angle)
+pub fn left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_diag(distance, 0.0), -bank_angle)
 }
 
-pub fn small_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_left(SMALL_TURN_RADIUS, 4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance)
+pub fn small_turn_left_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::sloped_turn_left(SMALL_TURN_RADIUS, 4.0 * CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance)
 }
 
-pub fn small_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(small_turn_left_gentle(distance, 0.0))
+pub fn small_turn_right_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(small_turn_left_gentle(distance, 0.0))
 }
 
-pub fn medium_turn_left_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_left(
+pub fn medium_turn_left_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::sloped_turn_left(
         MEDIUM_TURN_RADIUS,
         8.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
         distance,
     )
 }
 
-pub fn medium_turn_right_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(medium_turn_left_gentle(distance, 0.0))
+pub fn medium_turn_right_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(medium_turn_left_gentle(distance, 0.0))
 }
 
-pub fn large_turn_left_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::large_turn_to_diag_gentle(
+pub fn large_turn_left_to_diag_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::large_turn_to_diag_gentle(
         &[
             68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
             7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
@@ -667,8 +669,8 @@ pub fn large_turn_left_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate:
     )
 }
 
-pub fn large_turn_right_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::large_turn_to_diag_gentle(
+pub fn large_turn_right_to_diag_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::large_turn_to_diag_gentle(
         &[
             68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
             7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
@@ -680,8 +682,8 @@ pub fn large_turn_right_to_diag_gentle(distance: f32, _bank_angle: f32) -> crate
     )
 }
 
-pub fn large_turn_left_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::large_turn_to_orthogonal_gentle(
+pub fn large_turn_left_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::large_turn_to_orthogonal_gentle(
         &[
             68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
             7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
@@ -698,8 +700,8 @@ pub fn large_turn_left_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> 
     )
 }
 
-pub fn large_turn_right_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::large_turn_to_orthogonal_gentle(
+pub fn large_turn_right_to_orthogonal_gentle(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::large_turn_to_orthogonal_gentle(
         &[
             24.0 * CLEARANCE_HEIGHT / 3.0 - 2.0,
             3.0 - 48.0 * CLEARANCE_HEIGHT / 3.0,
@@ -716,23 +718,23 @@ pub fn large_turn_right_to_orthogonal_gentle(distance: f32, _bank_angle: f32) ->
     )
 }
 
-pub fn very_small_turn_left_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::sloped_turn_left(
+pub fn very_small_turn_left_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::sloped_turn_left(
         VERY_SMALL_TURN_RADIUS,
         8.0 * CLEARANCE_HEIGHT / VERY_SMALL_TURN_LENGTH,
         distance,
     )
 }
 
-pub fn very_small_turn_right_steep(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(very_small_turn_left_steep(distance, 0.0))
+pub fn very_small_turn_right_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(very_small_turn_left_steep(distance, 0.0))
 }
 
-pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     let tangent = glam::Vec3::new(0.0, 1.0, 0.0);
     let normal = 0.5 * std::f32::consts::PI * distance / VERTICAL_TWIST_LENGTH;
     let normal = glam::Vec3::new(normal.sin(), 0.0, -normal.cos());
-    crate::track_sections::TrackPoint {
+    TrackPoint {
         position: glam::Vec3::new(0.0, distance, 0.0),
         tangent,
         normal,
@@ -740,11 +742,11 @@ pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sect
     }
 }
 
-pub fn vertical_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn vertical_twist_right(distance: f32, _bank_angle: f32) -> TrackPoint {
     let tangent = glam::Vec3::new(0.0, 1.0, 0.0);
     let normal = 0.5 * std::f32::consts::PI * distance / VERTICAL_TWIST_LENGTH;
     let normal = glam::Vec3::new(-normal.sin(), 0.0, -normal.cos());
-    crate::track_sections::TrackPoint {
+    TrackPoint {
         position: glam::Vec3::new(0.0, distance, 0.0),
         tangent,
         normal,
@@ -752,182 +754,182 @@ pub fn vertical_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sec
     }
 }
 
-pub fn gentle_to_gentle_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle(distance, 0.0), -bank_angle * distance / GENTLE_LENGTH)
+pub fn gentle_to_gentle_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle(distance, 0.0), -bank_angle * distance / GENTLE_LENGTH)
 }
 
-pub fn gentle_to_gentle_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle(distance, 0.0), bank_angle * distance / GENTLE_LENGTH)
+pub fn gentle_to_gentle_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle(distance, 0.0), bank_angle * distance / GENTLE_LENGTH)
 }
 
-pub fn gentle_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle(distance, 0.0), -bank_angle * (1.0 - distance / GENTLE_LENGTH))
+pub fn gentle_left_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle(distance, 0.0), -bank_angle * (1.0 - distance / GENTLE_LENGTH))
 }
 
-pub fn gentle_right_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle(distance, 0.0), bank_angle * (1.0 - distance / GENTLE_LENGTH))
+pub fn gentle_right_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle(distance, 0.0), bank_angle * (1.0 - distance / GENTLE_LENGTH))
 }
 
-pub fn left_bank_to_gentle_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_to_gentle(distance, 0.0), -bank_angle)
+pub fn left_bank_to_gentle_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_to_gentle(distance, 0.0), -bank_angle)
 }
 
-pub fn right_bank_to_gentle_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_to_gentle(distance, 0.0), bank_angle)
+pub fn right_bank_to_gentle_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_to_gentle(distance, 0.0), bank_angle)
 }
 
-pub fn gentle_left_bank_to_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_to_flat(distance, 0.0), -bank_angle)
+pub fn gentle_left_bank_to_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_to_flat(distance, 0.0), -bank_angle)
 }
 
-pub fn gentle_right_bank_to_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_to_flat(distance, 0.0), bank_angle)
+pub fn gentle_right_bank_to_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_to_flat(distance, 0.0), bank_angle)
 }
 
-pub fn gentle_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle(distance, 0.0), -bank_angle)
+pub fn gentle_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle(distance, 0.0), -bank_angle)
 }
 
-pub fn gentle_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle(distance, 0.0), bank_angle)
+pub fn gentle_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle(distance, 0.0), bank_angle)
 }
 
-pub fn flat_to_gentle_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn flat_to_gentle_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle(distance, 0.0),
         -bank_angle * distance / FLAT_TO_GENTLE_LENGTH,
     )
 }
 
-pub fn flat_to_gentle_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn flat_to_gentle_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle(distance, 0.0),
         bank_angle * distance / FLAT_TO_GENTLE_LENGTH,
     )
 }
 
-pub fn gentle_left_bank_to_flat(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_left_bank_to_flat(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat(distance, 0.0),
         -bank_angle * (1.0 - distance / FLAT_TO_GENTLE_LENGTH),
     )
 }
 
-pub fn gentle_right_bank_to_flat(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_right_bank_to_flat(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat(distance, 0.0),
         bank_angle * (1.0 - distance / FLAT_TO_GENTLE_LENGTH),
     )
 }
 
-pub fn gentle_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_diag(distance, 0.0), -bank_angle * distance / GENTLE_DIAG_LENGTH)
+pub fn gentle_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_diag(distance, 0.0), -bank_angle * distance / GENTLE_DIAG_LENGTH)
 }
 
-pub fn gentle_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_diag(distance, 0.0), bank_angle * distance / GENTLE_DIAG_LENGTH)
+pub fn gentle_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_diag(distance, 0.0), bank_angle * distance / GENTLE_DIAG_LENGTH)
 }
 
-pub fn gentle_left_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_left_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_diag(distance, 0.0),
         -bank_angle * (1.0 - distance / GENTLE_DIAG_LENGTH),
     )
 }
 
-pub fn gentle_right_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_right_bank_to_gentle_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_diag(distance, 0.0),
         bank_angle * (1.0 - distance / GENTLE_DIAG_LENGTH),
     )
 }
 
-pub fn left_bank_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_to_gentle_diag(distance, 0.0), -bank_angle)
+pub fn left_bank_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_to_gentle_diag(distance, 0.0), -bank_angle)
 }
 
-pub fn right_bank_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&flat_to_gentle_diag(distance, 0.0), bank_angle)
+pub fn right_bank_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&flat_to_gentle_diag(distance, 0.0), bank_angle)
 }
 
-pub fn gentle_left_bank_to_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_to_flat_diag(distance, 0.0), -bank_angle)
+pub fn gentle_left_bank_to_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_to_flat_diag(distance, 0.0), -bank_angle)
 }
 
-pub fn gentle_right_bank_to_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_to_flat_diag(distance, 0.0), bank_angle)
+pub fn gentle_right_bank_to_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_to_flat_diag(distance, 0.0), bank_angle)
 }
 
-pub fn gentle_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_diag(distance, 0.0), -bank_angle)
+pub fn gentle_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_diag(distance, 0.0), -bank_angle)
 }
 
-pub fn gentle_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&gentle_diag(distance, 0.0), bank_angle)
+pub fn gentle_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&gentle_diag(distance, 0.0), bank_angle)
 }
 
-pub fn flat_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn flat_to_gentle_left_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle_diag(distance, 0.0),
         -bank_angle * distance / FLAT_TO_GENTLE_DIAG_LENGTH,
     )
 }
 
-pub fn flat_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn flat_to_gentle_right_bank_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &flat_to_gentle_diag(distance, 0.0),
         bank_angle * distance / FLAT_TO_GENTLE_DIAG_LENGTH,
     )
 }
 
-pub fn gentle_left_bank_to_flat_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_left_bank_to_flat_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat_diag(distance, 0.0),
         -bank_angle * (1.0 - distance / FLAT_TO_GENTLE_DIAG_LENGTH),
     )
 }
 
-pub fn gentle_right_bank_to_flat_diag(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
+pub fn gentle_right_bank_to_flat_diag(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
         &gentle_to_flat_diag(distance, 0.0),
         bank_angle * (1.0 - distance / FLAT_TO_GENTLE_DIAG_LENGTH),
     )
 }
 
-pub fn small_turn_left_bank_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&small_turn_left_gentle(distance, 0.0), -bank_angle)
+pub fn small_turn_left_bank_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&small_turn_left_gentle(distance, 0.0), -bank_angle)
 }
 
-pub fn small_turn_right_bank_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&small_turn_right_gentle(distance, 0.0), bank_angle)
+pub fn small_turn_right_bank_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&small_turn_right_gentle(distance, 0.0), bank_angle)
 }
 
-pub fn medium_turn_left_bank_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&medium_turn_left_gentle(distance, 0.0), -bank_angle)
+pub fn medium_turn_left_bank_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&medium_turn_left_gentle(distance, 0.0), -bank_angle)
 }
 
-pub fn medium_turn_right_bank_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&medium_turn_right_gentle(distance, 0.0), bank_angle)
+pub fn medium_turn_right_bank_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&medium_turn_right_gentle(distance, 0.0), bank_angle)
 }
 
-pub fn large_turn_left_bank_to_diag_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&large_turn_left_to_diag_gentle(distance, 0.0), -bank_angle)
+pub fn large_turn_left_bank_to_diag_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&large_turn_left_to_diag_gentle(distance, 0.0), -bank_angle)
 }
 
-pub fn large_turn_right_bank_to_diag_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&large_turn_right_to_diag_gentle(distance, 0.0), bank_angle)
+pub fn large_turn_right_bank_to_diag_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&large_turn_right_to_diag_gentle(distance, 0.0), bank_angle)
 }
 
-pub fn large_turn_left_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&large_turn_left_to_orthogonal_gentle(distance, 0.0), -bank_angle)
+pub fn large_turn_left_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&large_turn_left_to_orthogonal_gentle(distance, 0.0), -bank_angle)
 }
 
-pub fn large_turn_right_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&large_turn_right_to_orthogonal_gentle(distance, 0.0), bank_angle)
+pub fn large_turn_right_bank_to_orthogonal_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&large_turn_right_to_orthogonal_gentle(distance, 0.0), bank_angle)
 }
 
-pub fn s_bend_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_horizontal(
+pub fn s_bend_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_horizontal(
         &[
             152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
             9.0 - 76.0 * CLEARANCE_HEIGHT,
@@ -948,8 +950,8 @@ pub fn s_bend_left(distance: f32, _bank_angle: f32) -> crate::track_sections::Tr
     )
 }
 
-pub fn s_bend_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_horizontal(
+pub fn s_bend_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_horizontal(
         &[
             152.0 * CLEARANCE_HEIGHT / 3.0 - 6.0,
             9.0 - 76.0 * CLEARANCE_HEIGHT,
@@ -970,31 +972,31 @@ pub fn s_bend_right(distance: f32, _bank_angle: f32) -> crate::track_sections::T
     )
 }
 
-pub fn small_helix_left(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
-        &crate::curves::sloped_turn_left(SMALL_TURN_RADIUS, CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance),
+pub fn small_helix_left(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &curves::sloped_turn_left(SMALL_TURN_RADIUS, CLEARANCE_HEIGHT / SMALL_TURN_LENGTH, distance),
         -bank_angle,
     )
 }
 
-pub fn small_helix_right(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(small_helix_left(distance, bank_angle))
+pub fn small_helix_right(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(small_helix_left(distance, bank_angle))
 }
 
-pub fn medium_helix_left(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(
-        &crate::curves::sloped_turn_left(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
+pub fn medium_helix_left(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(
+        &curves::sloped_turn_left(MEDIUM_TURN_RADIUS, CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH, distance),
         -bank_angle,
     )
 }
 
-pub fn medium_helix_right(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(medium_helix_left(distance, bank_angle))
+pub fn medium_helix_right(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(medium_helix_left(distance, bank_angle))
 }
 
-pub fn medium_quarter_helix_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flatten_ends(
-        crate::curves::sloped_turn_left(
+pub fn medium_quarter_helix_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flatten_ends(
+        curves::sloped_turn_left(
             MEDIUM_TURN_RADIUS,
             2.0 * CLEARANCE_HEIGHT / MEDIUM_TURN_LENGTH,
             distance,
@@ -1003,21 +1005,21 @@ pub fn medium_quarter_helix_left(distance: f32, _bank_angle: f32) -> crate::trac
     )
 }
 
-pub fn medium_quarter_helix_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(medium_quarter_helix_left(distance, 0.0))
+pub fn medium_quarter_helix_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(medium_quarter_helix_left(distance, 0.0))
 }
 
-pub fn medium_quarter_helix_left_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&medium_quarter_helix_left(distance, 0.0), -bank_angle)
+pub fn medium_quarter_helix_left_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&medium_quarter_helix_left(distance, 0.0), -bank_angle)
 }
 
-pub fn medium_quarter_helix_right_bank(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::banked_curve(&medium_quarter_helix_right(distance, 0.0), bank_angle)
+pub fn medium_quarter_helix_right_bank(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::banked_curve(&medium_quarter_helix_right(distance, 0.0), bank_angle)
 }
 
-pub fn small_turn_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn small_turn_left_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
     let radius = SMALL_TURN_RADIUS;
-    let distance = crate::curves::reparameterize(
+    let distance = curves::reparameterize(
         &[
             1.2051404e-11,
             -1.0873811e-9,
@@ -1041,41 +1043,41 @@ pub fn small_turn_left_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::
     let binormal = glam::Vec3::new(0.0, 1.0, 0.0).cross(tangent).normalize();
     let normal = tangent.cross(binormal);
 
-    let point = crate::track_sections::TrackPoint {
+    let point = TrackPoint {
         position,
         tangent,
         normal,
         binormal,
     };
 
-    crate::curves::banked_curve(&point, -bank_angle * (1.0 - distance))
+    curves::banked_curve(&point, -bank_angle * (1.0 - distance))
 }
 
-pub fn small_turn_right_bank_to_gentle(distance: f32, bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(small_turn_left_bank_to_gentle(distance, bank_angle))
+pub fn small_turn_right_bank_to_gentle(distance: f32, bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(small_turn_left_bank_to_gentle(distance, bank_angle))
 }
 
-pub fn barrel_roll_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn barrel_roll_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     let radius = 7.0 * CLEARANCE_HEIGHT / 6.0;
-    crate::curves::roll_left(BARREL_ROLL_LENGTH, radius, distance)
+    curves::roll_left(BARREL_ROLL_LENGTH, radius, distance)
 }
 
-pub fn barrel_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(barrel_roll_left(distance, 0.0))
+pub fn barrel_roll_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(barrel_roll_left(distance, 0.0))
 }
 
-pub fn inline_twist_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn inline_twist_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     let radius = CLEARANCE_HEIGHT / 6.0;
-    crate::curves::roll_left(INLINE_TWIST_LENGTH, radius, distance)
+    curves::roll_left(INLINE_TWIST_LENGTH, radius, distance)
 }
 
-pub fn inline_twist_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(inline_twist_left(distance, 0.0))
+pub fn inline_twist_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(inline_twist_left(distance, 0.0))
 }
 
-pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn half_loop(distance: f32, _bank_angle: f32) -> TrackPoint {
     if distance < HALF_LOOP_SEGMENT_1_LENGTH {
-        crate::curves::plane_curve_vertical(
+        curves::plane_curve_vertical(
             &glam::Vec3::new(
                 0.0,
                 CLEARANCE_HEIGHT * (distance / HALF_LOOP_SEGMENT_1_LENGTH),
@@ -1084,7 +1086,7 @@ pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
             &glam::Vec3::new(0.0, 2.0 * CLEARANCE_HEIGHT / 1.0, 1.0).normalize(),
         )
     } else if distance < HALF_LOOP_SEGMENT_1_LENGTH + HALF_LOOP_SEGMENT_2_LENGTH {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[
                 3.0 - 32.0 * CLEARANCE_HEIGHT / 3.0,
                 16.0 * CLEARANCE_HEIGHT - 6.5,
@@ -1109,7 +1111,7 @@ pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
             distance - HALF_LOOP_SEGMENT_1_LENGTH,
         )
     } else {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[
                 0.0,
                 -16.0 * CLEARANCE_HEIGHT / 3.0,
@@ -1136,11 +1138,11 @@ pub fn half_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::Trac
     }
 }
 
-pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     let proj_distance = distance / VERTICAL_LOOP_FACTOR;
 
     let mut point = if proj_distance < VERTICAL_LOOP_SEGMENT_1_LENGTH {
-        crate::curves::plane_curve_vertical(
+        curves::plane_curve_vertical(
             &glam::Vec3::new(
                 0.0,
                 CLEARANCE_HEIGHT * (proj_distance / VERTICAL_LOOP_SEGMENT_1_LENGTH),
@@ -1152,7 +1154,7 @@ pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_secti
         // reparameterization coefficients from the original
         let distance = (proj_distance - VERTICAL_LOOP_SEGMENT_1_LENGTH) * 3.3;
         let distance = 3.6742346 * distance / 3.3;
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[1.0, -3.5, 4.0, 0.5],
             &[
                 -20.0 * CLEARANCE_HEIGHT / 3.0,
@@ -1172,7 +1174,7 @@ pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_secti
             distance,
         )
     } else {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[0.0, -1.0, 0.0, 2.0],
             &[
                 -11.0 * CLEARANCE_HEIGHT / 3.0,
@@ -1197,12 +1199,12 @@ pub fn vertical_loop_left(distance: f32, _bank_angle: f32) -> crate::track_secti
     point
 }
 
-pub fn vertical_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(vertical_loop_left(distance, 0.0))
+pub fn vertical_loop_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(vertical_loop_left(distance, 0.0))
 }
 
-pub fn quarter_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::cubic_curve_vertical(
+pub fn quarter_loop(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::cubic_curve_vertical(
         &[
             5.0 - 64.0 * CLEARANCE_HEIGHT / 3.0,
             -7.5 + 64.0 * CLEARANCE_HEIGHT / 3.0,
@@ -1228,13 +1230,13 @@ pub fn quarter_loop(distance: f32, _bank_angle: f32) -> crate::track_sections::T
     )
 }
 
-pub fn corkscrew_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(corkscrew_right(distance, 0.0))
+pub fn corkscrew_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(corkscrew_right(distance, 0.0))
 }
 
-pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> TrackPoint {
     if distance < CORKSCREW_SEGMENT_1_LENGTH {
-        crate::curves::bezier3d(
+        curves::bezier3d(
             &[0.31237242, -0.16237243, 0.0, 0.0],
             &[-0.4762897, 1.326807, 0.0, 0.0],
             &[0.16237243, -1.0623724, 2.25, 0.0],
@@ -1251,7 +1253,7 @@ pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections
             distance * 3.3,
         )
     } else {
-        crate::curves::bezier3d(
+        curves::bezier3d(
             &[0.16237243, 0.57525516, 0.6123724, 0.15],
             &[-0.4762897, 0.10206212, 1.2247448, 0.8505173],
             &[0.31237242, -0.77474487, 0.6123724, 1.35],
@@ -1270,13 +1272,13 @@ pub fn corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections
     }
 }
 
-pub fn large_corkscrew_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(large_corkscrew_right(distance, 0.0))
+pub fn large_corkscrew_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(large_corkscrew_right(distance, 0.0))
 }
 
-pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> TrackPoint {
     if distance < LARGE_CORKSCREW_SEGMENT_LENGTH {
-        crate::curves::bezier3d(
+        curves::bezier3d(
             &[0.28291696, 0.06708303, 0.0, 0.0],
             &[-0.7482803, 2.007046, 0.0, 0.0],
             &[0.13291697, -1.432917, 3.45, 0.0],
@@ -1293,7 +1295,7 @@ pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_se
             distance,
         )
     } else {
-        crate::curves::bezier3d(
+        curves::bezier3d(
             &[0.13291697, 1.0341657, 0.98291695, 0.35],
             &[-0.7482803, 0.23779514, 1.7692506, 1.2587655],
             &[0.28291696, -0.91583425, 0.98291695, 2.15],
@@ -1312,7 +1314,7 @@ pub fn large_corkscrew_right(distance: f32, _bank_angle: f32) -> crate::track_se
     }
 }
 
-pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     if distance < 0.001 {
         return gentle(0.0, 0.0);
     }
@@ -1320,7 +1322,7 @@ pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_se
     let proj_distance = distance / MEDIUM_HALF_LOOP_FACTOR;
 
     let mut point = if proj_distance < MEDIUM_HALF_LOOP_SEGMENT_1_LENGTH {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[1.2, -5.3, 7.0, 0.0],
             &[
                 -22.0 * CLEARANCE_HEIGHT / 3.0,
@@ -1340,7 +1342,7 @@ pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_se
             proj_distance,
         )
     } else {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[0.65, -2.55, 0.0, 2.9],
             &[
                 -56.0 * CLEARANCE_HEIGHT / 3.0 + 3.15,
@@ -1372,11 +1374,11 @@ pub fn medium_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_se
     point
 }
 
-pub fn medium_half_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(medium_half_loop_left(distance, 0.0))
+pub fn medium_half_loop_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(medium_half_loop_left(distance, 0.0))
 }
 
-pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     if distance < 0.001 {
         return gentle(0.0, 0.0);
     }
@@ -1386,7 +1388,7 @@ pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sec
     let mut point = if proj_distance < LARGE_HALF_LOOP_SEGMENT_1_LENGTH {
         gentle(proj_distance, 0.0)
     } else if proj_distance < LARGE_HALF_LOOP_SEGMENT_2_LENGTH {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[-3.6, 4.65, 1.5, 1.5],
             &[-0.122179694, 3.252083, 0.6123724, 0.6123724],
             &[
@@ -1401,7 +1403,7 @@ pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sec
             proj_distance - LARGE_HALF_LOOP_SEGMENT_1_LENGTH,
         )
     } else {
-        crate::curves::cubic_curve_vertical(
+        curves::cubic_curve_vertical(
             &[2.6, -4.65, 0.0, 4.05],
             &[1.1010206, -4.6515307, 6.0, 4.3546486],
             &[
@@ -1428,11 +1430,11 @@ pub fn large_half_loop_left(distance: f32, _bank_angle: f32) -> crate::track_sec
     point
 }
 
-pub fn large_half_loop_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(large_half_loop_left(distance, 0.0))
+pub fn large_half_loop_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(large_half_loop_left(distance, 0.0))
 }
 
-pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     use std::f32::consts::PI;
 
     if distance < 0.001 {
@@ -1447,7 +1449,7 @@ pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_section
     let b = (3.0 * PI / ZERO_G_ROLL_BASE_LENGTH - 2.0 * roll_rate_initial - roll_rate_final) / ZERO_G_ROLL_BASE_LENGTH;
     let c = roll_rate_initial;
 
-    crate::curves::zero_g_roll(
+    curves::zero_g_roll(
         7.0 * CLEARANCE_HEIGHT / 6.0,
         &[-0.5, -1.5, 5.0, 0.0],
         &[
@@ -1466,7 +1468,7 @@ pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_section
             -3.081927e-1,
             2.3402834e-1,
         ],
-        crate::curves::reparameterize(
+        curves::reparameterize(
             &[
                 -2.202892e-3,
                 2.5988393e-2,
@@ -1481,11 +1483,11 @@ pub fn zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_section
     )
 }
 
-pub fn zero_g_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(zero_g_roll_left(distance, 0.0))
+pub fn zero_g_roll_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(zero_g_roll_left(distance, 0.0))
 }
 
-pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
+pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> TrackPoint {
     use std::f32::consts::PI;
 
     let roll_rate_final = 0.85 * PI / 3.0;
@@ -1497,7 +1499,7 @@ pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_s
         / LARGE_ZERO_G_ROLL_BASE_LENGTH;
     let c = roll_rate_initial;
 
-    crate::curves::zero_g_roll(
+    curves::zero_g_roll(
         4.0 * CLEARANCE_HEIGHT / 6.0,
         &[0.0, 1.0, 3.0, 0.0],
         &[-8.0 * CLEARANCE_HEIGHT, 0.0, 24.0 * CLEARANCE_HEIGHT, 0.0],
@@ -1511,7 +1513,7 @@ pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_s
             -3.2755677e-3,
             1.7421886e-1,
         ],
-        crate::curves::reparameterize(
+        curves::reparameterize(
             &[
                 1.6635007e-6,
                 1.7291109e-6,
@@ -1526,12 +1528,12 @@ pub fn large_zero_g_roll_left(distance: f32, _bank_angle: f32) -> crate::track_s
     )
 }
 
-pub fn large_zero_g_roll_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis(large_zero_g_roll_left(distance, 0.0))
+pub fn large_zero_g_roll_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(large_zero_g_roll_left(distance, 0.0))
 }
 
-pub fn dive_loop_45_left(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::bezier3d(
+pub fn dive_loop_45_left(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::bezier3d(
         &[1.0, -3.0, 3.0, 0.0],
         &[-2.177324, 0.81649655, 4.898979, 0.0],
         &[0.5, 0.0, 3.0, 0.0],
@@ -1549,6 +1551,6 @@ pub fn dive_loop_45_left(distance: f32, _bank_angle: f32) -> crate::track_sectio
     )
 }
 
-pub fn dive_loop_45_right(distance: f32, _bank_angle: f32) -> crate::track_sections::TrackPoint {
-    crate::curves::flip_x_axis_diagonal(dive_loop_45_left(distance, 0.0))
+pub fn dive_loop_45_right(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis_diagonal(dive_loop_45_left(distance, 0.0))
 }
