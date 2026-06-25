@@ -120,6 +120,18 @@ impl ModelLengths {
     }
 }
 
+fn calculate_track_point_angle(track_section: &track_sections::TrackSection, distance: f32) -> usize {
+    let track_point = track_section.sample_curve(distance, 0.0, &glam::Vec3::ZERO, &glam::Vec3::ZERO);
+    let angle = if track_point.tangent == glam::Vec3::Y {
+        // quick and dirty hack for vertical pieces
+        track_point.binormal.x.atan2(track_point.binormal.z) - std::f32::consts::FRAC_PI_2
+    } else {
+        track_point.tangent.x.atan2(track_point.tangent.z)
+    };
+    let entry_angle_offset = (angle / std::f32::consts::FRAC_PI_4).round().rem_euclid(8.0);
+    (entry_angle_offset / 2.0).ceil() as usize
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct ModelDesc {
     pub mesh_count: i32,
@@ -219,8 +231,11 @@ impl ModelDesc {
         track_section: &track_sections::TrackSection,
         rotation: usize,
     ) -> Self {
-        let tie_start = (rotation + usize::from(track_section.entry_angle_offset)) % 4 < 2;
-        let tie_end = (rotation + usize::from(track_section.exit_angle_offset)) % 4 >= 2;
+        let entry_angle_offset = calculate_track_point_angle(track_section, 0.0);
+        let exit_angle_offset = calculate_track_point_angle(track_section, track_section.length);
+
+        let tie_start = (rotation + entry_angle_offset) % 4 < 2;
+        let tie_end = (rotation + exit_angle_offset) % 4 >= 2;
 
         let (full_length, mesh_count) = {
             let mut full_length = lengths.track * self.mesh_count as f32;
