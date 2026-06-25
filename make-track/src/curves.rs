@@ -273,6 +273,28 @@ pub fn large_turn_to_orthogonal_gentle(x: &[f32; 4], y: &[f32; 4], distance: f32
     point
 }
 
+pub fn large_turn_steep(
+    x: &[f32; 4],
+    y: &[f32; 4],
+    z: &[f32; 4],
+    reparam_coeffs: &[f32; 7],
+    distance: f32,
+) -> crate::track_sections::TrackPoint {
+    let u = reparameterize(reparam_coeffs, distance);
+
+    let position = glam::Vec3::new(-cubic(x, u), cubic(y, u), cubic(z, u));
+    let tangent = glam::Vec3::new(-cubic_derivative(x, u), cubic_derivative(y, u), cubic_derivative(z, u)).normalize();
+    let binormal = glam::Vec3::Y.cross(tangent).normalize();
+    let normal = tangent.cross(binormal).normalize();
+
+    crate::track_sections::TrackPoint {
+        position,
+        tangent,
+        normal,
+        binormal,
+    }
+}
+
 pub fn roll_left(length: f32, radius: f32, distance: f32) -> crate::track_sections::TrackPoint {
     use std::f32::consts::PI;
 

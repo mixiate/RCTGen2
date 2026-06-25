@@ -828,6 +828,98 @@
             "offset": [[0, 0], [0, 80]]
         }
     ],
+    "large_turn_left_to_diag_steep": [
+        {
+            "mask": "upright/large_turn_left_to_diag_steep_0.png",
+            "offset": [[0, 0], [-32, 64], [0, 80], [-32, 144]]
+        },
+        {
+            "mask": "upright/large_turn_left_to_diag_steep_1.png",
+            "extrude_in_front": true,
+            "offset": [[0, 0], [-32, 32], [-64, 48], [-96, 80]]
+        },
+        {
+            "mask": "upright/large_turn_left_to_diag_steep_2.png",
+            "offset": [[0, 0], [32, 32], [0, 16], [32, 48]]
+        },
+        {
+            "mask": "upright/large_turn_left_to_diag_steep_3.png",
+            "extrude_in_front": true,
+            "offset": [[0, 0], [32, 64], [64, 48], [96, 112]]
+        }
+    ],
+    "large_turn_right_to_diag_steep": [
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_diag_steep_3.png",
+            "extrude_in_front": true,
+            "offset": [[0, 0], [-32, 64], [-64, 48], [-96, 112]]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_diag_steep_2.png",
+            "offset": [[0, 0], [-32, 32], [0, 16], [-32, 48]]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_diag_steep_1.png",
+            "extrude_in_front": true,
+            "offset": [[0, 0], [32, 32], [64, 48], [96, 80]]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_diag_steep_0.png",
+            "offset": [[0, 0], [32, 64], [0, 80], [32, 144]]
+        }
+    ],
+    "large_turn_left_to_orthogonal_steep": [
+        {
+            "mask": "upright/large_turn_left_to_orthogonal_steep_0.png",
+            "mask_end": true,
+            "extrude_behind": true,
+            "offset": [[0, 0], [-32, 16], [-64, 32], [-96, 112]]
+        },
+        {
+            "mask": "upright/large_turn_left_to_orthogonal_steep_1.png",
+            "offset": [[0, 0], [-32, -16], [0, 0], [-32, 48]]
+        },
+        {
+            "mask": "upright/large_turn_left_to_orthogonal_steep_2.png",
+            "extrude_behind": true,
+            "offset": [[0, 0], [32, -16], [64, 32], [96, 80]]
+        },
+        {
+            "mask": "upright/large_turn_left_to_orthogonal_steep_3.png",
+            "mask_end": true,
+            "offset": [[0, 0], [32, 16], [0, 64], [32, 144]]
+        }
+    ],
+    "large_turn_right_to_orthogonal_steep": [
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_orthogonal_steep_2.png",
+            "extrude_behind": true,
+            "offset": [[0, 0], [-32, -16], [-64, 32], [-96, 80]]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_orthogonal_steep_1.png",
+            "offset": [[0, 0], [32, -16], [0, 0], [32, 48]]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_orthogonal_steep_0.png",
+            "mask_end": true,
+            "extrude_behind": true,
+            "offset": [[0, 0], [32, 16], [64, 32], [96, 112]]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/large_turn_left_to_orthogonal_steep_3.png",
+            "mask_end": true,
+            "offset": [[0, 0], [-32, 16], [0, 64], [-32, 144]]
+        }
+    ],
     "vertical_twist_left": [
         {
             "mask": "upright/single_tile.png"

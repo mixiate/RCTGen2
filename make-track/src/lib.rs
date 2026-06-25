@@ -485,6 +485,10 @@ fn list_track_sections(
     if sections.contains(&TrackGroup::LargeSteepSlopedTurns) {
         track_sections.push(&track_sections::SMALL_TURN_LEFT_STEEP);
         track_sections.push(&track_sections::SMALL_TURN_RIGHT_STEEP);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_DIAG_STEEP);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_DIAG_STEEP);
+        track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_ORTHOGONAL_STEEP);
+        track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_ORTHOGONAL_STEEP);
     }
     if sections.contains(&TrackGroup::BarrelRolls) {
         track_sections.push(&track_sections::BARREL_ROLL_LEFT);

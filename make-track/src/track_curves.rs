@@ -35,6 +35,7 @@ pub const MEDIUM_TURN_GENTLE_LENGTH: f32 = 4.25299;
 pub const LARGE_TURN_GENTLE_LENGTH: f32 = 3.017199;
 pub const VERY_SMALL_TURN_STEEP_LENGTH: f32 = 1.812048;
 pub const SMALL_TURN_STEEP_LENGTH: f32 = 4.027196;
+pub const LARGE_TURN_STEEP_LENGTH: f32 = 4.930971;
 pub const VERTICAL_TWIST_LENGTH: f32 = CLEARANCE_HEIGHT * 12.0;
 
 pub const S_BEND_LENGTH: f32 = 3.24075;
@@ -737,6 +738,73 @@ pub fn small_turn_left_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
 
 pub fn small_turn_right_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
     curves::flip_x_axis(small_turn_left_steep(distance, 0.0))
+}
+
+pub fn large_turn_left_to_diag_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    let x = [8.0 * CLEARANCE_HEIGHT - 2.0, 3.0 - 8.0 * CLEARANCE_HEIGHT, 0.0, 0.0];
+    let y = [
+        -2.985488 * CLEARANCE_HEIGHT,
+        -0.965078 * CLEARANCE_HEIGHT,
+        23.950566 * CLEARANCE_HEIGHT,
+        0.0,
+    ];
+    let z = [
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 112.0 * CLEARANCE_HEIGHT / 3.0,
+        44.0 * CLEARANCE_HEIGHT / 3.0,
+        0.0,
+    ];
+    let reparam = [
+        3.373074e-6,
+        -4.338863e-5,
+        2.424444_7e-4,
+        -6.190606_5e-4,
+        1.402225_7e-3,
+        6.114638_5e-4,
+        1.745786e-1,
+    ];
+
+    curves::large_turn_steep(&x, &y, &z, &reparam, distance)
+}
+
+pub fn large_turn_right_to_diag_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis(large_turn_left_to_diag_steep(distance, 0.0))
+}
+
+pub fn large_turn_left_to_orthogonal_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    let x = [
+        -24.0 * CLEARANCE_HEIGHT / 3.0 + 2.0,
+        -3.0 + 48.0 * CLEARANCE_HEIGHT / 3.0,
+        -8.0 * CLEARANCE_HEIGHT,
+        0.0,
+    ];
+    let y = [
+        -2.985488 * CLEARANCE_HEIGHT,
+        9.921543 * CLEARANCE_HEIGHT,
+        13.063945 * CLEARANCE_HEIGHT,
+        0.0,
+    ];
+    let z = [
+        68.0 * CLEARANCE_HEIGHT / 3.0 - 5.0,
+        7.5 - 92.0 * CLEARANCE_HEIGHT / 3.0,
+        8.0 * CLEARANCE_HEIGHT,
+        0.0,
+    ];
+    let reparam = [
+        3.3730748e-6,
+        -7.30391e-5,
+        6.810610_6e-4,
+        -3.688189_4e-3,
+        1.38952427e-02,
+        -4.344567e-2,
+        2.831603_6e-1,
+    ];
+
+    curves::large_turn_steep(&x, &y, &z, &reparam, distance)
+}
+
+pub fn large_turn_right_to_orthogonal_steep(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis_diagonal(large_turn_left_to_orthogonal_steep(distance, 0.0))
 }
 
 pub fn vertical_twist_left(distance: f32, _bank_angle: f32) -> TrackPoint {

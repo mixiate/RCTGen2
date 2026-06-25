@@ -908,6 +908,62 @@ pub const SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     chain_type: None,
 };
 
+pub const LARGE_TURN_LEFT_TO_DIAG_STEEP: TrackSection = TrackSection {
+    name: "large_turn_left_to_diag_steep",
+    curve: crate::track_curves::large_turn_left_to_diag_steep,
+    length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 0,
+    has_supports: true,
+    chain_type: None,
+};
+
+pub const LARGE_TURN_RIGHT_TO_DIAG_STEEP: TrackSection = TrackSection {
+    name: "large_turn_right_to_diag_steep",
+    curve: crate::track_curves::large_turn_right_to_diag_steep,
+    length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 0,
+    exit_angle_offset: 1,
+    has_supports: true,
+    chain_type: None,
+};
+
+pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
+    name: "large_turn_left_to_orthogonal_steep",
+    curve: crate::track_curves::large_turn_left_to_orthogonal_steep,
+    length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 1,
+    exit_angle_offset: 0,
+    has_supports: true,
+    chain_type: None,
+};
+
+pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
+    name: "large_turn_right_to_orthogonal_steep",
+    curve: crate::track_curves::large_turn_right_to_orthogonal_steep,
+    length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    entry_angle_offset: 1,
+    exit_angle_offset: 1,
+    has_supports: true,
+    chain_type: None,
+};
+
 pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
     name: "vertical_twist_left",
     curve: crate::track_curves::vertical_twist_left,
