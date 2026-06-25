@@ -28,8 +28,6 @@ pub struct TrackSection {
     pub mask_offset_y: bool,
     pub prefer_odd_alt_mesh_count: bool,
     pub invert_alt_mesh: bool,
-    pub entry_angle_offset: u8, // used for boundary tie tracks, but might be able to be merged with offsets calculation
-    pub exit_angle_offset: u8,  // same as entry ^
     pub has_supports: bool,
     pub chain_type: Option<chain::ChainType>,
 }
@@ -44,8 +42,6 @@ impl TrackSection {
             mask_offset_y: false,
             prefer_odd_alt_mesh_count: false,
             invert_alt_mesh: false,
-            entry_angle_offset: 0,
-            exit_angle_offset: 0,
             has_supports: true,
             chain_type: None,
         }
@@ -208,7 +204,6 @@ pub const VERY_SMALL_TURN_LEFT: TrackSection = TrackSection {
     name: "very_small_turn_left",
     curve: crate::track_curves::very_small_turn_left,
     length: crate::track_curves::VERY_SMALL_TURN_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -216,7 +211,6 @@ pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
     name: "small_turn_left",
     curve: crate::track_curves::small_turn_left,
     length: crate::track_curves::SMALL_TURN_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -224,7 +218,6 @@ pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
     length: crate::track_curves::MEDIUM_TURN_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -239,7 +232,6 @@ pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     name: "large_turn_right_to_diag",
     curve: crate::track_curves::large_turn_right_to_diag,
     length: crate::track_curves::LARGE_TURN_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -248,8 +240,6 @@ pub const FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     chain_type: Some(chain::ChainType::FlatDiag),
     ..TrackSection::default()
 };
@@ -259,8 +249,6 @@ pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_gentle_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     chain_type: Some(chain::ChainType::FlatDiag),
     ..TrackSection::default()
 };
@@ -270,8 +258,6 @@ pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_flat_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     chain_type: Some(chain::ChainType::FlatDiag),
     ..TrackSection::default()
 };
@@ -281,8 +267,6 @@ pub const GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     chain_type: Some(chain::ChainType::FlatDiag),
     ..TrackSection::default()
 };
@@ -292,8 +276,6 @@ pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_steep_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -302,8 +284,6 @@ pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_gentle_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -312,8 +292,6 @@ pub const STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_diag,
     length: crate::track_curves::STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -322,8 +300,6 @@ pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::small_flat_to_steep_diag,
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -332,8 +308,6 @@ pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::small_steep_to_flat_diag,
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -342,8 +316,6 @@ pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_steep_diag,
     length: crate::track_curves::FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -352,8 +324,6 @@ pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_flat_diag,
     length: crate::track_curves::FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -410,7 +380,6 @@ pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
     name: "small_turn_left_bank",
     curve: crate::track_curves::small_turn_left_bank,
     length: crate::track_curves::SMALL_TURN_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -418,7 +387,6 @@ pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
     name: "medium_turn_left_bank",
     curve: crate::track_curves::medium_turn_left_bank,
     length: crate::track_curves::MEDIUM_TURN_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -433,7 +401,6 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_bank",
     curve: crate::track_curves::large_turn_right_to_diag_bank,
     length: crate::track_curves::LARGE_TURN_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -442,8 +409,6 @@ pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_left_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -452,8 +417,6 @@ pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_right_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -462,8 +425,6 @@ pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_to_gentle_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -472,8 +433,6 @@ pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::right_bank_to_gentle_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -482,8 +441,6 @@ pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -492,8 +449,6 @@ pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -502,8 +457,6 @@ pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -512,7 +465,6 @@ pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_left_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -521,7 +473,6 @@ pub const SMALL_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_right_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -530,7 +481,6 @@ pub const MEDIUM_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::medium_turn_left_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -539,7 +489,6 @@ pub const MEDIUM_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::medium_turn_right_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -554,7 +503,6 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_gentle",
     curve: crate::track_curves::large_turn_right_to_diag_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -563,7 +511,6 @@ pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_left_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    entry_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -572,8 +519,6 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_right_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -583,7 +528,6 @@ pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
     length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
     mask_offset_y: true,
     invert_alt_mesh: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -593,7 +537,6 @@ pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
     mask_offset_y: true,
     invert_alt_mesh: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -603,7 +546,6 @@ pub const SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
     length: crate::track_curves::SMALL_TURN_STEEP_LENGTH,
     mask_offset_y: true,
     invert_alt_mesh: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -613,7 +555,6 @@ pub const SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     length: crate::track_curves::SMALL_TURN_STEEP_LENGTH,
     mask_offset_y: true,
     invert_alt_mesh: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -628,7 +569,6 @@ pub const LARGE_TURN_RIGHT_TO_DIAG_STEEP: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_steep",
     curve: crate::track_curves::large_turn_right_to_diag_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -637,7 +577,6 @@ pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_left_to_orthogonal_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    entry_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -646,8 +585,6 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_right_to_orthogonal_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -657,7 +594,6 @@ pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
     length: crate::track_curves::VERTICAL_TWIST_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -668,7 +604,6 @@ pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
     length: crate::track_curves::VERTICAL_TWIST_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -780,8 +715,6 @@ pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_gentle_left_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -790,8 +723,6 @@ pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_gentle_right_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -800,8 +731,6 @@ pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_gentle_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -810,8 +739,6 @@ pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_gentle_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -820,8 +747,6 @@ pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_to_gentle_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -830,8 +755,6 @@ pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::right_bank_to_gentle_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -840,8 +763,6 @@ pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -850,8 +771,6 @@ pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -860,8 +779,6 @@ pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -870,8 +787,6 @@ pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -880,8 +795,6 @@ pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_gentle_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -890,8 +803,6 @@ pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_gentle_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -900,8 +811,6 @@ pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_flat_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -910,8 +819,6 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_flat_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -920,7 +827,6 @@ pub const SMALL_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_left_bank_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -929,7 +835,6 @@ pub const SMALL_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_right_bank_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -938,7 +843,6 @@ pub const MEDIUM_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::medium_turn_left_bank_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -947,7 +851,6 @@ pub const MEDIUM_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::medium_turn_right_bank_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -962,7 +865,6 @@ pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     name: "large_turn_right_bank_to_diag_gentle",
     curve: crate::track_curves::large_turn_right_bank_to_diag_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -971,7 +873,6 @@ pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection
     curve: crate::track_curves::large_turn_left_bank_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    entry_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -980,8 +881,6 @@ pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSectio
     curve: crate::track_curves::large_turn_right_bank_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -1017,7 +916,6 @@ pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
     name: "small_helix_left",
     curve: crate::track_curves::small_helix_left,
     length: crate::track_curves::SMALL_HELIX_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -1025,7 +923,6 @@ pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
     name: "small_helix_right",
     curve: crate::track_curves::small_helix_right,
     length: crate::track_curves::SMALL_HELIX_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -1033,7 +930,6 @@ pub const MEDIUM_HELIX_LEFT: TrackSection = TrackSection {
     name: "medium_helix_left",
     curve: crate::track_curves::medium_helix_left,
     length: crate::track_curves::MEDIUM_HELIX_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -1041,7 +937,6 @@ pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
     name: "medium_helix_right",
     curve: crate::track_curves::medium_helix_right,
     length: crate::track_curves::MEDIUM_HELIX_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -1049,7 +944,6 @@ pub const MEDIUM_QUARTER_HELIX_LEFT: TrackSection = TrackSection {
     name: "medium_quarter_helix_left",
     curve: crate::track_curves::medium_quarter_helix_left,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -1057,7 +951,6 @@ pub const MEDIUM_QUARTER_HELIX_RIGHT: TrackSection = TrackSection {
     name: "medium_quarter_helix_right",
     curve: crate::track_curves::medium_quarter_helix_right,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -1066,7 +959,6 @@ pub const MEDIUM_QUARTER_HELIX_LEFT_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::medium_quarter_helix_left_bank,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -1075,7 +967,6 @@ pub const MEDIUM_QUARTER_HELIX_RIGHT_BANK: TrackSection = TrackSection {
     curve: crate::track_curves::medium_quarter_helix_right_bank,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -1084,7 +975,6 @@ pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_left_bank_to_gentle,
     length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     ..TrackSection::default()
 };
 
@@ -1093,7 +983,6 @@ pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::small_turn_right_bank_to_gentle,
     length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     ..TrackSection::default()
 };
 
@@ -1211,7 +1100,6 @@ pub const HALF_LOOP: TrackSection = TrackSection {
     name: "half_loop",
     curve: crate::track_curves::half_loop,
     length: crate::track_curves::HALF_LOOP_LENGTH,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1220,7 +1108,6 @@ pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
     name: "vertical_loop_left",
     curve: crate::track_curves::vertical_loop_left,
     length: crate::track_curves::VERTICAL_LOOP_LENGTH,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1229,7 +1116,6 @@ pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
     name: "vertical_loop_right",
     curve: crate::track_curves::vertical_loop_right,
     length: crate::track_curves::VERTICAL_LOOP_LENGTH,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1239,7 +1125,6 @@ pub const QUARTER_LOOP: TrackSection = TrackSection {
     curve: crate::track_curves::quarter_loop,
     length: crate::track_curves::QUARTER_LOOP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1249,7 +1134,6 @@ pub const CORKSCREW_LEFT: TrackSection = TrackSection {
     curve: crate::track_curves::corkscrew_left,
     length: crate::track_curves::CORKSCREW_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1259,7 +1143,6 @@ pub const CORKSCREW_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::corkscrew_right,
     length: crate::track_curves::CORKSCREW_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1269,7 +1152,6 @@ pub const LARGE_CORKSCREW_LEFT: TrackSection = TrackSection {
     curve: crate::track_curves::large_corkscrew_left,
     length: crate::track_curves::LARGE_CORKSCREW_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 3,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1279,7 +1161,6 @@ pub const LARGE_CORKSCREW_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::large_corkscrew_right,
     length: crate::track_curves::LARGE_CORKSCREW_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 1,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1289,7 +1170,6 @@ pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
     curve: crate::track_curves::medium_half_loop_left,
     length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1299,7 +1179,6 @@ pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::medium_half_loop_right,
     length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1309,7 +1188,6 @@ pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
     curve: crate::track_curves::large_half_loop_left,
     length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1319,7 +1197,6 @@ pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::large_half_loop_right,
     length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
     mask_offset_y: true,
-    exit_angle_offset: 2,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1369,7 +1246,6 @@ pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
     curve: crate::track_curves::dive_loop_45_left,
     length: crate::track_curves::DIVE_LOOP_45_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
     has_supports: false,
     ..TrackSection::default()
 };
@@ -1379,8 +1255,6 @@ pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::dive_loop_45_right,
     length: crate::track_curves::DIVE_LOOP_45_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    entry_angle_offset: 1,
-    exit_angle_offset: 1,
     has_supports: false,
     ..TrackSection::default()
 };
