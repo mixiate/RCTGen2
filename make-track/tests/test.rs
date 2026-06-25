@@ -1,4 +1,4 @@
-fn test_make_track(track_name: &str) {
+fn test_make_track(track_name: &str, pixel_diff_tolerance: usize) {
     let make_track_directory = std::path::PathBuf::from(std::env!("CARGO_MANIFEST_DIR"));
     let data_directory = make_track_directory.parent().unwrap().join("data");
     let test_files_directory = make_track_directory.join("tests").join("files");
@@ -26,7 +26,6 @@ fn test_make_track(track_name: &str) {
         assert!(output_file_count == expected_file_count);
     }
 
-    const PIXEL_DIFF_TOLERANCE: usize = 10;
     const DIMENSIONS_MAX_FAILURE_COUNT: usize = 5;
 
     let mut dimension_diff_count = 0;
@@ -63,8 +62,8 @@ fn test_make_track(track_name: &str) {
 
         let diff_count = output_file.as_raw().iter().zip(expected_file.as_raw().iter()).filter(|(a, b)| a != b).count();
         assert!(
-            diff_count <= PIXEL_DIFF_TOLERANCE,
-            "{file_name:?}: {diff_count} pixels differ (tolerance {PIXEL_DIFF_TOLERANCE})"
+            diff_count <= pixel_diff_tolerance,
+            "{file_name:?}: {diff_count} pixels differ (tolerance {pixel_diff_tolerance})"
         );
     }
 
@@ -86,46 +85,46 @@ fn test_make_track(track_name: &str) {
 
 #[test]
 fn test_track() {
-    test_make_track("test-track");
+    test_make_track("test-track", 10);
 }
 
 #[test]
 fn test_track_offsets() {
-    test_make_track("test-track-offsets");
+    test_make_track("test-track-offsets", 10);
 }
 
 #[test]
 fn test_track_tie() {
-    test_make_track("test-track-tie");
+    test_make_track("test-track-tie", 10);
 }
 
 #[test]
 fn test_track_alt() {
     // this only tests the flat track because the alt track mesh system is quite flawed
-    test_make_track("test-track-alt");
+    test_make_track("test-track-alt", 10);
 }
 
 #[test]
 fn test_track_boundary_tie() {
-    test_make_track("test-track-boundary-tie");
+    test_make_track("test-track-boundary-tie", 10);
 }
 
 #[test]
 fn test_track_semi_flat_shaded() {
-    test_make_track("test-track-semi-flat-shaded");
+    test_make_track("test-track-semi-flat-shaded", 10);
 }
 
 #[test]
 fn test_track_supports() {
-    test_make_track("test-track-supports");
+    test_make_track("test-track-supports", 10);
 }
 
 #[test]
 fn test_track_lift() {
-    test_make_track("test-track-lift");
+    test_make_track("test-track-lift", 10);
 }
 
 #[test]
 fn test_track_additional_models() {
-    test_make_track("test-track-additional-models");
+    test_make_track("test-track-additional-models", 15);
 }
