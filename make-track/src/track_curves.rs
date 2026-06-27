@@ -1710,36 +1710,33 @@ pub fn banked_inline_twist_left(distance: f32, bank_angle: f32) -> TrackPoint {
 }
 
 pub fn banked_inline_twist_right(distance: f32, bank_angle: f32) -> TrackPoint {
-    curves::banked_curve(
-        &inline_twist_right(distance, 0.0),
-        bank_angle * (1.0 - distance / INLINE_TWIST_LENGTH),
-    )
+    curves::flip_x_axis(banked_inline_twist_left(distance, bank_angle))
 }
 
 pub fn banked_barrel_roll_left(distance: f32, bank_angle: f32) -> TrackPoint {
-    curves::banked_curve(
-        &barrel_roll_left(distance, 0.0),
-        -bank_angle * (1.0 - distance / BARREL_ROLL_LENGTH),
-    )
+    let u = distance / BARREL_ROLL_LENGTH;
+    let mid = 2.0 * bank_angle / std::f32::consts::PI;
+    let bank = if u < mid {
+        (u - mid) * (u - mid) / (mid * mid)
+    } else {
+        0.0
+    };
+    curves::banked_curve(&barrel_roll_left(distance, 0.0), -bank_angle * bank)
 }
 
 pub fn banked_barrel_roll_right(distance: f32, bank_angle: f32) -> TrackPoint {
-    curves::banked_curve(
-        &barrel_roll_right(distance, 0.0),
-        bank_angle * (1.0 - distance / BARREL_ROLL_LENGTH),
-    )
+    curves::flip_x_axis(banked_barrel_roll_left(distance, bank_angle))
 }
 
 pub fn banked_zero_g_roll_left(distance: f32, bank_angle: f32) -> TrackPoint {
-    curves::banked_curve(
-        &zero_g_roll_left(distance, 0.0),
-        -bank_angle * (1.0 - distance / ZERO_G_ROLL_LENGTH),
-    )
+    let bank = if distance < 2.0 {
+        1.0 - distance + 0.25 * distance * distance
+    } else {
+        0.0
+    };
+    curves::banked_curve(&zero_g_roll_left(distance, 0.0), -bank_angle * bank)
 }
 
 pub fn banked_zero_g_roll_right(distance: f32, bank_angle: f32) -> TrackPoint {
-    curves::banked_curve(
-        &zero_g_roll_right(distance, 0.0),
-        bank_angle * (1.0 - distance / ZERO_G_ROLL_LENGTH),
-    )
+    curves::flip_x_axis(banked_zero_g_roll_left(distance, bank_angle))
 }
