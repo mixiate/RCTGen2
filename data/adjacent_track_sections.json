@@ -1362,5 +1362,17 @@
             "name": "steep_diag",
             "coords": [32, -32, -64]
         }
+    ],
+    "large_corkscrew_left_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        }
+    ],
+    "large_corkscrew_right_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        }
     ]
 }
