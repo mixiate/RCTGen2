@@ -78,6 +78,7 @@ pub enum TrackGroup {
     BankedBarrelRolls,
     BankedInlineTwists,
     BankedZeroGRolls,
+    LargeDiagonalCorkscrews,
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]

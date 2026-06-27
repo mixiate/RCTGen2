@@ -2212,7 +2212,53 @@ pub static BANKED_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     chain_type: None,
 };
 
-pub const TRACK_SECTIONS: [&TrackSection; 152] = [
+pub static LARGE_CORKSCREW_LEFT_DIAG: TrackSection = TrackSection {
+    name: "large_corkscrew_left_diag",
+    curve: crate::track_curves::large_corkscrew_left_diag,
+    length: crate::track_curves::LARGE_CORKSCREW_DIAG_LENGTH,
+    tiles: heapless::Vec::from_array([
+        [0, 0, 0],
+        [-32, 0, 0],
+        [0, 32, 0],
+        [-32, 32, 0],
+        [-64, 32, 16],
+        [-96, 32, 56],
+        [-128, 32, 80],
+        [-96, 0, 80],
+        [-128, 0, 80],
+    ]),
+    position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub static LARGE_CORKSCREW_RIGHT_DIAG: TrackSection = TrackSection {
+    name: "large_corkscrew_right_diag",
+    curve: crate::track_curves::large_corkscrew_right_diag,
+    length: crate::track_curves::LARGE_CORKSCREW_DIAG_LENGTH,
+    tiles: heapless::Vec::from_array([
+        [0, 0, 0],
+        [0, 32, 0],
+        [-32, 0, 0],
+        [-32, 32, 0],
+        [-32, 64, 16],
+        [-32, 96, 56],
+        [-32, 128, 80],
+        [0, 96, 80],
+        [0, 128, 80],
+    ]),
+    position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: false,
+    chain_type: None,
+};
+
+pub const TRACK_SECTIONS: [&TrackSection; 154] = [
     &FLAT,
     &FLAT_TO_GENTLE,
     &GENTLE_TO_FLAT,
@@ -2365,4 +2411,6 @@ pub const TRACK_SECTIONS: [&TrackSection; 152] = [
     &BANKED_ZERO_G_ROLL_RIGHT,
     &DIVE_LOOP_45_LEFT,
     &DIVE_LOOP_45_RIGHT,
+    &LARGE_CORKSCREW_LEFT_DIAG,
+    &LARGE_CORKSCREW_RIGHT_DIAG,
 ];

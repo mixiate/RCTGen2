@@ -88,6 +88,9 @@ pub const LARGE_ZERO_G_ROLL_LENGTH: f32 = 5.568162;
 
 pub const DIVE_LOOP_45_LENGTH: f32 = 5.335896;
 
+const LARGE_CORKSCREW_DIAG_SEGMENT_LENGTH: f32 = 2.821776;
+pub const LARGE_CORKSCREW_DIAG_LENGTH: f32 = LARGE_CORKSCREW_DIAG_SEGMENT_LENGTH * 2.0;
+
 pub fn flat(distance: f32, _bank_angle: f32) -> TrackPoint {
     curves::plane_curve_vertical(&glam::Vec3::new(0.0, 0.0, distance), &glam::Vec3::new(0.0, 0.0, 1.0))
 }
@@ -1739,4 +1742,46 @@ pub fn banked_zero_g_roll_left(distance: f32, bank_angle: f32) -> TrackPoint {
 
 pub fn banked_zero_g_roll_right(distance: f32, bank_angle: f32) -> TrackPoint {
     curves::flip_x_axis(banked_zero_g_roll_left(distance, bank_angle))
+}
+
+pub fn large_corkscrew_left_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    if distance < LARGE_CORKSCREW_DIAG_SEGMENT_LENGTH {
+        curves::bezier3d(
+            &[-0.146479, -0.980282, 2.4, 0.0],
+            &[-0.714409, 1.973175, 0.0, 0.0],
+            &[0.203122, -0.603122, 2.4, 0.0],
+            &[-4.3729663e-1, 1.2349013, -8.443673e-1, 1.3434461e-1],
+            &[
+                -2.1278336e-5,
+                9.9567216e-5,
+                2.5021553e-4,
+                -1.9514499e-3,
+                7.141846e-5,
+                2.837473e-2,
+                2.9466173e-1,
+            ],
+            distance,
+        )
+    } else {
+        curves::bezier3d(
+            &[0.146479, -1.419718, 0.0, 1.273239],
+            &[-0.714409, 0.170052, 1.803123, 1.258765],
+            &[0.203121, -0.006244, 1.803123, 2.0],
+            &[-4.3729663e-1, 7.6988645e-2, 3.135453e-1, -8.758192e-2],
+            &[
+                -2.1278205e-5,
+                3.2073012e-4,
+                -1.6220077e-3,
+                3.262217e-3,
+                -4.506426e-3,
+                -6.7162514e-3,
+                3.9212275e-1,
+            ],
+            distance - LARGE_CORKSCREW_DIAG_SEGMENT_LENGTH,
+        )
+    }
+}
+
+pub fn large_corkscrew_right_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis_diagonal(large_corkscrew_left_diag(distance, 0.0))
 }

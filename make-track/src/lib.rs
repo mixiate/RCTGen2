@@ -533,6 +533,10 @@ fn list_track_sections(sections: &indexmap::IndexSet<track_desc::TrackGroup>) ->
         track_sections.push(&track_sections::DIVE_LOOP_45_LEFT);
         track_sections.push(&track_sections::DIVE_LOOP_45_RIGHT);
     }
+    if sections.contains(&TrackGroup::LargeDiagonalCorkscrews) {
+        track_sections.push(&track_sections::LARGE_CORKSCREW_LEFT_DIAG);
+        track_sections.push(&track_sections::LARGE_CORKSCREW_RIGHT_DIAG);
+    }
     if sections.contains(&TrackGroup::LargeSlopedTurns) {
         track_sections.push(&track_sections::LARGE_TURN_LEFT_TO_DIAG_GENTLE);
         track_sections.push(&track_sections::LARGE_TURN_RIGHT_TO_DIAG_GENTLE);
