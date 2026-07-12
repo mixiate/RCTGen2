@@ -738,8 +738,7 @@
     "very_small_turn_left_steep": [
         {
             "mask": "inverted/very_small_turn_left_steep_0.png",
-            "empty": [true, false],
-            "tiles": [0, 0]
+            "empty": [true, false]
         },
         {
             "mask": "upright/single_tile.png",
@@ -751,16 +750,14 @@
         },
         {
             "mask": "inverted/very_small_turn_left_steep_3.png",
-            "transfer": [true, false],
-            "tiles": [0, 0]
+            "transfer": [true, false]
         }
     ],
     "very_small_turn_right_steep": [
         {
             "mirror": true,
             "mask": "inverted/very_small_turn_left_steep_3.png",
-            "transfer": [true, false],
-            "tiles": [0, 0]
+            "transfer": [true, false]
         },
         {
             "mirror": true,
@@ -775,8 +772,7 @@
         {
             "mirror": true,
             "mask": "inverted/very_small_turn_left_steep_0.png",
-            "empty": [true, false],
-            "tiles": [0, 0]
+            "empty": [true, false]
         }
     ],
     "vertical_twist_left": [
