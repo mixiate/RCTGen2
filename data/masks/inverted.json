@@ -597,13 +597,13 @@
     ],
     "small_turn_left_bank": [
         {
-            "mask": "upright/small_turn_left_bank_0.png"
+            "mask": "upright/small_turn_left_0.png"
         },
         {
-            "mask": "upright/small_turn_left_bank_1.png"
+            "mask": "upright/small_turn_left_1.png"
         },
         {
-            "mask": "upright/small_turn_left_bank_2.png"
+            "mask": "upright/small_turn_left_2.png"
         },
         {
             "mask": "inverted/small_turn_left_bank_3.png"
@@ -625,26 +625,26 @@
     ],
     "large_turn_left_to_diag_bank": [
         {
-            "mask": "upright/large_turn_left_to_diag_bank_0.png"
+            "mask": "upright/large_turn_left_to_diag_0.png"
         },
         {
             "mask": "inverted/large_turn_left_to_diag_bank_1.png"
         },
         {
-            "mask": "upright/large_turn_left_to_diag_bank_2.png"
+            "mask": "upright/large_turn_left_to_diag_2.png"
         },
         {
-            "mask": "upright/large_turn_left_to_diag_bank_3.png"
+            "mask": "upright/large_turn_left_to_diag_3.png"
         }
     ],
     "large_turn_right_to_diag_bank": [
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_to_diag_bank_3.png"
+            "mask": "upright/large_turn_left_to_diag_3.png"
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_to_diag_bank_2.png"
+            "mask": "upright/large_turn_left_to_diag_2.png"
         },
         {
             "mirror": true,
@@ -652,7 +652,7 @@
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_to_diag_bank_0.png"
+            "mask": "upright/large_turn_left_to_diag_0.png"
         }
     ],
     "small_turn_left_gentle": [
@@ -1010,11 +1010,11 @@
     ],
     "small_turn_left_bank_gentle": [
         {
-            "mask": "upright/small_turn_left_bank_gentle_0.png",
+            "mask": "upright/small_turn_left_gentle_0.png",
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
-            "mask": "upright/small_turn_left_bank_gentle_1.png",
+            "mask": "upright/small_turn_left_gentle_1.png",
             "offset": [[6, 0, 0], [0, 0, 0], [0, 0, 0], [0, 6, 0]]
         },
         {
@@ -1022,14 +1022,14 @@
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
-            "mask": "upright/small_turn_left_bank_gentle_3.png",
+            "mask": "upright/small_turn_left_gentle_3.png",
             "offset": [[6, 0, 0], [0, 0, 0], [0, 0, 0], [0, 6, 0]]
         }
     ],
     "small_turn_right_bank_gentle": [
         {
             "mirror": true,
-            "mask": "upright/small_turn_left_bank_gentle_3.png",
+            "mask": "upright/small_turn_left_gentle_3.png",
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
@@ -1039,12 +1039,12 @@
         },
         {
             "mirror": true,
-            "mask": "upright/small_turn_left_bank_gentle_1.png",
+            "mask": "upright/small_turn_left_gentle_1.png",
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
             "mirror": true,
-            "mask": "upright/small_turn_left_bank_gentle_0.png",
+            "mask": "upright/small_turn_left_gentle_0.png",
             "offset": [[6, 0, 0], [0, 0, 0], [0, 0, 0], [0, 6, 0]]
         }
     ],
@@ -1054,7 +1054,7 @@
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [0, 16, 0], [6, 0, 0], [16, 0, 0], [6, 0, 0]]
         },
         {
-            "mask": "upright/medium_turn_left_bank_gentle_1.png",
+            "mask": "upright/medium_turn_left_gentle_1.png",
             "offset": [[6, 0, 0], [0, 0, 0], [0, 0, 0], [16, 16, 0], [6, 0, 0], [0, 0, 0], [0, 6, 0]]
         },
         {
@@ -1079,7 +1079,7 @@
         },
         {
             "mirror": true,
-            "mask": "upright/medium_turn_left_bank_gentle_1.png",
+            "mask": "upright/medium_turn_left_gentle_1.png",
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [16, 16, 0], [0, 6, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
@@ -1174,23 +1174,23 @@
             "offset": [[6, 0, 0], [14, 0, 0], [0, 12, 0], [0, 0, 0]]
         },
         {
-            "mask": "upright/vertical_loop_left_2.png",
+            "mask": "upright/half_loop_2.png",
             "offset": [[0, 6, 0], [0, 6, 0], [10, 16, 0], [0, 16, 0]]
         },
         {
-            "mask": "upright/vertical_loop_left_3.png",
+            "mask": "upright/half_loop_3.png",
             "offset": [[6, 0, 0], [6, 0, 0], [16, 16, 0], [16, 0, 0]]
         }
     ],
     "vertical_loop_right": [
         {
             "mirror": true,
-            "mask": "upright/vertical_loop_left_3.png",
+            "mask": "upright/half_loop_3.png",
             "offset": [[0, 6, 0], [0, 6, 0], [16, 16, 0], [0, 16, 0]]
         },
         {
             "mirror": true,
-            "mask": "upright/vertical_loop_left_2.png",
+            "mask": "upright/half_loop_2.png",
             "offset": [[6, 0, 0], [6, 0, 0], [16, 10, 0], [16, 0, 0]]
         },
         {
@@ -2072,29 +2072,29 @@
     ],
     "large_turn_left_bank_to_diag_gentle": [
         {
-            "mask": "upright/large_turn_left_bank_to_diag_gentle_0.png"
+            "mask": "upright/large_turn_left_to_diag_gentle_0.png"
         },
         {
             "mask": "inverted/large_turn_left_bank_to_diag_gentle_1.png",
             "extrude_in_front": true
         },
         {
-            "mask": "upright/large_turn_left_bank_to_diag_gentle_2.png"
+            "mask": "upright/large_turn_left_to_diag_gentle_2.png"
         },
         {
-            "mask": "upright/large_turn_left_bank_to_diag_gentle_3.png",
+            "mask": "upright/large_turn_left_to_diag_gentle_3.png",
             "extrude_in_front": true
         }
     ],
     "large_turn_right_bank_to_diag_gentle": [
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_bank_to_diag_gentle_3.png",
+            "mask": "upright/large_turn_left_to_diag_gentle_3.png",
             "extrude_in_front": true
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_bank_to_diag_gentle_2.png"
+            "mask": "upright/large_turn_left_to_diag_gentle_2.png"
         },
         {
             "mirror": true,
@@ -2103,12 +2103,12 @@
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_bank_to_diag_gentle_0.png"
+            "mask": "upright/large_turn_left_to_diag_gentle_0.png"
         }
     ],
     "large_turn_left_bank_to_orthogonal_gentle": [
         {
-            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_0.png",
+            "mask": "upright/large_turn_left_to_orthogonal_gentle_0.png",
             "empty": [false, false, true, false, false],
             "extrude_behind": true
         },
@@ -2117,18 +2117,18 @@
             "empty": [false, false, true, true, false]
         },
         {
-            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_2.png",
+            "mask": "upright/large_turn_left_to_orthogonal_gentle_2.png",
             "empty": [false, false, true, false, false],
             "extrude_behind": true
         },
         {
-            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_3.png"
+            "mask": "upright/large_turn_left_to_orthogonal_gentle_3.png"
         }
     ],
     "large_turn_right_bank_to_orthogonal_gentle": [
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_2.png",
+            "mask": "upright/large_turn_left_to_orthogonal_gentle_2.png",
             "empty": [false, false, true, false, false],
             "extrude_behind": true
         },
@@ -2139,13 +2139,13 @@
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_0.png",
+            "mask": "upright/large_turn_left_to_orthogonal_gentle_0.png",
             "empty": [false, false, true, false, false],
             "extrude_behind": true
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_3.png"
+            "mask": "upright/large_turn_left_to_orthogonal_gentle_3.png"
         }
     ],
     "small_turn_left_bank_to_gentle": [
@@ -2154,7 +2154,7 @@
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
-            "mask": "upright/small_turn_left_bank_to_gentle_1.png",
+            "mask": "upright/small_turn_left_gentle_1.png",
             "offset": [[6, 0, 0], [0, 0, 0], [0, 0, 0], [0, 6, 0]]
         },
         {
@@ -2162,14 +2162,14 @@
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
-            "mask": "upright/small_turn_left_bank_to_gentle_3.png",
+            "mask": "upright/small_turn_left_gentle_3.png",
             "offset": [[6, 0, 0], [0, 0, 0], [0, 0, 0], [0, 6, 0]]
         }
     ],
     "small_turn_right_bank_to_gentle": [
         {
             "mirror": true,
-            "mask": "upright/small_turn_left_bank_to_gentle_3.png",
+            "mask": "upright/small_turn_left_gentle_3.png",
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
@@ -2179,7 +2179,7 @@
         },
         {
             "mirror": true,
-            "mask": "upright/small_turn_left_bank_to_gentle_1.png",
+            "mask": "upright/small_turn_left_gentle_1.png",
             "offset": [[0, 6, 0], [0, 0, 0], [0, 0, 0], [6, 0, 0]]
         },
         {
@@ -2190,41 +2190,41 @@
     ],
     "barrel_roll_left": [
         {
-            "mask": "upright/barrel_roll_left_0.png",
+            "mask": "upright/inline_twist_left_0.png",
             "split": [true, true, true]
         },
         {
-            "mask": "upright/barrel_roll_left_1.png",
+            "mask": "upright/inline_twist_left_1.png",
             "split": [true, true, true]
         },
         {
-            "mask": "upright/barrel_roll_left_2.png",
+            "mask": "upright/inline_twist_left_2.png",
             "split": [true, true, true]
         },
         {
-            "mask": "upright/barrel_roll_left_3.png",
+            "mask": "upright/inline_twist_left_3.png",
             "split": [true, true, true]
         }
     ],
     "barrel_roll_right": [
         {
             "mirror": true,
-            "mask": "upright/barrel_roll_left_3.png",
+            "mask": "upright/inline_twist_left_3.png",
             "split": [true, true, true]
         },
         {
             "mirror": true,
-            "mask": "upright/barrel_roll_left_2.png",
+            "mask": "upright/inline_twist_left_2.png",
             "split": [true, true, true]
         },
         {
             "mirror": true,
-            "mask": "upright/barrel_roll_left_1.png",
+            "mask": "upright/inline_twist_left_1.png",
             "split": [true, true, true]
         },
         {
             "mirror": true,
-            "mask": "upright/barrel_roll_left_0.png",
+            "mask": "upright/inline_twist_left_0.png",
             "split": [true, true, true]
         }
     ]
