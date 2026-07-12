@@ -69,16 +69,44 @@ fn split_sprite_depth(
     image
 }
 
+fn get_coordinates(tile: mask::TileType, tiles: &[[i16; 3]]) -> &[i16; 3] {
+    match tile {
+        mask::TileType::Index(index) => tiles.get(index),
+        mask::TileType::Last => tiles.last(),
+    }
+    .unwrap_or(&[0; 3])
+}
+
+fn calculate_tile_image_offset(coordinates: &[i16; 3], offset: &[i16; 3], rotation: usize) -> glam::IVec2 {
+    let [x, y, z] = *coordinates;
+    let (x, y) = match rotation {
+        1 => (y, -x),
+        2 => (-x, -y),
+        3 => (-y, x),
+        _ => (x, y),
+    };
+    let x = x + offset[0];
+    let y = y + offset[1];
+    let z = z + offset[2];
+
+    let offset_x = x - y;
+    let offset_y = (-(x + y) / 2) + z;
+    glam::IVec2::new(offset_x.into(), offset_y.into())
+}
+
 pub fn split_image(
     image: &renderer::image::IndexedImage,
     view: &mask::View,
+    tiles: &[[i16; 3]],
+    rotation: usize,
     y_offset: i32,
 ) -> Vec<renderer::image::IndexedImage> {
     view.sprites
         .iter()
         .map(|sprite| {
             let mut split_image = split_sprite(view, sprite, image.clone(), y_offset);
-            split_image.offset += sprite.offset;
+            let coordinates = get_coordinates(sprite.tile, tiles);
+            split_image.offset += calculate_tile_image_offset(coordinates, &sprite.offset, rotation);
             split_image.crop();
             split_image
         })
@@ -88,6 +116,8 @@ pub fn split_image(
 pub fn split_image_depth(
     image: &renderer::image::IndexedImage,
     view: &mask::View,
+    tiles: &[[i16; 3]],
+    rotation: usize,
     y_offset: i32,
     track_depth: &renderer::DepthBuffer,
     mask_depth: &renderer::DepthBuffer,
@@ -108,10 +138,9 @@ pub fn split_image_depth(
             } else {
                 split_sprite(view, sprite, image.clone(), y_offset)
             };
-
-            split_image.offset += sprite.offset;
+            let coordinates = get_coordinates(sprite.tile, tiles);
+            split_image.offset += calculate_tile_image_offset(coordinates, &sprite.offset, rotation);
             split_image.crop();
-
             split_image
         })
         .collect()

@@ -105,7 +105,7 @@ const FLAT_DIAG_CHAIN_IMAGES: [ChainImage; 4] = [
         pixels: [1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         width: 3,
         height: 1,
-        x_offset: -2,
+        x_offset: 0,
         y_offset: 0,
     },
     ChainImage {
@@ -113,13 +113,13 @@ const FLAT_DIAG_CHAIN_IMAGES: [ChainImage; 4] = [
         width: 1,
         height: 3,
         x_offset: 0,
-        y_offset: -2,
+        y_offset: -1,
     },
     ChainImage {
         pixels: [3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         width: 3,
         height: 1,
-        x_offset: -1,
+        x_offset: 0,
         y_offset: 0,
     },
     ChainImage {
@@ -127,6 +127,6 @@ const FLAT_DIAG_CHAIN_IMAGES: [ChainImage; 4] = [
         width: 1,
         height: 3,
         x_offset: 0,
-        y_offset: -1,
+        y_offset: 1,
     },
 ];

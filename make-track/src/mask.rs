@@ -16,7 +16,11 @@ struct ViewDesc {
     #[serde(default)]
     mirror: bool,
     #[serde(default)]
-    offset: heapless::Vec<[i32; 2], MAX_SECTION_COUNT>,
+    offset: heapless::Vec<[i16; 3], MAX_SECTION_COUNT>,
+    #[serde(default)]
+    tiles: heapless::Vec<u8, MAX_SECTION_COUNT>,
+    #[serde(default)]
+    empty: heapless::Vec<bool, MAX_SECTION_COUNT>,
     #[serde(default)]
     extrude_behind: bool,
     #[serde(default)]
@@ -59,7 +63,7 @@ const ORIGIN_MASK: u8 = 0b01_000_000;
 
 pub struct MaskImage {
     image: renderer::image::IndexedImage,
-    section_count: usize,
+    sections: u8,
 }
 
 impl MaskImage {
@@ -69,13 +73,20 @@ impl MaskImage {
         let image = renderer::image::IndexedImage::load(path, &PALETTE_FLAT)
             .with_context(|| format!("Could not load {}", path.display()))?;
 
-        let mut section_count = 0;
+        let mut sections = 0;
         let mut origin = None;
         for y in 0..image.height() {
             for x in 0..image.width() {
                 let pixel = image.get_pixel(x.into(), y.into());
-                section_count = std::cmp::max(section_count, pixel & PRIMARY_INDEX_MASK);
-                section_count = std::cmp::max(section_count, (pixel & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT);
+                let indices = [
+                    pixel & PRIMARY_INDEX_MASK,
+                    (pixel & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT,
+                ];
+                for index in indices {
+                    if index > 0 {
+                        sections |= 0b1 << (index - 1);
+                    }
+                }
 
                 if pixel & ORIGIN_MASK != 0 {
                     if origin.is_none() {
@@ -91,10 +102,11 @@ impl MaskImage {
         let mut image = image;
         image.offset = origin;
 
-        Ok(MaskImage {
-            image,
-            section_count: section_count.into(),
-        })
+        Ok(MaskImage { image, sections })
+    }
+
+    fn has_section(&self, index: usize) -> bool {
+        (self.sections & (0b1 << index)) != 0
     }
 }
 
@@ -102,7 +114,7 @@ impl Default for MaskImage {
     fn default() -> Self {
         MaskImage {
             image: renderer::image::IndexedImage::new(0, 0),
-            section_count: 0,
+            sections: 0,
         }
     }
 }
@@ -114,18 +126,26 @@ pub enum Operation {
     TransferNext,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum TileType {
+    Index(usize),
+    Last,
+}
+
 pub struct Sprite {
     pub index: u8,
-    pub offset: glam::IVec2,
+    pub offset: [i16; 3],
     pub operation: Option<Operation>,
+    pub tile: TileType,
 }
 
 impl Sprite {
-    fn new(index: usize, offset: Option<&[i32; 2]>, operation: Option<Operation>) -> Self {
+    fn new(index: usize, offset: Option<&[i16; 3]>, operation: Option<Operation>, tile: TileType) -> Self {
         Sprite {
             index: index.try_into().unwrap(),
-            offset: (*offset.unwrap_or(&[0, 0])).into(),
+            offset: *offset.unwrap_or(&[0, 0, 0]),
             operation,
+            tile,
         }
     }
 }
@@ -143,72 +163,101 @@ pub struct View {
 
 impl View {
     fn new(view_desc: &ViewDesc, directory: &std::path::Path, optional: bool) -> anyhow::Result<View> {
-        let image = MaskImage::new(&directory.join(&view_desc.mask))?;
+        let image = {
+            let mut image = MaskImage::new(&directory.join(&view_desc.mask))?;
+            for (index, empty) in view_desc.empty.iter().enumerate() {
+                if *empty {
+                    image.sections |= 0b1 << index;
+                }
+            }
+            image
+        };
+        let section_count = usize::try_from(image.sections.count_ones())?;
 
         let sprites = match &view_desc.operation {
             None | Some(OperationDesc::SplitEnds(false)) => {
-                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
-
-                let mut sprites = Vec::with_capacity(section_count * 2);
-                for i in 0..section_count {
-                    sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None));
+                let mut sprites = Vec::with_capacity(section_count);
+                for i in 0..MAX_SECTION_COUNT {
+                    if image.has_section(i) {
+                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
+                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None, tile));
+                    }
                 }
                 sprites
             }
             Some(OperationDesc::Split(splits)) => {
-                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
-                let section_count = std::cmp::max(section_count, splits.len());
-
                 let mut sprites = Vec::with_capacity(section_count * 2);
-                for i in 0..section_count {
-                    if *splits.get(i).unwrap_or(&false) {
-                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), Some(Operation::Intersect)));
-                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), Some(Operation::Difference)));
-                    } else {
-                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None));
+                for i in 0..MAX_SECTION_COUNT {
+                    if image.has_section(i) {
+                        let offset = view_desc.offset.get(i);
+                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
+                        if *splits.get(i).unwrap_or(&false) {
+                            sprites.push(Sprite::new(i + 1, offset, Some(Operation::Intersect), tile));
+                            sprites.push(Sprite::new(i + 1, offset, Some(Operation::Difference), tile));
+                        } else {
+                            sprites.push(Sprite::new(i + 1, offset, None, tile));
+                        }
                     }
                 }
                 sprites
             }
             Some(OperationDesc::SplitEnds(true)) => {
-                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
-
                 let mut sprites = Vec::with_capacity(section_count);
-                sprites.push(Sprite::new(1, view_desc.offset.first(), Some(Operation::Intersect)));
-                for i in 1..(section_count - 1) {
-                    sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None));
+
+                let first_section = image.sections.lowest_one().map(|x| x as usize).unwrap_or_default();
+
+                {
+                    let offset = view_desc.offset.get(first_section);
+                    let tile = view_desc.tiles.get(first_section).map(|x| usize::from(*x)).unwrap_or(first_section);
+                    let tile = TileType::Index(tile);
+                    sprites.push(Sprite::new(first_section + 1, offset, Some(Operation::Intersect), tile));
                 }
-                sprites.push(Sprite::new(1, view_desc.offset.last(), Some(Operation::Difference)));
+
+                for i in (first_section + 1)..MAX_SECTION_COUNT {
+                    if image.has_section(i) {
+                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
+                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None, tile));
+                    }
+                }
+
+                {
+                    let offset = view_desc.offset.last();
+                    sprites.push(Sprite::new(
+                        first_section + 1,
+                        offset,
+                        Some(Operation::Difference),
+                        TileType::Last,
+                    ));
+                }
+
                 sprites
             }
             Some(OperationDesc::Transfer(transfers)) => {
-                let section_count = std::cmp::max(image.section_count, view_desc.offset.len());
-                let section_count = std::cmp::max(section_count, transfers.len());
-
-                if transfers.len() == section_count && transfers.last() == Some(&true) {
+                if transfers.last() == Some(&true) {
                     anyhow::bail!("Cannot use transfer on the last sprite");
                 }
 
                 let mut previous_transfer = false;
-                let mut sprites = Vec::with_capacity(section_count * 2);
-                for i in 0..section_count {
+                let mut sprites = Vec::with_capacity(section_count);
+                for i in 0..MAX_SECTION_COUNT {
                     let transfer = *transfers.get(i).unwrap_or(&false);
-                    anyhow::ensure!(
-                        !(transfer && previous_transfer),
-                        "Cannot use transfer on consecutive sprites"
-                    );
 
-                    let operation = if previous_transfer {
-                        Some(Operation::Difference)
-                    } else if transfer {
-                        Some(Operation::TransferNext)
-                    } else {
-                        None
-                    };
+                    if image.has_section(i) {
+                        let operation = if previous_transfer {
+                            Some(Operation::Difference)
+                        } else if transfer {
+                            Some(Operation::TransferNext)
+                        } else {
+                            None
+                        };
+
+                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
+                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), operation, tile));
+                    }
+
                     previous_transfer = transfer;
-
-                    sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), operation));
                 }
+
                 sprites
             }
         };
