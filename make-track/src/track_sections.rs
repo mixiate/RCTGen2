@@ -33,20 +33,6 @@ pub struct TrackSection {
 }
 
 impl TrackSection {
-    const fn default() -> Self {
-        TrackSection {
-            name: "",
-            curve: crate::track_curves::flat,
-            length: 1.0,
-            position_offset: POSITION_OFFSET_ORTHOGONAL,
-            mask_offset_y: false,
-            prefer_odd_alt_mesh_count: false,
-            invert_alt_mesh: false,
-            has_supports: true,
-            chain_type: None,
-        }
-    }
-
     pub fn sample_curve(
         &self,
         distance: f32,
@@ -84,59 +70,84 @@ pub const FLAT: TrackSection = TrackSection {
     name: "flat",
     curve: crate::track_curves::flat,
     length: crate::track_curves::FLAT_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Flat),
-    ..TrackSection::default()
 };
 
 pub const FLAT_TO_GENTLE: TrackSection = TrackSection {
     name: "flat_to_gentle",
     curve: crate::track_curves::flat_to_gentle,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Flat),
-    ..TrackSection::default()
 };
 
 pub const GENTLE: TrackSection = TrackSection {
     name: "gentle",
     curve: crate::track_curves::gentle,
     length: crate::track_curves::GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Gentle),
-    ..TrackSection::default()
 };
 
 pub const GENTLE_TO_FLAT: TrackSection = TrackSection {
     name: "gentle_to_flat",
     curve: crate::track_curves::gentle_to_flat,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Flat),
-    ..TrackSection::default()
 };
 
 pub const GENTLE_TO_STEEP: TrackSection = TrackSection {
     name: "gentle_to_steep",
     curve: crate::track_curves::gentle_to_steep,
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Gentle),
-    ..TrackSection::default()
 };
 
 pub const STEEP_TO_GENTLE: TrackSection = TrackSection {
     name: "steep_to_gentle",
     curve: crate::track_curves::steep_to_gentle,
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Gentle),
-    ..TrackSection::default()
 };
 
 pub const STEEP: TrackSection = TrackSection {
     name: "steep",
     curve: crate::track_curves::steep,
     length: crate::track_curves::STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
+    has_supports: true,
     chain_type: Some(chain::ChainType::Gentle),
-    ..TrackSection::default()
 };
 
 pub const STEEP_TO_VERTICAL: TrackSection = TrackSection {
@@ -144,9 +155,11 @@ pub const STEEP_TO_VERTICAL: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_vertical,
     length: crate::track_curves::STEEP_TO_VERTICAL_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const VERTICAL_TO_STEEP: TrackSection = TrackSection {
@@ -154,8 +167,11 @@ pub const VERTICAL_TO_STEEP: TrackSection = TrackSection {
     curve: crate::track_curves::vertical_to_steep,
     length: crate::track_curves::VERTICAL_TO_STEEP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const VERTICAL: TrackSection = TrackSection {
@@ -163,76 +179,119 @@ pub const VERTICAL: TrackSection = TrackSection {
     curve: crate::track_curves::vertical,
     length: crate::track_curves::VERTICAL_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const SMALL_FLAT_TO_STEEP: TrackSection = TrackSection {
     name: "small_flat_to_steep",
     curve: crate::track_curves::small_flat_to_steep,
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_STEEP_TO_FLAT: TrackSection = TrackSection {
     name: "small_steep_to_flat",
     curve: crate::track_curves::small_steep_to_flat,
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_STEEP: TrackSection = TrackSection {
     name: "flat_to_steep",
     curve: crate::track_curves::flat_to_steep,
     length: crate::track_curves::FLAT_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
-    ..TrackSection::default()
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_TO_FLAT: TrackSection = TrackSection {
     name: "steep_to_flat",
     curve: crate::track_curves::steep_to_flat,
     length: crate::track_curves::FLAT_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
-    ..TrackSection::default()
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const VERY_SMALL_TURN_LEFT: TrackSection = TrackSection {
     name: "very_small_turn_left",
     curve: crate::track_curves::very_small_turn_left,
     length: crate::track_curves::VERY_SMALL_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT: TrackSection = TrackSection {
     name: "small_turn_left",
     curve: crate::track_curves::small_turn_left,
     length: crate::track_curves::SMALL_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT: TrackSection = TrackSection {
     name: "medium_turn_left",
     curve: crate::track_curves::medium_turn_left,
     length: crate::track_curves::MEDIUM_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG: TrackSection = TrackSection {
     name: "large_turn_left_to_diag",
     curve: crate::track_curves::large_turn_left_to_diag,
     length: crate::track_curves::LARGE_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG: TrackSection = TrackSection {
     name: "large_turn_right_to_diag",
     curve: crate::track_curves::large_turn_right_to_diag,
     length: crate::track_curves::LARGE_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_DIAG: TrackSection = TrackSection {
@@ -240,8 +299,11 @@ pub const FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::FlatDiag),
-    ..TrackSection::default()
 };
 
 pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -249,8 +311,11 @@ pub const FLAT_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_gentle_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::FlatDiag),
-    ..TrackSection::default()
 };
 
 pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -258,8 +323,11 @@ pub const GENTLE_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_flat_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::FlatDiag),
-    ..TrackSection::default()
 };
 
 pub const GENTLE_DIAG: TrackSection = TrackSection {
@@ -267,8 +335,11 @@ pub const GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
     chain_type: Some(chain::ChainType::FlatDiag),
-    ..TrackSection::default()
 };
 
 pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -276,7 +347,11 @@ pub const GENTLE_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_steep_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -284,7 +359,11 @@ pub const STEEP_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_gentle_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_DIAG: TrackSection = TrackSection {
@@ -292,7 +371,11 @@ pub const STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_diag,
     length: crate::track_curves::STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -300,7 +383,11 @@ pub const SMALL_FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::small_flat_to_steep_diag,
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -308,7 +395,11 @@ pub const SMALL_STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::small_steep_to_flat_diag,
     length: crate::track_curves::SMALL_FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -316,7 +407,11 @@ pub const FLAT_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_steep_diag,
     length: crate::track_curves::FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -324,84 +419,143 @@ pub const STEEP_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_flat_diag,
     length: crate::track_curves::FLAT_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "flat_to_left_bank",
     curve: crate::track_curves::flat_to_left_bank,
     length: crate::track_curves::FLAT_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_RIGHT_BANK: TrackSection = TrackSection {
     name: "flat_to_right_bank",
     curve: crate::track_curves::flat_to_right_bank,
     length: crate::track_curves::FLAT_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "left_bank_to_gentle",
     curve: crate::track_curves::left_bank_to_gentle,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "right_bank_to_gentle",
     curve: crate::track_curves::right_bank_to_gentle,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "gentle_to_left_bank",
     curve: crate::track_curves::gentle_to_left_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_RIGHT_BANK: TrackSection = TrackSection {
     name: "gentle_to_right_bank",
     curve: crate::track_curves::gentle_to_right_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK: TrackSection = TrackSection {
     name: "left_bank",
     curve: crate::track_curves::left_bank,
     length: crate::track_curves::FLAT_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_BANK: TrackSection = TrackSection {
     name: "small_turn_left_bank",
     curve: crate::track_curves::small_turn_left_bank,
     length: crate::track_curves::SMALL_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT_BANK: TrackSection = TrackSection {
     name: "medium_turn_left_bank",
     curve: crate::track_curves::medium_turn_left_bank,
     length: crate::track_curves::MEDIUM_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG_BANK: TrackSection = TrackSection {
     name: "large_turn_left_to_diag_bank",
     curve: crate::track_curves::large_turn_left_to_diag_bank,
     length: crate::track_curves::LARGE_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG_BANK: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_bank",
     curve: crate::track_curves::large_turn_right_to_diag_bank,
     length: crate::track_curves::LARGE_TURN_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -409,7 +563,11 @@ pub const FLAT_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_left_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -417,7 +575,11 @@ pub const FLAT_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_right_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -425,7 +587,11 @@ pub const LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_to_gentle_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -433,7 +599,11 @@ pub const RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::right_bank_to_gentle_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -441,7 +611,11 @@ pub const GENTLE_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -449,7 +623,11 @@ pub const GENTLE_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -457,53 +635,83 @@ pub const LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_diag,
     length: crate::track_curves::FLAT_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     name: "small_turn_left_gentle",
     curve: crate::track_curves::small_turn_left_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     name: "small_turn_right_gentle",
     curve: crate::track_curves::small_turn_right_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT_GENTLE: TrackSection = TrackSection {
     name: "medium_turn_left_gentle",
     curve: crate::track_curves::medium_turn_left_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_RIGHT_GENTLE: TrackSection = TrackSection {
     name: "medium_turn_right_gentle",
     curve: crate::track_curves::medium_turn_right_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     name: "large_turn_left_to_diag_gentle",
     curve: crate::track_curves::large_turn_left_to_diag_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG_GENTLE: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_gentle",
     curve: crate::track_curves::large_turn_right_to_diag_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -511,7 +719,11 @@ pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_left_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -519,57 +731,83 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_right_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const VERY_SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
     name: "very_small_turn_left_steep",
     curve: crate::track_curves::very_small_turn_left_steep,
     length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
-    ..TrackSection::default()
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const VERY_SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     name: "very_small_turn_right_steep",
     curve: crate::track_curves::very_small_turn_right_steep,
     length: crate::track_curves::VERY_SMALL_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
-    ..TrackSection::default()
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_STEEP: TrackSection = TrackSection {
     name: "small_turn_left_steep",
     curve: crate::track_curves::small_turn_left_steep,
     length: crate::track_curves::SMALL_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
-    ..TrackSection::default()
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_STEEP: TrackSection = TrackSection {
     name: "small_turn_right_steep",
     curve: crate::track_curves::small_turn_right_steep,
     length: crate::track_curves::SMALL_TURN_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
     invert_alt_mesh: true,
-    ..TrackSection::default()
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_DIAG_STEEP: TrackSection = TrackSection {
     name: "large_turn_left_to_diag_steep",
     curve: crate::track_curves::large_turn_left_to_diag_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_DIAG_STEEP: TrackSection = TrackSection {
     name: "large_turn_right_to_diag_steep",
     curve: crate::track_curves::large_turn_right_to_diag_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
@@ -577,7 +815,11 @@ pub const LARGE_TURN_LEFT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_left_to_orthogonal_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
@@ -585,7 +827,11 @@ pub const LARGE_TURN_RIGHT_TO_ORTHOGONAL_STEEP: TrackSection = TrackSection {
     curve: crate::track_curves::large_turn_right_to_orthogonal_steep,
     length: crate::track_curves::LARGE_TURN_STEEP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
@@ -594,8 +840,10 @@ pub const VERTICAL_TWIST_LEFT: TrackSection = TrackSection {
     length: crate::track_curves::VERTICAL_TWIST_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
@@ -604,110 +852,178 @@ pub const VERTICAL_TWIST_RIGHT: TrackSection = TrackSection {
     length: crate::track_curves::VERTICAL_TWIST_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     name: "gentle_to_gentle_left_bank",
     curve: crate::track_curves::gentle_to_gentle_left_bank,
     length: crate::track_curves::GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     name: "gentle_to_gentle_right_bank",
     curve: crate::track_curves::gentle_to_gentle_right_bank,
     length: crate::track_curves::GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "gentle_left_bank_to_gentle",
     curve: crate::track_curves::gentle_left_bank_to_gentle,
     length: crate::track_curves::GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "gentle_right_bank_to_gentle",
     curve: crate::track_curves::gentle_right_bank_to_gentle,
     length: crate::track_curves::GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     name: "left_bank_to_gentle_left_bank",
     curve: crate::track_curves::left_bank_to_gentle_left_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     name: "right_bank_to_gentle_right_bank",
     curve: crate::track_curves::right_bank_to_gentle_right_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_LEFT_BANK: TrackSection = TrackSection {
     name: "gentle_left_bank_to_left_bank",
     curve: crate::track_curves::gentle_left_bank_to_left_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK: TrackSection = TrackSection {
     name: "gentle_right_bank_to_right_bank",
     curve: crate::track_curves::gentle_right_bank_to_right_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK: TrackSection = TrackSection {
     name: "gentle_left_bank",
     curve: crate::track_curves::gentle_left_bank,
     length: crate::track_curves::GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     name: "gentle_right_bank",
     curve: crate::track_curves::gentle_right_bank,
     length: crate::track_curves::GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     name: "flat_to_gentle_left_bank",
     curve: crate::track_curves::flat_to_gentle_left_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     name: "flat_to_gentle_right_bank",
     curve: crate::track_curves::flat_to_gentle_right_bank,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_FLAT: TrackSection = TrackSection {
     name: "gentle_left_bank_to_flat",
     curve: crate::track_curves::gentle_left_bank_to_flat,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_FLAT: TrackSection = TrackSection {
     name: "gentle_right_bank_to_flat",
     curve: crate::track_curves::gentle_right_bank_to_flat,
     length: crate::track_curves::FLAT_TO_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -715,7 +1031,11 @@ pub const GENTLE_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_gentle_left_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -723,7 +1043,11 @@ pub const GENTLE_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_to_gentle_right_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -731,7 +1055,11 @@ pub const GENTLE_LEFT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_gentle_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
@@ -739,7 +1067,11 @@ pub const GENTLE_RIGHT_BANK_TO_GENTLE_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_gentle_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -747,7 +1079,11 @@ pub const LEFT_BANK_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::left_bank_to_gentle_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -755,7 +1091,11 @@ pub const RIGHT_BANK_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::right_bank_to_gentle_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -763,7 +1103,11 @@ pub const GENTLE_LEFT_BANK_TO_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -771,7 +1115,11 @@ pub const GENTLE_RIGHT_BANK_TO_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -779,7 +1127,11 @@ pub const GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -787,7 +1139,11 @@ pub const GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_diag,
     length: crate::track_curves::GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -795,7 +1151,11 @@ pub const FLAT_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_gentle_left_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -803,7 +1163,11 @@ pub const FLAT_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::flat_to_gentle_right_bank_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -811,7 +1175,11 @@ pub const GENTLE_LEFT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_flat_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
@@ -819,53 +1187,83 @@ pub const GENTLE_RIGHT_BANK_TO_FLAT_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_flat_diag,
     length: crate::track_curves::FLAT_TO_GENTLE_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     name: "small_turn_left_bank_gentle",
     curve: crate::track_curves::small_turn_left_bank_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     name: "small_turn_right_bank_gentle",
     curve: crate::track_curves::small_turn_right_bank_gentle,
     length: crate::track_curves::SMALL_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_LEFT_BANK_GENTLE: TrackSection = TrackSection {
     name: "medium_turn_left_bank_gentle",
     curve: crate::track_curves::medium_turn_left_bank_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_TURN_RIGHT_BANK_GENTLE: TrackSection = TrackSection {
     name: "medium_turn_right_bank_gentle",
     curve: crate::track_curves::medium_turn_right_bank_gentle,
     length: crate::track_curves::MEDIUM_TURN_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     name: "large_turn_left_bank_to_diag_gentle",
     curve: crate::track_curves::large_turn_left_bank_to_diag_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_BANK_TO_DIAG_GENTLE: TrackSection = TrackSection {
     name: "large_turn_right_bank_to_diag_gentle",
     curve: crate::track_curves::large_turn_right_bank_to_diag_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -873,7 +1271,11 @@ pub const LARGE_TURN_LEFT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection
     curve: crate::track_curves::large_turn_left_bank_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSection {
@@ -881,147 +1283,227 @@ pub const LARGE_TURN_RIGHT_BANK_TO_ORTHOGONAL_GENTLE: TrackSection = TrackSectio
     curve: crate::track_curves::large_turn_right_bank_to_orthogonal_gentle,
     length: crate::track_curves::LARGE_TURN_GENTLE_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
-    ..TrackSection::default()
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const S_BEND_LEFT: TrackSection = TrackSection {
     name: "s_bend_left",
     curve: crate::track_curves::s_bend_left,
     length: crate::track_curves::S_BEND_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const S_BEND_RIGHT: TrackSection = TrackSection {
     name: "s_bend_right",
     curve: crate::track_curves::s_bend_right,
     length: crate::track_curves::S_BEND_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const S_BEND_LEFT_BANK: TrackSection = TrackSection {
     name: "s_bend_left_bank",
     curve: crate::track_curves::s_bend_left_bank,
     length: crate::track_curves::S_BEND_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const S_BEND_RIGHT_BANK: TrackSection = TrackSection {
     name: "s_bend_right_bank",
     curve: crate::track_curves::s_bend_right_bank,
     length: crate::track_curves::S_BEND_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_HELIX_LEFT: TrackSection = TrackSection {
     name: "small_helix_left",
     curve: crate::track_curves::small_helix_left,
     length: crate::track_curves::SMALL_HELIX_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_HELIX_RIGHT: TrackSection = TrackSection {
     name: "small_helix_right",
     curve: crate::track_curves::small_helix_right,
     length: crate::track_curves::SMALL_HELIX_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_HELIX_LEFT: TrackSection = TrackSection {
     name: "medium_helix_left",
     curve: crate::track_curves::medium_helix_left,
     length: crate::track_curves::MEDIUM_HELIX_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_HELIX_RIGHT: TrackSection = TrackSection {
     name: "medium_helix_right",
     curve: crate::track_curves::medium_helix_right,
     length: crate::track_curves::MEDIUM_HELIX_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_LEFT: TrackSection = TrackSection {
     name: "medium_quarter_helix_left",
     curve: crate::track_curves::medium_quarter_helix_left,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_RIGHT: TrackSection = TrackSection {
     name: "medium_quarter_helix_right",
     curve: crate::track_curves::medium_quarter_helix_right,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
-    ..TrackSection::default()
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_LEFT_BANK: TrackSection = TrackSection {
     name: "medium_quarter_helix_left_bank",
     curve: crate::track_curves::medium_quarter_helix_left_bank,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const MEDIUM_QUARTER_HELIX_RIGHT_BANK: TrackSection = TrackSection {
     name: "medium_quarter_helix_right_bank",
     curve: crate::track_curves::medium_quarter_helix_right_bank,
     length: crate::track_curves::MEDIUM_QUARTER_HELIX_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_LEFT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "small_turn_left_bank_to_gentle",
     curve: crate::track_curves::small_turn_left_bank_to_gentle,
     length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const SMALL_TURN_RIGHT_BANK_TO_GENTLE: TrackSection = TrackSection {
     name: "small_turn_right_bank_to_gentle",
     curve: crate::track_curves::small_turn_right_bank_to_gentle,
     length: crate::track_curves::SMALL_TURN_BANK_TO_GENTLE_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
-    ..TrackSection::default()
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_STEEP: TrackSection = TrackSection {
     name: "gentle_left_bank_to_steep",
     curve: crate::track_curves::gentle_left_bank_to_steep,
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_STEEP: TrackSection = TrackSection {
     name: "gentle_right_bank_to_steep",
     curve: crate::track_curves::gentle_right_bank_to_steep,
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const STEEP_TO_GENTLE_LEFT_BANK: TrackSection = TrackSection {
     name: "steep_to_gentle_left_bank",
     curve: crate::track_curves::steep_to_gentle_left_bank,
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const STEEP_TO_GENTLE_RIGHT_BANK: TrackSection = TrackSection {
     name: "steep_to_gentle_right_bank",
     curve: crate::track_curves::steep_to_gentle_right_bank,
     length: crate::track_curves::GENTLE_TO_STEEP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const GENTLE_LEFT_BANK_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -1029,8 +1511,11 @@ pub const GENTLE_LEFT_BANK_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_left_bank_to_steep_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const GENTLE_RIGHT_BANK_TO_STEEP_DIAG: TrackSection = TrackSection {
@@ -1038,8 +1523,11 @@ pub const GENTLE_RIGHT_BANK_TO_STEEP_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::gentle_right_bank_to_steep_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const STEEP_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
@@ -1047,8 +1535,11 @@ pub const STEEP_TO_GENTLE_LEFT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_gentle_left_bank_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const STEEP_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
@@ -1056,68 +1547,95 @@ pub const STEEP_TO_GENTLE_RIGHT_BANK_DIAG: TrackSection = TrackSection {
     curve: crate::track_curves::steep_to_gentle_right_bank_diag,
     length: crate::track_curves::GENTLE_TO_STEEP_DIAG_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BARREL_ROLL_LEFT: TrackSection = TrackSection {
     name: "barrel_roll_left",
     curve: crate::track_curves::barrel_roll_left,
     length: crate::track_curves::BARREL_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BARREL_ROLL_RIGHT: TrackSection = TrackSection {
     name: "barrel_roll_right",
     curve: crate::track_curves::barrel_roll_right,
     length: crate::track_curves::BARREL_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const INLINE_TWIST_LEFT: TrackSection = TrackSection {
     name: "inline_twist_left",
     curve: crate::track_curves::inline_twist_left,
     length: crate::track_curves::INLINE_TWIST_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const INLINE_TWIST_RIGHT: TrackSection = TrackSection {
     name: "inline_twist_right",
     curve: crate::track_curves::inline_twist_right,
     length: crate::track_curves::INLINE_TWIST_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const HALF_LOOP: TrackSection = TrackSection {
     name: "half_loop",
     curve: crate::track_curves::half_loop,
     length: crate::track_curves::HALF_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const VERTICAL_LOOP_LEFT: TrackSection = TrackSection {
     name: "vertical_loop_left",
     curve: crate::track_curves::vertical_loop_left,
     length: crate::track_curves::VERTICAL_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const VERTICAL_LOOP_RIGHT: TrackSection = TrackSection {
     name: "vertical_loop_right",
     curve: crate::track_curves::vertical_loop_right,
     length: crate::track_curves::VERTICAL_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const QUARTER_LOOP: TrackSection = TrackSection {
@@ -1125,120 +1643,155 @@ pub const QUARTER_LOOP: TrackSection = TrackSection {
     curve: crate::track_curves::quarter_loop,
     length: crate::track_curves::QUARTER_LOOP_LENGTH,
     position_offset: POSITION_OFFSET_NONE,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const CORKSCREW_LEFT: TrackSection = TrackSection {
     name: "corkscrew_left",
     curve: crate::track_curves::corkscrew_left,
     length: crate::track_curves::CORKSCREW_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const CORKSCREW_RIGHT: TrackSection = TrackSection {
     name: "corkscrew_right",
     curve: crate::track_curves::corkscrew_right,
     length: crate::track_curves::CORKSCREW_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const LARGE_CORKSCREW_LEFT: TrackSection = TrackSection {
     name: "large_corkscrew_left",
     curve: crate::track_curves::large_corkscrew_left,
     length: crate::track_curves::LARGE_CORKSCREW_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const LARGE_CORKSCREW_RIGHT: TrackSection = TrackSection {
     name: "large_corkscrew_right",
     curve: crate::track_curves::large_corkscrew_right,
     length: crate::track_curves::LARGE_CORKSCREW_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const MEDIUM_HALF_LOOP_LEFT: TrackSection = TrackSection {
     name: "medium_half_loop_left",
     curve: crate::track_curves::medium_half_loop_left,
     length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const MEDIUM_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     name: "medium_half_loop_right",
     curve: crate::track_curves::medium_half_loop_right,
     length: crate::track_curves::MEDIUM_HALF_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const LARGE_HALF_LOOP_LEFT: TrackSection = TrackSection {
     name: "large_half_loop_left",
     curve: crate::track_curves::large_half_loop_left,
     length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const LARGE_HALF_LOOP_RIGHT: TrackSection = TrackSection {
     name: "large_half_loop_right",
     curve: crate::track_curves::large_half_loop_right,
     length: crate::track_curves::LARGE_HALF_LOOP_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     name: "zero_g_roll_left",
     curve: crate::track_curves::zero_g_roll_left,
     length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     name: "zero_g_roll_right",
     curve: crate::track_curves::zero_g_roll_right,
     length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const LARGE_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     name: "large_zero_g_roll_left",
     curve: crate::track_curves::large_zero_g_roll_left,
     length: crate::track_curves::LARGE_ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const LARGE_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     name: "large_zero_g_roll_right",
     curve: crate::track_curves::large_zero_g_roll_right,
     length: crate::track_curves::LARGE_ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
     prefer_odd_alt_mesh_count: true,
     invert_alt_mesh: true,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
@@ -1246,8 +1799,11 @@ pub const DIVE_LOOP_45_LEFT: TrackSection = TrackSection {
     curve: crate::track_curves::dive_loop_45_left,
     length: crate::track_curves::DIVE_LOOP_45_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
@@ -1255,60 +1811,81 @@ pub const DIVE_LOOP_45_RIGHT: TrackSection = TrackSection {
     curve: crate::track_curves::dive_loop_45_right,
     length: crate::track_curves::DIVE_LOOP_45_LENGTH,
     position_offset: POSITION_OFFSET_DIAGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BANKED_BARREL_ROLL_LEFT: TrackSection = TrackSection {
     name: "banked_barrel_roll_left",
     curve: crate::track_curves::banked_barrel_roll_left,
     length: crate::track_curves::BARREL_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BANKED_BARREL_ROLL_RIGHT: TrackSection = TrackSection {
     name: "banked_barrel_roll_right",
     curve: crate::track_curves::banked_barrel_roll_right,
     length: crate::track_curves::BARREL_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BANKED_INLINE_TWIST_LEFT: TrackSection = TrackSection {
     name: "banked_inline_twist_left",
     curve: crate::track_curves::banked_inline_twist_left,
     length: crate::track_curves::INLINE_TWIST_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BANKED_INLINE_TWIST_RIGHT: TrackSection = TrackSection {
     name: "banked_inline_twist_right",
     curve: crate::track_curves::banked_inline_twist_right,
     length: crate::track_curves::INLINE_TWIST_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BANKED_ZERO_G_ROLL_LEFT: TrackSection = TrackSection {
     name: "banked_zero_g_roll_left",
     curve: crate::track_curves::banked_zero_g_roll_left,
     length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
 
 pub const BANKED_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
     name: "banked_zero_g_roll_right",
     curve: crate::track_curves::banked_zero_g_roll_right,
     length: crate::track_curves::ZERO_G_ROLL_LENGTH,
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
     mask_offset_y: true,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
     has_supports: false,
-    ..TrackSection::default()
+    chain_type: None,
 };
