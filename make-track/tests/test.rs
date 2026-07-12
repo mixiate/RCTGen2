@@ -128,3 +128,8 @@ fn test_track_lift() {
 fn test_track_additional_models() {
     test_make_track("test-track-additional-models", 15);
 }
+
+#[test]
+fn test_track_inverted() {
+    test_make_track("test-track-inverted", 10);
+}
