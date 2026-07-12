@@ -1,0 +1,51 @@
+{
+    "tracks": [
+        {
+            "name": "test-track-inverted",
+            "sections": [
+                "flat",
+                "turns",
+                "gentle_slopes",
+                "steep_slopes",
+                "vertical_slopes",
+                "diagonals",
+                "sloped_turns",
+                "gentle_sloped_turns",
+                "banked_turns",
+                "banked_sloped_turns",
+                "large_sloped_turns",
+                "large_banked_sloped_turns",
+                "s_bends",
+                "medium_quarter_helices",
+                "medium_banked_quarter_helices",
+                "small_slope_transitions",
+                "small_slope_transitions_diagonal",
+                "large_slope_transitions",
+                "large_slope_transitions_diagonal",
+                "barrel_rolls",
+                "inline_twists",
+                "quarter_loops",
+                "corkscrews",
+                "large_corkscrews",
+                "half_loops",
+                "vertical_loops",
+                "medium_half_loops",
+                "large_half_loops",
+                "zero_g_rolls",
+                "dive_loops",
+                "turn_bank_transitions",
+                "very_small_turns"
+            ],
+            "z_offset": 2,
+            "masks": "inverted",
+            "models": {
+                "track": "track.obj",
+                "mask": "mask.obj"
+            }
+        }
+    ],
+    "lights": [
+        { "direction": [ 1, 0.66666, 1 ], "diffuse_strength": 1, "specular_strength": 1, "shadow": false }
+    ],
+    "dither": false
+}
