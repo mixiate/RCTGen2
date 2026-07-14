@@ -42,19 +42,19 @@ pub enum ViewsDescType {
 }
 
 impl ViewsDescType {
-    pub fn load(&self, directory: &std::path::Path) -> anyhow::Result<[View; 4]> {
+    pub fn load(&self, directory: &std::path::Path, tiles: &[[i16; 3]]) -> anyhow::Result<[View; 4]> {
         Ok(match self {
             ViewsDescType::Two(views) => [
-                View::new(&views[0], directory, false)?,
-                View::new(&views[1], directory, false)?,
-                View::new(&views[0], directory, true)?,
-                View::new(&views[1], directory, true)?,
+                View::load(&views[0], directory, tiles, 0, false)?,
+                View::load(&views[1], directory, tiles, 1, false)?,
+                View::load(&views[0], directory, tiles, 2, true)?,
+                View::load(&views[1], directory, tiles, 3, true)?,
             ],
             ViewsDescType::Four(views) => [
-                View::new(&views[0], directory, false)?,
-                View::new(&views[1], directory, false)?,
-                View::new(&views[2], directory, false)?,
-                View::new(&views[3], directory, false)?,
+                View::load(&views[0], directory, tiles, 0, false)?,
+                View::load(&views[1], directory, tiles, 1, false)?,
+                View::load(&views[2], directory, tiles, 2, false)?,
+                View::load(&views[3], directory, tiles, 3, false)?,
             ],
         })
     }
@@ -149,26 +149,18 @@ pub enum Operation {
     TransferNext,
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum TileType {
-    Index(usize),
-    Last,
-}
-
 pub struct Sprite {
     pub index: u8,
-    pub offset: [i16; 3],
+    pub offset: glam::IVec2,
     pub operation: Option<Operation>,
-    pub tile: TileType,
 }
 
 impl Sprite {
-    fn new(index: usize, offset: Option<&[i16; 3]>, operation: Option<Operation>, tile: TileType) -> Self {
+    fn new(index: usize, offset: glam::IVec2, operation: Option<Operation>) -> Self {
         Sprite {
             index: index.try_into().unwrap(),
-            offset: *offset.unwrap_or(&[0, 0, 0]),
+            offset,
             operation,
-            tile,
         }
     }
 }
@@ -185,7 +177,13 @@ pub struct View {
 }
 
 impl View {
-    fn new(view_desc: &ViewDesc, directory: &std::path::Path, optional: bool) -> anyhow::Result<View> {
+    fn load(
+        view_desc: &ViewDesc,
+        directory: &std::path::Path,
+        tiles: &[[i16; 3]],
+        rotation: usize,
+        optional: bool,
+    ) -> anyhow::Result<View> {
         let image = {
             let mut image = MaskImage::new(&directory.join(&view_desc.mask))?;
             for (index, empty) in view_desc.empty.iter().enumerate() {
@@ -202,8 +200,9 @@ impl View {
                 let mut sprites = Vec::with_capacity(section_count);
                 for i in 0..MAX_SECTION_COUNT {
                     if image.has_section(i) {
-                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
-                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None, tile));
+                        let coordinates = get_coordinates(i, &view_desc.tiles, tiles)?;
+                        let offset = calculate_tile_image_offset(coordinates, view_desc.offset.get(i), rotation);
+                        sprites.push(Sprite::new(i + 1, offset, None));
                     }
                 }
                 sprites
@@ -212,13 +211,13 @@ impl View {
                 let mut sprites = Vec::with_capacity(section_count * 2);
                 for i in 0..MAX_SECTION_COUNT {
                     if image.has_section(i) {
-                        let offset = view_desc.offset.get(i);
-                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
+                        let coordinates = get_coordinates(i, &view_desc.tiles, tiles)?;
+                        let offset = calculate_tile_image_offset(coordinates, view_desc.offset.get(i), rotation);
                         if *splits.get(i).unwrap_or(&false) {
-                            sprites.push(Sprite::new(i + 1, offset, Some(Operation::Intersect), tile));
-                            sprites.push(Sprite::new(i + 1, offset, Some(Operation::Difference), tile));
+                            sprites.push(Sprite::new(i + 1, offset, Some(Operation::Intersect)));
+                            sprites.push(Sprite::new(i + 1, offset, Some(Operation::Difference)));
                         } else {
-                            sprites.push(Sprite::new(i + 1, offset, None, tile));
+                            sprites.push(Sprite::new(i + 1, offset, None));
                         }
                     }
                 }
@@ -227,30 +226,26 @@ impl View {
             Some(OperationDesc::SplitEnds(true)) => {
                 let mut sprites = Vec::with_capacity(section_count);
 
-                let first_section = image.sections.lowest_one().map(|x| x as usize).unwrap_or_default();
+                let first_index = image.sections.lowest_one().map(|x| x as usize).unwrap_or_default();
 
                 {
-                    let offset = view_desc.offset.get(first_section);
-                    let tile = view_desc.tiles.get(first_section).map(|x| usize::from(*x)).unwrap_or(first_section);
-                    let tile = TileType::Index(tile);
-                    sprites.push(Sprite::new(first_section + 1, offset, Some(Operation::Intersect), tile));
+                    let coordinates = get_coordinates(first_index, &view_desc.tiles, tiles)?;
+                    let offset = calculate_tile_image_offset(coordinates, view_desc.offset.get(first_index), rotation);
+                    sprites.push(Sprite::new(first_index + 1, offset, Some(Operation::Intersect)));
                 }
 
-                for i in (first_section + 1)..MAX_SECTION_COUNT {
+                for i in (first_index + 1)..MAX_SECTION_COUNT {
                     if image.has_section(i) {
-                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
-                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), None, tile));
+                        let coordinates = get_coordinates(i, &view_desc.tiles, tiles)?;
+                        let offset = calculate_tile_image_offset(coordinates, view_desc.offset.get(i), rotation);
+                        sprites.push(Sprite::new(i + 1, offset, None));
                     }
                 }
 
                 {
-                    let offset = view_desc.offset.last();
-                    sprites.push(Sprite::new(
-                        first_section + 1,
-                        offset,
-                        Some(Operation::Difference),
-                        TileType::Last,
-                    ));
+                    let coordinates = tiles.last().expect("Track section has no tiles");
+                    let offset = calculate_tile_image_offset(coordinates, view_desc.offset.last(), rotation);
+                    sprites.push(Sprite::new(first_index + 1, offset, Some(Operation::Difference)));
                 }
 
                 sprites
@@ -274,8 +269,9 @@ impl View {
                             None
                         };
 
-                        let tile = TileType::Index(view_desc.tiles.get(i).map(|x| usize::from(*x)).unwrap_or(i));
-                        sprites.push(Sprite::new(i + 1, view_desc.offset.get(i), operation, tile));
+                        let coordinates = get_coordinates(i, &view_desc.tiles, tiles)?;
+                        let offset = calculate_tile_image_offset(coordinates, view_desc.offset.get(i), rotation);
+                        sprites.push(Sprite::new(i + 1, offset, operation));
                     }
 
                     previous_transfer = transfer;
@@ -330,6 +326,30 @@ impl View {
         let (x, y) = self.translate_coords(x, y);
         (self.image.image.get_pixel(x, y) & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT == index
     }
+}
+
+fn get_coordinates<'a>(index: usize, tile_map: &[u8], tiles: &'a [[i16; 3]]) -> anyhow::Result<&'a [i16; 3]> {
+    use anyhow::Context as _;
+    let index = tile_map.get(index).map(|x| usize::from(*x)).unwrap_or(index);
+    tiles.get(index).with_context(|| "More sections than tiles in mask")
+}
+
+fn calculate_tile_image_offset(coordinates: &[i16; 3], offset: Option<&[i16; 3]>, rotation: usize) -> glam::IVec2 {
+    let [x, y, z] = *coordinates;
+    let (x, y) = match rotation {
+        1 => (y, -x),
+        2 => (-x, -y),
+        3 => (-y, x),
+        _ => (x, y),
+    };
+    let offset = offset.unwrap_or(&[0; 3]);
+    let x = x + offset[0];
+    let y = y + offset[1];
+    let z = z + offset[2];
+
+    let offset_x = x - y;
+    let offset_y = (-(x + y) / 2) + z;
+    glam::IVec2::new(offset_x.into(), offset_y.into())
 }
 
 pub const PALETTE: [[u8; 3]; 128] = [
