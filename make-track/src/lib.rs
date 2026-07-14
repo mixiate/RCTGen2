@@ -281,15 +281,7 @@ fn split_track_section(
             image.offset += offset_offset;
             mask_depth.offset += offset_offset;
 
-            split::split_image_depth(
-                &image,
-                view,
-                &track_section.tiles,
-                view_index,
-                mask_y_offset,
-                &track_depth,
-                &mask_depth,
-            )
+            split::split_image_depth(&image, view, mask_y_offset, &track_depth, &mask_depth)
         } else {
             let mut image = image.into_cropped_indexed_image(dither);
             if track.lift
@@ -299,7 +291,7 @@ fn split_track_section(
             }
             image.offset += offset_offset;
 
-            split::split_image(&image, view, &track_section.tiles, view_index, mask_y_offset)
+            split::split_image(&image, view, mask_y_offset)
         };
 
         for (sprite_index, image) in split_images
@@ -632,7 +624,7 @@ fn render(
             .into_par_iter()
             .map(|track_section| {
                 if let Some(views) = masks.get_views(track_section.name) {
-                    let views = views.load(&masks_directory)?;
+                    let views = views.load(&masks_directory, &track_section.tiles)?;
                     let images = render_track_section(
                         &render_device,
                         &camera,
