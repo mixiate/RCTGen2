@@ -73,11 +73,13 @@
         },
         {
             "mask": "upright/steep_to_gentle_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/steep_to_gentle_2.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
@@ -366,7 +368,8 @@
     "flat_to_left_bank": [
         {
             "mask": "upright/flat_to_left_bank_0.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png",
@@ -393,7 +396,8 @@
         {
             "mirror": true,
             "mask": "upright/flat_to_left_bank_0.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         }
     ],
     "left_bank_to_gentle": [
@@ -403,7 +407,8 @@
         },
         {
             "mask": "upright/left_bank_to_gentle_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
@@ -422,7 +427,8 @@
         {
             "mirror": true,
             "mask": "upright/left_bank_to_gentle_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png",
@@ -432,11 +438,13 @@
     "gentle_to_left_bank": [
         {
             "mask": "upright/gentle_to_left_bank_0.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/gentle_to_left_bank_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
@@ -455,12 +463,14 @@
         {
             "mirror": true,
             "mask": "upright/gentle_to_left_bank_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mirror": true,
             "mask": "upright/gentle_to_left_bank_0.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         }
     ],
     "left_bank": [
@@ -763,43 +773,51 @@
         {
             "mask": "upright/very_small_turn_left_steep_0.png",
             "empty": [false, true],
+            "tiles": [0, 0],
             "mask_end": true
         },
         {
             "mask": "upright/very_small_turn_left_steep_1.png",
             "transfer": [true, false],
+            "tiles": [0, 0],
             "mask_end": true
         },
         {
             "mask": "upright/very_small_turn_left_steep_2.png",
-            "empty": [true]
+            "empty": [true],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/very_small_turn_left_steep_3.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         }
     ],
     "very_small_turn_right_steep": [
         {
             "mirror": true,
             "mask": "upright/very_small_turn_left_steep_3.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mirror": true,
             "mask": "upright/very_small_turn_left_steep_2.png",
-            "empty": [true]
+            "empty": [true],
+            "tiles": [0, 0]
         },
         {
             "mirror": true,
             "mask": "upright/very_small_turn_left_steep_1.png",
             "transfer": [true, false],
+            "tiles": [0, 0],
             "mask_end": true
         },
         {
             "mirror": true,
             "mask": "upright/very_small_turn_left_steep_0.png",
             "empty": [false, true],
+            "tiles": [0, 0],
             "mask_end": true
         }
     ],
@@ -995,7 +1013,8 @@
         },
         {
             "mask": "upright/gentle_left_bank_to_gentle_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
@@ -1014,7 +1033,8 @@
         {
             "mirror": true,
             "mask": "upright/gentle_left_bank_to_gentle_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
@@ -1140,7 +1160,8 @@
         },
         {
             "mask": "upright/gentle_left_bank_to_flat_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
@@ -1159,7 +1180,8 @@
         {
             "mirror": true,
             "mask": "upright/gentle_left_bank_to_flat_1.png",
-            "transfer": [true, false]
+            "transfer": [true, false],
+            "tiles": [0, 0]
         },
         {
             "mask": "upright/single_tile.png"
