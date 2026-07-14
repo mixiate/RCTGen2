@@ -630,11 +630,6 @@ fn render(
         let track_section_sprite_descs = track_sections
             .into_par_iter()
             .map(|track_section| {
-                let track_section_name = if let Some(suffix) = &track.suffix {
-                    format!("{}_{suffix}", track_section.name)
-                } else {
-                    track_section.name.to_owned()
-                };
                 if let Some(views) = masks.get_views(track_section.name) {
                     let images = render_track_section(
                         &render_device,
@@ -657,6 +652,11 @@ fn render(
                         skip_empty_sprites,
                         &output_directory,
                     )?;
+                    let track_section_name = if let Some(suffix) = &track.suffix {
+                        format!("{}_{suffix}", track_section.name)
+                    } else {
+                        track_section.name.to_owned()
+                    };
                     Ok(TrackSectionSprites {
                         track_name: track.name.clone(),
                         track_section_name,
