@@ -620,7 +620,8 @@ fn render(
         let models = track.models.load(base_directory)?;
         let model_lengths = track_model::ModelLengths::calculate(track, &models);
 
-        let masks = mask::Masks::load(&data_directory.join("masks").join(&track.masks).with_extension("json"))?;
+        let masks_directory = data_directory.join("masks");
+        let masks = mask::Masks::load(&masks_directory.join(&track.masks).with_extension("json"))?;
 
         let output_directory = output_directory.join("track").join(&track.name);
         std::fs::create_dir_all(&output_directory)?;
@@ -631,6 +632,7 @@ fn render(
             .into_par_iter()
             .map(|track_section| {
                 if let Some(views) = masks.get_views(track_section.name) {
+                    let views = views.load(&masks_directory)?;
                     let images = render_track_section(
                         &render_device,
                         &camera,
@@ -641,11 +643,11 @@ fn render(
                         track,
                         track_desc.offsets.as_ref(),
                         track_section,
-                        views,
+                        &views,
                     )?;
                     let sprites = split_track_section(
                         images,
-                        views,
+                        &views,
                         track_desc.dither,
                         track_section,
                         track,

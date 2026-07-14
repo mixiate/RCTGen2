@@ -11,7 +11,7 @@ enum OperationDesc {
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
-struct ViewDesc {
+pub struct ViewDesc {
     mask: std::path::PathBuf,
     #[serde(default)]
     mirror: bool,
@@ -36,23 +36,46 @@ struct ViewDesc {
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 #[serde(untagged)]
-enum ViewsDescType {
+pub enum ViewsDescType {
     Two([ViewDesc; 2]),
     Four([ViewDesc; 4]),
+}
+
+impl ViewsDescType {
+    pub fn load(&self, directory: &std::path::Path) -> anyhow::Result<[View; 4]> {
+        Ok(match self {
+            ViewsDescType::Two(views) => [
+                View::new(&views[0], directory, false)?,
+                View::new(&views[1], directory, false)?,
+                View::new(&views[0], directory, true)?,
+                View::new(&views[1], directory, true)?,
+            ],
+            ViewsDescType::Four(views) => [
+                View::new(&views[0], directory, false)?,
+                View::new(&views[1], directory, false)?,
+                View::new(&views[2], directory, false)?,
+                View::new(&views[3], directory, false)?,
+            ],
+        })
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 #[serde(transparent)]
-struct MasksDesc {
+pub struct Masks {
     track_sections: std::collections::HashMap<String, ViewsDescType>,
 }
 
-impl MasksDesc {
-    fn load(path: &std::path::Path) -> anyhow::Result<MasksDesc> {
+impl Masks {
+    pub fn load(path: &std::path::Path) -> anyhow::Result<Masks> {
         use anyhow::Context as _;
         let json = std::fs::read_to_string(path).with_context(|| format!("Could not read {}", path.display()))?;
-        serde_json::from_str::<MasksDesc>(&json).with_context(|| format!("Could not parse json in {}", path.display()))
+        serde_json::from_str::<Masks>(&json).with_context(|| format!("Could not parse json in {}", path.display()))
+    }
+
+    pub fn get_views(&self, track_section_name: &str) -> Option<&ViewsDescType> {
+        self.track_sections.get(track_section_name)
     }
 }
 
@@ -306,47 +329,6 @@ impl View {
     pub fn sample_secondary(&self, x: i32, y: i32, index: u8) -> bool {
         let (x, y) = self.translate_coords(x, y);
         (self.image.image.get_pixel(x, y) & SECONDARY_INDEX_MASK) >> SECONDARY_INDEX_SHIFT == index
-    }
-}
-
-pub struct Masks {
-    track_sections: std::collections::HashMap<String, [View; 4]>,
-}
-
-impl Masks {
-    pub fn load(path: &std::path::Path) -> anyhow::Result<Masks> {
-        use anyhow::Context as _;
-
-        let directory =
-            path.parent().with_context(|| format!("Could not get parent directory of {}", path.display()))?;
-
-        let desc = MasksDesc::load(path)?;
-
-        let mut track_sections = std::collections::HashMap::new();
-
-        for (name, views) in desc.track_sections {
-            let views = match &views {
-                ViewsDescType::Two(views) => [
-                    View::new(&views[0], directory, false)?,
-                    View::new(&views[1], directory, false)?,
-                    View::new(&views[0], directory, true)?,
-                    View::new(&views[1], directory, true)?,
-                ],
-                ViewsDescType::Four(views) => [
-                    View::new(&views[0], directory, false)?,
-                    View::new(&views[1], directory, false)?,
-                    View::new(&views[2], directory, false)?,
-                    View::new(&views[3], directory, false)?,
-                ],
-            };
-            track_sections.insert(name, views);
-        }
-
-        Ok(Masks { track_sections })
-    }
-
-    pub fn get_views(&self, track_section_name: &str) -> Option<&[View]> {
-        self.track_sections.get(track_section_name).map(|x| x.as_slice())
     }
 }
 
