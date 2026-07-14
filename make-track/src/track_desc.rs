@@ -153,6 +153,7 @@ pub struct Offsets {
     pub steep: [[f32; 2]; 4],
     pub flat_banked: [[f32; 2]; 4],
     pub gentle_banked: [[f32; 2]; 4],
+    pub gentle_banked_right: Option<[[f32; 2]; 4]>,
     pub inverted: [[f32; 2]; 2],
     pub diagonal: [[f32; 2]; 2],
     pub diagonal_gentle: [[f32; 2]; 4],

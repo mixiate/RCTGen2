@@ -4,7 +4,8 @@ pub enum OffsetType {
     Gentle,
     Steep,
     FlatBanked,
-    GentleBanked,
+    GentleBankedLeft,
+    GentleBankedRight,
     Inverted,
     Diagonal,
     DiagonalGentle,
@@ -73,7 +74,11 @@ fn get_offset_type(
         }
     } else if compare_vector(&point.tangent, &GENTLE_TANGENT, rotation) {
         if banked {
-            Some((OffsetType::GentleBanked, banked_right))
+            if banked_right {
+                Some((OffsetType::GentleBankedRight, false))
+            } else {
+                Some((OffsetType::GentleBankedLeft, false))
+            }
         } else {
             Some((OffsetType::Gentle, false))
         }
@@ -146,7 +151,15 @@ fn get_offset(offsets: &crate::track_desc::Offsets, offset_desc: &OffsetDesc, ro
         OffsetType::Gentle => offsets.gentle[offset_index],
         OffsetType::Steep => offsets.steep[offset_index],
         OffsetType::FlatBanked => offsets.flat_banked[offset_index],
-        OffsetType::GentleBanked => offsets.gentle_banked[offset_index],
+        OffsetType::GentleBankedLeft => offsets.gentle_banked[offset_index],
+        OffsetType::GentleBankedRight => {
+            if let Some(gentle_banked_right) = offsets.gentle_banked_right {
+                gentle_banked_right[offset_index]
+            } else {
+                let offset = offsets.gentle_banked[(offset_index + 2) % 4];
+                [-offset[0], offset[1]]
+            }
+        }
         OffsetType::Inverted => get_mirrored_offset(&offsets.inverted, offset_index),
         OffsetType::Diagonal => get_mirrored_offset(&offsets.diagonal, offset_index),
         OffsetType::DiagonalGentle => offsets.diagonal_gentle[offset_index],
