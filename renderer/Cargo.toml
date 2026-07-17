@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.102"
+anyhow = "1.0.103"
 embree = { path = "../embree" }
-glam = "0.32.1"
+glam = "0.33.2"
 obj = "0.10.2"
 png = "0.18.1"
-rand_pcg = "0.10.1"
-rayon = "1.11.0"
+rand_pcg = "0.10.2"
+rayon = "1.12.0"
 
 [lints]
 workspace = true
