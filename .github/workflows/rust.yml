@@ -16,8 +16,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Update Rust
-        run: rustup update
       - name: Check cargo fmt
         run: cargo fmt --check
 
@@ -26,8 +24,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Update Rust
-        run: rustup update
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features
 
@@ -37,8 +33,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-    - name: Update Rust
-      run: rustup update
     - name: Download Embree
       run: gh release download --repo RenderKit/embree v$env:EMBREE_VERSION
       env:
@@ -60,8 +54,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-    - name: Update Rust
-      run: rustup update
     - name: Download Embree
       run: gh release download --repo RenderKit/embree v$EMBREE_VERSION
       env:
@@ -83,8 +75,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
-    - name: Update Rust
-      run: rustup update
     - name: Download Embree
       run: gh release download --repo RenderKit/embree v$EMBREE_VERSION
       env:
