@@ -73,10 +73,8 @@ impl RctGen2App {
     }
 
     fn update_offsets(&self) {
-        if let Some(track_desc) = &self.track_desc
-            && let Some(offsets) = track_desc.offsets
-        {
-            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(offsets)));
+        if let Some(track_desc) = &self.track_desc {
+            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
         }
     }
 
@@ -194,6 +192,7 @@ impl RctGen2App {
                         if ui.button("Remove offsets").clicked() {
                             track_desc.offsets = None;
                             removed_offsets = true;
+                            update_offsets = true;
                         }
                         ui.separator();
                     }
