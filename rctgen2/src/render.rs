@@ -31,7 +31,12 @@ pub enum RenderMessage {
     Exit,
 }
 
-pub type SharedTexture = Arc<Mutex<Option<egui::TextureHandle>>>;
+pub struct Texture {
+    pub handle: egui::TextureHandle,
+    pub offset: glam::IVec2,
+}
+
+pub type SharedTexture = Arc<Mutex<Option<Texture>>>;
 
 struct Track {
     track_desc: make_track::track_desc::Desc,
@@ -126,7 +131,7 @@ fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &Share
         args.samples,
         track.track_desc.edge_distance.unwrap_or(0.088388346),
     );
-    let image = if args.indexed {
+    let (image, offset) = if args.indexed {
         let image = framebuffer.into_indexed_image(args.dither);
         let pixels: Vec<_> = image
             .as_raw()
@@ -140,7 +145,10 @@ fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &Share
                 }
             })
             .collect();
-        renderer::image::Image::from_raw(usize::from(image.width()), usize::from(image.height()), pixels)
+        (
+            renderer::image::Image::from_raw(usize::from(image.width()), usize::from(image.height()), pixels),
+            image.offset,
+        )
     } else {
         framebuffer.to_image()
     };
@@ -149,7 +157,10 @@ fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &Share
     let texture = args.egui_context.load_texture("render", egui_image, egui::TextureOptions::default());
 
     if let Ok(mut render_texture) = render_texture.lock() {
-        *render_texture = Some(texture);
+        *render_texture = Some(Texture {
+            handle: texture,
+            offset,
+        });
     }
 
     args.egui_context.request_repaint();
