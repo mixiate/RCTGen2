@@ -25,7 +25,7 @@ pub struct RenderArgs {
 
 pub enum RenderMessage {
     LoadTrack(Box<LoadTrackArgs>),
-    UpdateOffsets(Box<make_track::track_desc::Offsets>),
+    UpdateOffsets(Box<Option<make_track::track_desc::Offsets>>),
     UpdateModel(UpdateModelArgs),
     Render(RenderArgs),
     Exit,
@@ -196,7 +196,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
                 RenderMessage::UpdateOffsets(offsets) => {
                     current_scene = None;
                     if let Some(track) = current_track.as_mut() {
-                        track.track_desc.offsets = Some(*offsets);
+                        track.track_desc.offsets = *offsets;
                     }
                 }
                 RenderMessage::UpdateModel(args) => {
