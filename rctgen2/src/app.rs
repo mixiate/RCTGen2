@@ -1,4 +1,4 @@
-use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, UpdateModelArgs};
+use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, Texture, UpdateModelArgs};
 use eframe::egui;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -26,7 +26,7 @@ pub struct RctGen2App {
     indexed: bool,
     dither: bool,
     rotation: usize,
-    texture: Option<egui::TextureHandle>,
+    texture: Option<Texture>,
 }
 
 impl RctGen2App {
@@ -394,7 +394,14 @@ impl eframe::App for RctGen2App {
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(34, 33, 39));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
             if let Some(texture) = &self.texture {
-                ui.centered_and_justified(|ui| ui.image((texture.id(), texture.size_vec2())));
+                let texture_size = texture.handle.size_vec2();
+                let image = egui::Image::from_texture((texture.handle.id(), texture_size));
+
+                let image_pos = ui.max_rect().center();
+                let image_pos = image_pos + egui::Vec2::new(texture.offset.x as f32, texture.offset.y as f32);
+                let image_rect = egui::Rect::from_min_size(image_pos, texture_size);
+
+                ui.place(image_rect, image);
             }
         });
 
