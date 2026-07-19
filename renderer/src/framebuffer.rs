@@ -78,6 +78,14 @@ impl Framebuffer {
         found_pixel.then_some([min_x, min_y, max_x, max_y])
     }
 
+    fn offset(&self, min_x: usize, min_y: usize) -> glam::IVec2 {
+        glam::IVec2::new(
+            min_x as i32 + self.offset.x.floor() as i32,
+            // ORIGINAL COMMENT: y - 1 compensates for error not sure why it's needed TODO work out why it's needed
+            min_y as i32 + self.offset.y.floor() as i32 - 1,
+        )
+    }
+
     pub fn to_image(&self) -> crate::image::Image {
         let pixels = self
             .buffer
@@ -98,11 +106,7 @@ impl Framebuffer {
         let [min_x, min_y, max_x, max_y] = *bounds;
         let width = max_x - min_x;
         let height = max_y - min_y;
-        let offset = glam::IVec2::new(
-            min_x as i32 + self.offset.x.floor() as i32,
-            // ORIGINAL COMMENT: y - 1 compensates for error not sure why it's needed TODO work out why it's needed
-            min_y as i32 + self.offset.y.floor() as i32 - 1,
-        );
+        let offset = self.offset(min_x, min_y);
         let mut image =
             crate::image::IndexedImage::with_offset(width.try_into().unwrap(), height.try_into().unwrap(), offset);
 
@@ -165,11 +169,7 @@ impl Framebuffer {
             let [min_x, min_y, max_x, max_y] = bounds;
             let width = max_x - min_x;
             let height = max_y - min_y;
-            let offset = glam::IVec2::new(
-                min_x as i32 + self.offset.x.floor() as i32,
-                // ORIGINAL COMMENT: y - 1 compensates for error not sure why it's needed TODO work out why it's needed
-                min_y as i32 + self.offset.y.floor() as i32 - 1,
-            );
+            let offset = self.offset(min_x, min_y);
             let mut depth_buffer = DepthBuffer::new(width, height, offset);
             for y in min_y..max_y {
                 for x in min_x..max_x {
