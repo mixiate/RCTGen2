@@ -1,3 +1,5 @@
+const MAX_MULTISAMPLES: usize = 4;
+
 #[derive(Clone, Copy)]
 pub struct Light {
     pub diffuse_strength: f32,
@@ -153,7 +155,7 @@ fn sample_point(
         }
     };
 
-    let mut samples = vec![crate::framebuffer::Fragment::default(); multi_samples_x * multi_samples_y];
+    let mut samples = [crate::framebuffer::Fragment::default(); MAX_MULTISAMPLES * MAX_MULTISAMPLES];
 
     for sub_x in 0..multi_samples_x {
         for sub_y in 0..multi_samples_y {
@@ -267,6 +269,9 @@ pub fn render_scene(
 ) -> crate::Framebuffer {
     use rand_pcg::rand_core::SeedableRng as _;
     use rayon::prelude::*;
+
+    let multi_samples_x = std::cmp::min(multi_samples_x, MAX_MULTISAMPLES);
+    let multi_samples_y = std::cmp::min(multi_samples_y, MAX_MULTISAMPLES);
 
     let rng = rand_pcg::Pcg32::seed_from_u64(1);
 
