@@ -12,5 +12,8 @@ make-track = { path = "../make-track" }
 renderer = { path = "../renderer" }
 rfd = "0.17.2"
 
+[build-dependencies]
+winresource = { version = "0.1.31", default-features = false }
+
 [lints]
 workspace = true
