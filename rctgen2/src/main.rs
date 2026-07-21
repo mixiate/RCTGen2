@@ -16,8 +16,11 @@ fn main() -> anyhow::Result<()> {
         std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &render_texture))
     };
 
+    let icon = include_bytes!("../resources/icon.png");
+    let icon = eframe::icon_data::from_png_bytes(icon).expect("Could not load icon");
+
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_min_inner_size([800.0, 600.0]),
+        viewport: egui::ViewportBuilder::default().with_min_inner_size([800.0, 600.0]).with_icon(icon),
         centered: true,
         wgpu_options: egui_wgpu::WgpuConfiguration {
             surface: egui_wgpu::SurfaceConfig {
