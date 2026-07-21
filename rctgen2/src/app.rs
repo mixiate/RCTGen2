@@ -1,4 +1,5 @@
 use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, Texture, UpdateModelArgs};
+use crate::settings;
 use eframe::egui;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -18,6 +19,7 @@ pub struct RctGen2App {
     render_tx: Sender<RenderMessage>,
     render_texture: SharedTexture,
     errors: Vec<String>,
+    settings: settings::AppSettings,
     side_panel_tab: Option<SidePanelTab>,
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
@@ -30,12 +32,18 @@ pub struct RctGen2App {
 }
 
 impl RctGen2App {
-    pub fn new(app_rx: Receiver<AppMessage>, render_tx: Sender<RenderMessage>, render_texture: SharedTexture) -> Self {
+    pub fn new(
+        app_rx: Receiver<AppMessage>,
+        render_tx: Sender<RenderMessage>,
+        render_texture: SharedTexture,
+        config_dir: std::path::PathBuf,
+    ) -> Self {
         Self {
             app_rx,
             render_tx,
             render_texture,
             errors: Vec::new(),
+            settings: settings::AppSettings::new(config_dir),
             side_panel_tab: None,
             track_desc_path: None,
             track_desc: None,
@@ -333,6 +341,11 @@ impl eframe::App for RctGen2App {
                     }
 
                     ui.separator();
+                    if ui.button("Settings").clicked() {
+                        self.settings.window_open = true;
+                    }
+
+                    ui.separator();
 
                     if ui.button("Exit").clicked() {
                         ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
@@ -404,6 +417,10 @@ impl eframe::App for RctGen2App {
                 ui.place(image_rect, image);
             }
         });
+
+        if let Err(error) = self.settings.window(ui) {
+            self.errors.extend(error.chain().map(|x| x.to_string()));
+        }
 
         if !self.errors.is_empty() {
             let modal = egui::containers::modal::Modal::new(egui::Id::new("Error")).show(ui.ctx(), |ui| {
