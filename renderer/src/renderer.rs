@@ -156,6 +156,7 @@ fn sample_point(
     };
 
     let mut samples = [crate::framebuffer::Fragment::default(); MAX_MULTISAMPLES * MAX_MULTISAMPLES];
+    let samples = &mut samples[0..(multi_samples_x * multi_samples_y)];
 
     for sub_x in 0..multi_samples_x {
         for sub_y in 0..multi_samples_y {
