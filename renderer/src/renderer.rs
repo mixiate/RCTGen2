@@ -185,8 +185,6 @@ fn sample_point(
         }
     }
 
-    let samples = samples;
-
     let (closest_sample, min_depth) = {
         let mut closest_sample = None;
         let mut min_depth = f32::INFINITY;
