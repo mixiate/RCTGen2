@@ -1,8 +1,11 @@
 #![windows_subsystem = "windows"]
 
+mod adjacent_track;
 mod app;
+mod drawing;
 mod render;
 mod settings;
+mod sprites;
 
 use eframe::egui;
 use std::sync::{Arc, Mutex};
@@ -18,6 +21,12 @@ fn main() -> anyhow::Result<()> {
         let render_texture = render_texture.clone();
         std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &render_texture))
     };
+
+    let data_directory = std::env::current_exe()?;
+    let data_directory = data_directory
+        .parent()
+        .with_context(|| format!("Could not get parent directory of {}", data_directory.display()))?;
+    let data_directory = data_directory.join("data");
 
     let config_dir = dirs::config_dir().context("Could not get config directory")?.join("RCTGen2");
 
@@ -46,6 +55,7 @@ fn main() -> anyhow::Result<()> {
                 app_rx,
                 render_tx,
                 render_texture,
+                &data_directory,
                 config_dir,
             )))
         }),

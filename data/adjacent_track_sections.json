@@ -1,0 +1,1366 @@
+{
+    "flat": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-32, 0, 0]
+        }
+    ],
+    "flat_to_gentle": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "gentle_to_flat": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "flat",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_to_steep": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 0, 32]
+        }
+    ],
+    "steep_to_gentle": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 32]
+        }
+    ],
+    "steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 0, 64]
+        }
+    ],
+    "steep_to_vertical": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "vertical",
+            "coords": [0, 0, 56]
+        }
+    ],
+    "vertical_to_steep": [
+        {
+            "name": "vertical",
+            "coords": [0, 0, -32]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 0, 56]
+        }
+    ],
+    "vertical": [
+        {
+            "name": "vertical",
+            "coords": [0, 0, -32]
+        },
+        {
+            "name": "vertical",
+            "coords": [0, 0, 32]
+        }
+    ],
+    "small_flat_to_steep": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 0, 24]
+        }
+    ],
+    "small_steep_to_flat": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "flat",
+            "coords": [-32, 0, 24]
+        }
+    ],
+    "flat_to_steep": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "steep",
+            "coords": [-128, 0, 88]
+        }
+    ],
+    "steep_to_flat": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "flat",
+            "coords": [-128, 0, 88]
+        }
+    ],
+    "very_small_turn_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [0, -32, 0],
+            "rotation": 3
+        }
+    ],
+    "small_turn_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-32, -64, 0],
+            "rotation": 3
+        }
+    ],
+    "medium_turn_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-64, -96, 0],
+            "rotation": 3
+        }
+    ],
+    "large_turn_left_to_diag": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat_diag",
+            "coords": [-64, -32, 0],
+            "rotation": 3
+        }
+    ],
+    "large_turn_right_to_diag": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat_diag",
+            "coords": [-64, 32, 0]
+        }
+    ],
+    "flat_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "flat_diag",
+            "coords": [-32, 32, 0]
+        }
+    ],
+    "flat_to_gentle_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "gentle_to_flat_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "flat_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "gentle_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 16]
+        }
+    ],
+    "gentle_to_steep_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "steep_diag",
+            "coords": [-32, 32, 32]
+        }
+    ],
+    "steep_to_gentle_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 32]
+        }
+    ],
+    "steep_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        },
+        {
+            "name": "steep_diag",
+            "coords": [-32, 32, 64]
+        }
+    ],
+    "small_flat_to_steep_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "steep_diag",
+            "coords": [-32, 32, 24]
+        }
+    ],
+    "small_steep_to_flat_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        },
+        {
+            "name": "flat_diag",
+            "coords": [-32, 32, 24]
+        }
+    ],
+    "flat_to_steep_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "steep_diag",
+            "coords": [-96, 96, 88]
+        }
+    ],
+    "steep_to_flat_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        },
+        {
+            "name": "flat_diag",
+            "coords": [-96, 96, 88]
+        }
+    ],
+    "flat_to_left_bank": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 0]
+        }
+    ],
+    "flat_to_right_bank": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 0],
+            "rotation": 2
+        }
+    ],
+    "left_bank_to_gentle": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "right_bank_to_gentle": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_to_left_bank": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_to_right_bank": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 8],
+            "rotation": 2
+        }
+    ],
+    "left_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 0]
+        }
+    ],
+    "small_turn_left_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, -64, 0],
+            "rotation": 3
+        }
+    ],
+    "medium_turn_left_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-64, -96, 0],
+            "rotation": 3
+        }
+    ],
+    "large_turn_left_to_diag_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-64, -32, 0],
+            "rotation": 3
+        }
+    ],
+    "large_turn_right_to_diag_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-96, 64, 0],
+            "rotation": 2
+        }
+    ],
+    "flat_to_left_bank_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-32, 32, 0]
+        }
+    ],
+    "flat_to_right_bank_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-64, 64, 0],
+            "rotation": 2
+        }
+    ],
+    "left_bank_to_gentle_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "right_bank_to_gentle_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [0, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "gentle_to_left_bank_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "gentle_to_right_bank_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-64, 64, 8],
+            "rotation": 2
+        }
+    ],
+    "left_bank_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [32, -32, 0]
+        },
+        {
+            "name": "left_bank_diag",
+            "coords": [-32, 32, 0]
+        }
+    ],
+    "small_turn_left_gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, -64, 32],
+            "rotation": 3
+        }
+    ],
+    "small_turn_right_gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 64, 32],
+            "rotation": 1
+        }
+    ],
+    "medium_turn_left_gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-64, -96, 64],
+            "rotation": 3
+        }
+    ],
+    "medium_turn_right_gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-64, 96, 64],
+            "rotation": 1
+        }
+    ],
+    "large_turn_left_to_diag_gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-64, -32, 48],
+            "rotation": 3
+        }
+    ],
+    "large_turn_right_to_diag_gentle": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_diag",
+            "coords": [-64, 32, 48]
+        }
+    ],
+    "large_turn_left_to_orthogonal_gentle": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-96, 32, 48]
+        }
+    ],
+    "large_turn_right_to_orthogonal_gentle": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 96, 48],
+            "rotation": 1
+        }
+    ],
+    "very_small_turn_left_steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [0, -32, 64],
+            "rotation": 3
+        }
+    ],
+    "very_small_turn_right_steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [0, 32, 64],
+            "rotation": 1
+        }
+    ],
+    "small_turn_left_steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, -64, 128],
+            "rotation": 3
+        }
+    ],
+    "small_turn_right_steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 64, 128],
+            "rotation": 1
+        }
+    ],
+    "large_turn_left_to_diag_steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep_diag",
+            "coords": [-64, -32, 160],
+            "rotation": 3
+        }
+    ],
+    "large_turn_right_to_diag_steep": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "steep_diag",
+            "coords": [-64, 32, 160]
+        }
+    ],
+    "large_turn_left_to_orthogonal_steep": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [-96, 32, 160]
+        }
+    ],
+    "large_turn_right_to_orthogonal_steep": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 96, 160],
+            "rotation": 1
+        }
+    ],
+    "vertical_twist_left": [
+        {
+            "name": "vertical",
+            "coords": [0, 0, -32]
+        },
+        {
+            "name": "vertical",
+            "coords": [0, 0, 96],
+            "rotation": 3
+        }
+    ],
+    "vertical_twist_right": [
+        {
+            "name": "vertical",
+            "coords": [0, 0, -32]
+        },
+        {
+            "name": "vertical",
+            "coords": [0, 0, 96],
+            "rotation": 1
+        }
+    ],
+    "gentle_to_gentle_left_bank": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "gentle_to_gentle_right_bank": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "gentle_left_bank_to_gentle": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "gentle_right_bank_to_gentle": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "left_bank_to_gentle_left_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "right_bank_to_gentle_right_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_left_bank_to_left_bank": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_right_bank_to_right_bank": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 0, 8],
+            "rotation": 2
+        }
+    ],
+    "gentle_left_bank": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "gentle_right_bank": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 0, 16]
+        }
+    ],
+    "flat_to_gentle_left_bank": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "flat_to_gentle_right_bank": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_left_bank_to_flat": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "flat",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_right_bank_to_flat": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "flat",
+            "coords": [-32, 0, 8]
+        }
+    ],
+    "gentle_to_gentle_left_bank_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        }
+    ],
+    "gentle_to_gentle_right_bank_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [32, -32, -16]
+        }
+    ],
+    "gentle_left_bank_to_gentle_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 16]
+        }
+    ],
+    "gentle_right_bank_to_gentle_diag": [
+        {
+            "name": "gentle_diag",
+            "coords": [-32, 32, 16]
+        }
+    ],
+    "left_bank_to_gentle_left_bank_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [32, -32, 0]
+        }
+    ],
+    "right_bank_to_gentle_right_bank_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [0, 0, 0],
+            "rotation": 2
+        }
+    ],
+    "gentle_left_bank_to_left_bank_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "gentle_right_bank_to_right_bank_diag": [
+        {
+            "name": "left_bank_diag",
+            "coords": [-64, 64, 8],
+            "rotation": 2
+        }
+    ],
+    "flat_to_gentle_left_bank_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        }
+    ],
+    "flat_to_gentle_right_bank_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [32, -32, 0]
+        }
+    ],
+    "gentle_left_bank_to_flat_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "gentle_right_bank_to_flat_diag": [
+        {
+            "name": "flat_diag",
+            "coords": [-32, 32, 8]
+        }
+    ],
+    "small_turn_left_bank_gentle": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-32, -64, 32],
+            "rotation": 3
+        }
+    ],
+    "small_turn_right_bank_gentle": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 64, 32],
+            "rotation": 1
+        }
+    ],
+    "medium_turn_left_bank_gentle": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-64, -96, 64],
+            "rotation": 3
+        }
+    ],
+    "medium_turn_right_bank_gentle": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-64, 96, 64],
+            "rotation": 1
+        }
+    ],
+    "large_turn_left_bank_to_diag_gentle": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "large_turn_right_bank_to_diag_gentle": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "large_turn_left_bank_to_orthogonal_gentle": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [-96, 32, 48]
+        }
+    ],
+    "large_turn_right_bank_to_orthogonal_gentle": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 96, 48],
+            "rotation": 1
+        }
+    ],
+    "s_bend_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-96, -32, 0]
+        }
+    ],
+    "s_bend_right": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-96, 32, 0]
+        }
+    ],
+    "s_bend_left_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-96, -32, 0],
+            "rotation": 2
+        }
+    ],
+    "s_bend_right_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "left_bank",
+            "coords": [-96, 32, 0]
+        }
+    ],
+    "small_helix_left": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, -64, 8],
+            "rotation": 3
+        }
+    ],
+    "small_helix_right": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "left_bank",
+            "coords": [-32, 64, 8],
+            "rotation": 3
+        }
+    ],
+    "medium_helix_left": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-64, -96, 8],
+            "rotation": 3
+        }
+    ],
+    "medium_helix_right": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "left_bank",
+            "coords": [-64, 96, 8],
+            "rotation": 3
+        }
+    ],
+    "medium_quarter_helix_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-64, -96, 16],
+            "rotation": 3
+        }
+    ],
+    "medium_quarter_helix_right": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "flat",
+            "coords": [-64, 96, 16],
+            "rotation": 1
+        }
+    ],
+    "medium_quarter_helix_left_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "left_bank",
+            "coords": [-64, -96, 16],
+            "rotation": 3
+        }
+    ],
+    "medium_quarter_helix_right_bank": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "left_bank",
+            "coords": [-64, 96, 16],
+            "rotation": 3
+        }
+    ],
+    "small_turn_left_bank_to_gentle": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, -64, 24],
+            "rotation": 3
+        }
+    ],
+    "small_turn_right_bank_to_gentle": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        },
+        {
+            "name": "gentle",
+            "coords": [-32, 64, 24],
+            "rotation": 1
+        }
+    ],
+    "gentle_left_bank_to_steep": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 0, 32]
+        }
+    ],
+    "gentle_right_bank_to_steep": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        },
+        {
+            "name": "steep",
+            "coords": [-32, 0, 32]
+        }
+    ],
+    "steep_to_gentle_left_bank": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "gentle_left_bank",
+            "coords": [-32, 0, 32]
+        }
+    ],
+    "steep_to_gentle_right_bank": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        },
+        {
+            "name": "gentle_right_bank",
+            "coords": [-32, 0, 32]
+        }
+    ],
+    "gentle_left_bank_to_steep_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [-32, 32, 32]
+        }
+    ],
+    "gentle_right_bank_to_steep_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [-32, 32, 32]
+        }
+    ],
+    "steep_to_gentle_left_bank_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        }
+    ],
+    "steep_to_gentle_right_bank_diag": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        }
+    ],
+    "barrel_roll_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "barrel_roll_right": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "banked_barrel_roll_left": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "banked_barrel_roll_right": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        }
+    ],
+    "inline_twist_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "inline_twist_right": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "banked_inline_twist_left": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "banked_inline_twist_right": [
+        {
+            "name": "left_bank",
+            "coords": [32, 0, 0],
+            "rotation": 2
+        }
+    ],
+    "half_loop": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "vertical_loop_left": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "vertical_loop_right": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "quarter_loop": [
+        {
+            "name": "vertical",
+            "coords": [0, 0, -32]
+        }
+    ],
+    "corkscrew_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "corkscrew_right": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "large_corkscrew_left": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "large_corkscrew_right": [
+        {
+            "name": "flat",
+            "coords": [32, 0, 0]
+        }
+    ],
+    "medium_half_loop_left": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "medium_half_loop_right": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "large_half_loop_left": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "large_half_loop_right": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "zero_g_roll_left": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "zero_g_roll_right": [
+        {
+            "name": "gentle",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "large_zero_g_roll_left": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        }
+    ],
+    "large_zero_g_roll_right": [
+        {
+            "name": "steep",
+            "coords": [32, 0, -64]
+        }
+    ],
+    "banked_zero_g_roll_left": [
+        {
+            "name": "gentle_left_bank",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "banked_zero_g_roll_right": [
+        {
+            "name": "gentle_right_bank",
+            "coords": [32, 0, -16]
+        }
+    ],
+    "dive_loop_45_left": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        }
+    ],
+    "dive_loop_45_right": [
+        {
+            "name": "steep_diag",
+            "coords": [32, -32, -64]
+        }
+    ]
+}

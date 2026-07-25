@@ -20,7 +20,7 @@ impl TrackPoint {
     }
 }
 
-const MAX_TILE_COUNT: usize = 10;
+pub const MAX_TILE_COUNT: usize = 10;
 
 pub struct TrackSection {
     pub name: &'static str,

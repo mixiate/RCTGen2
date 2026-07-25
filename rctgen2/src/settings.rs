@@ -42,9 +42,9 @@ impl AppSettings {
             .with_context(|| format!("Could not save settings: {}", self.settings_file_path.display()))
     }
 
-    pub fn window(&mut self, ui: &mut egui::Ui) -> anyhow::Result<()> {
+    pub fn window(&mut self, ui: &mut egui::Ui) -> bool {
         if !self.window_open {
-            return Ok(());
+            return false;
         }
 
         let mut changed = false;
@@ -78,6 +78,6 @@ impl AppSettings {
                 });
             });
 
-        if changed { self.save() } else { Ok(()) }
+        changed
     }
 }
