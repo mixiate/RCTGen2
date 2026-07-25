@@ -36,7 +36,13 @@ pub struct Texture {
     pub offset: glam::IVec2,
 }
 
-pub type SharedTexture = Arc<Mutex<Option<Texture>>>;
+pub struct TrackTexture {
+    pub texture: Texture,
+    pub track_section_name: &'static str,
+    pub rotation: usize,
+}
+
+pub type SharedTexture = Arc<Mutex<Option<TrackTexture>>>;
 
 struct Track {
     track_desc: make_track::track_desc::Desc,
@@ -104,7 +110,7 @@ fn update_model<'a>(
     Ok(Scene { scene, mesh_types })
 }
 
-fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &SharedTexture) {
+fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Texture {
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
             glam::Vec3::new(32.0, 0.0, 32.0),
@@ -118,15 +124,14 @@ fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &Share
     let camera = camera * view_rotation;
 
     let view_rotation_inverse = view_rotation.inverse();
-    let mut lights = args.lights;
-    for light in &mut lights {
+    for light in &mut args.lights {
         light.direction = view_rotation_inverse.transform_vector3(light.direction).normalize();
     }
     let framebuffer = renderer::render_scene(
         &scene.scene,
         &scene.mesh_types,
         &camera,
-        &lights,
+        &args.lights,
         args.samples,
         args.samples,
         track.track_desc.edge_distance.unwrap_or(0.088388346),
@@ -152,18 +157,13 @@ fn render(track: &Track, scene: &Scene, args: RenderArgs, render_texture: &Share
     } else {
         framebuffer.to_image()
     };
+    let z_offset = track.track_desc.tracks.first().map(|x| x.z_offset).unwrap_or_default();
+    let offset = offset + glam::IVec2::new(0, -z_offset + 16);
 
     let egui_image = egui::ColorImage::from_rgba_unmultiplied([image.width(), image.height()], image.pixels());
-    let texture = args.egui_context.load_texture("render", egui_image, egui::TextureOptions::default());
+    let handle = args.egui_context.load_texture("render", egui_image, egui::TextureOptions::default());
 
-    if let Ok(mut render_texture) = render_texture.lock() {
-        *render_texture = Some(Texture {
-            handle: texture,
-            offset,
-        });
-    }
-
-    args.egui_context.request_repaint();
+    Texture { handle, offset }
 }
 
 fn report_error(tx: &Sender<AppMessage>, error: &anyhow::Error) {
@@ -182,6 +182,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
 
     let mut current_track = None;
     let mut current_scene = None;
+    let mut current_track_section_name = make_track::track_sections::FLAT.name;
 
     let mut messages = Vec::new();
 
@@ -213,7 +214,10 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
                 RenderMessage::UpdateModel(args) => {
                     if let Some(track) = &current_track {
                         match update_model(&args, &render_device, track) {
-                            Ok(scene) => current_scene = Some(scene),
+                            Ok(scene) => {
+                                current_scene = Some(scene);
+                                current_track_section_name = args.track_section.name;
+                            }
                             Err(error) => report_error(app_tx, &error),
                         }
                     }
@@ -223,11 +227,21 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
             }
         }
 
-        if let Some(RenderMessage::Render(args)) = render_message
+        if let Some(RenderMessage::Render(mut args)) = render_message
             && let Some(track) = &current_track
             && let Some(scene) = &current_scene
         {
-            render(track, scene, args, render_texture);
+            let texture = render(track, scene, &mut args);
+
+            if let Ok(mut render_texture) = render_texture.lock() {
+                *render_texture = Some(TrackTexture {
+                    texture,
+                    track_section_name: current_track_section_name,
+                    rotation: args.rotation,
+                });
+            }
+
+            args.egui_context.request_repaint();
             let _result = app_tx.send(AppMessage::NewFrame);
         }
     }
