@@ -1,5 +1,7 @@
-use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, Texture, UpdateModelArgs};
+use crate::adjacent_track;
+use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, TrackTexture, UpdateModelArgs};
 use crate::settings;
+use crate::sprites;
 use eframe::egui;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -20,6 +22,8 @@ pub struct RctGen2App {
     render_texture: SharedTexture,
     errors: Vec<String>,
     settings: settings::AppSettings,
+    adjacent_track_sections: adjacent_track::AdjacentTrackSections,
+    rct2_sprites: Option<sprites::Sprites>,
     side_panel_tab: Option<SidePanelTab>,
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
@@ -27,8 +31,9 @@ pub struct RctGen2App {
     samples: usize,
     indexed: bool,
     dither: bool,
+    show_adjacent_sprites: bool,
     rotation: usize,
-    texture: Option<Texture>,
+    texture: Option<TrackTexture>,
 }
 
 impl RctGen2App {
@@ -36,14 +41,42 @@ impl RctGen2App {
         app_rx: Receiver<AppMessage>,
         render_tx: Sender<RenderMessage>,
         render_texture: SharedTexture,
+        data_directory: &std::path::Path,
         config_dir: std::path::PathBuf,
     ) -> Self {
+        let mut errors = Vec::new();
+
+        let settings = settings::AppSettings::new(config_dir);
+
+        let adjacent_track_sections = data_directory.join("adjacent_track_sections").with_extension("json");
+        let adjacent_track_sections = match adjacent_track::load_adjacent_track_sections(&adjacent_track_sections) {
+            Ok(sections) => sections,
+            Err(error) => {
+                errors.extend(error.chain().map(|x| x.to_string()));
+                Default::default()
+            }
+        };
+
+        let rct2_sprites = if let Some(g1_dat_path) = &settings.settings.g1_dat_path {
+            match sprites::Sprites::try_new(g1_dat_path) {
+                Ok(sprites) => Some(sprites),
+                Err(error) => {
+                    errors.extend(error.chain().map(|x| x.to_string()));
+                    None
+                }
+            }
+        } else {
+            None
+        };
+
         Self {
             app_rx,
             render_tx,
             render_texture,
-            errors: Vec::new(),
-            settings: settings::AppSettings::new(config_dir),
+            errors,
+            settings,
+            adjacent_track_sections,
+            rct2_sprites,
             side_panel_tab: None,
             track_desc_path: None,
             track_desc: None,
@@ -51,6 +84,7 @@ impl RctGen2App {
             samples: 4,
             indexed: true,
             dither: true,
+            show_adjacent_sprites: false,
             rotation: 0,
             texture: None,
         }
@@ -72,6 +106,7 @@ impl RctGen2App {
                 directory,
             })));
             self.update_model();
+            self.texture = None;
             self.dither = track_desc.dither;
             self.track_desc_path = Some(file_path);
             self.track_desc = Some(track_desc);
@@ -360,6 +395,7 @@ impl eframe::App for RctGen2App {
                 if ui.checkbox(&mut self.dither, "Dithered").changed() {
                     queue_render = true;
                 }
+                ui.checkbox(&mut self.show_adjacent_sprites, "Adjacent Sprites");
 
                 egui::ComboBox::from_id_salt("Track section")
                     .selected_text(self.track_section.name)
@@ -406,20 +442,30 @@ impl eframe::App for RctGen2App {
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(34, 33, 39));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
-            if let Some(texture) = &self.texture {
-                let texture_size = texture.handle.size_vec2();
-                let image = egui::Image::from_texture((texture.handle.id(), texture_size));
-
-                let image_pos = ui.max_rect().center();
-                let image_pos = image_pos + egui::Vec2::new(texture.offset.x as f32, texture.offset.y as f32);
-                let image_rect = egui::Rect::from_min_size(image_pos, texture_size);
-
-                ui.place(image_rect, image);
+            if let Some(track_desc) = &self.track_desc
+                && let Some(texture) = &self.texture
+            {
+                crate::drawing::draw(
+                    track_desc,
+                    texture,
+                    self.show_adjacent_sprites,
+                    &self.adjacent_track_sections,
+                    self.rct2_sprites.as_mut(),
+                    ui,
+                );
             }
         });
 
-        if let Err(error) = self.settings.window(ui) {
-            self.errors.extend(error.chain().map(|x| x.to_string()));
+        if self.settings.window(ui) {
+            if let Some(g1_dat_path) = &self.settings.settings.g1_dat_path {
+                match sprites::Sprites::try_new(g1_dat_path) {
+                    Ok(sprites) => self.rct2_sprites = Some(sprites),
+                    Err(error) => self.errors.extend(error.chain().map(|x| x.to_string())),
+                }
+            }
+            if let Err(error) = self.settings.save() {
+                self.errors.extend(error.chain().map(|x| x.to_string()));
+            }
         }
 
         if !self.errors.is_empty() {

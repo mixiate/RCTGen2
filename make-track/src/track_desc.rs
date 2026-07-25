@@ -190,6 +190,16 @@ pub struct Light {
 }
 
 #[serde_with::skip_serializing_none]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Sprite {
+    pub index: u32,
+    pub offset: Option<[i16; 3]>,
+}
+
+pub type TrackSectionSprites = [heapless::Vec<heapless::Vec<Sprite, 2>, { crate::track_sections::MAX_TILE_COUNT }>; 4];
+
+#[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Desc {
@@ -199,6 +209,8 @@ pub struct Desc {
     #[serde(default = "bool_true", skip_serializing_if = "Clone::clone")]
     pub dither: bool,
     pub edge_distance: Option<f32>,
+    #[serde(default, skip_serializing_if = "indexmap::IndexMap::is_empty")]
+    pub original_sprites: indexmap::IndexMap<String, TrackSectionSprites>,
 }
 
 impl Desc {
