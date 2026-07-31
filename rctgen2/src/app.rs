@@ -136,124 +136,24 @@ impl RctGen2App {
         }
     }
 
-    fn draw_offsets_panel(&mut self, ui: &mut egui::Ui) {
-        let mut removed_offsets = false;
-        let mut update_offsets = false;
-
-        if let Some(track_desc) = self.track_desc.as_mut() {
-            egui::Panel::right("Offsets").resizable(false).show(ui, |ui| {
-                ui.vertical_centered(|ui| {
-                    if track_desc.offsets.is_some() {
-                        if ui.button("Remove offsets").clicked() {
-                            track_desc.offsets = None;
-                            removed_offsets = true;
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                    }
-                });
-                if let Some(offsets) = track_desc.offsets.as_mut() {
-                    let mut remove_gentle_banked_right = false;
-
-                    ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
-                    let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
-                    egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
-                        if offsets_widget(ui, "Flat", &mut offsets.flat) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Gentle", &mut offsets.gentle) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Steep", &mut offsets.steep) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Flat Banked", &mut offsets.flat_banked) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if let Some(gentle_banked_right) = offsets.gentle_banked_right.as_mut() {
-                            if offsets_widget(ui, "Gentle Banked Left", &mut offsets.gentle_banked) {
-                                update_offsets = true;
-                            }
-                            ui.separator();
-                            if offsets_widget(ui, "Gentle Banked Right", gentle_banked_right) {
-                                update_offsets = true;
-                            }
-                            ui.vertical_centered(|ui| {
-                                if ui.button("Remove Gentle Banked Right").clicked() {
-                                    remove_gentle_banked_right = true;
-                                }
-                            });
-                        } else {
-                            if offsets_widget(ui, "Gentle Banked", &mut offsets.gentle_banked) {
-                                update_offsets = true;
-                            }
-                            ui.separator();
-                            ui.vertical_centered(|ui| {
-                                if ui.button("Add Gentle Banked Right").clicked() {
-                                    offsets.gentle_banked_right = Some(Default::default());
-                                }
-                            });
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Inverted", &mut offsets.inverted) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Diagonal", &mut offsets.diagonal) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Diagonal Gentle", &mut offsets.diagonal_gentle) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Diagonal Steep", &mut offsets.diagonal_steep) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Diagonal Banked", &mut offsets.diagonal_banked) {
-                            update_offsets = true;
-                        }
-                        ui.separator();
-                        if offsets_widget(ui, "Vertical", &mut offsets.vertical) {
-                            update_offsets = true;
-                        }
-                    });
-                    if remove_gentle_banked_right {
-                        offsets.gentle_banked_right = None;
-                    }
-                } else if !removed_offsets {
-                    ui.vertical_centered(|ui| {
-                        if ui.button("Add offsets").clicked() {
-                            track_desc.offsets = Some(make_track::track_desc::Offsets::default());
-                        }
-                    });
-                }
-            });
-        }
-
-        if update_offsets {
-            self.update_offsets();
-            self.update_model();
-            self.queue_render(ui.ctx().clone());
-        }
-    }
-
     fn draw_side_panel(&mut self, ui: &mut egui::Ui) {
-        match self.side_panel_tab {
-            Some(panels::SidePanelTab::Lights) => {
-                if let Some(track_desc) = self.track_desc.as_mut()
-                    && panels::lights::lights_panel(track_desc, ui)
-                {
-                    self.queue_render(ui.ctx().clone());
+        if let Some(track_desc) = self.track_desc.as_mut() {
+            match self.side_panel_tab {
+                Some(panels::SidePanelTab::Lights) => {
+                    if panels::lights::lights_panel(track_desc, ui) {
+                        self.queue_render(ui.ctx().clone());
+                    }
                 }
+                Some(panels::SidePanelTab::Offsets) => {
+                    let offsets_changed = panels::offsets::offsets_panel(&mut track_desc.offsets, ui);
+                    if offsets_changed {
+                        self.update_offsets();
+                        self.update_model();
+                        self.queue_render(ui.ctx().clone());
+                    }
+                }
+                None => {}
             }
-            Some(panels::SidePanelTab::Offsets) => self.draw_offsets_panel(ui),
-            None => {}
         }
     }
 }
@@ -439,22 +339,6 @@ pub fn drag_value(
         });
 
         ui.label(label);
-    });
-    changed
-}
-
-fn offsets_widget(ui: &mut egui::Ui, name: &str, offsets: &mut [[f32; 2]]) -> bool {
-    let mut changed = false;
-    ui.label(name);
-    ui.columns_const(|[col_0, col_1]| {
-        for offset in offsets.iter_mut() {
-            if drag_value(col_0, &mut offset[0], "X", None) {
-                changed = true;
-            }
-            if drag_value(col_1, &mut offset[1], "Y", None) {
-                changed = true;
-            }
-        }
     });
     changed
 }
