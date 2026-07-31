@@ -140,7 +140,8 @@ impl RctGen2App {
         if let Some(track_desc) = self.track_desc.as_mut() {
             match self.side_panel_tab {
                 Some(panels::SidePanelTab::Lights) => {
-                    if panels::lights::lights_panel(track_desc, ui) {
+                    let lights_changed = panels::lights::lights_panel(&mut track_desc.lights, ui);
+                    if lights_changed {
                         self.queue_render(ui.ctx().clone());
                     }
                 }
