@@ -1,4 +1,5 @@
 use crate::adjacent_track;
+use crate::panels;
 use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, TrackTexture, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
@@ -10,12 +11,6 @@ pub enum AppMessage {
     Error(Vec<String>),
 }
 
-#[derive(Clone, Copy, PartialEq)]
-enum SidePanelTab {
-    Lights,
-    Offsets,
-}
-
 pub struct RctGen2App {
     app_rx: Receiver<AppMessage>,
     render_tx: Sender<RenderMessage>,
@@ -24,7 +19,7 @@ pub struct RctGen2App {
     settings: settings::AppSettings,
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
     rct2_sprites: Option<sprites::Sprites>,
-    side_panel_tab: Option<SidePanelTab>,
+    side_panel_tab: Option<panels::SidePanelTab>,
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
@@ -141,89 +136,6 @@ impl RctGen2App {
         }
     }
 
-    fn draw_lights_panel(&mut self, ui: &mut egui::Ui) {
-        let mut queue_render = false;
-        if let Some(track_desc) = self.track_desc.as_mut() {
-            egui::Panel::right("Lights").resizable(false).show(ui, |ui| {
-                let mut deleted_index = None;
-                ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
-                let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
-                egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
-                    for (i, light) in track_desc.lights.iter_mut().enumerate() {
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                            ui.scope(|ui| {
-                                ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-                                if ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked() {
-                                    deleted_index = Some(i);
-                                    queue_render = true;
-                                }
-                            });
-
-                            if inverted_checkbox(ui, &mut light.disabled) {
-                                queue_render = true;
-                            }
-                        });
-                        ui.columns_const(|[col_0, col_1]| {
-                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.direction[0], "X", None) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.direction[1], "Y", None) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.direction[2], "Z", None) {
-                                    queue_render = true;
-                                }
-                            });
-
-                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                if drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
-                                    queue_render = true;
-                                }
-                            });
-                            col_1.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                                if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
-                                    queue_render = true;
-                                }
-                            });
-                        });
-
-                        ui.separator();
-                    }
-                    ui.vertical_centered(|ui| {
-                        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-                        if ui.add(egui::Button::new("Add light").fill(egui::Color32::LIGHT_GREEN)).clicked() {
-                            track_desc.lights.push(make_track::track_desc::Light {
-                                direction: [1.0, 0.5, 1.0],
-                                diffuse_strength: 1.0,
-                                specular_strength: 1.0,
-                                shadow: true,
-                                disabled: false,
-                            });
-                            queue_render = true;
-                        }
-                    });
-                });
-                if let Some(i) = deleted_index {
-                    track_desc.lights.remove(i);
-                    queue_render = true;
-                }
-            });
-        }
-        if queue_render {
-            self.queue_render(ui.ctx().clone());
-        }
-    }
-
     fn draw_offsets_panel(&mut self, ui: &mut egui::Ui) {
         let mut removed_offsets = false;
         let mut update_offsets = false;
@@ -333,8 +245,14 @@ impl RctGen2App {
 
     fn draw_side_panel(&mut self, ui: &mut egui::Ui) {
         match self.side_panel_tab {
-            Some(SidePanelTab::Lights) => self.draw_lights_panel(ui),
-            Some(SidePanelTab::Offsets) => self.draw_offsets_panel(ui),
+            Some(panels::SidePanelTab::Lights) => {
+                if let Some(track_desc) = self.track_desc.as_mut()
+                    && panels::lights::lights_panel(track_desc, ui)
+                {
+                    self.queue_render(ui.ctx().clone());
+                }
+            }
+            Some(panels::SidePanelTab::Offsets) => self.draw_offsets_panel(ui),
             None => {}
         }
     }
@@ -422,7 +340,7 @@ impl eframe::App for RctGen2App {
             });
         });
 
-        side_panel_tabs(ui, &mut self.side_panel_tab);
+        panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
         self.draw_side_panel(ui);
 
@@ -493,7 +411,12 @@ impl eframe::App for RctGen2App {
     }
 }
 
-fn drag_value(ui: &mut egui::Ui, value: &mut f32, label: &str, range: Option<core::ops::RangeInclusive<f32>>) -> bool {
+pub fn drag_value(
+    ui: &mut egui::Ui,
+    value: &mut f32,
+    label: &str,
+    range: Option<core::ops::RangeInclusive<f32>>,
+) -> bool {
     let mut changed = false;
     ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
         ui.scope(|ui| {
@@ -520,16 +443,6 @@ fn drag_value(ui: &mut egui::Ui, value: &mut f32, label: &str, range: Option<cor
     changed
 }
 
-fn inverted_checkbox(ui: &mut egui::Ui, value: &mut bool) -> bool {
-    let mut inverse_value = !(*value);
-    if ui.checkbox(&mut inverse_value, "Enabled").clicked() {
-        *value = !inverse_value;
-        true
-    } else {
-        false
-    }
-}
-
 fn offsets_widget(ui: &mut egui::Ui, name: &str, offsets: &mut [[f32; 2]]) -> bool {
     let mut changed = false;
     ui.label(name);
@@ -544,36 +457,4 @@ fn offsets_widget(ui: &mut egui::Ui, name: &str, offsets: &mut [[f32; 2]]) -> bo
         }
     });
     changed
-}
-
-fn side_panel_tab(ui: &mut egui::Ui, text: &str, selected_tab: &mut Option<SidePanelTab>, tab: SidePanelTab) {
-    let selected = *selected_tab == Some(tab);
-    if ui
-        .add_sized(
-            [40.0, 40.0],
-            egui::Button::new(egui::RichText::new(text).size(25.0)).selected(selected).corner_radius(0.0),
-        )
-        .clicked()
-    {
-        if selected {
-            *selected_tab = None;
-        } else {
-            *selected_tab = Some(tab);
-        }
-    }
-}
-
-fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab>) {
-    let mut frame = egui::Frame::side_top_panel(ui.style());
-    frame.inner_margin = egui::Margin::ZERO;
-
-    egui::Panel::right("SidePanelTabs").resizable(false).exact_size(40.0).frame(frame).show(ui, |ui| {
-        egui::MenuBar::new().ui(ui, |ui| {
-            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
-                ui.style_mut().spacing.item_spacing = egui::vec2(0.0, 0.0);
-                side_panel_tab(ui, "💡", selected_tab, SidePanelTab::Lights);
-                side_panel_tab(ui, "↔", selected_tab, SidePanelTab::Offsets);
-            });
-        });
-    });
 }
