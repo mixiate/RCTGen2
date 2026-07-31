@@ -11,14 +11,14 @@ fn inverted_checkbox(ui: &mut egui::Ui, value: &mut bool) -> bool {
     }
 }
 
-pub fn lights_panel(track_desc: &mut make_track::track_desc::Desc, ui: &mut egui::Ui) -> bool {
+pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut egui::Ui) -> bool {
     let mut queue_render = false;
     egui::Panel::right("Lights").resizable(false).show(ui, |ui| {
         let mut deleted_index = None;
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
         egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
-            for (i, light) in track_desc.lights.iter_mut().enumerate() {
+            for (i, light) in lights.iter_mut().enumerate() {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
                     ui.scope(|ui| {
                         ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
@@ -71,7 +71,7 @@ pub fn lights_panel(track_desc: &mut make_track::track_desc::Desc, ui: &mut egui
             ui.vertical_centered(|ui| {
                 ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
                 if ui.add(egui::Button::new("Add light").fill(egui::Color32::LIGHT_GREEN)).clicked() {
-                    track_desc.lights.push(make_track::track_desc::Light {
+                    lights.push(make_track::track_desc::Light {
                         direction: [1.0, 0.5, 1.0],
                         diffuse_strength: 1.0,
                         specular_strength: 1.0,
@@ -83,7 +83,7 @@ pub fn lights_panel(track_desc: &mut make_track::track_desc::Desc, ui: &mut egui
             });
         });
         if let Some(i) = deleted_index {
-            track_desc.lights.remove(i);
+            lights.remove(i);
             queue_render = true;
         }
     });
