@@ -75,7 +75,7 @@ fn draw_adjacent_track_section(
             let tile_coords = rotate_coords(tile_coords, (*rotation).into());
             let coords = rotate_coords(&add_coords(coords, &tile_coords), main_sprite.rotation);
             for sprite in sprites {
-                let coords = add_coords(&coords, &sprite.offset.unwrap_or([0; 3]));
+                let coords = add_coords(&coords, &sprite.offset);
                 if !compare_coords(&coords, draw_order) {
                     continue;
                 }

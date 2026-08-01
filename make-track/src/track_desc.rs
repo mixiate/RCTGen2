@@ -189,12 +189,16 @@ pub struct Light {
     pub disabled: bool,
 }
 
-#[serde_with::skip_serializing_none]
+fn is_default_offset(offset: &[i16; 3]) -> bool {
+    *offset == [0; 3]
+}
+
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Sprite {
     pub index: u32,
-    pub offset: Option<[i16; 3]>,
+    #[serde(default, skip_serializing_if = "is_default_offset")]
+    pub offset: [i16; 3],
 }
 
 pub type TrackSectionSprites = [heapless::Vec<heapless::Vec<Sprite, 2>, { crate::track_sections::MAX_TILE_COUNT }>; 4];
