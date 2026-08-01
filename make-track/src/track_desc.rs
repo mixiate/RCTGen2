@@ -193,7 +193,7 @@ fn is_default_offset(offset: &[i16; 3]) -> bool {
     *offset == [0; 3]
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Sprite {
     pub index: u32,
