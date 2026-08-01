@@ -1,4 +1,5 @@
 use crate::adjacent_track;
+use crate::modals;
 use crate::panels;
 use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, TrackTexture, UpdateModelArgs};
 use crate::settings;
@@ -20,6 +21,7 @@ pub struct RctGen2App {
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
     rct2_sprites: Option<sprites::Sprites>,
     side_panel_tab: Option<panels::SidePanelTab>,
+    sprites_track_selection_modal: modals::TrackSectionSelectionModal,
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
@@ -73,6 +75,7 @@ impl RctGen2App {
             adjacent_track_sections,
             rct2_sprites,
             side_panel_tab: None,
+            sprites_track_selection_modal: modals::TrackSectionSelectionModal::new(),
             track_desc_path: None,
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
@@ -152,6 +155,13 @@ impl RctGen2App {
                         self.update_model();
                         self.queue_render(ui.ctx().clone());
                     }
+                }
+                Some(panels::SidePanelTab::Sprites) => {
+                    panels::sprites::sprites_panel(
+                        &mut track_desc.original_sprites,
+                        &mut self.sprites_track_selection_modal,
+                        ui,
+                    );
                 }
                 None => {}
             }
