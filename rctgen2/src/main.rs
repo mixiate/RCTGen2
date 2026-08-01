@@ -3,6 +3,7 @@
 mod adjacent_track;
 mod app;
 mod drawing;
+mod modals;
 mod panels;
 mod render;
 mod settings;

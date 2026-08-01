@@ -1,0 +1,185 @@
+use crate::modals;
+use eframe::egui;
+use egui::containers::scroll_area::ScrollBarVisibility;
+use make_track::track_desc::TrackSectionSprites;
+use make_track::track_sections::TRACK_SECTIONS;
+
+fn remove_button(ui: &mut egui::Ui) -> bool {
+    let mut clicked = false;
+    ui.scope(|ui| {
+        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
+        clicked = ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked();
+    });
+    clicked
+}
+
+fn add_button(ui: &mut egui::Ui) -> bool {
+    let mut clicked = false;
+    ui.scope(|ui| {
+        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
+        clicked = ui.add(egui::Button::new("➕").fill(egui::Color32::LIGHT_GREEN)).clicked();
+    });
+    clicked
+}
+
+fn sprite_widgets(sprite: &mut make_track::track_desc::Sprite, ui: &mut egui::Ui) -> bool {
+    let button_height = ui.style().spacing.interact_size.y;
+    ui.add_sized(
+        [75.0, button_height],
+        egui::DragValue::new(&mut sprite.index).speed(0.0).update_while_editing(false),
+    );
+    ui.add(egui::DragValue::new(&mut sprite.offset[0]).speed(0.05));
+    ui.add(egui::DragValue::new(&mut sprite.offset[1]).speed(0.05));
+    ui.add(egui::DragValue::new(&mut sprite.offset[2]).speed(0.05));
+
+    remove_button(ui)
+}
+
+fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, ui: &mut egui::Ui) {
+    ui.vertical(|ui| {
+        let sprites_is_full = sprites.is_full();
+        let sprites_len = sprites.len();
+
+        let mut add_sprite = false;
+        let mut removed_index = None;
+
+        for (sprite_index, sprite) in sprites.iter_mut().enumerate() {
+            ui.horizontal(|ui| {
+                if sprite_widgets(sprite, ui) {
+                    removed_index = Some(sprite_index);
+                }
+                if !sprites_is_full && sprites_len - 1 == sprite_index && add_button(ui) {
+                    add_sprite = true;
+                }
+            });
+            ui.end_row();
+        }
+
+        if sprites.is_empty() && add_button(ui) {
+            add_sprite = true;
+        }
+
+        if add_sprite {
+            let _ignore_full = sprites.push(make_track::track_desc::Sprite::default());
+        }
+        if let Some(removed_index) = removed_index {
+            sprites.remove(removed_index);
+        }
+    });
+}
+
+fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) {
+    for (view_index, view) in sprites.iter_mut().enumerate() {
+        if view_index != 0 {
+            ui.separator();
+        }
+
+        for (tile_index, sprites) in view.iter_mut().enumerate() {
+            ui.horizontal(|ui| {
+                let tile_label = match tile_index {
+                    0 => "0:",
+                    1 => "1:",
+                    2 => "2:",
+                    3 => "3:",
+                    4 => "4:",
+                    5 => "5:",
+                    6 => "6:",
+                    7 => "7:",
+                    8 => "8:",
+                    9 => "9:",
+                    _ => "",
+                };
+                ui.label(tile_label);
+
+                sprites_grid(sprites, ui);
+            });
+        }
+    }
+}
+
+pub fn sprites_panel(
+    sprites: &mut indexmap::IndexMap<String, TrackSectionSprites>,
+    track_section_selection_modal: &mut modals::TrackSectionSelectionModal,
+    ui: &mut egui::Ui,
+) {
+    egui::Panel::right("Sprites side panel").resizable(false).min_size(340.0).show(ui, |ui| {
+        ui.vertical_centered(|ui| {
+            if ui.button("Add piece").clicked() {
+                track_section_selection_modal.open();
+            }
+        });
+        ui.separator();
+
+        let mut removed_track_section_index = None;
+
+        ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
+
+        egui::ScrollArea::vertical()
+            .scroll_bar_visibility(ScrollBarVisibility::AlwaysVisible)
+            .show(ui, |ui| {
+                for (index, (track_section_name, sprites)) in sprites.iter_mut().enumerate() {
+                    let id = ui.make_persistent_id(track_section_name);
+                    let mut label_clicked = false;
+
+                    let mut header =
+                        egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, false)
+                            .show_header(ui, |ui| {
+                                ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
+                                    let label = egui::Label::new(track_section_name)
+                                        .selectable(false)
+                                        .sense(egui::Sense::click());
+                                    if ui.add(label).clicked() {
+                                        label_clicked = true;
+                                    }
+
+                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                                        if remove_button(ui) {
+                                            removed_track_section_index = Some(index);
+                                        }
+                                    });
+                                });
+                            });
+
+                    if label_clicked {
+                        header.set_open(!header.is_open());
+                    }
+
+                    header.body(|ui| {
+                        track_section_body(sprites, ui);
+                    });
+                }
+            });
+
+        if let Some(index) = removed_track_section_index {
+            sprites.shift_remove_index(index);
+        }
+    });
+
+    if let Some(track_section) = track_section_selection_modal.draw(ui) {
+        add_track_section(sprites, track_section);
+    }
+}
+
+fn add_track_section(
+    sprites: &mut indexmap::IndexMap<String, TrackSectionSprites>,
+    track_section: &make_track::track_sections::TrackSection,
+) {
+    let name = track_section.name.to_string();
+    if let indexmap::map::Entry::Vacant(entry) = sprites.entry(name) {
+        let mut view = heapless::Vec::new();
+        let _ignore_result = view.resize_default(track_section.tiles.len());
+        let sprites = [view.clone(), view.clone(), view.clone(), view];
+
+        entry.insert_sorted_by(sprites, |key_a, _, key_b, _| {
+            let a_index = TRACK_SECTIONS.iter().position(|x| x.name == key_a);
+            let b_index = TRACK_SECTIONS.iter().position(|x| x.name == key_b);
+            if let Some(a_index) = a_index
+                && let Some(b_index) = b_index
+            {
+                a_index.cmp(&b_index)
+            } else {
+                std::cmp::Ordering::Less
+            }
+        });
+    }
+}
