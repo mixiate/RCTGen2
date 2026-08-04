@@ -29,6 +29,7 @@ pub struct RctGen2App {
     indexed: bool,
     dither: bool,
     show_adjacent_sprites: bool,
+    show_original_piece: bool,
     rotation: usize,
     texture: Option<TrackTexture>,
 }
@@ -83,6 +84,7 @@ impl RctGen2App {
             indexed: true,
             dither: true,
             show_adjacent_sprites: false,
+            show_original_piece: false,
             rotation: 0,
             texture: None,
         }
@@ -224,7 +226,17 @@ impl eframe::App for RctGen2App {
                 if ui.checkbox(&mut self.dither, "Dithered").changed() {
                     queue_render = true;
                 }
-                ui.checkbox(&mut self.show_adjacent_sprites, "Adjacent Sprites");
+
+                let show_original_piece_enabled = if let Some(track_desc) = &self.track_desc {
+                    track_desc.original_sprites.contains_key(self.track_section.name)
+                } else {
+                    true
+                };
+                ui.add_enabled(
+                    show_original_piece_enabled,
+                    egui::Checkbox::new(&mut self.show_original_piece, "Original"),
+                );
+                ui.checkbox(&mut self.show_adjacent_sprites, "Adjacent");
 
                 egui::ComboBox::from_id_salt("Track section")
                     .selected_text(self.track_section.name)
@@ -278,6 +290,7 @@ impl eframe::App for RctGen2App {
                     track_desc,
                     texture,
                     self.show_adjacent_sprites,
+                    self.show_original_piece,
                     &self.adjacent_track_sections,
                     self.rct2_sprites.as_mut(),
                     ui,
