@@ -95,7 +95,7 @@ fn draw_with_adjacent_sprites(
     ui: &mut egui::Ui,
 ) {
     let adjacent_sections = adjacent_track::list_track_sections(
-        main_sprite.track_section_name,
+        main_sprite.track_section.name,
         adjacent_track_sections,
         track_desc_sprites,
     );
