@@ -38,7 +38,7 @@ pub struct Texture {
 
 pub struct TrackTexture {
     pub texture: Texture,
-    pub track_section_name: &'static str,
+    pub track_section: &'static make_track::track_sections::TrackSection,
     pub rotation: usize,
 }
 
@@ -182,7 +182,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
 
     let mut current_track = None;
     let mut current_scene = None;
-    let mut current_track_section_name = make_track::track_sections::FLAT.name;
+    let mut current_track_section = &make_track::track_sections::FLAT;
 
     let mut messages = Vec::new();
 
@@ -216,7 +216,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
                         match update_model(&args, &render_device, track) {
                             Ok(scene) => {
                                 current_scene = Some(scene);
-                                current_track_section_name = args.track_section.name;
+                                current_track_section = args.track_section;
                             }
                             Err(error) => report_error(app_tx, &error),
                         }
@@ -236,7 +236,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
             if let Ok(mut render_texture) = render_texture.lock() {
                 *render_texture = Some(TrackTexture {
                     texture,
-                    track_section_name: current_track_section_name,
+                    track_section: current_track_section,
                     rotation: args.rotation,
                 });
             }
