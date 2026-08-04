@@ -87,11 +87,30 @@ fn draw_adjacent_track_section(
     }
 }
 
+fn draw_original_track_section(
+    track_section: &make_track::track_sections::TrackSection,
+    rotation: usize,
+    original_sprites: &mut sprites::Sprites,
+    track_desc_sprites: &TrackSectionSprites,
+    ui: &mut egui::Ui,
+) {
+    for (tile_coords, sprites) in track_section.tiles.iter().zip(track_desc_sprites[rotation].iter()) {
+        let coords = rotate_coords(tile_coords, rotation);
+        for sprite in sprites {
+            let coords = add_coords(&coords, &sprite.offset);
+            if let Some(texture) = original_sprites.get_sprite(sprite.index, ui.ctx()) {
+                draw_sprite(ui, texture, &coords);
+            }
+        }
+    }
+}
+
 fn draw_with_adjacent_sprites(
     main_sprite: &TrackTexture,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     original_sprites: &mut sprites::Sprites,
     track_desc_sprites: &indexmap::IndexMap<String, TrackSectionSprites>,
+    show_original_piece: bool,
     ui: &mut egui::Ui,
 ) {
     let adjacent_sections = adjacent_track::list_track_sections(
@@ -101,7 +120,17 @@ fn draw_with_adjacent_sprites(
     );
 
     draw_adjacent_track_section(main_sprite, original_sprites, &adjacent_sections, DrawOrder::Before, ui);
-    draw_sprite(ui, &main_sprite.texture, &[0; 3]);
+    if show_original_piece && let Some(sprites) = track_desc_sprites.get(main_sprite.track_section.name) {
+        draw_original_track_section(
+            main_sprite.track_section,
+            main_sprite.rotation,
+            original_sprites,
+            sprites,
+            ui,
+        );
+    } else {
+        draw_sprite(ui, &main_sprite.texture, &[0; 3]);
+    }
     draw_adjacent_track_section(main_sprite, original_sprites, &adjacent_sections, DrawOrder::After, ui);
 }
 
@@ -109,6 +138,7 @@ pub fn draw(
     track_desc: &track_desc::Desc,
     main_sprite: &TrackTexture,
     show_adjacent_sprites: bool,
+    show_original_piece: bool,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     original_sprites: Option<&mut sprites::Sprites>,
     ui: &mut egui::Ui,
@@ -119,6 +149,18 @@ pub fn draw(
             adjacent_track_sections,
             original_sprites,
             &track_desc.original_sprites,
+            show_original_piece,
+            ui,
+        );
+    } else if show_original_piece
+        && let Some(original_sprites) = original_sprites
+        && let Some(sprites) = track_desc.original_sprites.get(main_sprite.track_section.name)
+    {
+        draw_original_track_section(
+            main_sprite.track_section,
+            main_sprite.rotation,
+            original_sprites,
+            sprites,
             ui,
         );
     } else {
