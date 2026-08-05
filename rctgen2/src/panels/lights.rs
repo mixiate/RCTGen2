@@ -32,38 +32,32 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
                         queue_render = true;
                     }
                 });
-                ui.columns_const(|[col_0, col_1]| {
-                    col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if widgets::drag_value(ui, &mut light.direction[0], "X", None) {
-                            queue_render = true;
-                        }
-                    });
-                    col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if widgets::drag_value(ui, &mut light.direction[1], "Y", None) {
-                            queue_render = true;
-                        }
-                    });
-                    col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if widgets::drag_value(ui, &mut light.direction[2], "Z", None) {
-                            queue_render = true;
-                        }
-                    });
+                egui::Grid::new("Lights grid").show(ui, |ui| {
+                    if widgets::drag_value(ui, &mut light.direction[0], "X", None) {
+                        queue_render = true;
+                    }
+                    if widgets::drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
+                        queue_render = true;
+                    }
+                    ui.end_row();
 
-                    col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if widgets::drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
-                            queue_render = true;
-                        }
-                    });
-                    col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if widgets::drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
-                            queue_render = true;
-                        }
-                    });
-                    col_1.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                    if widgets::drag_value(ui, &mut light.direction[1], "Y", None) {
+                        queue_render = true;
+                    }
+                    if widgets::drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
+                        queue_render = true;
+                    }
+                    ui.end_row();
+
+                    if widgets::drag_value(ui, &mut light.direction[2], "Z", None) {
+                        queue_render = true;
+                    }
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
                         if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
                             queue_render = true;
                         }
                     });
+                    ui.end_row();
                 });
 
                 ui.separator();
