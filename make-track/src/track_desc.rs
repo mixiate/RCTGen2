@@ -161,6 +161,7 @@ impl Track {
     }
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Offsets {
