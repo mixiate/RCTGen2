@@ -1,4 +1,4 @@
-use crate::app::drag_value;
+use crate::widgets;
 use eframe::egui;
 
 fn inverted_checkbox(ui: &mut egui::Ui, value: &mut bool) -> bool {
@@ -34,28 +34,28 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
                 });
                 ui.columns_const(|[col_0, col_1]| {
                     col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if drag_value(ui, &mut light.direction[0], "X", None) {
+                        if widgets::drag_value(ui, &mut light.direction[0], "X", None) {
                             queue_render = true;
                         }
                     });
                     col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if drag_value(ui, &mut light.direction[1], "Y", None) {
+                        if widgets::drag_value(ui, &mut light.direction[1], "Y", None) {
                             queue_render = true;
                         }
                     });
                     col_0.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if drag_value(ui, &mut light.direction[2], "Z", None) {
+                        if widgets::drag_value(ui, &mut light.direction[2], "Z", None) {
                             queue_render = true;
                         }
                     });
 
                     col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
+                        if widgets::drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
                             queue_render = true;
                         }
                     });
                     col_1.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        if drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
+                        if widgets::drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
                             queue_render = true;
                         }
                     });
