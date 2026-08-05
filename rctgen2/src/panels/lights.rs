@@ -59,9 +59,9 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
 
                 ui.separator();
             }
-            ui.vertical_centered(|ui| {
-                ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-                if ui.add(egui::Button::new("Add light").fill(egui::Color32::LIGHT_GREEN)).clicked() {
+
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                if widgets::buttons::add_button(ui) {
                     lights.push(make_track::track_desc::Light {
                         direction: [1.0, 0.5, 1.0],
                         diffuse_strength: 1.0,
