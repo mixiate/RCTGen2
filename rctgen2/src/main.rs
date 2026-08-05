@@ -8,6 +8,7 @@ mod panels;
 mod render;
 mod settings;
 mod sprites;
+mod widgets;
 
 use eframe::egui;
 use std::sync::{Arc, Mutex};

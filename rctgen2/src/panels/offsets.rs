@@ -1,4 +1,4 @@
-use crate::app::drag_value;
+use crate::widgets;
 use eframe::egui;
 
 fn offsets_widget(ui: &mut egui::Ui, name: &str, offsets: &mut [[f32; 2]]) -> bool {
@@ -6,10 +6,10 @@ fn offsets_widget(ui: &mut egui::Ui, name: &str, offsets: &mut [[f32; 2]]) -> bo
     ui.label(name);
     ui.columns_const(|[col_0, col_1]| {
         for offset in offsets.iter_mut() {
-            if drag_value(col_0, &mut offset[0], "X", None) {
+            if widgets::drag_value(col_0, &mut offset[0], "X", None) {
                 changed = true;
             }
-            if drag_value(col_1, &mut offset[1], "Y", None) {
+            if widgets::drag_value(col_1, &mut offset[1], "Y", None) {
                 changed = true;
             }
         }
