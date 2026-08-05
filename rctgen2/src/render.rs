@@ -19,6 +19,7 @@ pub struct RenderArgs {
     pub rotation: usize,
     pub samples: usize,
     pub dither: bool,
+    pub edge_distance: Option<f32>,
     pub indexed: bool,
     pub lights: Vec<renderer::Light>,
 }
@@ -134,7 +135,7 @@ fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Texture {
         &args.lights,
         args.samples,
         args.samples,
-        track.track_desc.edge_distance.unwrap_or(0.088388346),
+        args.edge_distance.unwrap_or(0.088388346),
     );
     let (image, offset) = if args.indexed {
         let image = framebuffer.into_indexed_image(args.dither);

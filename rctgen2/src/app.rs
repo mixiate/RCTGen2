@@ -27,7 +27,6 @@ pub struct RctGen2App {
     track_section: &'static make_track::track_sections::TrackSection,
     samples: usize,
     indexed: bool,
-    dither: bool,
     show_adjacent_sprites: bool,
     show_original_piece: bool,
     rotation: usize,
@@ -82,7 +81,6 @@ impl RctGen2App {
             track_section: &make_track::track_sections::FLAT,
             samples: 4,
             indexed: true,
-            dither: true,
             show_adjacent_sprites: false,
             show_original_piece: false,
             rotation: 0,
@@ -107,7 +105,6 @@ impl RctGen2App {
             })));
             self.update_model();
             self.texture = None;
-            self.dither = track_desc.dither;
             self.track_desc_path = Some(file_path);
             self.track_desc = Some(track_desc);
             self.queue_render(egui_context);
@@ -134,7 +131,8 @@ impl RctGen2App {
                 egui_context,
                 rotation: self.rotation,
                 samples: self.samples,
-                dither: self.dither,
+                dither: track_desc.dither,
+                edge_distance: track_desc.edge_distance,
                 indexed: self.indexed,
                 lights: track_desc.get_lights(),
             }));
@@ -155,6 +153,12 @@ impl RctGen2App {
                     if offsets_changed {
                         self.update_offsets();
                         self.update_model();
+                        self.queue_render(ui.ctx().clone());
+                    }
+                }
+                Some(panels::SidePanelTab::Render) => {
+                    let changed = panels::render::render_panel(track_desc, ui);
+                    if changed {
                         self.queue_render(ui.ctx().clone());
                     }
                 }
@@ -221,9 +225,6 @@ impl eframe::App for RctGen2App {
                     queue_render = true;
                 }
                 if ui.checkbox(&mut self.indexed, "Indexed").changed() {
-                    queue_render = true;
-                }
-                if ui.checkbox(&mut self.dither, "Dithered").changed() {
                     queue_render = true;
                 }
 
