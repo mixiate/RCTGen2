@@ -1,9 +1,8 @@
 use crate::widgets;
 use eframe::egui;
 
-fn offsets_widget(ui: &mut egui::Ui, name: &str, offsets: &mut [[f32; 2]]) -> bool {
+fn offsets_drag_values(ui: &mut egui::Ui, offsets: &mut [[f32; 2]]) -> bool {
     let mut changed = false;
-    ui.label(name);
     ui.columns_const(|[col_0, col_1]| {
         for offset in offsets.iter_mut() {
             if widgets::drag_value(col_0, &mut offset[0], "X", None) {
@@ -38,68 +37,86 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
             ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
             let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
             egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
-                if offsets_widget(ui, "Flat", &mut offsets.flat) {
+                ui.label("Flat");
+                if offsets_drag_values(ui, &mut offsets.flat) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Gentle", &mut offsets.gentle) {
+                ui.label("Gentle");
+                if offsets_drag_values(ui, &mut offsets.gentle) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Steep", &mut offsets.steep) {
+                ui.label("Steep");
+                if offsets_drag_values(ui, &mut offsets.steep) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Flat Banked", &mut offsets.flat_banked) {
+                ui.label("Flat Banked");
+                if offsets_drag_values(ui, &mut offsets.flat_banked) {
                     update_offsets = true;
                 }
                 ui.separator();
                 if let Some(gentle_banked_right) = offsets.gentle_banked_right.as_mut() {
-                    if offsets_widget(ui, "Gentle Banked Left", &mut offsets.gentle_banked) {
+                    ui.label("Gentle Banked Left");
+                    if offsets_drag_values(ui, &mut offsets.gentle_banked) {
                         update_offsets = true;
                     }
                     ui.separator();
-                    if offsets_widget(ui, "Gentle Banked Right", gentle_banked_right) {
+                    ui.horizontal(|ui| {
+                        ui.label("Gentle Banked Right");
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            if widgets::buttons::remove_button(ui) {
+                                remove_gentle_banked_right = true;
+                            }
+                        });
+                    });
+                    if offsets_drag_values(ui, gentle_banked_right) {
                         update_offsets = true;
                     }
-                    ui.vertical_centered(|ui| {
-                        if ui.button("Remove Gentle Banked Right").clicked() {
-                            remove_gentle_banked_right = true;
-                        }
-                    });
                 } else {
-                    if offsets_widget(ui, "Gentle Banked", &mut offsets.gentle_banked) {
+                    ui.label("Gentle Banked");
+                    if offsets_drag_values(ui, &mut offsets.gentle_banked) {
                         update_offsets = true;
                     }
                     ui.separator();
-                    ui.vertical_centered(|ui| {
-                        if ui.button("Add Gentle Banked Right").clicked() {
-                            offsets.gentle_banked_right = Some(Default::default());
-                        }
+                    ui.horizontal(|ui| {
+                        ui.label("Gentle Banked Right");
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            if widgets::buttons::add_button(ui) {
+                                offsets.gentle_banked_right = Some(Default::default());
+                            }
+                        });
                     });
                 }
                 ui.separator();
-                if offsets_widget(ui, "Inverted", &mut offsets.inverted) {
+                ui.label("Inverted");
+                if offsets_drag_values(ui, &mut offsets.inverted) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Diagonal", &mut offsets.diagonal) {
+                ui.label("Diagonal");
+                if offsets_drag_values(ui, &mut offsets.diagonal) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Diagonal Gentle", &mut offsets.diagonal_gentle) {
+                ui.label("Diagonal Gentle");
+                if offsets_drag_values(ui, &mut offsets.diagonal_gentle) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Diagonal Steep", &mut offsets.diagonal_steep) {
+                ui.label("Diagonal Steep");
+                if offsets_drag_values(ui, &mut offsets.diagonal_steep) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Diagonal Banked", &mut offsets.diagonal_banked) {
+                ui.label("Diagonal Banked");
+                if offsets_drag_values(ui, &mut offsets.diagonal_banked) {
                     update_offsets = true;
                 }
                 ui.separator();
-                if offsets_widget(ui, "Vertical", &mut offsets.vertical) {
+                ui.label("Vertical");
+                if offsets_drag_values(ui, &mut offsets.vertical) {
                     update_offsets = true;
                 }
             });
