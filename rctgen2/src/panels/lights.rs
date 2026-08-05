@@ -20,13 +20,10 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
         egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
             for (i, light) in lights.iter_mut().enumerate() {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                    ui.scope(|ui| {
-                        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-                        if ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked() {
-                            deleted_index = Some(i);
-                            queue_render = true;
-                        }
-                    });
+                    if widgets::buttons::remove_button(ui) {
+                        deleted_index = Some(i);
+                        queue_render = true;
+                    }
 
                     if inverted_checkbox(ui, &mut light.disabled) {
                         queue_render = true;

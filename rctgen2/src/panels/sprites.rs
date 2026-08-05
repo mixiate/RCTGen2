@@ -1,26 +1,9 @@
 use crate::modals;
+use crate::widgets;
 use eframe::egui;
 use egui::containers::scroll_area::ScrollBarVisibility;
 use make_track::track_desc::TrackSectionSprites;
 use make_track::track_sections::TRACK_SECTIONS;
-
-fn remove_button(ui: &mut egui::Ui) -> bool {
-    let mut clicked = false;
-    ui.scope(|ui| {
-        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-        clicked = ui.add(egui::Button::new("✖").fill(egui::Color32::LIGHT_RED)).clicked();
-    });
-    clicked
-}
-
-fn add_button(ui: &mut egui::Ui) -> bool {
-    let mut clicked = false;
-    ui.scope(|ui| {
-        ui.visuals_mut().override_text_color = Some(egui::Color32::BLACK);
-        clicked = ui.add(egui::Button::new("➕").fill(egui::Color32::LIGHT_GREEN)).clicked();
-    });
-    clicked
-}
 
 fn sprite_widgets(sprite: &mut make_track::track_desc::Sprite, ui: &mut egui::Ui) -> bool {
     let button_height = ui.style().spacing.interact_size.y;
@@ -32,7 +15,7 @@ fn sprite_widgets(sprite: &mut make_track::track_desc::Sprite, ui: &mut egui::Ui
     ui.add(egui::DragValue::new(&mut sprite.offset[1]).speed(0.05));
     ui.add(egui::DragValue::new(&mut sprite.offset[2]).speed(0.05));
 
-    remove_button(ui)
+    widgets::buttons::remove_button(ui)
 }
 
 fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, ui: &mut egui::Ui) {
@@ -48,14 +31,14 @@ fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, 
                 if sprite_widgets(sprite, ui) {
                     removed_index = Some(sprite_index);
                 }
-                if !sprites_is_full && sprites_len - 1 == sprite_index && add_button(ui) {
+                if !sprites_is_full && sprites_len - 1 == sprite_index && widgets::buttons::add_button(ui) {
                     add_sprite = true;
                 }
             });
             ui.end_row();
         }
 
-        if sprites.is_empty() && add_button(ui) {
+        if sprites.is_empty() && widgets::buttons::add_button(ui) {
             add_sprite = true;
         }
 
@@ -133,7 +116,7 @@ pub fn sprites_panel(
                                     }
 
                                     ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                                        if remove_button(ui) {
+                                        if widgets::buttons::remove_button(ui) {
                                             removed_track_section_index = Some(index);
                                         }
                                     });
