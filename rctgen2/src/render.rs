@@ -20,7 +20,6 @@ pub struct RenderArgs {
     pub samples: usize,
     pub dither: bool,
     pub edge_distance: Option<f32>,
-    pub indexed: bool,
     pub lights: Vec<renderer::Light>,
 }
 
@@ -32,18 +31,18 @@ pub enum RenderMessage {
     Exit,
 }
 
-pub struct Texture {
-    pub handle: egui::TextureHandle,
-    pub offset: glam::IVec2,
+pub struct Images {
+    pub unindexed: renderer::image::Image,
+    pub indexed: renderer::image::IndexedImage,
 }
 
-pub struct TrackTexture {
-    pub texture: Texture,
+pub struct TrackImage {
+    pub images: Images,
     pub track_section: &'static make_track::track_sections::TrackSection,
     pub rotation: usize,
 }
 
-pub type SharedTexture = Arc<Mutex<Option<TrackTexture>>>;
+pub type SharedTrackImage = Arc<Mutex<Option<TrackImage>>>;
 
 struct Track {
     track_desc: make_track::track_desc::Desc,
@@ -111,7 +110,7 @@ fn update_model<'a>(
     Ok(Scene { scene, mesh_types })
 }
 
-fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Texture {
+fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Images {
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
             glam::Vec3::new(32.0, 0.0, 32.0),
@@ -137,34 +136,18 @@ fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Texture {
         args.samples,
         args.edge_distance.unwrap_or(0.088388346),
     );
-    let (image, offset) = if args.indexed {
-        let image = framebuffer.into_indexed_image(args.dither);
-        let pixels: Vec<_> = image
-            .as_raw()
-            .iter()
-            .flat_map(|x| {
-                if *x == 0 {
-                    [0; 4]
-                } else {
-                    let colour = renderer::palette::PALETTE[usize::from(*x)];
-                    [colour[0], colour[1], colour[2], 255]
-                }
-            })
-            .collect();
-        (
-            renderer::image::Image::from_raw(usize::from(image.width()), usize::from(image.height()), pixels),
-            image.offset,
-        )
-    } else {
-        framebuffer.to_image()
-    };
+
+    let mut unindexed_image = framebuffer.to_image();
+    let mut indexed_image = framebuffer.into_indexed_image(args.dither);
+
     let z_offset = track.track_desc.tracks.first().map(|x| x.z_offset).unwrap_or_default();
-    let offset = offset + glam::IVec2::new(0, -z_offset + 16);
+    unindexed_image.offset.y += -z_offset + 16;
+    indexed_image.offset.y += -z_offset + 16;
 
-    let egui_image = egui::ColorImage::from_rgba_unmultiplied([image.width(), image.height()], image.pixels());
-    let handle = args.egui_context.load_texture("render", egui_image, egui::TextureOptions::default());
-
-    Texture { handle, offset }
+    Images {
+        unindexed: unindexed_image,
+        indexed: indexed_image,
+    }
 }
 
 fn report_error(tx: &Sender<AppMessage>, error: &anyhow::Error) {
@@ -172,7 +155,7 @@ fn report_error(tx: &Sender<AppMessage>, error: &anyhow::Error) {
     let _result = tx.send(AppMessage::Error(errors));
 }
 
-pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMessage>, render_texture: &SharedTexture) {
+pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMessage>, track_image: &SharedTrackImage) {
     let render_device = match renderer::Device::try_new() {
         Ok(render_device) => render_device,
         Err(_) => {
@@ -232,11 +215,11 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
             && let Some(track) = &current_track
             && let Some(scene) = &current_scene
         {
-            let texture = render(track, scene, &mut args);
+            let images = render(track, scene, &mut args);
 
-            if let Ok(mut render_texture) = render_texture.lock() {
-                *render_texture = Some(TrackTexture {
-                    texture,
+            if let Ok(mut track_image) = track_image.lock() {
+                *track_image = Some(TrackImage {
+                    images,
                     track_section: current_track_section,
                     rotation: args.rotation,
                 });

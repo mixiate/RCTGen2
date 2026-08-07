@@ -2,12 +2,27 @@ pub struct Image {
     pixels: Vec<u8>,
     width: usize,
     height: usize,
+    pub offset: glam::IVec2,
 }
 
 impl Image {
-    pub fn from_raw(width: usize, height: usize, pixels: Vec<u8>) -> Self {
+    pub fn new(width: usize, height: usize) -> Self {
+        Self {
+            pixels: vec![0; width * height * 4],
+            width,
+            height,
+            offset: glam::IVec2::new(0, 0),
+        }
+    }
+
+    pub fn from_raw(width: usize, height: usize, pixels: Vec<u8>, offset: glam::IVec2) -> Self {
         assert!(pixels.len() == width * height * 4);
-        Self { pixels, width, height }
+        Self {
+            pixels,
+            width,
+            height,
+            offset,
+        }
     }
 
     pub fn width(&self) -> usize {
@@ -20,6 +35,25 @@ impl Image {
 
     pub fn pixels(&self) -> &[u8] {
         &self.pixels
+    }
+
+    pub fn pixels_mut(&mut self) -> &mut [u8] {
+        &mut self.pixels
+    }
+
+    pub fn get_pixel(&self, x: usize, y: usize) -> [u8; 4] {
+        let index = (x * 4) + (y * self.width * 4);
+        [
+            self.pixels[index],
+            self.pixels[index + 1],
+            self.pixels[index + 2],
+            self.pixels[index + 3],
+        ]
+    }
+
+    pub fn set_pixel(&mut self, x: usize, y: usize, pixel: [u8; 4]) {
+        let index = (x * 4) + (y * self.width * 4);
+        self.pixels[index..index + 4].copy_from_slice(&pixel);
     }
 
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
