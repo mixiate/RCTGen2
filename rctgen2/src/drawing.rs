@@ -1,10 +1,10 @@
 use crate::adjacent_track;
 use crate::adjacent_track::TrackSectionWithSprites;
-use crate::render::{Texture, TrackTexture};
+use crate::render::TrackImage;
 use crate::sprites;
-use eframe::egui;
 use make_track::track_desc;
 use make_track::track_desc::TrackSectionSprites;
+use renderer::image::{Image, IndexedImage};
 
 fn add_coords(a: &[i16; 3], b: &[i16; 3]) -> [i16; 3] {
     [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
@@ -20,26 +20,78 @@ fn rotate_coords(coordinates: &[i16; 3], rotation: usize) -> [i16; 3] {
     }
 }
 
-fn coords_to_screen_space(coordinates: &[i16; 3]) -> [i16; 2] {
+fn coords_to_screen_space(coordinates: &[i16; 3]) -> [i32; 2] {
     let [x, y, z] = coordinates;
     let offset_x = x - y;
     let offset_y = (-(x + y) / 2) + z;
-    [-offset_x, -offset_y]
+    [(-offset_x).into(), (-offset_y).into()]
 }
 
-fn draw_sprite(ui: &mut egui::Ui, texture: &Texture, coords: &[i16; 3]) {
-    let texture_size = texture.handle.size_vec2();
-    let image = egui::Image::from_texture((texture.handle.id(), texture_size));
+fn clip_image_to_buffer(
+    dest_width: usize,
+    dest_height: usize,
+    dest_offset: glam::IVec2,
+    src_width: u16,
+    src_height: u16,
+    src_offset: glam::IVec2,
+    coords: &[i16; 3],
+) -> (i32, i32, i32, i32, i32, i32) {
+    let position = coords_to_screen_space(coords);
+    let dest_x = dest_offset.x + position[0] + src_offset.x;
+    let dest_y = dest_offset.y + position[1] + src_offset.y;
 
-    let image_rect = {
-        let position = coords_to_screen_space(coords);
-        let mut image_pos = ui.max_rect().center();
-        image_pos += egui::Vec2::new(position[0].into(), position[1].into());
-        image_pos += egui::Vec2::new(texture.offset.x as f32, texture.offset.y as f32);
-        egui::Rect::from_min_size(image_pos, texture_size)
-    };
+    let src_x = -std::cmp::min(dest_x, 0);
+    let src_y = -std::cmp::min(dest_y, 0);
+    let dest_x = std::cmp::max(dest_x, 0);
+    let dest_y = std::cmp::max(dest_y, 0);
 
-    ui.place(image_rect, image);
+    let mut width = i32::from(src_width) - src_x;
+    let mut height = i32::from(src_height) - src_y;
+    width -= std::cmp::max(dest_x + width - dest_width as i32, 0);
+    height -= std::cmp::max(dest_y + height - dest_height as i32, 0);
+
+    (dest_x, dest_y, src_x, src_y, width, height)
+}
+
+fn draw_image(buffer: &mut Image, image: &Image, coords: &[i16; 3]) {
+    let (dest_x, dest_y, src_x, src_y, width, height) = clip_image_to_buffer(
+        buffer.width(),
+        buffer.height(),
+        buffer.offset,
+        image.width() as u16,
+        image.height() as u16,
+        image.offset,
+        coords,
+    );
+    for y in 0..height {
+        for x in 0..width {
+            let pixel = image.get_pixel((src_x + x) as usize, (src_y + y) as usize);
+            if pixel[3] != 0 {
+                buffer.set_pixel((dest_x + x) as usize, (dest_y + y) as usize, pixel);
+            }
+        }
+    }
+}
+
+fn draw_indexed_image(buffer: &mut Image, image: &IndexedImage, coords: &[i16; 3]) {
+    let (dest_x, dest_y, src_x, src_y, width, height) = clip_image_to_buffer(
+        buffer.width(),
+        buffer.height(),
+        buffer.offset,
+        image.width(),
+        image.height(),
+        image.offset,
+        coords,
+    );
+    for y in 0..height {
+        for x in 0..width {
+            let pixel = image.get_pixel((src_x + x) as usize, (src_y + y) as usize);
+            if pixel != 0 {
+                let [r, g, b] = renderer::palette::PALETTE[usize::from(pixel)];
+                buffer.set_pixel((dest_x + x) as usize, (dest_y + y) as usize, [r, g, b, 255]);
+            }
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -56,31 +108,31 @@ fn compare_coords(coords: &[i16; 3], draw_order: DrawOrder) -> bool {
 }
 
 fn draw_adjacent_track_section(
-    main_sprite: &TrackTexture,
-    original_sprites: &mut sprites::Sprites,
+    track_image: &TrackImage,
+    sprites: &mut sprites::Sprites,
     adjacent_sections: &[TrackSectionWithSprites],
     draw_order: DrawOrder,
-    ui: &mut egui::Ui,
+    buffer: &mut Image,
 ) {
     for TrackSectionWithSprites {
         track_section,
         coords,
         rotation,
-        sprites,
+        sprites: track_sprites,
     } in adjacent_sections
     {
-        let sprite_rotation = (main_sprite.rotation + usize::from(*rotation)) % 4;
+        let sprite_rotation = (track_image.rotation + usize::from(*rotation)) % 4;
 
-        for (tile_coords, sprites) in track_section.tiles.iter().zip(sprites.iter()) {
+        for (tile_coords, track_sprites) in track_section.tiles.iter().zip(track_sprites.iter()) {
             let tile_coords = rotate_coords(tile_coords, (*rotation).into());
-            let coords = rotate_coords(&add_coords(coords, &tile_coords), main_sprite.rotation);
-            for sprite in &sprites[sprite_rotation] {
+            let coords = rotate_coords(&add_coords(coords, &tile_coords), track_image.rotation);
+            for sprite in &track_sprites[sprite_rotation] {
                 let coords = add_coords(&coords, &sprite.offset);
                 if !compare_coords(&coords, draw_order) {
                     continue;
                 }
-                if let Some(texture) = original_sprites.get_sprite(sprite.index, ui.ctx()) {
-                    draw_sprite(ui, texture, &coords);
+                if let Some(sprite) = sprites.get(sprite.index) {
+                    draw_indexed_image(buffer, sprite, &coords);
                 }
             }
         }
@@ -90,80 +142,88 @@ fn draw_adjacent_track_section(
 fn draw_original_track_section(
     track_section: &make_track::track_sections::TrackSection,
     rotation: usize,
-    original_sprites: &mut sprites::Sprites,
-    track_desc_sprites: &TrackSectionSprites,
-    ui: &mut egui::Ui,
+    sprites: &mut sprites::Sprites,
+    track_sprites: &TrackSectionSprites,
+    buffer: &mut Image,
 ) {
-    for (tile_coords, sprites) in track_section.tiles.iter().zip(track_desc_sprites.iter()) {
+    for (tile_coords, track_sprites) in track_section.tiles.iter().zip(track_sprites.iter()) {
         let coords = rotate_coords(tile_coords, rotation);
-        for sprite in &sprites[rotation] {
+        for sprite in &track_sprites[rotation] {
             let coords = add_coords(&coords, &sprite.offset);
-            if let Some(texture) = original_sprites.get_sprite(sprite.index, ui.ctx()) {
-                draw_sprite(ui, texture, &coords);
+            if let Some(sprite) = sprites.get(sprite.index) {
+                draw_indexed_image(buffer, sprite, &coords);
             }
         }
     }
 }
 
 fn draw_with_adjacent_sprites(
-    main_sprite: &TrackTexture,
+    track_image: &TrackImage,
+    indexed: bool,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-    original_sprites: &mut sprites::Sprites,
+    sprites: &mut sprites::Sprites,
     track_desc_sprites: &indexmap::IndexMap<String, TrackSectionSprites>,
     show_original_piece: bool,
-    ui: &mut egui::Ui,
+    buffer: &mut Image,
 ) {
     let adjacent_sections = adjacent_track::list_track_sections(
-        main_sprite.track_section.name,
+        track_image.track_section.name,
         adjacent_track_sections,
         track_desc_sprites,
     );
 
-    draw_adjacent_track_section(main_sprite, original_sprites, &adjacent_sections, DrawOrder::Before, ui);
-    if show_original_piece && let Some(sprites) = track_desc_sprites.get(main_sprite.track_section.name) {
+    draw_adjacent_track_section(track_image, sprites, &adjacent_sections, DrawOrder::Before, buffer);
+    if show_original_piece && let Some(track_sprites) = track_desc_sprites.get(track_image.track_section.name) {
         draw_original_track_section(
-            main_sprite.track_section,
-            main_sprite.rotation,
-            original_sprites,
+            track_image.track_section,
+            track_image.rotation,
             sprites,
-            ui,
+            track_sprites,
+            buffer,
         );
+    } else if indexed {
+        draw_indexed_image(buffer, &track_image.images.indexed, &[0; 3]);
     } else {
-        draw_sprite(ui, &main_sprite.texture, &[0; 3]);
+        draw_image(buffer, &track_image.images.unindexed, &[0; 3]);
     }
-    draw_adjacent_track_section(main_sprite, original_sprites, &adjacent_sections, DrawOrder::After, ui);
+    draw_adjacent_track_section(track_image, sprites, &adjacent_sections, DrawOrder::After, buffer);
 }
 
+#[expect(clippy::too_many_arguments)]
 pub fn draw(
     track_desc: &track_desc::Desc,
-    main_sprite: &TrackTexture,
+    track_image: &TrackImage,
+    indexed: bool,
     show_adjacent_sprites: bool,
     show_original_piece: bool,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-    original_sprites: Option<&mut sprites::Sprites>,
-    ui: &mut egui::Ui,
+    sprites: Option<&mut sprites::Sprites>,
+    buffer: &mut Image,
 ) {
-    if show_adjacent_sprites && let Some(original_sprites) = original_sprites {
+    if show_adjacent_sprites && let Some(sprites) = sprites {
         draw_with_adjacent_sprites(
-            main_sprite,
+            track_image,
+            indexed,
             adjacent_track_sections,
-            original_sprites,
+            sprites,
             &track_desc.original_sprites,
             show_original_piece,
-            ui,
+            buffer,
         );
     } else if show_original_piece
-        && let Some(original_sprites) = original_sprites
-        && let Some(sprites) = track_desc.original_sprites.get(main_sprite.track_section.name)
+        && let Some(sprites) = sprites
+        && let Some(track_sprites) = track_desc.original_sprites.get(track_image.track_section.name)
     {
         draw_original_track_section(
-            main_sprite.track_section,
-            main_sprite.rotation,
-            original_sprites,
+            track_image.track_section,
+            track_image.rotation,
             sprites,
-            ui,
+            track_sprites,
+            buffer,
         );
+    } else if indexed {
+        draw_indexed_image(buffer, &track_image.images.indexed, &[0; 3]);
     } else {
-        draw_sprite(ui, &main_sprite.texture, &[0; 3]);
+        draw_image(buffer, &track_image.images.unindexed, &[0; 3]);
     }
 }

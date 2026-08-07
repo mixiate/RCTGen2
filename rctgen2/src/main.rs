@@ -18,11 +18,11 @@ fn main() -> anyhow::Result<()> {
 
     let (render_tx, render_rx) = std::sync::mpsc::channel();
     let (app_tx, app_rx) = std::sync::mpsc::channel();
-    let render_texture = Arc::new(Mutex::new(None));
+    let track_image = Arc::new(Mutex::new(None));
 
     let render_thread = {
-        let render_texture = render_texture.clone();
-        std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &render_texture))
+        let track_image = track_image.clone();
+        std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &track_image))
     };
 
     let data_directory = std::env::current_exe()?;
@@ -55,9 +55,10 @@ fn main() -> anyhow::Result<()> {
         Box::new(|creation_context| {
             creation_context.egui_ctx.set_theme(egui::Theme::Dark);
             Ok(Box::new(app::RctGen2App::new(
+                &creation_context.egui_ctx,
                 app_rx,
                 render_tx,
-                render_texture,
+                track_image,
                 &data_directory,
                 config_dir,
             )))

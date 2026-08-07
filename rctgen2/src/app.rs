@@ -1,7 +1,7 @@
 use crate::adjacent_track;
 use crate::modals;
 use crate::panels;
-use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTexture, TrackTexture, UpdateModelArgs};
+use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
 use eframe::egui;
@@ -15,7 +15,7 @@ pub enum AppMessage {
 pub struct RctGen2App {
     app_rx: Receiver<AppMessage>,
     render_tx: Sender<RenderMessage>,
-    render_texture: SharedTexture,
+    track_image: SharedTrackImage,
     errors: Vec<String>,
     settings: settings::AppSettings,
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
@@ -30,14 +30,17 @@ pub struct RctGen2App {
     show_adjacent_sprites: bool,
     show_original_piece: bool,
     rotation: usize,
-    texture: Option<TrackTexture>,
+    current_track_image: Option<TrackImage>,
+    back_buffer: egui::TextureHandle,
+    back_buffer_image: renderer::image::Image,
 }
 
 impl RctGen2App {
     pub fn new(
+        egui_context: &egui::Context,
         app_rx: Receiver<AppMessage>,
         render_tx: Sender<RenderMessage>,
-        render_texture: SharedTexture,
+        track_image: SharedTrackImage,
         data_directory: &std::path::Path,
         config_dir: std::path::PathBuf,
     ) -> Self {
@@ -66,10 +69,16 @@ impl RctGen2App {
             None
         };
 
+        let back_buffer_size = 512;
+        let back_buffer = egui::ColorImage::filled([back_buffer_size, back_buffer_size], egui::Color32::TRANSPARENT);
+        let back_buffer = egui_context.load_texture("back buffer", back_buffer, egui::TextureOptions::default());
+        let mut back_buffer_image = renderer::image::Image::new(back_buffer_size, back_buffer_size);
+        back_buffer_image.offset = glam::IVec2::new(back_buffer_size as i32 / 2, back_buffer_size as i32 / 2);
+
         Self {
             app_rx,
             render_tx,
-            render_texture,
+            track_image,
             errors,
             settings,
             adjacent_track_sections,
@@ -84,7 +93,9 @@ impl RctGen2App {
             show_adjacent_sprites: false,
             show_original_piece: false,
             rotation: 0,
-            texture: None,
+            current_track_image: None,
+            back_buffer,
+            back_buffer_image,
         }
     }
 
@@ -104,7 +115,7 @@ impl RctGen2App {
                 directory,
             })));
             self.update_model();
-            self.texture = None;
+            self.current_track_image = None;
             self.track_desc_path = Some(file_path);
             self.track_desc = Some(track_desc);
             self.queue_render(egui_context);
@@ -133,7 +144,6 @@ impl RctGen2App {
                 samples: self.samples,
                 dither: track_desc.dither,
                 edge_distance: track_desc.edge_distance,
-                indexed: self.indexed,
                 lights: track_desc.get_lights(),
             }));
         }
@@ -187,6 +197,7 @@ impl eframe::App for RctGen2App {
 
         let mut update_model = false;
         let mut queue_render = false;
+        let mut redraw = false;
         let previous_track_section = self.track_section;
 
         egui::Panel::top("Top Menu").show(ui, |ui| {
@@ -225,7 +236,7 @@ impl eframe::App for RctGen2App {
                     queue_render = true;
                 }
                 if ui.checkbox(&mut self.indexed, "Indexed").changed() {
-                    queue_render = true;
+                    redraw = true;
                 }
 
                 let show_original_piece_enabled = if let Some(track_desc) = &self.track_desc {
@@ -233,11 +244,18 @@ impl eframe::App for RctGen2App {
                 } else {
                     true
                 };
-                ui.add_enabled(
-                    show_original_piece_enabled,
-                    egui::Checkbox::new(&mut self.show_original_piece, "Original"),
-                );
-                ui.checkbox(&mut self.show_adjacent_sprites, "Adjacent");
+                if ui
+                    .add_enabled(
+                        show_original_piece_enabled,
+                        egui::Checkbox::new(&mut self.show_original_piece, "Original"),
+                    )
+                    .clicked()
+                {
+                    redraw = true;
+                }
+                if ui.checkbox(&mut self.show_adjacent_sprites, "Adjacent").clicked() {
+                    redraw = true;
+                }
 
                 egui::ComboBox::from_id_salt("Track section")
                     .selected_text(self.track_section.name)
@@ -276,27 +294,40 @@ impl eframe::App for RctGen2App {
         }
 
         if fetch_frame
-            && let Ok(mut render_texture) = self.render_texture.lock()
-            && render_texture.is_some()
+            && let Ok(mut track_image) = self.track_image.lock()
+            && track_image.is_some()
         {
-            self.texture = render_texture.take();
+            self.current_track_image = track_image.take();
+            redraw = true;
+        }
+
+        if redraw
+            && let Some(track_desc) = &self.track_desc
+            && let Some(track_image) = &self.current_track_image
+        {
+            self.back_buffer_image.pixels_mut().fill(0);
+            crate::drawing::draw(
+                track_desc,
+                track_image,
+                self.indexed,
+                self.show_adjacent_sprites,
+                self.show_original_piece,
+                &self.adjacent_track_sections,
+                self.rct2_sprites.as_mut(),
+                &mut self.back_buffer_image,
+            );
+            let image =
+                egui::ColorImage::from_rgba_unmultiplied(self.back_buffer.size(), self.back_buffer_image.pixels());
+            self.back_buffer.set(image, egui::TextureOptions::default());
         }
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(34, 33, 39));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
-            if let Some(track_desc) = &self.track_desc
-                && let Some(texture) = &self.texture
-            {
-                crate::drawing::draw(
-                    track_desc,
-                    texture,
-                    self.show_adjacent_sprites,
-                    self.show_original_piece,
-                    &self.adjacent_track_sections,
-                    self.rct2_sprites.as_mut(),
-                    ui,
-                );
-            }
+            let texture_size = self.back_buffer.size_vec2();
+            let image = egui::Image::from_texture((self.back_buffer.id(), texture_size));
+            let image_pos = ui.max_rect().center() - (texture_size / egui::Vec2::new(2.0, 2.0));
+            let image_rect = egui::Rect::from_min_size(image_pos, texture_size);
+            ui.place(image_rect, image);
         });
 
         if self.settings.window(ui) {

@@ -86,7 +86,7 @@ impl Framebuffer {
         )
     }
 
-    pub fn to_image(&self) -> (crate::image::Image, glam::IVec2) {
+    pub fn to_image(&self) -> crate::image::Image {
         let pixels = self
             .buffer
             .iter()
@@ -99,10 +99,8 @@ impl Framebuffer {
                 }
             })
             .collect::<Vec<u8>>();
-        (
-            crate::image::Image::from_raw(self.width, self.height, pixels),
-            self.offset(0, 0),
-        )
+
+        crate::image::Image::from_raw(self.width, self.height, pixels, self.offset(0, 0))
     }
 
     fn into_indexed_image_inner(mut self, dither: bool, bounds: &[usize; 4]) -> crate::image::IndexedImage {
