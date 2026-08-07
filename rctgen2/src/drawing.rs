@@ -6,6 +6,22 @@ use make_track::track_desc;
 use make_track::track_desc::TrackSectionSprites;
 use renderer::image::{Image, IndexedImage};
 
+pub struct Options {
+    pub indexed: bool,
+    pub adjacent_track: bool,
+    pub original_track: bool,
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Options {
+            indexed: true,
+            adjacent_track: false,
+            original_track: false,
+        }
+    }
+}
+
 fn add_coords(a: &[i16; 3], b: &[i16; 3]) -> [i16; 3] {
     [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
 }
@@ -159,11 +175,10 @@ fn draw_original_track_section(
 
 fn draw_with_adjacent_sprites(
     track_image: &TrackImage,
-    indexed: bool,
+    options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     sprites: &mut sprites::Sprites,
     track_desc_sprites: &indexmap::IndexMap<String, TrackSectionSprites>,
-    show_original_piece: bool,
     buffer: &mut Image,
 ) {
     let adjacent_sections = adjacent_track::list_track_sections(
@@ -173,7 +188,9 @@ fn draw_with_adjacent_sprites(
     );
 
     draw_adjacent_track_section(track_image, sprites, &adjacent_sections, DrawOrder::Before, buffer);
-    if show_original_piece && let Some(track_sprites) = track_desc_sprites.get(track_image.track_section.name) {
+    if options.original_track
+        && let Some(track_sprites) = track_desc_sprites.get(track_image.track_section.name)
+    {
         draw_original_track_section(
             track_image.track_section,
             track_image.rotation,
@@ -181,7 +198,7 @@ fn draw_with_adjacent_sprites(
             track_sprites,
             buffer,
         );
-    } else if indexed {
+    } else if options.indexed {
         draw_indexed_image(buffer, &track_image.images.indexed, &[0; 3]);
     } else {
         draw_image(buffer, &track_image.images.unindexed, &[0; 3]);
@@ -189,28 +206,26 @@ fn draw_with_adjacent_sprites(
     draw_adjacent_track_section(track_image, sprites, &adjacent_sections, DrawOrder::After, buffer);
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn draw(
     track_desc: &track_desc::Desc,
     track_image: &TrackImage,
-    indexed: bool,
-    show_adjacent_sprites: bool,
-    show_original_piece: bool,
+    options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     sprites: Option<&mut sprites::Sprites>,
     buffer: &mut Image,
 ) {
-    if show_adjacent_sprites && let Some(sprites) = sprites {
+    if options.adjacent_track
+        && let Some(sprites) = sprites
+    {
         draw_with_adjacent_sprites(
             track_image,
-            indexed,
+            options,
             adjacent_track_sections,
             sprites,
             &track_desc.original_sprites,
-            show_original_piece,
             buffer,
         );
-    } else if show_original_piece
+    } else if options.original_track
         && let Some(sprites) = sprites
         && let Some(track_sprites) = track_desc.original_sprites.get(track_image.track_section.name)
     {
@@ -221,7 +236,7 @@ pub fn draw(
             track_sprites,
             buffer,
         );
-    } else if indexed {
+    } else if options.indexed {
         draw_indexed_image(buffer, &track_image.images.indexed, &[0; 3]);
     } else {
         draw_image(buffer, &track_image.images.unindexed, &[0; 3]);

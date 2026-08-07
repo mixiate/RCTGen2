@@ -26,9 +26,7 @@ pub struct RctGen2App {
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
     samples: usize,
-    indexed: bool,
-    show_adjacent_sprites: bool,
-    show_original_piece: bool,
+    drawing_options: crate::drawing::Options,
     rotation: usize,
     current_track_image: Option<TrackImage>,
     back_buffer: egui::TextureHandle,
@@ -89,9 +87,7 @@ impl RctGen2App {
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
             samples: 4,
-            indexed: true,
-            show_adjacent_sprites: false,
-            show_original_piece: false,
+            drawing_options: Default::default(),
             rotation: 0,
             current_track_image: None,
             back_buffer,
@@ -235,7 +231,7 @@ impl eframe::App for RctGen2App {
                 if ui.add(egui::DragValue::new(&mut self.samples).prefix("Samples: ").range(1..=4)).changed() {
                     queue_render = true;
                 }
-                if ui.checkbox(&mut self.indexed, "Indexed").changed() {
+                if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
                     redraw = true;
                 }
 
@@ -247,13 +243,13 @@ impl eframe::App for RctGen2App {
                 if ui
                     .add_enabled(
                         show_original_piece_enabled,
-                        egui::Checkbox::new(&mut self.show_original_piece, "Original"),
+                        egui::Checkbox::new(&mut self.drawing_options.original_track, "Original"),
                     )
                     .clicked()
                 {
                     redraw = true;
                 }
-                if ui.checkbox(&mut self.show_adjacent_sprites, "Adjacent").clicked() {
+                if ui.checkbox(&mut self.drawing_options.adjacent_track, "Adjacent").clicked() {
                     redraw = true;
                 }
 
@@ -309,9 +305,7 @@ impl eframe::App for RctGen2App {
             crate::drawing::draw(
                 track_desc,
                 track_image,
-                self.indexed,
-                self.show_adjacent_sprites,
-                self.show_original_piece,
+                &self.drawing_options,
                 &self.adjacent_track_sections,
                 self.rct2_sprites.as_mut(),
                 &mut self.back_buffer_image,
