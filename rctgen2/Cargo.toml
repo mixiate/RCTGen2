@@ -12,6 +12,7 @@ glam = "0.33.2"
 heapless = "0.9.3"
 indexmap = "2.14.0"
 make-track = { path = "../make-track" }
+openrct2 = { path = "../openrct2" }
 rct = { path = "../rct" }
 renderer = { path = "../renderer" }
 rfd = "0.17.2"

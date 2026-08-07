@@ -3174,6 +3174,7 @@ dependencies = [
  "heapless",
  "indexmap 2.14.0",
  "make-track",
+ "openrct2",
  "rct",
  "renderer",
  "rfd",
