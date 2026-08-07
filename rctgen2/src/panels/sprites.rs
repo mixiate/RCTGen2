@@ -52,12 +52,12 @@ fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, 
 }
 
 fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) {
-    for (view_index, view) in sprites.iter_mut().enumerate() {
-        if view_index != 0 {
+    for rotation in 0..4 {
+        if rotation != 0 {
             ui.separator();
         }
 
-        for (tile_index, sprites) in view.iter_mut().enumerate() {
+        for (tile_index, tiles) in sprites.iter_mut().enumerate() {
             ui.horizontal(|ui| {
                 let tile_label = match tile_index {
                     0 => "0:",
@@ -74,7 +74,7 @@ fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) {
                 };
                 ui.label(tile_label);
 
-                sprites_grid(sprites, ui);
+                sprites_grid(&mut tiles[rotation], ui);
             });
         }
     }
@@ -149,11 +149,10 @@ fn add_track_section(
 ) {
     let name = track_section.name.to_string();
     if let indexmap::map::Entry::Vacant(entry) = sprites.entry(name) {
-        let mut view = heapless::Vec::new();
-        let _ignore_result = view.resize_default(track_section.tiles.len());
-        let sprites = [view.clone(), view.clone(), view.clone(), view];
+        let mut tiles = heapless::Vec::new();
+        let _ignore_result = tiles.resize_default(track_section.tiles.len());
 
-        entry.insert_sorted_by(sprites, |key_a, _, key_b, _| {
+        entry.insert_sorted_by(tiles, |key_a, _, key_b, _| {
             let a_index = TRACK_SECTIONS.iter().position(|x| x.name == key_a);
             let b_index = TRACK_SECTIONS.iter().position(|x| x.name == key_b);
             if let Some(a_index) = a_index
