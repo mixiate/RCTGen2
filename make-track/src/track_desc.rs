@@ -202,7 +202,7 @@ pub struct Sprite {
     pub offset: [i16; 3],
 }
 
-pub type TrackSectionSprites = [heapless::Vec<heapless::Vec<Sprite, 2>, { crate::track_sections::MAX_TILE_COUNT }>; 4];
+pub type TrackSectionSprites = heapless::Vec<[heapless::Vec<Sprite, 2>; 4], { crate::track_sections::MAX_TILE_COUNT }>;
 
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]

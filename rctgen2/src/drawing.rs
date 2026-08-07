@@ -71,10 +71,10 @@ fn draw_adjacent_track_section(
     {
         let sprite_rotation = (main_sprite.rotation + usize::from(*rotation)) % 4;
 
-        for (tile_coords, sprites) in track_section.tiles.iter().zip(sprites[sprite_rotation].iter()) {
+        for (tile_coords, sprites) in track_section.tiles.iter().zip(sprites.iter()) {
             let tile_coords = rotate_coords(tile_coords, (*rotation).into());
             let coords = rotate_coords(&add_coords(coords, &tile_coords), main_sprite.rotation);
-            for sprite in sprites {
+            for sprite in &sprites[sprite_rotation] {
                 let coords = add_coords(&coords, &sprite.offset);
                 if !compare_coords(&coords, draw_order) {
                     continue;
@@ -94,9 +94,9 @@ fn draw_original_track_section(
     track_desc_sprites: &TrackSectionSprites,
     ui: &mut egui::Ui,
 ) {
-    for (tile_coords, sprites) in track_section.tiles.iter().zip(track_desc_sprites[rotation].iter()) {
+    for (tile_coords, sprites) in track_section.tiles.iter().zip(track_desc_sprites.iter()) {
         let coords = rotate_coords(tile_coords, rotation);
-        for sprite in sprites {
+        for sprite in &sprites[rotation] {
             let coords = add_coords(&coords, &sprite.offset);
             if let Some(texture) = original_sprites.get_sprite(sprite.index, ui.ctx()) {
                 draw_sprite(ui, texture, &coords);
