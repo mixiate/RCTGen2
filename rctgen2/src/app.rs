@@ -4,6 +4,7 @@ use crate::panels;
 use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
+use crate::widgets;
 use eframe::egui;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -31,6 +32,9 @@ pub struct RctGen2App {
     current_track_image: Option<TrackImage>,
     back_buffer: egui::TextureHandle,
     back_buffer_image: renderer::image::Image,
+    colour_button_textures: Vec<widgets::colour_picker::ButtonTextures>,
+    colour_picker_1: widgets::colour_picker::ColourPicker,
+    colour_picker_2: widgets::colour_picker::ColourPicker,
 }
 
 impl RctGen2App {
@@ -92,6 +96,9 @@ impl RctGen2App {
             current_track_image: None,
             back_buffer,
             back_buffer_image,
+            colour_button_textures: widgets::colour_picker::create_colour_button_textures(egui_context),
+            colour_picker_1: widgets::colour_picker::ColourPicker::new(),
+            colour_picker_2: widgets::colour_picker::ColourPicker::new(),
         }
     }
 
@@ -297,26 +304,36 @@ impl eframe::App for RctGen2App {
             redraw = true;
         }
 
-        if redraw
-            && let Some(track_desc) = &self.track_desc
-            && let Some(track_image) = &self.current_track_image
-        {
-            self.back_buffer_image.pixels_mut().fill(0);
-            crate::drawing::draw(
-                track_desc,
-                track_image,
-                &self.drawing_options,
-                &self.adjacent_track_sections,
-                self.rct2_sprites.as_mut(),
-                &mut self.back_buffer_image,
-            );
-            let image =
-                egui::ColorImage::from_rgba_unmultiplied(self.back_buffer.size(), self.back_buffer_image.pixels());
-            self.back_buffer.set(image, egui::TextureOptions::default());
-        }
-
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(34, 33, 39));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
+            ui.with_layout(egui::Layout::left_to_right(egui::Align::BOTTOM), |ui| {
+                ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
+                if self.colour_picker_1.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_1) {
+                    redraw = true;
+                }
+                if self.colour_picker_2.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_2) {
+                    redraw = true;
+                }
+            });
+
+            if redraw
+                && let Some(track_desc) = &self.track_desc
+                && let Some(track_image) = &self.current_track_image
+            {
+                self.back_buffer_image.pixels_mut().fill(0);
+                crate::drawing::draw(
+                    track_desc,
+                    track_image,
+                    &self.drawing_options,
+                    &self.adjacent_track_sections,
+                    self.rct2_sprites.as_mut(),
+                    &mut self.back_buffer_image,
+                );
+                let image =
+                    egui::ColorImage::from_rgba_unmultiplied(self.back_buffer.size(), self.back_buffer_image.pixels());
+                self.back_buffer.set(image, egui::TextureOptions::default());
+            }
+
             let texture_size = self.back_buffer.size_vec2();
             let image = egui::Image::from_texture((self.back_buffer.id(), texture_size));
             let image_pos = ui.max_rect().center() - (texture_size / egui::Vec2::new(2.0, 2.0));

@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }
 serde_with = "3.21.0"
+strum = { version = "0.28.0", features = ["derive"] }
 
 [lints]
 workspace = true
