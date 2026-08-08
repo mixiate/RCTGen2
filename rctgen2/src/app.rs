@@ -247,21 +247,32 @@ impl eframe::App for RctGen2App {
                     redraw = true;
                 }
 
-                let show_original_piece_enabled = if let Some(track_desc) = &self.track_desc {
+                let original_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc {
                     track_desc.original_sprites.contains_key(self.track_section.name)
                 } else {
-                    true
+                    false
                 };
                 if ui
                     .add_enabled(
-                        show_original_piece_enabled,
+                        original_track_checkbox_enabled && self.rct2_sprites.is_some(),
                         egui::Checkbox::new(&mut self.drawing_options.original_track, "Original"),
                     )
-                    .clicked()
+                    .changed()
                 {
                     redraw = true;
                 }
-                if ui.checkbox(&mut self.drawing_options.adjacent_track, "Adjacent").clicked() {
+                let adjacent_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc {
+                    !track_desc.original_sprites.is_empty()
+                } else {
+                    false
+                };
+                if ui
+                    .add_enabled(
+                        adjacent_track_checkbox_enabled && self.rct2_sprites.is_some(),
+                        egui::Checkbox::new(&mut self.drawing_options.adjacent_track, "Adjacent"),
+                    )
+                    .changed()
+                {
                     redraw = true;
                 }
 
