@@ -6,19 +6,30 @@ use make_track::track_desc::TrackSectionSprites;
 use make_track::track_sections::TRACK_SECTIONS;
 
 fn sprite_widgets(sprite: &mut make_track::track_desc::Sprite, ui: &mut egui::Ui) -> bool {
-    let button_height = ui.style().spacing.interact_size.y;
-    ui.add_sized(
-        [75.0, button_height],
-        egui::DragValue::new(&mut sprite.index).speed(0.0).update_while_editing(false),
-    );
-    ui.add(egui::DragValue::new(&mut sprite.offset[0]).speed(0.05));
-    ui.add(egui::DragValue::new(&mut sprite.offset[1]).speed(0.05));
-    ui.add(egui::DragValue::new(&mut sprite.offset[2]).speed(0.05));
-
-    widgets::buttons::remove_button(ui)
+    let mut changed = false;
+    if ui
+        .add_sized(
+            [75.0, ui.style().spacing.interact_size.y],
+            egui::DragValue::new(&mut sprite.index).speed(0.0).update_while_editing(false),
+        )
+        .changed()
+    {
+        changed = true;
+    }
+    if ui.add(egui::DragValue::new(&mut sprite.offset[0]).speed(0.05)).changed() {
+        changed = true;
+    }
+    if ui.add(egui::DragValue::new(&mut sprite.offset[1]).speed(0.05)).changed() {
+        changed = true;
+    }
+    if ui.add(egui::DragValue::new(&mut sprite.offset[2]).speed(0.05)).changed() {
+        changed = true;
+    }
+    changed
 }
 
-fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, ui: &mut egui::Ui) {
+fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, ui: &mut egui::Ui) -> bool {
+    let mut changed = false;
     ui.vertical(|ui| {
         let sprites_is_full = sprites.is_full();
         let sprites_len = sprites.len();
@@ -29,6 +40,9 @@ fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, 
         for (sprite_index, sprite) in sprites.iter_mut().enumerate() {
             ui.horizontal(|ui| {
                 if sprite_widgets(sprite, ui) {
+                    changed = true;
+                }
+                if widgets::buttons::remove_button(ui) {
                     removed_index = Some(sprite_index);
                 }
                 if !sprites_is_full && sprites_len - 1 == sprite_index && widgets::buttons::add_button(ui) {
@@ -44,14 +58,18 @@ fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, 
 
         if add_sprite {
             let _ignore_full = sprites.push(make_track::track_desc::Sprite::default());
+            changed = true;
         }
         if let Some(removed_index) = removed_index {
             sprites.remove(removed_index);
+            changed = true;
         }
     });
+    changed
 }
 
-fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) {
+fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) -> bool {
+    let mut changed = false;
     for rotation in 0..4 {
         if rotation != 0 {
             ui.separator();
@@ -74,17 +92,21 @@ fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) {
                 };
                 ui.label(tile_label);
 
-                sprites_grid(&mut tiles[rotation], ui);
+                if sprites_grid(&mut tiles[rotation], ui) {
+                    changed = true;
+                }
             });
         }
     }
+    changed
 }
 
 pub fn sprites_panel(
     sprites: &mut indexmap::IndexMap<String, TrackSectionSprites>,
     track_section_selection_modal: &mut modals::TrackSectionSelectionModal,
     ui: &mut egui::Ui,
-) {
+) -> bool {
+    let mut changed = false;
     egui::Panel::right("Sprites side panel").resizable(false).min_size(340.0).show(ui, |ui| {
         ui.vertical_centered(|ui| {
             if ui.button("Add piece").clicked() {
@@ -128,19 +150,25 @@ pub fn sprites_panel(
                     }
 
                     header.body(|ui| {
-                        track_section_body(sprites, ui);
+                        if track_section_body(sprites, ui) {
+                            changed = true;
+                        }
                     });
                 }
             });
 
         if let Some(index) = removed_track_section_index {
             sprites.shift_remove_index(index);
+            changed = true;
         }
     });
 
     if let Some(track_section) = track_section_selection_modal.draw(ui) {
         add_track_section(sprites, track_section);
+        changed = true;
     }
+
+    changed
 }
 
 fn add_track_section(
