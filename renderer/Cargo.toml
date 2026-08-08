@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.103"
+anyhow = "1.0.104"
 embree = { path = "../embree" }
-glam = "0.33.2"
+glam = "0.33.3"
 obj = "0.10.2"
 png = "0.18.1"
 rand_pcg = "0.10.2"
