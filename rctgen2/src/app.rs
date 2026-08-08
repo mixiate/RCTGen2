@@ -152,7 +152,8 @@ impl RctGen2App {
         }
     }
 
-    fn draw_side_panel(&mut self, ui: &mut egui::Ui) {
+    fn draw_side_panel(&mut self, ui: &mut egui::Ui) -> bool {
+        let mut redraw = false;
         if let Some(track_desc) = self.track_desc.as_mut() {
             match self.side_panel_tab {
                 Some(panels::SidePanelTab::Lights) => {
@@ -176,15 +177,19 @@ impl RctGen2App {
                     }
                 }
                 Some(panels::SidePanelTab::Sprites) => {
-                    panels::sprites::sprites_panel(
+                    let changed = panels::sprites::sprites_panel(
                         &mut track_desc.original_sprites,
                         &mut self.sprites_track_selection_modal,
                         ui,
                     );
+                    if changed {
+                        redraw = true;
+                    }
                 }
                 None => {}
             }
         }
+        redraw
     }
 }
 
@@ -287,7 +292,9 @@ impl eframe::App for RctGen2App {
 
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
-        self.draw_side_panel(ui);
+        if self.draw_side_panel(ui) {
+            redraw = true;
+        }
 
         if update_model {
             self.update_model();
