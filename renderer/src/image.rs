@@ -176,41 +176,22 @@ impl IndexedImage {
         &self.pixels
     }
 
-    pub fn load(path: &std::path::Path, expected_palette: &[u8]) -> anyhow::Result<Self> {
+    pub fn read(reader: impl std::io::BufRead + std::io::Seek, expected_palette: &[u8]) -> anyhow::Result<Self> {
         use anyhow::Context as _;
 
-        let file = std::fs::File::open(path)?;
-        let decoder = png::Decoder::new(std::io::BufReader::new(file));
+        let decoder = png::Decoder::new(reader);
         let mut reader = decoder.read_info()?;
 
-        let palette = reader
-            .info()
-            .palette
-            .as_ref()
-            .with_context(|| format!("Error reading {}, image has no palette", path.display()))?;
-        anyhow::ensure!(
-            *palette == expected_palette,
-            "Error reading {}, image palette is incorrect",
-            path.display()
-        );
+        let palette = reader.info().palette.as_ref().context("Image has no palette")?;
+        anyhow::ensure!(*palette == expected_palette, "Image palette is incorrect");
 
-        let buffer_size = reader
-            .output_buffer_size()
-            .with_context(|| format!("Error reading {} buffer size", path.display()))?;
+        let buffer_size = reader.output_buffer_size().context("Error reading buffer size")?;
         let mut buffer = vec![0; buffer_size];
         let info = reader.next_frame(&mut buffer)?;
         buffer.truncate(info.buffer_size());
 
-        anyhow::ensure!(
-            info.bit_depth == png::BitDepth::Eight,
-            "Error reading {}, image bit depth is not 8",
-            path.display()
-        );
-        anyhow::ensure!(
-            info.color_type == png::ColorType::Indexed,
-            "Error reading {}, image is not indexed",
-            path.display()
-        );
+        anyhow::ensure!(info.bit_depth == png::BitDepth::Eight, "Image bit depth is not 8");
+        anyhow::ensure!(info.color_type == png::ColorType::Indexed, "Image is not indexed");
 
         let width = u16::try_from(info.width)?;
         let height = u16::try_from(info.height)?;
@@ -221,6 +202,14 @@ impl IndexedImage {
             height,
             offset: glam::IVec2::new(0, 0),
         })
+    }
+
+    pub fn load(path: &std::path::Path, expected_palette: &[u8]) -> anyhow::Result<Self> {
+        use anyhow::Context as _;
+
+        let file = std::fs::File::open(path)?;
+        IndexedImage::read(std::io::BufReader::new(file), expected_palette)
+            .with_context(|| format!("{}", path.display()))
     }
 
     pub fn save(&self, path: &std::path::Path) -> anyhow::Result<()> {
