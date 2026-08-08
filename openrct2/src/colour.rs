@@ -1,4 +1,6 @@
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+use strum::{EnumCount, EnumIter};
+
+#[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize, EnumCount, EnumIter)]
 #[serde(rename_all = "snake_case")]
 pub enum Colour {
     Black,
@@ -59,7 +61,7 @@ pub enum Colour {
     Void,
 }
 
-pub static COLOUR_RAMPS: [[u8; 12]; 56] = [
+pub static COLOUR_RAMPS: [[u8; 12]; Colour::COUNT] = [
     [10, 10, 10, 10, 10, 11, 12, 13, 14, 15, 16, 17],             // Black
     [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],             // Grey
     [13, 14, 15, 16, 17, 18, 19, 20, 21, 21, 21, 21],             // White
