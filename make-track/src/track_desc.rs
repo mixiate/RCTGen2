@@ -190,15 +190,37 @@ pub struct Light {
     pub disabled: bool,
 }
 
-fn is_default_offset(offset: &[i16; 3]) -> bool {
-    *offset == [0; 3]
+fn is_default<T: Default + PartialEq>(t: &T) -> bool {
+    t == &T::default()
+}
+
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+pub struct MetalSupport {
+    pub position: openrct2::supports::SupportPosition,
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub height: i8,
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub extra_heights: [i16; 4],
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub rotation: u8,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub alternates: bool,
+}
+
+pub type TrackSectionMetalSupports = heapless::Vec<Option<MetalSupport>, { crate::track_sections::MAX_TILE_COUNT }>;
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub struct MetalSupports {
+    pub support_type: openrct2::supports::MetalSupportType,
+    #[serde(default, skip_serializing_if = "indexmap::IndexMap::is_empty")]
+    pub sections: indexmap::IndexMap<String, TrackSectionMetalSupports>,
 }
 
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Sprite {
     pub index: u32,
-    #[serde(default, skip_serializing_if = "is_default_offset")]
+    #[serde(default, skip_serializing_if = "is_default")]
     pub offset: [i16; 3],
 }
 
@@ -211,6 +233,7 @@ pub struct Desc {
     pub tracks: Vec<Track>,
     pub offsets: Option<Offsets>,
     pub lights: Vec<Light>,
+    pub metal_supports: Option<MetalSupports>,
     #[serde(default = "bool_true", skip_serializing_if = "Clone::clone")]
     pub dither: bool,
     pub edge_distance: Option<f32>,
