@@ -35,6 +35,7 @@ pub struct RctGen2App {
     colour_button_textures: Vec<widgets::colour_picker::ButtonTextures>,
     colour_picker_1: widgets::colour_picker::ColourPicker,
     colour_picker_2: widgets::colour_picker::ColourPicker,
+    colour_picker_3: widgets::colour_picker::ColourPicker,
 }
 
 impl RctGen2App {
@@ -99,6 +100,7 @@ impl RctGen2App {
             colour_button_textures: widgets::colour_picker::create_colour_button_textures(egui_context),
             colour_picker_1: widgets::colour_picker::ColourPicker::new(),
             colour_picker_2: widgets::colour_picker::ColourPicker::new(),
+            colour_picker_3: widgets::colour_picker::ColourPicker::new(),
         }
     }
 
@@ -275,6 +277,22 @@ impl eframe::App for RctGen2App {
                 {
                     redraw = true;
                 }
+                let supports_checkbox_enabled = if let Some(track_desc) = &self.track_desc
+                    && let Some(metal_supports) = &track_desc.metal_supports
+                {
+                    metal_supports.sections.contains_key(self.track_section.name)
+                } else {
+                    false
+                };
+                if ui
+                    .add_enabled(
+                        supports_checkbox_enabled && self.rct2_sprites.is_some(),
+                        egui::Checkbox::new(&mut self.drawing_options.supports, "Supports"),
+                    )
+                    .changed()
+                {
+                    redraw = true;
+                }
 
                 egui::ComboBox::from_id_salt("Track section")
                     .selected_text(self.track_section.name)
@@ -330,6 +348,9 @@ impl eframe::App for RctGen2App {
                     redraw = true;
                 }
                 if self.colour_picker_2.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_2) {
+                    redraw = true;
+                }
+                if self.colour_picker_3.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_3) {
                     redraw = true;
                 }
             });
