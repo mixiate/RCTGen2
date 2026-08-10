@@ -194,7 +194,7 @@ fn is_default<T: Default + PartialEq>(t: &T) -> bool {
     t == &T::default()
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
 pub struct MetalSupport {
     pub position: openrct2::supports::SupportPosition,
     #[serde(default, skip_serializing_if = "is_default")]
@@ -209,7 +209,7 @@ pub struct MetalSupport {
 
 pub type TrackSectionMetalSupports = heapless::Vec<Option<MetalSupport>, { crate::track_sections::MAX_TILE_COUNT }>;
 
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
 pub struct MetalSupports {
     pub support_type: openrct2::supports::MetalSupportType,
     #[serde(default, skip_serializing_if = "indexmap::IndexMap::is_empty")]
