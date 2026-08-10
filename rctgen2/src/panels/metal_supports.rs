@@ -137,15 +137,22 @@ fn main_panel(
         .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
         .show(ui, |ui| {
             for (index, (track_section_name, supports)) in metal_supports.sections.iter_mut().enumerate() {
-                let response = containers::collapsible_with_remove(ui, track_section_name, |ui| {
-                    track_section_body(supports, rotation, ui)
+                let frame = if current_track_section.name == track_section_name {
+                    egui::Frame::new().fill(ui.visuals().faint_bg_color)
+                } else {
+                    egui::Frame::new()
+                };
+                frame.show(ui, |ui| {
+                    let response = containers::collapsible_with_remove(ui, track_section_name, |ui| {
+                        track_section_body(supports, rotation, ui)
+                    });
+                    if response.changed {
+                        changed = true;
+                    }
+                    if response.removed {
+                        removed_track_section_index = Some(index);
+                    }
                 });
-                if response.changed {
-                    changed = true;
-                }
-                if response.removed {
-                    removed_track_section_index = Some(index);
-                }
             }
         });
 
