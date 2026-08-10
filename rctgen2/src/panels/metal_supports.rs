@@ -40,9 +40,7 @@ fn track_section_body(supports: &mut TrackSectionMetalSupports, rotation: usize,
     let mut changed = false;
     let mut added_tile_index = None;
     for (tile_index, support) in supports.iter_mut().enumerate() {
-        if tile_index != 0 {
-            ui.separator();
-        }
+        ui.separator();
 
         let mut remove_support = false;
         if let Some(support) = support.as_mut() {
@@ -91,6 +89,8 @@ fn track_section_body(supports: &mut TrackSectionMetalSupports, rotation: usize,
             changed = true;
         }
     }
+    ui.separator();
+
     if let Some(added_tile_index) = added_tile_index
         && let Some(support) = supports.get_mut(added_tile_index)
     {
