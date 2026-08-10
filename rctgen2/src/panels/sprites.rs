@@ -101,7 +101,7 @@ pub fn sprites_panel(
                 track_section_selection_modal.open();
             }
         });
-        ui.separator();
+        ui.add(egui::Separator::default().spacing(0.0));
 
         let mut removed_track_section_index = None;
 

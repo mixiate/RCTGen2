@@ -129,7 +129,7 @@ fn main_panel(
             add_track_section(&mut metal_supports.sections, current_track_section);
         }
     });
-    ui.separator();
+    ui.add(egui::Separator::default().spacing(0.0));
 
     let mut removed_track_section_index = None;
     ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
