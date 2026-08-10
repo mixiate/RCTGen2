@@ -72,9 +72,7 @@ fn sprites_grid(sprites: &mut heapless::Vec<make_track::track_desc::Sprite, 2>, 
 fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) -> bool {
     let mut changed = false;
     for rotation in 0..4 {
-        if rotation != 0 {
-            ui.separator();
-        }
+        ui.separator();
 
         for (tile_index, tiles) in sprites.iter_mut().enumerate() {
             ui.horizontal(|ui| {
@@ -86,6 +84,7 @@ fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) -> b
             });
         }
     }
+    ui.separator();
     changed
 }
 
