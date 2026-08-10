@@ -1,4 +1,5 @@
 pub mod lights;
+pub mod metal_supports;
 pub mod offsets;
 pub mod render;
 pub mod sprites;
@@ -9,6 +10,7 @@ use eframe::egui;
 pub enum SidePanelTab {
     Lights,
     Offsets,
+    MetalSupports,
     Render,
     Sprites,
 }
@@ -40,6 +42,7 @@ pub fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab
                 ui.style_mut().spacing.item_spacing = egui::vec2(0.0, 0.0);
                 side_panel_tab(ui, "💡", selected_tab, SidePanelTab::Lights);
                 side_panel_tab(ui, "↔", selected_tab, SidePanelTab::Offsets);
+                side_panel_tab(ui, "|", selected_tab, SidePanelTab::MetalSupports);
                 side_panel_tab(ui, "📷", selected_tab, SidePanelTab::Render);
                 side_panel_tab(ui, "🖼️", selected_tab, SidePanelTab::Sprites);
             });

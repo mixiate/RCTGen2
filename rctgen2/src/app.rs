@@ -172,6 +172,17 @@ impl RctGen2App {
                         self.queue_render(ui.ctx().clone());
                     }
                 }
+                Some(panels::SidePanelTab::MetalSupports) => {
+                    let changed = panels::metal_supports::metal_supports_panel(
+                        &mut track_desc.metal_supports,
+                        self.rotation,
+                        self.track_section,
+                        ui,
+                    );
+                    if changed {
+                        redraw = true;
+                    }
+                }
                 Some(panels::SidePanelTab::Render) => {
                     let changed = panels::render::render_panel(track_desc, ui);
                     if changed {

@@ -1,10 +1,22 @@
-#[derive(Clone, Copy, Debug, strum::EnumCount, serde::Deserialize, serde::Serialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    PartialEq,
+    strum::EnumCount,
+    strum::EnumIter,
+    strum::IntoStaticStr,
+    serde::Deserialize,
+    serde::Serialize,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum SupportPosition {
     TopCorner,
     LeftCorner,
     RightCorner,
     BottomCorner,
+    #[default]
     Centre,
     TopLeftSide,
     TopRightSide,
@@ -33,9 +45,21 @@ impl SupportPosition {
     }
 }
 
-#[derive(Clone, Copy, Debug, strum::EnumCount, serde::Deserialize, serde::Serialize)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    PartialEq,
+    strum::EnumCount,
+    strum::EnumIter,
+    strum::IntoStaticStr,
+    serde::Deserialize,
+    serde::Serialize,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum MetalSupportType {
+    #[default]
     Tubes,
     Fork,
     Boxed,
