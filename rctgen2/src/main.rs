@@ -2,6 +2,7 @@
 
 mod adjacent_track;
 mod app;
+mod containers;
 mod drawing;
 mod modals;
 mod panels;
