@@ -351,7 +351,7 @@ impl eframe::App for RctGen2App {
             redraw = true;
         }
 
-        let frame = egui::Frame::default().fill(egui::Color32::from_rgb(34, 33, 39));
+        let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
             ui.with_layout(egui::Layout::left_to_right(egui::Align::BOTTOM), |ui| {
                 ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
