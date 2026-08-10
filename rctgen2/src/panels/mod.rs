@@ -41,9 +41,9 @@ pub fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab
             ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
                 ui.style_mut().spacing.item_spacing = egui::vec2(0.0, 0.0);
                 side_panel_tab(ui, "💡", selected_tab, SidePanelTab::Lights);
+                side_panel_tab(ui, "📷", selected_tab, SidePanelTab::Render);
                 side_panel_tab(ui, "↔", selected_tab, SidePanelTab::Offsets);
                 side_panel_tab(ui, "|", selected_tab, SidePanelTab::MetalSupports);
-                side_panel_tab(ui, "📷", selected_tab, SidePanelTab::Render);
                 side_panel_tab(ui, "🖼️", selected_tab, SidePanelTab::Sprites);
             });
         });
