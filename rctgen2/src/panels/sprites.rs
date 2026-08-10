@@ -1,3 +1,4 @@
+use crate::containers;
 use crate::modals;
 use crate::widgets;
 use eframe::egui;
@@ -110,37 +111,15 @@ pub fn sprites_panel(
             .scroll_bar_visibility(ScrollBarVisibility::AlwaysVisible)
             .show(ui, |ui| {
                 for (index, (track_section_name, sprites)) in sprites.iter_mut().enumerate() {
-                    let id = ui.make_persistent_id(track_section_name);
-                    let mut label_clicked = false;
-
-                    let mut header =
-                        egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, false)
-                            .show_header(ui, |ui| {
-                                ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                                    let label = egui::Label::new(track_section_name)
-                                        .selectable(false)
-                                        .sense(egui::Sense::click());
-                                    if ui.add(label).clicked() {
-                                        label_clicked = true;
-                                    }
-
-                                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                                        if widgets::buttons::remove_button(ui) {
-                                            removed_track_section_index = Some(index);
-                                        }
-                                    });
-                                });
-                            });
-
-                    if label_clicked {
-                        header.set_open(!header.is_open());
-                    }
-
-                    header.body(|ui| {
-                        if track_section_body(sprites, ui) {
-                            changed = true;
-                        }
+                    let response = containers::collapsible_with_remove(ui, track_section_name, |ui| {
+                        track_section_body(sprites, ui)
                     });
+                    if response.changed {
+                        changed = true;
+                    }
+                    if response.removed {
+                        removed_track_section_index = Some(index);
+                    }
                 }
             });
 
