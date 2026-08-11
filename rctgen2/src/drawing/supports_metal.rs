@@ -155,9 +155,17 @@ pub fn draw_supports(
     support_type: MetalSupportType,
     sprites: &mut sprites::Sprites,
 ) {
-    for (tile_coords, support) in track_section.tiles.iter().zip(supports.iter()) {
-        if let Some(support) = support {
-            draw_support(buffer, tile_coords, support, rotation, colour, support_type, sprites);
+    let mut tile_indices: heapless::Vec<_, { make_track::track_sections::MAX_TILE_COUNT }> =
+        (0..track_section.tiles.len()).collect();
+    tile_indices.sort_by_key(|i| {
+        let coords = drawing::rotate_coords(&track_section.tiles[*i], rotation);
+        coords[0] + coords[1]
+    });
+
+    for tile_index in tile_indices {
+        if let Some(support) = &supports[tile_index] {
+            let coords = &track_section.tiles[tile_index];
+            draw_support(buffer, coords, support, rotation, colour, support_type, sprites);
         }
     }
 }
