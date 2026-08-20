@@ -114,9 +114,11 @@ impl RctGen2App {
                 .with_context(|| format!("Could not get parent directory of {}", file_path.display()))?
                 .to_path_buf();
             let track_desc = make_track::track_desc::Desc::load(&file_path)?;
+            let track = track_desc.tracks.first().with_context(|| "No track found in track description")?;
 
             let _result = self.render_tx.send(RenderMessage::SetDirectory(directory));
-            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track_desc.clone())));
+            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track.clone())));
+            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
             self.update_model();
             self.current_track_image = None;
             self.track_desc_path = Some(file_path);
