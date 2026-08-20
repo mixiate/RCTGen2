@@ -54,6 +54,7 @@ fn main() -> anyhow::Result<()> {
         "RCTGen2",
         options,
         Box::new(|creation_context| {
+            creation_context.egui_ctx.options_mut(|options| options.sync_window_theme = false);
             creation_context.egui_ctx.set_theme(egui::Theme::Dark);
             Ok(Box::new(app::RctGen2App::new(
                 &creation_context.egui_ctx,
