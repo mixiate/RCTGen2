@@ -108,6 +108,7 @@ pub fn sprites_panel(
 
         egui::ScrollArea::vertical()
             .scroll_bar_visibility(ScrollBarVisibility::AlwaysVisible)
+            .auto_shrink(false)
             .show(ui, |ui| {
                 for (index, (track_section_name, sprites)) in sprites.iter_mut().enumerate() {
                     let response = containers::collapsible_with_remove(ui, track_section_name, |ui| {
