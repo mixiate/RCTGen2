@@ -135,6 +135,7 @@ fn main_panel(
     ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
     egui::ScrollArea::vertical()
         .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
+        .auto_shrink(false)
         .show(ui, |ui| {
             for (index, (track_section_name, supports)) in metal_supports.sections.iter_mut().enumerate() {
                 let frame = if current_track_section.name == track_section_name {
