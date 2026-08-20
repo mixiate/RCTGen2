@@ -20,7 +20,7 @@ pub struct RenderArgs {
 
 pub enum RenderMessage {
     SetDirectory(std::path::PathBuf),
-    LoadTrack(Box<make_track::track_desc::Desc>),
+    LoadTrack(Box<make_track::track_desc::Track>),
     UpdateOffsets(Box<Option<make_track::track_desc::Offsets>>),
     UpdateModel(UpdateModelArgs),
     Render(RenderArgs),
@@ -41,7 +41,7 @@ pub struct TrackImage {
 pub type SharedTrackImage = Arc<Mutex<Option<TrackImage>>>;
 
 struct Track {
-    track_desc: make_track::track_desc::Desc,
+    track: make_track::track_desc::Track,
     track_models: make_track::track_desc::Models<renderer::model::Model>,
     lengths: make_track::track_model::ModelLengths,
 }
@@ -51,15 +51,12 @@ struct Scene<'a> {
     mesh_types: Vec<renderer::MeshType>,
 }
 
-fn load_track(track_desc: make_track::track_desc::Desc, directory: &std::path::Path) -> anyhow::Result<Track> {
-    use anyhow::Context as _;
-
-    let track = track_desc.tracks.first().with_context(|| "No track found in track description")?;
+fn load_track(track: make_track::track_desc::Track, directory: &std::path::Path) -> anyhow::Result<Track> {
     let track_models = track.models.load(directory)?;
-    let lengths = make_track::track_model::ModelLengths::calculate(track, &track_models);
+    let lengths = make_track::track_model::ModelLengths::calculate(&track, &track_models);
 
     Ok(Track {
-        track_desc,
+        track,
         track_models,
         lengths,
     })
@@ -69,17 +66,16 @@ fn update_model<'a>(
     args: &UpdateModelArgs,
     render_device: &'a renderer::Device,
     track: &'a Track,
+    offsets: Option<&make_track::track_desc::Offsets>,
 ) -> anyhow::Result<Scene<'a>> {
-    use anyhow::Context as _;
-
     let model_desc = make_track::track_model::ModelDesc::new(
-        track.track_desc.tracks.first().with_context(|| "No track found in track description")?,
+        &track.track,
         &track.track_models,
         &track.lengths,
         args.track_section,
         args.rotation,
     );
-    let (offset_start, offset_end) = if let Some(offsets) = &track.track_desc.offsets {
+    let (offset_start, offset_end) = if let Some(offsets) = offsets {
         let offset_start =
             make_track::offset::calculate(offsets, args.track_section, model_desc.bank_angle, 0.0, args.rotation);
         let offset_end = make_track::offset::calculate(
@@ -135,10 +131,8 @@ fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Images {
 
     let mut unindexed_image = framebuffer.to_image();
     let mut indexed_image = framebuffer.into_indexed_image(args.dither);
-
-    let z_offset = track.track_desc.tracks.first().map(|x| x.z_offset).unwrap_or_default();
-    unindexed_image.offset.y += -z_offset + 16;
-    indexed_image.offset.y += -z_offset + 16;
+    unindexed_image.offset.y += -track.track.z_offset + 16;
+    indexed_image.offset.y += -track.track.z_offset + 16;
 
     Images {
         unindexed: unindexed_image,
@@ -162,6 +156,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
 
     let mut current_directory = None;
     let mut current_track = None;
+    let mut current_offsets = None;
     let mut current_scene = None;
     let mut current_track_section = &make_track::track_sections::FLAT;
 
@@ -193,13 +188,11 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
                 }
                 RenderMessage::UpdateOffsets(offsets) => {
                     current_scene = None;
-                    if let Some(track) = current_track.as_mut() {
-                        track.track_desc.offsets = *offsets;
-                    }
+                    current_offsets = *offsets;
                 }
                 RenderMessage::UpdateModel(args) => {
                     if let Some(track) = &current_track {
-                        match update_model(&args, &render_device, track) {
+                        match update_model(&args, &render_device, track, current_offsets.as_ref()) {
                             Ok(scene) => {
                                 current_scene = Some(scene);
                                 current_track_section = args.track_section;
