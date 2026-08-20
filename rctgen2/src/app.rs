@@ -1,7 +1,7 @@
 use crate::adjacent_track;
 use crate::modals;
 use crate::panels;
-use crate::render::{LoadTrackArgs, RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
+use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
 use crate::widgets;
@@ -115,10 +115,8 @@ impl RctGen2App {
                 .to_path_buf();
             let track_desc = make_track::track_desc::Desc::load(&file_path)?;
 
-            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(LoadTrackArgs {
-                track_desc: track_desc.clone(),
-                directory,
-            })));
+            let _result = self.render_tx.send(RenderMessage::SetDirectory(directory));
+            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track_desc.clone())));
             self.update_model();
             self.current_track_image = None;
             self.track_desc_path = Some(file_path);

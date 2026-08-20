@@ -4,11 +4,6 @@ use std::sync::mpsc::Receiver;
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
-pub struct LoadTrackArgs {
-    pub track_desc: make_track::track_desc::Desc,
-    pub directory: std::path::PathBuf,
-}
-
 pub struct UpdateModelArgs {
     pub track_section: &'static make_track::track_sections::TrackSection,
     pub rotation: usize,
@@ -24,7 +19,8 @@ pub struct RenderArgs {
 }
 
 pub enum RenderMessage {
-    LoadTrack(Box<LoadTrackArgs>),
+    SetDirectory(std::path::PathBuf),
+    LoadTrack(Box<make_track::track_desc::Desc>),
     UpdateOffsets(Box<Option<make_track::track_desc::Offsets>>),
     UpdateModel(UpdateModelArgs),
     Render(RenderArgs),
@@ -55,15 +51,15 @@ struct Scene<'a> {
     mesh_types: Vec<renderer::MeshType>,
 }
 
-fn load_track(args: LoadTrackArgs) -> anyhow::Result<Track> {
+fn load_track(track_desc: make_track::track_desc::Desc, directory: &std::path::Path) -> anyhow::Result<Track> {
     use anyhow::Context as _;
 
-    let track = args.track_desc.tracks.first().with_context(|| "No track found in track description")?;
-    let track_models = track.models.load(&args.directory)?;
+    let track = track_desc.tracks.first().with_context(|| "No track found in track description")?;
+    let track_models = track.models.load(directory)?;
     let lengths = make_track::track_model::ModelLengths::calculate(track, &track_models);
 
     Ok(Track {
-        track_desc: args.track_desc,
+        track_desc,
         track_models,
         lengths,
     })
@@ -164,6 +160,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
         }
     };
 
+    let mut current_directory = None;
     let mut current_track = None;
     let mut current_scene = None;
     let mut current_track_section = &make_track::track_sections::FLAT;
@@ -182,13 +179,18 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
 
         for message in messages.drain(0..) {
             match message {
-                RenderMessage::LoadTrack(args) => match load_track(*args) {
-                    Ok(track) => {
-                        current_scene = None;
-                        current_track = Some(track);
+                RenderMessage::SetDirectory(directory) => current_directory = Some(directory),
+                RenderMessage::LoadTrack(track_desc) => {
+                    if let Some(directory) = current_directory.as_ref() {
+                        match load_track(*track_desc, directory) {
+                            Ok(track) => {
+                                current_scene = None;
+                                current_track = Some(track);
+                            }
+                            Err(error) => report_error(app_tx, &error),
+                        }
                     }
-                    Err(error) => report_error(app_tx, &error),
-                },
+                }
                 RenderMessage::UpdateOffsets(offsets) => {
                     current_scene = None;
                     if let Some(track) = current_track.as_mut() {
