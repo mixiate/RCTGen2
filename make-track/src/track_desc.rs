@@ -151,7 +151,7 @@ pub struct Track {
     pub bank_angle: f32,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub lift: bool,
-    pub masks: std::path::PathBuf,
+    pub masks: String,
     pub models: Models<std::path::PathBuf>,
 }
 
