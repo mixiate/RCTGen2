@@ -148,17 +148,11 @@ pub struct Track {
     #[serde(default, skip_serializing_if = "is_float_0")]
     pub support_pivot: f32,
     #[serde(default = "default_bank_angle", skip_serializing_if = "is_default_bank_angle")]
-    bank_angle: f32,
+    pub bank_angle: f32,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub lift: bool,
     pub masks: std::path::PathBuf,
     pub models: Models<std::path::PathBuf>,
-}
-
-impl Track {
-    pub fn bank_angle(&self) -> f32 {
-        self.bank_angle.to_radians()
-    }
 }
 
 #[serde_with::skip_serializing_none]
