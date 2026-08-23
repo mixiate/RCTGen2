@@ -99,10 +99,10 @@ pub struct Models<T> {
     pub additional: indexmap::IndexMap<String, AdditionalModel<T>>,
 }
 
-impl Models<std::path::PathBuf> {
+impl Models<relative_path::RelativePathBuf> {
     pub fn load(&self, base_directory: &std::path::Path) -> anyhow::Result<Models<renderer::model::Model>> {
-        let load_optional_model = |path: &Option<std::path::PathBuf>| {
-            path.as_ref().map(|x| renderer::model::Model::load(&base_directory.join(x))).transpose()
+        let load_optional_model = |path: &Option<relative_path::RelativePathBuf>| {
+            path.as_ref().map(|x| renderer::model::Model::load(&x.to_path(base_directory))).transpose()
         };
 
         let mut additional = indexmap::IndexMap::with_capacity(self.additional.len());
@@ -110,15 +110,15 @@ impl Models<std::path::PathBuf> {
             additional.insert(
                 track_piece_name.clone(),
                 AdditionalModel {
-                    model: renderer::model::Model::load(&base_directory.join(&additional_model.model))?,
+                    model: renderer::model::Model::load(&additional_model.model.to_path(base_directory))?,
                     mirror: additional_model.mirror,
                 },
             );
         }
 
         Ok(Models::<renderer::model::Model> {
-            track: renderer::model::Model::load(&base_directory.join(&self.track))?,
-            mask: renderer::model::Model::load(&base_directory.join(&self.mask))?,
+            track: renderer::model::Model::load(&self.track.to_path(base_directory))?,
+            mask: renderer::model::Model::load(&self.mask.to_path(base_directory))?,
             tie: load_optional_model(&self.tie)?,
             track_tie: load_optional_model(&self.track_tie)?,
             track_alt: load_optional_model(&self.track_alt)?,
@@ -154,7 +154,7 @@ pub struct Track {
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub lift: bool,
     pub masks: String,
-    pub models: Models<std::path::PathBuf>,
+    pub models: Models<relative_path::RelativePathBuf>,
 }
 
 #[serde_with::skip_serializing_none]
