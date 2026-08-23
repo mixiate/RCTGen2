@@ -137,6 +137,21 @@ pub fn tracks_panel(tracks: &mut [make_track::track_desc::Track], ui: &mut egui:
                         }
                         ui.end_row();
                     });
+
+                    egui::CollapsingHeader::new("Sections").id_salt(index).show(ui, |ui| {
+                        use strum::IntoEnumIterator as _;
+                        for group in make_track::track_desc::TrackGroup::iter() {
+                            let mut enabled = track.sections.contains(&group);
+                            let label: &'static str = group.into();
+                            if ui.checkbox(&mut enabled, label).changed() {
+                                if enabled {
+                                    track.sections.insert(group);
+                                } else {
+                                    track.sections.shift_remove(&group);
+                                }
+                            }
+                        }
+                    });
                 }
             });
     });
