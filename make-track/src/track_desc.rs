@@ -24,7 +24,9 @@ fn is_float_1(float: &f32) -> bool {
     *float == 1.0
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(
+    Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Deserialize, serde::Serialize, strum::EnumIter, strum::IntoStaticStr,
+)]
 #[serde(rename_all = "snake_case")]
 pub enum TrackGroup {
     Flat,
