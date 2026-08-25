@@ -192,7 +192,7 @@ pub fn tracks_panel(
     ui: &mut egui::Ui,
 ) -> bool {
     let mut changed = false;
-    egui::Panel::right("Tracks side panel").resizable(false).show(ui, |ui| {
+    egui::Panel::right("Tracks side panel").show(ui, |ui| {
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
