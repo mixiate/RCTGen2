@@ -3145,6 +3145,7 @@ dependencies = [
  "make-track",
  "openrct2",
  "rct",
+ "relative-path",
  "renderer",
  "rfd",
  "serde",
