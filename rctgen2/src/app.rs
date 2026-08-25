@@ -271,13 +271,76 @@ impl eframe::App for RctGen2App {
                         ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
+
+                egui::ComboBox::from_id_salt("Track section")
+                    .selected_text(self.track_section.name)
+                    .width(300.0)
+                    .height(500.0)
+                    .show_ui(ui, |ui| {
+                        for track_section in make_track::track_sections::TRACK_SECTIONS {
+                            ui.selectable_value(&mut self.track_section, track_section, track_section.name);
+                        }
+                    });
+                if self.track_section != previous_track_section {
+                    update_model = true;
+                    queue_render = true;
+                }
+            });
+        });
+
+        panels::side_panel_tabs(ui, &mut self.side_panel_tab);
+
+        if self.draw_side_panel(ui) {
+            redraw = true;
+        }
+
+        let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
+        egui::CentralPanel::default().frame(frame).show(ui, |ui| {
+            let frame = egui::Frame::popup(ui.style()).outer_margin(egui::Margin::same(10)).shadow(egui::Shadow::NONE);
+            frame.show(ui, |ui| {
                 if ui.add(egui::DragValue::new(&mut self.samples).prefix("Samples: ").range(1..=4)).changed() {
                     queue_render = true;
                 }
                 if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
                     redraw = true;
                 }
-
+            });
+            frame.show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
+                    if self.colour_picker_1.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_1)
+                    {
+                        redraw = true;
+                    }
+                    if self.colour_picker_2.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_2)
+                    {
+                        redraw = true;
+                    }
+                    if self.colour_picker_3.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_3)
+                    {
+                        redraw = true;
+                    }
+                });
+            });
+            frame.show(ui, |ui| {
+                let supports_checkbox_enabled = if let Some(track_desc) = &self.track_desc
+                    && let Some(metal_supports) = &track_desc.metal_supports
+                {
+                    metal_supports.sections.contains_key(self.track_section.name)
+                } else {
+                    false
+                };
+                if ui
+                    .add_enabled(
+                        supports_checkbox_enabled && self.rct2_sprites.is_some(),
+                        egui::Checkbox::new(&mut self.drawing_options.supports, "Supports"),
+                    )
+                    .changed()
+                {
+                    redraw = true;
+                }
+            });
+            frame.show(ui, |ui| {
                 let original_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc {
                     track_desc.original_sprites.contains_key(self.track_section.name)
                 } else {
@@ -306,38 +369,15 @@ impl eframe::App for RctGen2App {
                 {
                     redraw = true;
                 }
-                let supports_checkbox_enabled = if let Some(track_desc) = &self.track_desc
-                    && let Some(metal_supports) = &track_desc.metal_supports
-                {
-                    metal_supports.sections.contains_key(self.track_section.name)
-                } else {
-                    false
-                };
+            });
+            frame.show(ui, |ui| {
                 if ui
-                    .add_enabled(
-                        supports_checkbox_enabled && self.rct2_sprites.is_some(),
-                        egui::Checkbox::new(&mut self.drawing_options.supports, "Supports"),
+                    .add_sized(
+                        egui::Vec2::new(35.0, 35.0),
+                        egui::Button::new(egui::RichText::new("↻").size(25.0)),
                     )
-                    .changed()
+                    .clicked()
                 {
-                    redraw = true;
-                }
-
-                egui::ComboBox::from_id_salt("Track section")
-                    .selected_text(self.track_section.name)
-                    .width(300.0)
-                    .height(500.0)
-                    .show_ui(ui, |ui| {
-                        for track_section in make_track::track_sections::TRACK_SECTIONS {
-                            ui.selectable_value(&mut self.track_section, track_section, track_section.name);
-                        }
-                    });
-                if self.track_section != previous_track_section {
-                    update_model = true;
-                    queue_render = true;
-                }
-
-                if ui.add(egui::Button::new("↻")).clicked() {
                     self.rotation += 1;
                     if self.rotation == 4 {
                         self.rotation = 0;
@@ -346,43 +386,21 @@ impl eframe::App for RctGen2App {
                     queue_render = true;
                 }
             });
-        });
 
-        panels::side_panel_tabs(ui, &mut self.side_panel_tab);
+            if update_model {
+                self.update_model();
+            }
+            if queue_render {
+                self.queue_render(ui.ctx().clone());
+            }
 
-        if self.draw_side_panel(ui) {
-            redraw = true;
-        }
-
-        if update_model {
-            self.update_model();
-        }
-        if queue_render {
-            self.queue_render(ui.ctx().clone());
-        }
-
-        if fetch_frame
-            && let Ok(mut track_image) = self.track_image.lock()
-            && track_image.is_some()
-        {
-            self.current_track_image = track_image.take();
-            redraw = true;
-        }
-
-        let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
-        egui::CentralPanel::default().frame(frame).show(ui, |ui| {
-            ui.with_layout(egui::Layout::left_to_right(egui::Align::BOTTOM), |ui| {
-                ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
-                if self.colour_picker_1.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_1) {
-                    redraw = true;
-                }
-                if self.colour_picker_2.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_2) {
-                    redraw = true;
-                }
-                if self.colour_picker_3.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_3) {
-                    redraw = true;
-                }
-            });
+            if fetch_frame
+                && let Ok(mut track_image) = self.track_image.lock()
+                && track_image.is_some()
+            {
+                self.current_track_image = track_image.take();
+                redraw = true;
+            }
 
             if redraw
                 && let Some(track_desc) = &self.track_desc
