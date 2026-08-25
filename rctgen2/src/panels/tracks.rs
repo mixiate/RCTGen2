@@ -1,5 +1,7 @@
 use crate::widgets;
 use eframe::egui;
+use make_track::track_desc::AdditionalModel;
+use make_track::track_sections::TRACK_SECTIONS;
 use relative_path::RelativePathBuf;
 
 fn length_widgets(ui: &mut egui::Ui, value: &mut Option<f32>) -> bool {
@@ -100,11 +102,54 @@ fn optional_model_widgets(
     }
 }
 
+fn add_additional_model_button(
+    ui: &mut egui::Ui,
+    additional_models: &mut indexmap::IndexMap<String, AdditionalModel<RelativePathBuf>>,
+    directory: &std::path::Path,
+    errors: &mut Vec<String>,
+    current_track_section: &make_track::track_sections::TrackSection,
+) -> bool {
+    let mut changed = false;
+    let enabled = !additional_models.contains_key(current_track_section.name);
+    if ui.add_enabled(enabled, egui::Button::new("Add current section")).clicked() {
+        match model_file_dialog(directory) {
+            Ok(Some(file_path)) => {
+                let name = current_track_section.name.to_string();
+                if let indexmap::map::Entry::Vacant(entry) = additional_models.entry(name) {
+                    let model = AdditionalModel {
+                        model: file_path,
+                        mirror: false,
+                    };
+
+                    entry.insert_sorted_by(model, |key_a, _, key_b, _| {
+                        let a_index = TRACK_SECTIONS.iter().position(|x| x.name == key_a);
+                        let b_index = TRACK_SECTIONS.iter().position(|x| x.name == key_b);
+                        if let Some(a_index) = a_index
+                            && let Some(b_index) = b_index
+                        {
+                            a_index.cmp(&b_index)
+                        } else {
+                            std::cmp::Ordering::Less
+                        }
+                    });
+                }
+                changed = true;
+            }
+            Err(error) => {
+                errors.push(error.to_string());
+            }
+            _ => {}
+        }
+    }
+    changed
+}
+
 fn models_collapsible(
     ui: &mut egui::Ui,
     models: &mut make_track::track_desc::Models<RelativePathBuf>,
     dir: &std::path::Path,
     errors: &mut Vec<String>,
+    current_track_section: &make_track::track_sections::TrackSection,
 ) -> bool {
     let mut changed = false;
     egui::Grid::new("Track models grid").min_col_width(0.0).show(ui, |ui| {
@@ -182,6 +227,35 @@ fn models_collapsible(
         optional_model_widgets(ui, "Support Bank", &mut models.support_bank, dir, errors, &mut changed);
         ui.end_row();
     });
+
+    ui.separator();
+
+    ui.horizontal(|ui| {
+        ui.label("Additional Models");
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            if add_additional_model_button(ui, &mut models.additional, dir, errors, current_track_section) {
+                changed = true;
+            }
+        });
+    });
+    egui::Grid::new("Track additional models grid").min_col_width(0.0).show(ui, |ui| {
+        let mut removed_index = None;
+        for (index, (track_section, model)) in models.additional.iter_mut().enumerate() {
+            model_widgets(ui, track_section, &mut model.model, dir, errors, &mut changed);
+            if ui.checkbox(&mut model.mirror, "Mirror").changed() {
+                changed = true;
+            }
+            if widgets::buttons::remove_button(ui) {
+                removed_index = Some(index);
+            }
+            ui.end_row();
+        }
+        if let Some(index) = removed_index {
+            models.additional.shift_remove_index(index);
+            changed = true;
+        }
+    });
+
     changed
 }
 
@@ -189,6 +263,7 @@ pub fn tracks_panel(
     tracks: &mut [make_track::track_desc::Track],
     directory: &std::path::Path,
     errors: &mut Vec<String>,
+    current_track_section: &make_track::track_sections::TrackSection,
     ui: &mut egui::Ui,
 ) -> bool {
     let mut changed = false;
@@ -305,7 +380,7 @@ pub fn tracks_panel(
                     });
 
                     egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
-                        if models_collapsible(ui, &mut track.models, directory, errors) {
+                        if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
                             changed = true;
                         }
                     });
