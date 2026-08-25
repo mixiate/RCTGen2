@@ -14,6 +14,7 @@ indexmap = "2.14.0"
 make-track = { path = "../make-track" }
 openrct2 = { path = "../openrct2" }
 rct = { path = "../rct" }
+relative-path = { version = "2.0.1", features = ["serde"] }
 renderer = { path = "../renderer" }
 rfd = "0.17.2"
 serde = { version = "1.0.229", features = ["derive"] }
