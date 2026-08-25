@@ -159,11 +159,16 @@ impl RctGen2App {
         if let Some(track_desc) = self.track_desc.as_mut() {
             match self.side_panel_tab {
                 Some(panels::SidePanelTab::Tracks) => {
-                    let changed = panels::tracks::tracks_panel(&mut track_desc.tracks, ui);
-                    if changed && let Some(track) = track_desc.tracks.first() {
-                        let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track.clone())));
-                        self.update_model();
-                        self.queue_render(ui.ctx().clone());
+                    if let Some(path) = &self.track_desc_path
+                        && let Some(directory) = path.parent()
+                    {
+                        let changed =
+                            panels::tracks::tracks_panel(&mut track_desc.tracks, directory, &mut self.errors, ui);
+                        if changed && let Some(track) = track_desc.tracks.first() {
+                            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track.clone())));
+                            self.update_model();
+                            self.queue_render(ui.ctx().clone());
+                        }
                     }
                 }
                 Some(panels::SidePanelTab::Lights) => {
