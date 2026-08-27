@@ -138,23 +138,31 @@ impl Models<relative_path::RelativePathBuf> {
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct Track {
-    pub name: String,
-    pub suffix: Option<String>,
-    pub sections: indexmap::IndexSet<TrackGroup>,
+pub struct Model {
     pub length: Option<f32>,
     pub tie_length: Option<f32>,
-    pub z_offset: i32,
     #[serde(default = "float_1", skip_serializing_if = "is_float_1")]
     pub support_spacing: f32,
     #[serde(default, skip_serializing_if = "is_float_0")]
     pub support_pivot: f32,
     #[serde(default = "default_bank_angle", skip_serializing_if = "is_default_bank_angle")]
     pub bank_angle: f32,
+    pub models: Models<relative_path::RelativePathBuf>,
+}
+
+#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Track {
+    pub name: String,
+    pub suffix: Option<String>,
+    pub sections: indexmap::IndexSet<TrackGroup>,
+    pub z_offset: i32,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub lift: bool,
     pub masks: String,
-    pub models: Models<relative_path::RelativePathBuf>,
+    #[serde(flatten)]
+    pub model: Model,
 }
 
 #[serde_with::skip_serializing_none]

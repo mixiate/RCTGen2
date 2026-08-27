@@ -52,8 +52,8 @@ struct Scene<'a> {
 }
 
 fn load_track(track: make_track::track_desc::Track, directory: &std::path::Path) -> anyhow::Result<Track> {
-    let track_models = track.models.load(directory)?;
-    let lengths = make_track::track_model::ModelLengths::calculate(&track, &track_models);
+    let track_models = track.model.models.load(directory)?;
+    let lengths = make_track::track_model::ModelLengths::calculate(&track.model, &track_models);
 
     Ok(Track {
         track,
@@ -69,7 +69,7 @@ fn update_model<'a>(
     offsets: Option<&make_track::track_desc::Offsets>,
 ) -> anyhow::Result<Scene<'a>> {
     let model_desc = make_track::track_model::ModelDesc::new(
-        &track.track,
+        &track.track.model,
         &track.track_models,
         &track.lengths,
         args.track_section,
