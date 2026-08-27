@@ -180,7 +180,8 @@ fn render_track_section(
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
-                let model_desc = track_model::ModelDesc::new(track, models, model_lengths, track_section, rotation);
+                let model_desc =
+                    track_model::ModelDesc::new(&track.model, models, model_lengths, track_section, rotation);
                 let (offset_start, offset_end) = if let Some(offsets) = offsets {
                     let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
                     let offset_end = offset::calculate(
@@ -210,7 +211,7 @@ fn render_track_section(
             })
             .collect::<anyhow::Result<Vec<_>>>()?
     } else {
-        let model_desc = track_model::ModelDesc::new(track, models, model_lengths, track_section, 0);
+        let model_desc = track_model::ModelDesc::new(&track.model, models, model_lengths, track_section, 0);
         render_track_section_views(
             render_device,
             camera,
@@ -607,8 +608,8 @@ fn render(
 
     let mut sprite_descs = Vec::new();
     for track in &track_desc.tracks {
-        let models = track.models.load(base_directory)?;
-        let model_lengths = track_model::ModelLengths::calculate(track, &models);
+        let models = track.model.models.load(base_directory)?;
+        let model_lengths = track_model::ModelLengths::calculate(&track.model, &models);
 
         let masks_directory = data_directory.join("masks");
         let masks = mask::Masks::load(&masks_directory.join(&track.masks).with_extension("json"))?;
