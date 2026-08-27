@@ -41,41 +41,21 @@ pub struct TrackImage {
 
 pub type SharedTrackImage = Arc<Mutex<Option<TrackImage>>>;
 
-struct TrackModels {
-    models: make_track::track_desc::Models<renderer::model::Model>,
-    lengths: make_track::track_model::ModelLengths,
-}
-
 struct Scene<'a> {
     scene: renderer::Scene<'a>,
     mesh_types: Vec<renderer::MeshType>,
-}
-
-fn load_models(
-    settings: &make_track::track_desc::ModelSettings,
-    models: &make_track::track_desc::Models<relative_path::RelativePathBuf>,
-    directory: &std::path::Path,
-) -> anyhow::Result<TrackModels> {
-    let models = models.load(directory)?;
-    let lengths = make_track::track_model::ModelLengths::calculate(settings, &models);
-
-    Ok(TrackModels { models, lengths })
 }
 
 fn update_model<'a>(
     args: &UpdateModelArgs,
     render_device: &'a renderer::Device,
     model_settings: &make_track::track_desc::ModelSettings,
-    models: &'a TrackModels,
+    models: &'a make_track::track_desc::Models<renderer::model::Model>,
+    lengths: &make_track::track_model::ModelLengths,
     offsets: Option<&make_track::track_desc::Offsets>,
 ) -> anyhow::Result<Scene<'a>> {
-    let model_desc = make_track::track_model::ModelDesc::new(
-        model_settings,
-        &models.models,
-        &models.lengths,
-        args.track_section,
-        args.rotation,
-    );
+    let model_desc =
+        make_track::track_model::ModelDesc::new(model_settings, models, lengths, args.track_section, args.rotation);
     let (offset_start, offset_end) = if let Some(offsets) = offsets {
         let offset_start =
             make_track::offset::calculate(offsets, args.track_section, model_desc.bank_angle, 0.0, args.rotation);
@@ -93,7 +73,7 @@ fn update_model<'a>(
     let mut scene = renderer::SceneBuilder::new(render_device)?;
     make_track::track_model::build(
         &mut scene,
-        &models.models,
+        models,
         args.track_section,
         &model_desc,
         &offset_start,
@@ -153,6 +133,7 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
     let mut current_directory = None;
     let mut current_model_settings = None;
     let mut current_models = None;
+    let mut current_model_lengths = None;
     let mut current_offsets = None;
     let mut current_scene = None;
     let mut current_track_section = &make_track::track_sections::FLAT;
@@ -172,15 +153,23 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
         for message in messages.drain(0..) {
             match message {
                 RenderMessage::SetDirectory(directory) => current_directory = Some(directory),
-                RenderMessage::UpdateModelSettings(settings) => current_model_settings = Some(settings),
+                RenderMessage::UpdateModelSettings(settings) => {
+                    current_model_settings = Some(settings);
+                    if let Some(models) = &current_models {
+                        current_model_lengths =
+                            Some(make_track::track_model::ModelLengths::calculate(&settings, models));
+                    }
+                }
                 RenderMessage::LoadModels(models) => {
                     if let Some(directory) = &current_directory
                         && let Some(settings) = &current_model_settings
                     {
-                        match load_models(settings, &models, directory) {
+                        match models.load(directory) {
                             Ok(models) => {
+                                let lengths = make_track::track_model::ModelLengths::calculate(settings, &models);
                                 current_scene = None;
                                 current_models = Some(models);
+                                current_model_lengths = Some(lengths);
                             }
                             Err(error) => report_error(app_tx, &error),
                         }
@@ -193,8 +182,16 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
                 RenderMessage::UpdateModel(args) => {
                     if let Some(settings) = &current_model_settings
                         && let Some(models) = &current_models
+                        && let Some(lengths) = &current_model_lengths
                     {
-                        match update_model(&args, &render_device, settings, models, current_offsets.as_ref()) {
+                        match update_model(
+                            &args,
+                            &render_device,
+                            settings,
+                            models,
+                            lengths,
+                            current_offsets.as_ref(),
+                        ) {
                             Ok(scene) => {
                                 current_scene = Some(scene);
                                 current_track_section = args.track_section;

@@ -170,12 +170,22 @@ impl RctGen2App {
                             self.track_section,
                             ui,
                         );
-                        if changed && let Some(track) = track_desc.tracks.first() {
-                            let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-                            let _result =
-                                self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-                            self.update_model();
-                            self.queue_render(ui.ctx().clone());
+                        if let Some(track) = track_desc.tracks.first() {
+                            if changed.model_settings {
+                                let _result =
+                                    self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+                            }
+                            if changed.models {
+                                let _result =
+                                    self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+                            }
+                            if changed.redraw {
+                                redraw = true;
+                            }
+                            if changed.model_settings || changed.models || changed.masks {
+                                self.update_model();
+                                self.queue_render(ui.ctx().clone());
+                            }
                         }
                     }
                 }

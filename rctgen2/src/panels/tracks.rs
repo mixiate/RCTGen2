@@ -259,14 +259,22 @@ fn models_collapsible(
     changed
 }
 
+#[derive(Default)]
+pub struct TracksPanelChanged {
+    pub model_settings: bool,
+    pub models: bool,
+    pub masks: bool,
+    pub redraw: bool,
+}
+
 pub fn tracks_panel(
     tracks: &mut [make_track::track_desc::Track],
     directory: &std::path::Path,
     errors: &mut Vec<String>,
     current_track_section: &make_track::track_sections::TrackSection,
     ui: &mut egui::Ui,
-) -> bool {
-    let mut changed = false;
+) -> TracksPanelChanged {
+    let mut changed = TracksPanelChanged::default();
     egui::Panel::right("Tracks side panel").show(ui, |ui| {
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
@@ -284,9 +292,7 @@ pub fn tracks_panel(
                             });
                             let mut size = ui.spacing().interact_size;
                             size.x = 150.0;
-                            if ui.add_sized(size, egui::TextEdit::singleline(&mut track.name)).changed() {
-                                changed = true;
-                            }
+                            ui.add_sized(size, egui::TextEdit::singleline(&mut track.name));
                         }
                         ui.end_row();
 
@@ -296,12 +302,9 @@ pub fn tracks_panel(
                                 ui.label("Suffix");
                             });
                             if let Some(suffix) = track.suffix.as_mut() {
-                                if ui.add(egui::TextEdit::singleline(suffix)).changed() {
-                                    changed = true;
-                                }
+                                ui.add(egui::TextEdit::singleline(suffix));
                                 if widgets::buttons::remove_button(ui) {
                                     removed = true;
-                                    changed = true;
                                 }
                             } else {
                                 if widgets::buttons::add_button(ui) {
@@ -318,7 +321,7 @@ pub fn tracks_panel(
                             ui.label("Length");
                         });
                         if length_widgets(ui, &mut track.model_settings.length) {
-                            changed = true;
+                            changed.model_settings = true;
                         }
                         ui.end_row();
 
@@ -326,7 +329,7 @@ pub fn tracks_panel(
                             ui.label("Tie length");
                         });
                         if length_widgets(ui, &mut track.model_settings.tie_length) {
-                            changed = true;
+                            changed.model_settings = true;
                         }
                         ui.end_row();
 
@@ -334,7 +337,7 @@ pub fn tracks_panel(
                             ui.label("Z offset");
                         });
                         if ui.add(egui::DragValue::new(&mut track.z_offset).speed(0.1)).changed() {
-                            changed = true;
+                            changed.redraw = true;
                         }
                         ui.end_row();
 
@@ -343,7 +346,7 @@ pub fn tracks_panel(
                         });
                         if ui.add(egui::DragValue::new(&mut track.model_settings.support_spacing).speed(0.01)).changed()
                         {
-                            changed = true;
+                            changed.model_settings = true;
                         }
                         ui.end_row();
 
@@ -351,7 +354,7 @@ pub fn tracks_panel(
                             ui.label("Support pivot");
                         });
                         if ui.add(egui::DragValue::new(&mut track.model_settings.support_pivot).speed(0.01)).changed() {
-                            changed = true;
+                            changed.model_settings = true;
                         }
                         ui.end_row();
 
@@ -359,7 +362,7 @@ pub fn tracks_panel(
                             ui.label("Bank angle");
                         });
                         if ui.add(egui::DragValue::new(&mut track.model_settings.bank_angle).speed(0.1)).changed() {
-                            changed = true;
+                            changed.model_settings = true;
                         }
                         ui.end_row();
 
@@ -367,7 +370,7 @@ pub fn tracks_panel(
                             ui.label("Lift");
                         });
                         if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
-                            changed = true;
+                            changed.model_settings = true;
                         }
                         ui.end_row();
 
@@ -375,14 +378,14 @@ pub fn tracks_panel(
                             ui.label("Masks");
                         });
                         if ui.add(egui::TextEdit::singleline(&mut track.masks)).changed() {
-                            changed = true;
+                            changed.masks = true;
                         }
                         ui.end_row();
                     });
 
                     egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
                         if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
-                            changed = true;
+                            changed.models = true;
                         }
                     });
 
