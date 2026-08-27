@@ -20,7 +20,7 @@ pub struct RenderArgs {
 
 pub enum RenderMessage {
     SetDirectory(std::path::PathBuf),
-    LoadTrack(Box<make_track::track_desc::Track>),
+    LoadModel(Box<make_track::track_desc::Model>),
     UpdateOffsets(Box<Option<make_track::track_desc::Offsets>>),
     UpdateModel(UpdateModelArgs),
     Render(RenderArgs),
@@ -40,8 +40,8 @@ pub struct TrackImage {
 
 pub type SharedTrackImage = Arc<Mutex<Option<TrackImage>>>;
 
-struct Track {
-    track: make_track::track_desc::Track,
+struct TrackModel {
+    model: make_track::track_desc::Model,
     track_models: make_track::track_desc::Models<renderer::model::Model>,
     lengths: make_track::track_model::ModelLengths,
 }
@@ -51,12 +51,12 @@ struct Scene<'a> {
     mesh_types: Vec<renderer::MeshType>,
 }
 
-fn load_track(track: make_track::track_desc::Track, directory: &std::path::Path) -> anyhow::Result<Track> {
-    let track_models = track.model.models.load(directory)?;
-    let lengths = make_track::track_model::ModelLengths::calculate(&track.model, &track_models);
+fn load_model(model: make_track::track_desc::Model, directory: &std::path::Path) -> anyhow::Result<TrackModel> {
+    let track_models = model.models.load(directory)?;
+    let lengths = make_track::track_model::ModelLengths::calculate(&model, &track_models);
 
-    Ok(Track {
-        track,
+    Ok(TrackModel {
+        model,
         track_models,
         lengths,
     })
@@ -65,13 +65,13 @@ fn load_track(track: make_track::track_desc::Track, directory: &std::path::Path)
 fn update_model<'a>(
     args: &UpdateModelArgs,
     render_device: &'a renderer::Device,
-    track: &'a Track,
+    track_model: &'a TrackModel,
     offsets: Option<&make_track::track_desc::Offsets>,
 ) -> anyhow::Result<Scene<'a>> {
     let model_desc = make_track::track_model::ModelDesc::new(
-        &track.track.model,
-        &track.track_models,
-        &track.lengths,
+        &track_model.model,
+        &track_model.track_models,
+        &track_model.lengths,
         args.track_section,
         args.rotation,
     );
@@ -92,7 +92,7 @@ fn update_model<'a>(
     let mut scene = renderer::SceneBuilder::new(render_device)?;
     make_track::track_model::build(
         &mut scene,
-        &track.track_models,
+        &track_model.track_models,
         args.track_section,
         &model_desc,
         &offset_start,
@@ -102,7 +102,7 @@ fn update_model<'a>(
     Ok(Scene { scene, mesh_types })
 }
 
-fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Images {
+fn render(scene: &Scene, args: &mut RenderArgs) -> Images {
     let camera = glam::Mat4::from_mat3(
         glam::Mat3::from_cols(
             glam::Vec3::new(32.0, 0.0, 32.0),
@@ -129,15 +129,10 @@ fn render(track: &Track, scene: &Scene, args: &mut RenderArgs) -> Images {
         args.edge_distance.unwrap_or(0.088388346),
     );
 
-    let mut unindexed_image = framebuffer.to_image();
-    let mut indexed_image = framebuffer.into_indexed_image(args.dither);
-    unindexed_image.offset.y += -track.track.z_offset + 16;
-    indexed_image.offset.y += -track.track.z_offset + 16;
+    let unindexed = framebuffer.to_image();
+    let indexed = framebuffer.into_indexed_image(args.dither);
 
-    Images {
-        unindexed: unindexed_image,
-        indexed: indexed_image,
-    }
+    Images { unindexed, indexed }
 }
 
 fn report_error(tx: &Sender<AppMessage>, error: &anyhow::Error) {
@@ -175,9 +170,9 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
         for message in messages.drain(0..) {
             match message {
                 RenderMessage::SetDirectory(directory) => current_directory = Some(directory),
-                RenderMessage::LoadTrack(track_desc) => {
+                RenderMessage::LoadModel(track_desc) => {
                     if let Some(directory) = current_directory.as_ref() {
-                        match load_track(*track_desc, directory) {
+                        match load_model(*track_desc, directory) {
                             Ok(track) => {
                                 current_scene = None;
                                 current_track = Some(track);
@@ -207,10 +202,9 @@ pub fn render_thread(render_rx: &Receiver<RenderMessage>, app_tx: &Sender<AppMes
         }
 
         if let Some(RenderMessage::Render(mut args)) = render_message
-            && let Some(track) = &current_track
             && let Some(scene) = &current_scene
         {
-            let images = render(track, scene, &mut args);
+            let images = render(scene, &mut args);
 
             if let Ok(mut track_image) = track_image.lock() {
                 *track_image = Some(TrackImage {

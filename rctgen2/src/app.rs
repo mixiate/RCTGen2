@@ -117,7 +117,7 @@ impl RctGen2App {
             let track = track_desc.tracks.first().with_context(|| "No track found in track description")?;
 
             let _result = self.render_tx.send(RenderMessage::SetDirectory(directory));
-            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track.clone())));
+            let _result = self.render_tx.send(RenderMessage::LoadModel(Box::new(track.model.clone())));
             let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
             self.update_model();
             self.current_track_image = None;
@@ -170,7 +170,7 @@ impl RctGen2App {
                             ui,
                         );
                         if changed && let Some(track) = track_desc.tracks.first() {
-                            let _result = self.render_tx.send(RenderMessage::LoadTrack(Box::new(track.clone())));
+                            let _result = self.render_tx.send(RenderMessage::LoadModel(Box::new(track.model.clone())));
                             self.update_model();
                             self.queue_render(ui.ctx().clone());
                         }
@@ -404,6 +404,7 @@ impl eframe::App for RctGen2App {
 
             if redraw
                 && let Some(track_desc) = &self.track_desc
+                && let Some(track) = track_desc.tracks.first()
                 && let Some(track_image) = &self.current_track_image
             {
                 let max_tile_height = track_image
@@ -419,6 +420,7 @@ impl eframe::App for RctGen2App {
                 crate::drawing::draw(
                     track_desc,
                     track_image,
+                    track.z_offset,
                     &self.drawing_options,
                     &self.adjacent_track_sections,
                     self.rct2_sprites.as_mut(),

@@ -76,6 +76,7 @@ fn draw_original_track_section(
 
 fn draw_with_adjacent_sprites(
     track_image: &TrackImage,
+    z_offset: i16,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     sprites: &mut sprites::Sprites,
@@ -111,12 +112,12 @@ fn draw_with_adjacent_sprites(
         blit::draw_indexed_image(
             buffer,
             &track_image.images.indexed,
-            &[0; 3],
+            &[0, 0, z_offset],
             options.colour_1,
             options.colour_2,
         );
     } else {
-        blit::draw_image(buffer, &track_image.images.unindexed, &[0; 3]);
+        blit::draw_image(buffer, &track_image.images.unindexed, &[0, 0, z_offset]);
     }
     draw_adjacent_track_section(
         track_image,
@@ -131,11 +132,13 @@ fn draw_with_adjacent_sprites(
 pub fn draw(
     track_desc: &track_desc::Desc,
     track_image: &TrackImage,
+    z_offset: i32,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     mut sprites: Option<&mut sprites::Sprites>,
     buffer: &mut Image,
 ) {
+    let z_offset = (z_offset - 16) as i16;
     if options.supports
         && let Some(sprites) = sprites.as_mut()
         && let Some(metal_supports) = &track_desc.metal_supports
@@ -157,6 +160,7 @@ pub fn draw(
     {
         draw_with_adjacent_sprites(
             track_image,
+            z_offset,
             options,
             adjacent_track_sections,
             sprites,
@@ -179,11 +183,11 @@ pub fn draw(
         blit::draw_indexed_image(
             buffer,
             &track_image.images.indexed,
-            &[0; 3],
+            &[0, 0, z_offset],
             options.colour_1,
             options.colour_2,
         );
     } else {
-        blit::draw_image(buffer, &track_image.images.unindexed, &[0; 3]);
+        blit::draw_image(buffer, &track_image.images.unindexed, &[0, 0, z_offset]);
     }
 }
