@@ -317,7 +317,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Length");
                         });
-                        if length_widgets(ui, &mut track.model.length) {
+                        if length_widgets(ui, &mut track.model_settings.length) {
                             changed = true;
                         }
                         ui.end_row();
@@ -325,7 +325,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Tie length");
                         });
-                        if length_widgets(ui, &mut track.model.tie_length) {
+                        if length_widgets(ui, &mut track.model_settings.tie_length) {
                             changed = true;
                         }
                         ui.end_row();
@@ -341,7 +341,8 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Support spacing");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.model.support_spacing).speed(0.01)).changed() {
+                        if ui.add(egui::DragValue::new(&mut track.model_settings.support_spacing).speed(0.01)).changed()
+                        {
                             changed = true;
                         }
                         ui.end_row();
@@ -349,7 +350,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Support pivot");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.model.support_pivot).speed(0.01)).changed() {
+                        if ui.add(egui::DragValue::new(&mut track.model_settings.support_pivot).speed(0.01)).changed() {
                             changed = true;
                         }
                         ui.end_row();
@@ -357,7 +358,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Bank angle");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.model.bank_angle).speed(0.1)).changed() {
+                        if ui.add(egui::DragValue::new(&mut track.model_settings.bank_angle).speed(0.1)).changed() {
                             changed = true;
                         }
                         ui.end_row();
@@ -365,7 +366,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Lift");
                         });
-                        if ui.add(egui::Checkbox::without_text(&mut track.lift)).changed() {
+                        if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
                             changed = true;
                         }
                         ui.end_row();
@@ -380,7 +381,7 @@ pub fn tracks_panel(
                     });
 
                     egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
-                        if models_collapsible(ui, &mut track.model.models, directory, errors, current_track_section) {
+                        if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
                             changed = true;
                         }
                     });
