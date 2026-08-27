@@ -117,7 +117,8 @@ impl RctGen2App {
             let track = track_desc.tracks.first().with_context(|| "No track found in track description")?;
 
             let _result = self.render_tx.send(RenderMessage::SetDirectory(directory));
-            let _result = self.render_tx.send(RenderMessage::LoadModel(Box::new(track.model.clone())));
+            let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+            let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
             let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
             self.update_model();
             self.current_track_image = None;
@@ -170,7 +171,9 @@ impl RctGen2App {
                             ui,
                         );
                         if changed && let Some(track) = track_desc.tracks.first() {
-                            let _result = self.render_tx.send(RenderMessage::LoadModel(Box::new(track.model.clone())));
+                            let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+                            let _result =
+                                self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
                             self.update_model();
                             self.queue_render(ui.ctx().clone());
                         }

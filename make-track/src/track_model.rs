@@ -94,15 +94,18 @@ pub struct ModelLengths {
 }
 
 impl ModelLengths {
-    pub fn calculate(model: &track_desc::Model, models: &track_desc::Models<renderer::model::Model>) -> ModelLengths {
-        let track_tie = model.tie_length.unwrap_or_else(|| {
+    pub fn calculate(
+        settings: &track_desc::ModelSettings,
+        models: &track_desc::Models<renderer::model::Model>,
+    ) -> ModelLengths {
+        let track_tie = settings.tie_length.unwrap_or_else(|| {
             if let Some(track_tie) = &models.track_tie {
                 ModelLengths::calculate_model_length(track_tie)
             } else {
                 0.0
             }
         });
-        let track = model.length.unwrap_or_else(|| ModelLengths::calculate_model_length(&models.track)) + track_tie;
+        let track = settings.length.unwrap_or_else(|| ModelLengths::calculate_model_length(&models.track)) + track_tie;
 
         ModelLengths { track, track_tie }
     }
@@ -147,20 +150,20 @@ pub struct ModelDesc {
 
 impl ModelDesc {
     pub fn new(
-        model: &track_desc::Model,
+        settings: &track_desc::ModelSettings,
         models: &track_desc::Models<renderer::model::Model>,
         lengths: &ModelLengths,
         track_section: &track_sections::TrackSection,
         rotation: usize,
     ) -> Self {
         let model_desc = if models.track_alt.is_some() {
-            ModelDesc::new_alternating(model, lengths, track_section)
+            ModelDesc::new_alternating(settings, lengths, track_section)
         } else {
-            ModelDesc::new_non_alternating(model, lengths, track_section)
+            ModelDesc::new_non_alternating(settings, lengths, track_section)
         };
 
         if models.track_tie.is_some() {
-            model_desc.boundary_tie(model, lengths, track_section, rotation)
+            model_desc.boundary_tie(settings, lengths, track_section, rotation)
         } else {
             model_desc
         }
@@ -172,7 +175,7 @@ impl ModelDesc {
     }
 
     fn new_non_alternating(
-        model: &track_desc::Model,
+        settings: &track_desc::ModelSettings,
         lengths: &ModelLengths,
         track_section: &track_sections::TrackSection,
     ) -> Self {
@@ -185,17 +188,17 @@ impl ModelDesc {
             scale,
             length,
             tie_length: scale * lengths.track_tie,
-            bank_angle: model.bank_angle.to_radians(),
+            bank_angle: settings.bank_angle.to_radians(),
             extrusion_count: ModelDesc::calculate_extrusion_count(length),
             track_even: false,
-            support_spacing: model.support_spacing,
-            support_pivot: model.support_pivot,
+            support_spacing: settings.support_spacing,
+            support_pivot: settings.support_pivot,
         }
     }
 
     /// Attempts to use an even number of alternating track meshes if it doesn't cause too much distortion
     fn new_alternating(
-        model: &track_desc::Model,
+        settings: &track_desc::ModelSettings,
         lengths: &ModelLengths,
         track_section: &track_sections::TrackSection,
     ) -> Self {
@@ -213,20 +216,20 @@ impl ModelDesc {
                 scale,
                 length,
                 tie_length: scale * lengths.track_tie,
-                bank_angle: model.bank_angle.to_radians(),
+                bank_angle: settings.bank_angle.to_radians(),
                 extrusion_count: ModelDesc::calculate_extrusion_count(length),
                 track_even: false,
-                support_spacing: model.support_spacing,
-                support_pivot: model.support_pivot,
+                support_spacing: settings.support_spacing,
+                support_pivot: settings.support_pivot,
             }
         } else {
-            Self::new_non_alternating(model, lengths, track_section)
+            Self::new_non_alternating(settings, lengths, track_section)
         }
     }
 
     fn boundary_tie(
         &self,
-        model: &track_desc::Model,
+        settings: &track_desc::ModelSettings,
         lengths: &ModelLengths,
         track_section: &track_sections::TrackSection,
         rotation: usize,
@@ -260,8 +263,8 @@ impl ModelDesc {
             bank_angle: self.bank_angle,
             extrusion_count: self.extrusion_count * 2,
             track_even: !tie_start,
-            support_spacing: model.support_spacing,
-            support_pivot: model.support_pivot,
+            support_spacing: settings.support_spacing,
+            support_pivot: settings.support_pivot,
         }
     }
 }

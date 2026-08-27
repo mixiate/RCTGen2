@@ -181,7 +181,7 @@ fn render_track_section(
             .enumerate()
             .map(|(rotation, view)| {
                 let model_desc =
-                    track_model::ModelDesc::new(&track.model, models, model_lengths, track_section, rotation);
+                    track_model::ModelDesc::new(&track.model_settings, models, model_lengths, track_section, rotation);
                 let (offset_start, offset_end) = if let Some(offsets) = offsets {
                     let offset_start = offset::calculate(offsets, track_section, model_desc.bank_angle, 0.0, rotation);
                     let offset_end = offset::calculate(
@@ -211,7 +211,7 @@ fn render_track_section(
             })
             .collect::<anyhow::Result<Vec<_>>>()?
     } else {
-        let model_desc = track_model::ModelDesc::new(&track.model, models, model_lengths, track_section, 0);
+        let model_desc = track_model::ModelDesc::new(&track.model_settings, models, model_lengths, track_section, 0);
         render_track_section_views(
             render_device,
             camera,
@@ -261,7 +261,7 @@ fn split_track_section(
 ) -> anyhow::Result<Vec<openrct2::objects::image::ImageFile>> {
     let mut sprite_descs = Vec::new();
     for ((view_index, view), (image, mask_depth)) in
-        views.iter().filter(|x| track.lift || !x.optional).enumerate().zip(images)
+        views.iter().filter(|x| track.model_settings.lift || !x.optional).enumerate().zip(images)
     {
         let offset_offset = glam::IVec2::new(0, 16) + glam::IVec2::new(0, -track.z_offset);
         let mask_y_offset = if track_section.mask_offset_y {
@@ -273,7 +273,7 @@ fn split_track_section(
         let split_images = if let Some(mut mask_depth) = mask_depth {
             let track_depth = image.to_cropped_depth();
             let mut image = image.into_cropped_indexed_image(dither);
-            if track.lift
+            if track.model_settings.lift
                 && let Some(chain_type) = track_section.chain_type
             {
                 chain::apply_chain(&mut image, chain_type, view_index);
@@ -285,7 +285,7 @@ fn split_track_section(
             split::split_image_depth(&image, view, mask_y_offset, &track_depth, &mask_depth)
         } else {
             let mut image = image.into_cropped_indexed_image(dither);
-            if track.lift
+            if track.model_settings.lift
                 && let Some(chain_type) = track_section.chain_type
             {
                 chain::apply_chain(&mut image, chain_type, view_index);
@@ -608,8 +608,8 @@ fn render(
 
     let mut sprite_descs = Vec::new();
     for track in &track_desc.tracks {
-        let models = track.model.models.load(base_directory)?;
-        let model_lengths = track_model::ModelLengths::calculate(&track.model, &models);
+        let models = track.models.load(base_directory)?;
+        let model_lengths = track_model::ModelLengths::calculate(&track.model_settings, &models);
 
         let masks_directory = data_directory.join("masks");
         let masks = mask::Masks::load(&masks_directory.join(&track.masks).with_extension("json"))?;
