@@ -328,7 +328,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Masks");
                         });
-                        if ui.add(egui::TextEdit::singleline(&mut track.masks)).changed() {
+                        if ui.add(egui::TextEdit::singleline(&mut track.masks)).lost_focus() {
                             changed.masks = true;
                         }
                         ui.end_row();
