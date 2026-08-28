@@ -318,6 +318,22 @@ pub fn tracks_panel(
                         ui.end_row();
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.label("Z offset");
+                        });
+                        if ui.add(egui::DragValue::new(&mut track.z_offset).speed(0.1)).changed() {
+                            changed.redraw = true;
+                        }
+                        ui.end_row();
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.label("Masks");
+                        });
+                        if ui.add(egui::TextEdit::singleline(&mut track.masks)).changed() {
+                            changed.masks = true;
+                        }
+                        ui.end_row();
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Length");
                         });
                         if length_widgets(ui, &mut track.model_settings.length) {
@@ -330,14 +346,6 @@ pub fn tracks_panel(
                         });
                         if length_widgets(ui, &mut track.model_settings.tie_length) {
                             changed.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Z offset");
-                        });
-                        if ui.add(egui::DragValue::new(&mut track.z_offset).speed(0.1)).changed() {
-                            changed.redraw = true;
                         }
                         ui.end_row();
 
@@ -371,14 +379,6 @@ pub fn tracks_panel(
                         });
                         if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
                             changed.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Masks");
-                        });
-                        if ui.add(egui::TextEdit::singleline(&mut track.masks)).changed() {
-                            changed.masks = true;
                         }
                         ui.end_row();
                     });
