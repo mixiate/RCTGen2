@@ -119,6 +119,7 @@ impl RctGen2App {
             let _result = self.render_tx.send(RenderMessage::SetDirectory(directory));
             let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
             let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+            let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
             let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
             self.update_model();
             self.current_track_image = None;
@@ -178,6 +179,9 @@ impl RctGen2App {
                             if changed.models {
                                 let _result =
                                     self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+                            }
+                            if changed.masks {
+                                let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
                             }
                             if changed.redraw {
                                 redraw = true;
