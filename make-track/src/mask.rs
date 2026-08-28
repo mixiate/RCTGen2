@@ -60,23 +60,12 @@ impl ViewsDescType {
     }
 }
 
-#[derive(Debug, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
-#[serde(transparent)]
-pub struct Masks {
-    track_sections: std::collections::HashMap<String, ViewsDescType>,
-}
+pub type Masks = std::collections::HashMap<String, ViewsDescType>;
 
-impl Masks {
-    pub fn load(path: &std::path::Path) -> anyhow::Result<Masks> {
-        use anyhow::Context as _;
-        let json = std::fs::read_to_string(path).with_context(|| format!("Could not read {}", path.display()))?;
-        serde_json::from_str::<Masks>(&json).with_context(|| format!("Could not parse json in {}", path.display()))
-    }
-
-    pub fn get_views(&self, track_section_name: &str) -> Option<&ViewsDescType> {
-        self.track_sections.get(track_section_name)
-    }
+pub fn load_masks(path: &std::path::Path) -> anyhow::Result<std::collections::HashMap<String, ViewsDescType>> {
+    use anyhow::Context as _;
+    let json = std::fs::read_to_string(path).with_context(|| format!("Could not read {}", path.display()))?;
+    serde_json::from_str::<Masks>(&json).with_context(|| format!("Could not parse json in {}", path.display()))
 }
 
 const PRIMARY_INDEX_MASK: u8 = 0b00_000_111;

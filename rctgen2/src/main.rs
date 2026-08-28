@@ -21,16 +21,17 @@ fn main() -> anyhow::Result<()> {
     let (app_tx, app_rx) = std::sync::mpsc::channel();
     let track_image = Arc::new(Mutex::new(None));
 
-    let render_thread = {
-        let track_image = track_image.clone();
-        std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &track_image))
-    };
-
     let data_directory = std::env::current_exe()?;
     let data_directory = data_directory
         .parent()
         .with_context(|| format!("Could not get parent directory of {}", data_directory.display()))?;
     let data_directory = data_directory.join("data");
+
+    let render_thread = {
+        let track_image = track_image.clone();
+        let data_directory = data_directory.clone();
+        std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &track_image, &data_directory))
+    };
 
     let config_dir = dirs::config_dir().context("Could not get config directory")?.join("RCTGen2");
 
