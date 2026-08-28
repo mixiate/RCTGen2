@@ -11,10 +11,8 @@ pub struct Entry {
     zoom_offset: u16,
 }
 
-// OpenRCT2 calls the first flag transparent but it's on every non palette entry and is not used for transparency
-const ENTRY_FLAG_SPRITE: u16 = 0b0001;
+const ENTRY_FLAG_TRANSPARENT: u16 = 0b0001;
 const ENTRY_FLAG_COMPRESSED: u16 = 0b0100;
-#[expect(unused)]
 const ENTRY_FLAG_PALETTE: u16 = 0b1000;
 
 pub struct EncodedSprite {
@@ -116,7 +114,7 @@ impl Archive {
             height,
             offset_x: i16::try_from(x).unwrap(),
             offset_y: i16::try_from(y).unwrap(),
-            flags: ENTRY_FLAG_SPRITE,
+            flags: ENTRY_FLAG_TRANSPARENT,
             zoom_offset: 0,
         });
         self.data.extend(pixels);
@@ -129,7 +127,7 @@ impl Archive {
             height: encoded_sprite.height,
             offset_x: i16::try_from(x).unwrap(),
             offset_y: i16::try_from(y).unwrap(),
-            flags: ENTRY_FLAG_SPRITE | ENTRY_FLAG_COMPRESSED,
+            flags: ENTRY_FLAG_TRANSPARENT | ENTRY_FLAG_COMPRESSED,
             zoom_offset: 0,
         });
 
@@ -186,9 +184,9 @@ impl Archive {
     }
 
     pub fn get_pixels(&'_ self, entry: &Entry) -> Option<Pixels<'_>> {
-        if entry.flags & (ENTRY_FLAG_SPRITE | ENTRY_FLAG_COMPRESSED) == (ENTRY_FLAG_SPRITE | ENTRY_FLAG_COMPRESSED) {
+        if entry.flags & ENTRY_FLAG_COMPRESSED != 0 {
             Some(Pixels::Compressed(self.decode_sprite(entry)?))
-        } else if entry.flags & ENTRY_FLAG_SPRITE != 0 {
+        } else if entry.flags & ENTRY_FLAG_PALETTE == 0 {
             let index = usize::try_from(entry.data_offset).ok()?;
             let data_size = usize::from(entry.width * entry.height);
             Some(Pixels::Uncompressed(self.data.get(index..(index + data_size))?))
