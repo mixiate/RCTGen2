@@ -16,6 +16,7 @@ pub enum AppMessage {
 
 #[derive(Clone, Copy, Default)]
 pub struct Changes {
+    pub directory: bool,
     pub model_settings: bool,
     pub load_models: bool,
     pub masks: bool,
@@ -192,7 +193,6 @@ impl eframe::App for RctGen2App {
 
         ui::menu_bars::menu_bar(
             ui,
-            &self.render_tx,
             &mut self.current_track_image,
             &mut self.track_desc_path,
             &mut self.track_desc,
@@ -301,6 +301,12 @@ impl eframe::App for RctGen2App {
             if let Some(track_desc) = &self.track_desc
                 && let Some(track) = track_desc.tracks.first()
             {
+                if changes.directory
+                    && let Some(track_desc_path) = &self.track_desc_path
+                    && let Some(directory) = track_desc_path.parent()
+                {
+                    let _result = self.render_tx.send(RenderMessage::SetDirectory(directory.to_path_buf()));
+                }
                 if changes.model_settings {
                     let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
                     changes.update_model = true;
