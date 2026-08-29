@@ -139,26 +139,6 @@ impl RctGen2App {
         Ok(())
     }
 
-    fn update_model(&self) {
-        let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
-            track_section: self.track_section,
-            rotation: self.rotation,
-        }));
-    }
-
-    fn queue_render(&self, egui_context: egui::Context) {
-        if let Some(track_desc) = &self.track_desc {
-            let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
-                egui_context,
-                rotation: self.rotation,
-                samples: self.samples,
-                dither: track_desc.dither,
-                edge_distance: track_desc.edge_distance,
-                lights: track_desc.get_lights(),
-            }));
-        }
-    }
-
     fn draw_side_panel(&mut self, changes: &mut Changes, ui: &mut egui::Ui) {
         if let Some(track_desc) = self.track_desc.as_mut() {
             match self.side_panel_tab {
@@ -278,7 +258,6 @@ impl eframe::App for RctGen2App {
                     });
                 if self.track_section != previous_track_section {
                     changes.update_model = true;
-                    changes.render = true;
                 }
             });
         });
@@ -376,37 +355,45 @@ impl eframe::App for RctGen2App {
                         self.rotation = 0;
                     }
                     changes.update_model = true;
-                    changes.render = true;
                 }
             });
-
-            if changes.model_settings || changes.load_models || changes.masks || changes.offsets {
-                changes.update_model = true;
-                changes.render = true;
-            }
 
             if let Some(track_desc) = &self.track_desc
                 && let Some(track) = track_desc.tracks.first()
             {
                 if changes.model_settings {
                     let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+                    changes.update_model = true;
                 }
                 if changes.load_models {
                     let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+                    changes.update_model = true;
                 }
                 if changes.masks {
                     let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
+                    changes.update_model = true;
                 }
                 if changes.offsets {
                     let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
+                    changes.update_model = true;
                 }
-            }
-
-            if changes.update_model {
-                self.update_model();
-            }
-            if changes.render {
-                self.queue_render(ui.ctx().clone());
+                if changes.update_model {
+                    let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
+                        track_section: self.track_section,
+                        rotation: self.rotation,
+                    }));
+                    changes.render = true;
+                }
+                if changes.render {
+                    let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
+                        egui_context: ui.ctx().clone(),
+                        rotation: self.rotation,
+                        samples: self.samples,
+                        dither: track_desc.dither,
+                        edge_distance: track_desc.edge_distance,
+                        lights: track_desc.get_lights(),
+                    }));
+                }
             }
 
             if fetch_frame
