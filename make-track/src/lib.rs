@@ -16,6 +16,7 @@ fn render_scene(
     mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    samples: usize,
     edge_distance: f32,
     rotation: usize,
 ) -> renderer::Framebuffer {
@@ -25,18 +26,19 @@ fn render_scene(
     let view_rotation_inverse = view_rotation.inverse();
     let lights = lights.iter().map(|x| x.transform(&view_rotation_inverse)).collect::<Vec<_>>();
 
-    renderer::render_scene(scene, mesh_types, &camera, &lights, 4, 4, edge_distance)
+    renderer::render_scene(scene, mesh_types, &camera, &lights, samples, samples, edge_distance)
 }
 
 fn render_scene_depth(
     scene: &renderer::Scene,
     mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
+    samples: usize,
     rotation: usize,
 ) -> renderer::DepthBuffer {
     let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
     let camera = camera * view_rotation;
-    renderer::render_scene_depth(scene, mesh_types, &camera, 4, 4)
+    renderer::render_scene_depth(scene, mesh_types, &camera, samples, samples)
 }
 
 #[expect(clippy::too_many_arguments)]
@@ -44,6 +46,7 @@ fn render_track_section_view(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    samples: usize,
     edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
@@ -71,7 +74,7 @@ fn render_track_section_view(
         }
     }
 
-    let image = render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation);
+    let image = render_scene(&scene, &mesh_types, camera, lights, samples, edge_distance, rotation);
 
     let mask_depth = if view.requires_track_mask {
         let (scene, mesh_types) = track_model::build_mask(
@@ -82,7 +85,7 @@ fn render_track_section_view(
             offset_start,
             offset_end,
         )?;
-        Some(render_scene_depth(&scene, &mesh_types, camera, rotation))
+        Some(render_scene_depth(&scene, &mesh_types, camera, samples, rotation))
     } else {
         None
     };
@@ -95,6 +98,7 @@ fn render_track_section_views(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    samples: usize,
     edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
     track_section: &track_sections::TrackSection,
@@ -134,12 +138,14 @@ fn render_track_section_views(
         view_mesh_types
             .into_par_iter()
             .enumerate()
-            .map(|(rotation, mesh_types)| render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation))
+            .map(|(rotation, mesh_types)| {
+                render_scene(&scene, &mesh_types, camera, lights, samples, edge_distance, rotation)
+            })
             .collect::<Vec<_>>()
     } else {
         (0..views.len())
             .into_par_iter()
-            .map(|rotation| render_scene(&scene, &mesh_types, camera, lights, edge_distance, rotation))
+            .map(|rotation| render_scene(&scene, &mesh_types, camera, lights, samples, edge_distance, rotation))
             .collect::<Vec<_>>()
     };
 
@@ -150,7 +156,7 @@ fn render_track_section_views(
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
-                view.requires_track_mask.then(|| render_scene_depth(&scene, &mesh_types, camera, rotation))
+                view.requires_track_mask.then(|| render_scene_depth(&scene, &mesh_types, camera, samples, rotation))
             })
             .collect::<Vec<_>>()
     } else {
@@ -165,6 +171,7 @@ fn render_track_section(
     render_device: &renderer::Device,
     camera: &glam::Mat4,
     lights: &[renderer::Light],
+    samples: usize,
     edge_distance: f32,
     models: &track_desc::Models<renderer::model::Model>,
     model_lengths: &track_model::ModelLengths,
@@ -199,6 +206,7 @@ fn render_track_section(
                     render_device,
                     camera,
                     lights,
+                    samples,
                     edge_distance,
                     models,
                     track_section,
@@ -216,6 +224,7 @@ fn render_track_section(
             render_device,
             camera,
             lights,
+            samples,
             edge_distance,
             models,
             track_section,
@@ -628,6 +637,7 @@ fn render(
                         &render_device,
                         &camera,
                         &lights,
+                        track_desc.samples.into(),
                         edge_distance,
                         &models,
                         &model_lengths,
@@ -667,6 +677,7 @@ fn render(
                         &render_device,
                         &camera,
                         &lights,
+                        track_desc.samples.into(),
                         edge_distance,
                         &models,
                         &model_lengths,
