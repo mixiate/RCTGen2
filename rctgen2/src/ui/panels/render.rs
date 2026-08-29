@@ -5,11 +5,13 @@ pub fn render_panel(track_desc: &mut make_track::track_desc::Desc, ui: &mut egui
     let mut changed = false;
 
     egui::Panel::right("Render settings panel").resizable(false).exact_size(250.0).show(ui, |ui| {
-        if ui.checkbox(&mut track_desc.dither, "Dither").changed() {
+        if ui.add(egui::DragValue::new(&mut track_desc.samples).prefix("Samples: ").range(1..=4)).changed() {
             changed = true;
         }
 
-        ui.separator();
+        if ui.checkbox(&mut track_desc.dither, "Dither").changed() {
+            changed = true;
+        }
 
         let mut edge_distance_removed = false;
         if let Some(edge_distance) = track_desc.edge_distance.as_mut() {

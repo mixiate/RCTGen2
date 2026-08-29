@@ -39,7 +39,6 @@ pub struct RctGen2App {
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
-    samples: usize,
     drawing_options: crate::drawing::Options,
     rotation: usize,
     current_track_image: Option<TrackImage>,
@@ -104,7 +103,6 @@ impl RctGen2App {
             track_desc_path: None,
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
-            samples: 4,
             drawing_options: Default::default(),
             rotation: 0,
             current_track_image: None,
@@ -163,9 +161,6 @@ impl eframe::App for RctGen2App {
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
             let frame = egui::Frame::popup(ui.style()).outer_margin(egui::Margin::same(10)).shadow(egui::Shadow::NONE);
             frame.show(ui, |ui| {
-                if ui.add(egui::DragValue::new(&mut self.samples).prefix("Samples: ").range(1..=4)).changed() {
-                    changes.render = true;
-                }
                 if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
                     changes.redraw = true;
                 }
@@ -287,7 +282,7 @@ impl eframe::App for RctGen2App {
                     let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
                         egui_context: ui.ctx().clone(),
                         rotation: self.rotation,
-                        samples: self.samples,
+                        samples: track_desc.samples.into(),
                         dither: track_desc.dither,
                         edge_distance: track_desc.edge_distance,
                         lights: track_desc.get_lights(),

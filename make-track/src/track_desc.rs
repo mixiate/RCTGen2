@@ -11,6 +11,14 @@ fn is_default_bank_angle(bank_angle: &f32) -> bool {
     *bank_angle == 45.0
 }
 
+fn default_samples() -> u8 {
+    4
+}
+
+fn is_default_samples(samples: &u8) -> bool {
+    *samples == 4
+}
+
 fn float_1() -> f32 {
     1.0
 }
@@ -238,6 +246,8 @@ pub struct Desc {
     pub offsets: Option<Offsets>,
     pub lights: Vec<Light>,
     pub metal_supports: Option<MetalSupports>,
+    #[serde(default = "default_samples", skip_serializing_if = "is_default_samples")]
+    pub samples: u8,
     #[serde(default = "bool_true", skip_serializing_if = "Clone::clone")]
     pub dither: bool,
     pub edge_distance: Option<f32>,
