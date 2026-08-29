@@ -18,6 +18,7 @@ pub struct Changes {
     pub model_settings: bool,
     pub load_models: bool,
     pub masks: bool,
+    pub offsets: bool,
     pub update_model: bool,
     pub render: bool,
     pub redraw: bool,
@@ -140,12 +141,6 @@ impl RctGen2App {
         Ok(())
     }
 
-    fn update_offsets(&self) {
-        if let Some(track_desc) = &self.track_desc {
-            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
-        }
-    }
-
     fn update_model(&self) {
         let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
             track_section: self.track_section,
@@ -191,11 +186,9 @@ impl RctGen2App {
                     }
                 }
                 Some(panels::SidePanelTab::Offsets) => {
-                    let offsets_changed = panels::offsets::offsets_panel(&mut track_desc.offsets, ui);
-                    if offsets_changed {
-                        self.update_offsets();
-                        self.update_model();
-                        self.queue_render(ui.ctx().clone());
+                    let changed = panels::offsets::offsets_panel(&mut track_desc.offsets, ui);
+                    if changed {
+                        changes.offsets = true;
                     }
                 }
                 Some(panels::SidePanelTab::MetalSupports) => {
@@ -393,7 +386,7 @@ impl eframe::App for RctGen2App {
                 }
             });
 
-            if changes.model_settings || changes.load_models || changes.masks {
+            if changes.model_settings || changes.load_models || changes.masks || changes.offsets {
                 changes.update_model = true;
                 changes.render = true;
             }
@@ -409,6 +402,9 @@ impl eframe::App for RctGen2App {
                 }
                 if changes.masks {
                     let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
+                }
+                if changes.offsets {
+                    let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
                 }
             }
 
