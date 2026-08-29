@@ -161,8 +161,7 @@ impl RctGen2App {
         }
     }
 
-    fn draw_side_panel(&mut self, changes: &mut Changes, ui: &mut egui::Ui) -> bool {
-        let mut redraw = false;
+    fn draw_side_panel(&mut self, changes: &mut Changes, ui: &mut egui::Ui) {
         if let Some(track_desc) = self.track_desc.as_mut() {
             match self.side_panel_tab {
                 Some(panels::SidePanelTab::Tracks) => {
@@ -182,7 +181,7 @@ impl RctGen2App {
                 Some(panels::SidePanelTab::Lights) => {
                     let lights_changed = panels::lights::lights_panel(&mut track_desc.lights, ui);
                     if lights_changed {
-                        self.queue_render(ui.ctx().clone());
+                        changes.render = true;
                     }
                 }
                 Some(panels::SidePanelTab::Offsets) => {
@@ -199,13 +198,13 @@ impl RctGen2App {
                         ui,
                     );
                     if changed {
-                        redraw = true;
+                        changes.redraw = true;
                     }
                 }
                 Some(panels::SidePanelTab::Render) => {
                     let changed = panels::render::render_panel(track_desc, ui);
                     if changed {
-                        self.queue_render(ui.ctx().clone());
+                        changes.render = true;
                     }
                 }
                 Some(panels::SidePanelTab::Sprites) => {
@@ -215,13 +214,12 @@ impl RctGen2App {
                         ui,
                     );
                     if changed {
-                        redraw = true;
+                        changes.redraw = true;
                     }
                 }
                 None => {}
             }
         }
-        redraw
     }
 }
 
@@ -289,9 +287,7 @@ impl eframe::App for RctGen2App {
 
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
-        if self.draw_side_panel(&mut changes, ui) {
-            changes.redraw = true;
-        }
+        self.draw_side_panel(&mut changes, ui);
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
