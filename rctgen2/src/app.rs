@@ -115,7 +115,7 @@ impl RctGen2App {
         }
     }
 
-    fn load_track(&mut self, egui_context: egui::Context) -> anyhow::Result<()> {
+    fn load_track(&mut self, changes: &mut Changes) -> anyhow::Result<()> {
         use anyhow::Context as _;
 
         let file_result = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file();
@@ -125,18 +125,16 @@ impl RctGen2App {
                 .with_context(|| format!("Could not get parent directory of {}", file_path.display()))?
                 .to_path_buf();
             let track_desc = make_track::track_desc::Desc::load(&file_path)?;
-            let track = track_desc.tracks.first().with_context(|| "No track found in track description")?;
 
             let _result = self.render_tx.send(RenderMessage::SetDirectory(directory));
-            let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-            let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-            let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
-            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
-            self.update_model();
+            changes.model_settings = true;
+            changes.load_models = true;
+            changes.masks = true;
+            changes.offsets = true;
+
             self.current_track_image = None;
             self.track_desc_path = Some(file_path);
             self.track_desc = Some(track_desc);
-            self.queue_render(egui_context);
         }
         Ok(())
     }
@@ -240,7 +238,7 @@ impl eframe::App for RctGen2App {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
-                        && let Err(error) = self.load_track(ui.ctx().clone())
+                        && let Err(error) = self.load_track(&mut changes)
                     {
                         self.errors.extend(error.chain().map(|x| x.to_string()));
                     }
