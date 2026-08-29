@@ -1,4 +1,4 @@
-use crate::modals;
+use crate::ui;
 use eframe::egui;
 use openrct2::colour::Colour;
 
@@ -33,8 +33,8 @@ fn create_texture(
 pub fn create_colour_button_textures(egui_context: &egui::Context) -> Vec<ButtonTextures> {
     use strum::IntoEnumIterator as _;
 
-    let unpressed = include_bytes!("../../resources/colour_button.png");
-    let pressed = include_bytes!("../../resources/colour_button_pressed.png");
+    let unpressed = include_bytes!("../../../resources/colour_button.png");
+    let pressed = include_bytes!("../../../resources/colour_button_pressed.png");
 
     let unpressed =
         renderer::image::IndexedImage::read(std::io::Cursor::new(unpressed), &renderer::palette::PALETTE_FLAT).unwrap();
@@ -61,14 +61,14 @@ pub fn colour_button(ui: &mut egui::Ui, textures: &ButtonTextures, pressed: bool
 
 pub struct ColourPicker {
     hovered: bool,
-    modal: modals::ColourSelectionModal,
+    modal: ui::modals::ColourSelectionModal,
 }
 
 impl ColourPicker {
     pub fn new() -> Self {
         ColourPicker {
             hovered: false,
-            modal: modals::ColourSelectionModal::new(),
+            modal: ui::modals::ColourSelectionModal::new(),
         }
     }
 

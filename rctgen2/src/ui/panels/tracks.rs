@@ -1,5 +1,5 @@
 use crate::app;
-use crate::widgets;
+use crate::ui::widgets;
 use eframe::egui;
 use make_track::track_desc::AdditionalModel;
 use make_track::track_sections::TRACK_SECTIONS;

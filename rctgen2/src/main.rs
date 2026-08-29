@@ -2,14 +2,11 @@
 
 mod adjacent_track;
 mod app;
-mod containers;
 mod drawing;
-mod modals;
-mod panels;
 mod render;
 mod settings;
 mod sprites;
-mod widgets;
+mod ui;
 
 use eframe::egui;
 use std::sync::{Arc, Mutex};

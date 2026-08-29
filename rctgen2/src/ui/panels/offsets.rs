@@ -1,4 +1,4 @@
-use crate::widgets;
+use crate::ui::widgets;
 use eframe::egui;
 
 fn offsets_drag_values(ui: &mut egui::Ui, offsets: &mut [[f32; 2]]) -> bool {

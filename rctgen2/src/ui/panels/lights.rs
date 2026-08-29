@@ -1,4 +1,4 @@
-use crate::widgets;
+use crate::ui::widgets;
 use eframe::egui;
 
 fn inverted_checkbox(ui: &mut egui::Ui, value: &mut bool) -> bool {

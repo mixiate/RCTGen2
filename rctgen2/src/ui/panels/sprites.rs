@@ -1,6 +1,6 @@
-use crate::containers;
-use crate::modals;
-use crate::widgets;
+use crate::ui::containers;
+use crate::ui::modals;
+use crate::ui::widgets;
 use eframe::egui;
 use egui::containers::scroll_area::ScrollBarVisibility;
 use make_track::track_desc::TrackSectionSprites;
