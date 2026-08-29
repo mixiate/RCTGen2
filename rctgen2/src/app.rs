@@ -25,6 +25,7 @@ pub struct Changes {
 }
 
 fn load_track(
+    file_path: std::path::PathBuf,
     render_tx: &Sender<RenderMessage>,
     current_track_image: &mut Option<TrackImage>,
     current_path: &mut Option<std::path::PathBuf>,
@@ -33,24 +34,22 @@ fn load_track(
 ) -> anyhow::Result<()> {
     use anyhow::Context as _;
 
-    let file_result = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file();
-    if let Some(file_path) = file_result {
-        let directory = file_path
-            .parent()
-            .with_context(|| format!("Could not get parent directory of {}", file_path.display()))?
-            .to_path_buf();
-        let track_desc = make_track::track_desc::Desc::load(&file_path)?;
+    let directory = file_path
+        .parent()
+        .with_context(|| format!("Could not get parent directory of {}", file_path.display()))?
+        .to_path_buf();
+    let track_desc = make_track::track_desc::Desc::load(&file_path)?;
 
-        let _result = render_tx.send(RenderMessage::SetDirectory(directory));
-        changes.model_settings = true;
-        changes.load_models = true;
-        changes.masks = true;
-        changes.offsets = true;
+    let _result = render_tx.send(RenderMessage::SetDirectory(directory));
+    changes.model_settings = true;
+    changes.load_models = true;
+    changes.masks = true;
+    changes.offsets = true;
 
-        *current_track_image = None;
-        *current_path = Some(file_path);
-        *current_track_desc = Some(track_desc);
-    }
+    *current_track_image = None;
+    *current_path = Some(file_path);
+    *current_track_desc = Some(track_desc);
+
     Ok(())
 }
 
@@ -224,7 +223,9 @@ impl eframe::App for RctGen2App {
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
+                        && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
                         && let Err(error) = load_track(
+                            file_path,
                             &self.render_tx,
                             &mut self.current_track_image,
                             &mut self.track_desc_path,
