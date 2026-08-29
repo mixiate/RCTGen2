@@ -116,67 +116,6 @@ impl RctGen2App {
             colour_picker_3: widgets::colour_picker::ColourPicker::new(),
         }
     }
-
-    fn draw_side_panel(&mut self, changes: &mut Changes, ui: &mut egui::Ui) {
-        if let Some(track_desc) = self.track_desc.as_mut() {
-            match self.side_panel_tab {
-                Some(panels::SidePanelTab::Tracks) => {
-                    if let Some(path) = &self.track_desc_path
-                        && let Some(directory) = path.parent()
-                    {
-                        panels::tracks::tracks_panel(
-                            &mut track_desc.tracks,
-                            directory,
-                            &mut self.errors,
-                            self.track_section,
-                            changes,
-                            ui,
-                        );
-                    }
-                }
-                Some(panels::SidePanelTab::Lights) => {
-                    let lights_changed = panels::lights::lights_panel(&mut track_desc.lights, ui);
-                    if lights_changed {
-                        changes.render = true;
-                    }
-                }
-                Some(panels::SidePanelTab::Offsets) => {
-                    let changed = panels::offsets::offsets_panel(&mut track_desc.offsets, ui);
-                    if changed {
-                        changes.offsets = true;
-                    }
-                }
-                Some(panels::SidePanelTab::MetalSupports) => {
-                    let changed = panels::metal_supports::metal_supports_panel(
-                        &mut track_desc.metal_supports,
-                        self.rotation,
-                        self.track_section,
-                        ui,
-                    );
-                    if changed {
-                        changes.redraw = true;
-                    }
-                }
-                Some(panels::SidePanelTab::Render) => {
-                    let changed = panels::render::render_panel(track_desc, ui);
-                    if changed {
-                        changes.render = true;
-                    }
-                }
-                Some(panels::SidePanelTab::Sprites) => {
-                    let changed = panels::sprites::sprites_panel(
-                        &mut track_desc.original_sprites,
-                        &mut self.sprites_track_selection_modal,
-                        ui,
-                    );
-                    if changed {
-                        changes.redraw = true;
-                    }
-                }
-                None => {}
-            }
-        }
-    }
 }
 
 impl eframe::App for RctGen2App {
@@ -204,7 +143,21 @@ impl eframe::App for RctGen2App {
 
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
-        self.draw_side_panel(&mut changes, ui);
+        if let Some(track_desc) = self.track_desc.as_mut()
+            && let Some(tab) = self.side_panel_tab
+        {
+            panels::side_panel(
+                ui,
+                tab,
+                &mut self.sprites_track_selection_modal,
+                &mut self.track_desc_path,
+                track_desc,
+                self.track_section,
+                self.rotation,
+                &mut changes,
+                &mut self.errors,
+            );
+        }
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
