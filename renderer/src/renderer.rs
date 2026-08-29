@@ -269,8 +269,8 @@ pub fn render_scene(
     use rand_pcg::rand_core::SeedableRng as _;
     use rayon::prelude::*;
 
-    let multi_samples_x = std::cmp::min(multi_samples_x, MAX_MULTISAMPLES);
-    let multi_samples_y = std::cmp::min(multi_samples_y, MAX_MULTISAMPLES);
+    let multi_samples_x = multi_samples_x.clamp(1, MAX_MULTISAMPLES);
+    let multi_samples_y = multi_samples_y.clamp(1, MAX_MULTISAMPLES);
 
     let rng = rand_pcg::Pcg32::seed_from_u64(1);
 
