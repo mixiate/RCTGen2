@@ -224,17 +224,61 @@ impl eframe::App for RctGen2App {
                 ui.menu_button("File", |ui| {
                     if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
                         && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
-                        && let Err(error) = load_track(
+                    {
+                        self.settings.settings.add_recent_file(&file_path);
+                        if let Err(error) = load_track(
                             file_path,
                             &self.render_tx,
                             &mut self.current_track_image,
                             &mut self.track_desc_path,
                             &mut self.track_desc,
                             &mut changes,
-                        )
-                    {
-                        self.errors.extend(error.chain().map(|x| x.to_string()));
+                        ) {
+                            self.errors.extend(error.chain().map(|x| x.to_string()));
+                        }
                     }
+
+                    ui.scope(|ui| {
+                        if self.settings.settings.recent_files().is_empty() {
+                            ui.disable();
+                        }
+                        egui::containers::menu::SubMenuButton::new("Open Recent").ui(ui, |ui| {
+                            let mut clicked_index = None;
+                            egui::ScrollArea::vertical().show(ui, |ui| {
+                                for (index, file_path) in self.settings.settings.recent_files().iter().enumerate() {
+                                    if let Some(file_name) = file_path.file_name()
+                                        && let Some(file_name) = file_name.to_str()
+                                    {
+                                        let response = ui.button(file_name);
+                                        if response.clicked() {
+                                            clicked_index = Some(index);
+                                        }
+                                        if let Some(file_path) = file_path.to_str() {
+                                            response.on_hover_text(file_path);
+                                        }
+                                    }
+                                }
+                                ui.separator();
+                                if ui.button("Clear recent files").clicked() {
+                                    self.settings.settings.clear_recent_files();
+                                }
+                            });
+                            if let Some(index) = clicked_index {
+                                let file_path = self.settings.settings.recent_files()[index].clone();
+                                self.settings.settings.add_recent_file(&file_path);
+                                if let Err(error) = load_track(
+                                    file_path,
+                                    &self.render_tx,
+                                    &mut self.current_track_image,
+                                    &mut self.track_desc_path,
+                                    &mut self.track_desc,
+                                    &mut changes,
+                                ) {
+                                    self.errors.extend(error.chain().map(|x| x.to_string()));
+                                }
+                            }
+                        });
+                    });
 
                     if let Some(path) = &self.track_desc_path
                         && let Some(track_desc) = &self.track_desc
@@ -486,6 +530,7 @@ impl eframe::App for RctGen2App {
     }
 
     fn on_exit(&mut self) {
+        let _result = self.settings.save();
         let _result = self.render_tx.send(RenderMessage::Exit);
     }
 }
