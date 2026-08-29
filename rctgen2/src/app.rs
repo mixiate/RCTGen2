@@ -13,6 +13,13 @@ pub enum AppMessage {
     Error(Vec<String>),
 }
 
+#[derive(Clone, Copy, Default)]
+pub struct Changes {
+    pub update_model: bool,
+    pub render: bool,
+    pub redraw: bool,
+}
+
 pub struct RctGen2App {
     app_rx: Receiver<AppMessage>,
     render_tx: Sender<RenderMessage>,
@@ -251,9 +258,7 @@ impl eframe::App for RctGen2App {
             }
         }
 
-        let mut update_model = false;
-        let mut queue_render = false;
-        let mut redraw = false;
+        let mut changes = Changes::default();
         let previous_track_section = self.track_section;
 
         egui::Panel::top("Top Menu").show(ui, |ui| {
@@ -299,8 +304,8 @@ impl eframe::App for RctGen2App {
                         }
                     });
                 if self.track_section != previous_track_section {
-                    update_model = true;
-                    queue_render = true;
+                    changes.update_model = true;
+                    changes.render = true;
                 }
             });
         });
@@ -308,7 +313,7 @@ impl eframe::App for RctGen2App {
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
         if self.draw_side_panel(ui) {
-            redraw = true;
+            changes.redraw = true;
         }
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
@@ -316,10 +321,10 @@ impl eframe::App for RctGen2App {
             let frame = egui::Frame::popup(ui.style()).outer_margin(egui::Margin::same(10)).shadow(egui::Shadow::NONE);
             frame.show(ui, |ui| {
                 if ui.add(egui::DragValue::new(&mut self.samples).prefix("Samples: ").range(1..=4)).changed() {
-                    queue_render = true;
+                    changes.render = true;
                 }
                 if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
-                    redraw = true;
+                    changes.redraw = true;
                 }
             });
             frame.show(ui, |ui| {
@@ -327,15 +332,15 @@ impl eframe::App for RctGen2App {
                     ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
                     if self.colour_picker_1.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_1)
                     {
-                        redraw = true;
+                        changes.redraw = true;
                     }
                     if self.colour_picker_2.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_2)
                     {
-                        redraw = true;
+                        changes.redraw = true;
                     }
                     if self.colour_picker_3.button(ui, &self.colour_button_textures, &mut self.drawing_options.colour_3)
                     {
-                        redraw = true;
+                        changes.redraw = true;
                     }
                 });
             });
@@ -354,7 +359,7 @@ impl eframe::App for RctGen2App {
                     )
                     .changed()
                 {
-                    redraw = true;
+                    changes.redraw = true;
                 }
             });
             frame.show(ui, |ui| {
@@ -370,7 +375,7 @@ impl eframe::App for RctGen2App {
                     )
                     .changed()
                 {
-                    redraw = true;
+                    changes.redraw = true;
                 }
                 let adjacent_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc {
                     !track_desc.original_sprites.is_empty()
@@ -384,7 +389,7 @@ impl eframe::App for RctGen2App {
                     )
                     .changed()
                 {
-                    redraw = true;
+                    changes.redraw = true;
                 }
             });
             frame.show(ui, |ui| {
@@ -399,15 +404,15 @@ impl eframe::App for RctGen2App {
                     if self.rotation == 4 {
                         self.rotation = 0;
                     }
-                    update_model = true;
-                    queue_render = true;
+                    changes.update_model = true;
+                    changes.render = true;
                 }
             });
 
-            if update_model {
+            if changes.update_model {
                 self.update_model();
             }
-            if queue_render {
+            if changes.render {
                 self.queue_render(ui.ctx().clone());
             }
 
@@ -416,10 +421,10 @@ impl eframe::App for RctGen2App {
                 && track_image.is_some()
             {
                 self.current_track_image = track_image.take();
-                redraw = true;
+                changes.redraw = true;
             }
 
-            if redraw
+            if changes.redraw
                 && let Some(track_desc) = &self.track_desc
                 && let Some(track) = track_desc.tracks.first()
                 && let Some(track_image) = &self.current_track_image
