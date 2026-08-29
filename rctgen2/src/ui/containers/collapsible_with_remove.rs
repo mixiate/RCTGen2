@@ -1,4 +1,4 @@
-use crate::widgets;
+use crate::ui::widgets;
 use eframe::egui;
 
 pub struct Response {

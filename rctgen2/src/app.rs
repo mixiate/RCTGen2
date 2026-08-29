@@ -1,10 +1,10 @@
 use crate::adjacent_track;
-use crate::modals;
-use crate::panels;
 use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
-use crate::widgets;
+use crate::ui::modals;
+use crate::ui::panels;
+use crate::ui::widgets;
 use eframe::egui;
 use std::sync::mpsc::{Receiver, Sender};
 

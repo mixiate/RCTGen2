@@ -1,4 +1,4 @@
-use crate::widgets::colour_picker;
+use crate::ui::widgets::colour_picker;
 use eframe::egui;
 use openrct2::colour::Colour;
 

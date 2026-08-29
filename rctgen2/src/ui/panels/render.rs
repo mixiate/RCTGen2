@@ -1,4 +1,4 @@
-use crate::widgets;
+use crate::ui::widgets;
 use eframe::egui;
 
 pub fn render_panel(track_desc: &mut make_track::track_desc::Desc, ui: &mut egui::Ui) -> bool {

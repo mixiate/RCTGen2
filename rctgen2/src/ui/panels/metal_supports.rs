@@ -1,5 +1,5 @@
-use crate::containers;
-use crate::widgets;
+use crate::ui::containers;
+use crate::ui::widgets;
 use eframe::egui;
 use make_track::track_desc::{MetalSupport, TrackSectionMetalSupports};
 use make_track::track_sections::TRACK_SECTIONS;
