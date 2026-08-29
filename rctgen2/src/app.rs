@@ -15,6 +15,9 @@ pub enum AppMessage {
 
 #[derive(Clone, Copy, Default)]
 pub struct Changes {
+    pub model_settings: bool,
+    pub load_models: bool,
+    pub masks: bool,
     pub update_model: bool,
     pub render: bool,
     pub redraw: bool,
@@ -163,7 +166,7 @@ impl RctGen2App {
         }
     }
 
-    fn draw_side_panel(&mut self, ui: &mut egui::Ui) -> bool {
+    fn draw_side_panel(&mut self, changes: &mut Changes, ui: &mut egui::Ui) -> bool {
         let mut redraw = false;
         if let Some(track_desc) = self.track_desc.as_mut() {
             match self.side_panel_tab {
@@ -171,33 +174,14 @@ impl RctGen2App {
                     if let Some(path) = &self.track_desc_path
                         && let Some(directory) = path.parent()
                     {
-                        let changed = panels::tracks::tracks_panel(
+                        panels::tracks::tracks_panel(
                             &mut track_desc.tracks,
                             directory,
                             &mut self.errors,
                             self.track_section,
+                            changes,
                             ui,
                         );
-                        if let Some(track) = track_desc.tracks.first() {
-                            if changed.model_settings {
-                                let _result =
-                                    self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-                            }
-                            if changed.models {
-                                let _result =
-                                    self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-                            }
-                            if changed.masks {
-                                let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
-                            }
-                            if changed.redraw {
-                                redraw = true;
-                            }
-                            if changed.model_settings || changed.models || changed.masks {
-                                self.update_model();
-                                self.queue_render(ui.ctx().clone());
-                            }
-                        }
                     }
                 }
                 Some(panels::SidePanelTab::Lights) => {
@@ -312,7 +296,7 @@ impl eframe::App for RctGen2App {
 
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
-        if self.draw_side_panel(ui) {
+        if self.draw_side_panel(&mut changes, ui) {
             changes.redraw = true;
         }
 
@@ -408,6 +392,25 @@ impl eframe::App for RctGen2App {
                     changes.render = true;
                 }
             });
+
+            if changes.model_settings || changes.load_models || changes.masks {
+                changes.update_model = true;
+                changes.render = true;
+            }
+
+            if let Some(track_desc) = &self.track_desc
+                && let Some(track) = track_desc.tracks.first()
+            {
+                if changes.model_settings {
+                    let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+                }
+                if changes.load_models {
+                    let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+                }
+                if changes.masks {
+                    let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
+                }
+            }
 
             if changes.update_model {
                 self.update_model();

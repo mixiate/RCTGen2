@@ -1,3 +1,4 @@
+use crate::app;
 use crate::widgets;
 use eframe::egui;
 use make_track::track_desc::AdditionalModel;
@@ -259,22 +260,14 @@ fn models_collapsible(
     changed
 }
 
-#[derive(Default)]
-pub struct TracksPanelChanged {
-    pub model_settings: bool,
-    pub models: bool,
-    pub masks: bool,
-    pub redraw: bool,
-}
-
 pub fn tracks_panel(
     tracks: &mut [make_track::track_desc::Track],
     directory: &std::path::Path,
     errors: &mut Vec<String>,
     current_track_section: &make_track::track_sections::TrackSection,
+    changes: &mut app::Changes,
     ui: &mut egui::Ui,
-) -> TracksPanelChanged {
-    let mut changed = TracksPanelChanged::default();
+) {
     egui::Panel::right("Tracks side panel").show(ui, |ui| {
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
@@ -321,7 +314,7 @@ pub fn tracks_panel(
                             ui.label("Z offset");
                         });
                         if ui.add(egui::DragValue::new(&mut track.z_offset).speed(0.1)).changed() {
-                            changed.redraw = true;
+                            changes.redraw = true;
                         }
                         ui.end_row();
 
@@ -329,7 +322,7 @@ pub fn tracks_panel(
                             ui.label("Masks");
                         });
                         if ui.add(egui::TextEdit::singleline(&mut track.masks)).lost_focus() {
-                            changed.masks = true;
+                            changes.masks = true;
                         }
                         ui.end_row();
 
@@ -337,7 +330,7 @@ pub fn tracks_panel(
                             ui.label("Length");
                         });
                         if length_widgets(ui, &mut track.model_settings.length) {
-                            changed.model_settings = true;
+                            changes.model_settings = true;
                         }
                         ui.end_row();
 
@@ -345,7 +338,7 @@ pub fn tracks_panel(
                             ui.label("Tie length");
                         });
                         if length_widgets(ui, &mut track.model_settings.tie_length) {
-                            changed.model_settings = true;
+                            changes.model_settings = true;
                         }
                         ui.end_row();
 
@@ -354,7 +347,7 @@ pub fn tracks_panel(
                         });
                         if ui.add(egui::DragValue::new(&mut track.model_settings.support_spacing).speed(0.01)).changed()
                         {
-                            changed.model_settings = true;
+                            changes.model_settings = true;
                         }
                         ui.end_row();
 
@@ -362,7 +355,7 @@ pub fn tracks_panel(
                             ui.label("Support pivot");
                         });
                         if ui.add(egui::DragValue::new(&mut track.model_settings.support_pivot).speed(0.01)).changed() {
-                            changed.model_settings = true;
+                            changes.model_settings = true;
                         }
                         ui.end_row();
 
@@ -370,7 +363,7 @@ pub fn tracks_panel(
                             ui.label("Bank angle");
                         });
                         if ui.add(egui::DragValue::new(&mut track.model_settings.bank_angle).speed(0.1)).changed() {
-                            changed.model_settings = true;
+                            changes.model_settings = true;
                         }
                         ui.end_row();
 
@@ -378,14 +371,14 @@ pub fn tracks_panel(
                             ui.label("Lift");
                         });
                         if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
-                            changed.model_settings = true;
+                            changes.model_settings = true;
                         }
                         ui.end_row();
                     });
 
                     egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
                         if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
-                            changed.models = true;
+                            changes.load_models = true;
                         }
                     });
 
@@ -406,5 +399,4 @@ pub fn tracks_panel(
                 }
             });
     });
-    changed
 }
