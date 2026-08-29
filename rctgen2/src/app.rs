@@ -2,6 +2,7 @@ use crate::adjacent_track;
 use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
+use crate::ui;
 use crate::ui::modals;
 use crate::ui::panels;
 use crate::ui::widgets;
@@ -22,35 +23,6 @@ pub struct Changes {
     pub update_model: bool,
     pub render: bool,
     pub redraw: bool,
-}
-
-fn load_track(
-    file_path: std::path::PathBuf,
-    render_tx: &Sender<RenderMessage>,
-    current_track_image: &mut Option<TrackImage>,
-    current_path: &mut Option<std::path::PathBuf>,
-    current_track_desc: &mut Option<make_track::track_desc::Desc>,
-    changes: &mut Changes,
-) -> anyhow::Result<()> {
-    use anyhow::Context as _;
-
-    let directory = file_path
-        .parent()
-        .with_context(|| format!("Could not get parent directory of {}", file_path.display()))?
-        .to_path_buf();
-    let track_desc = make_track::track_desc::Desc::load(&file_path)?;
-
-    let _result = render_tx.send(RenderMessage::SetDirectory(directory));
-    changes.model_settings = true;
-    changes.load_models = true;
-    changes.masks = true;
-    changes.offsets = true;
-
-    *current_track_image = None;
-    *current_path = Some(file_path);
-    *current_track_desc = Some(track_desc);
-
-    Ok(())
 }
 
 pub struct RctGen2App {
@@ -217,107 +189,18 @@ impl eframe::App for RctGen2App {
         }
 
         let mut changes = Changes::default();
-        let previous_track_section = self.track_section;
 
-        egui::Panel::top("Top Menu").show(ui, |ui| {
-            egui::MenuBar::new().ui(ui, |ui| {
-                ui.menu_button("File", |ui| {
-                    if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
-                        && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
-                    {
-                        self.settings.settings.add_recent_file(&file_path);
-                        if let Err(error) = load_track(
-                            file_path,
-                            &self.render_tx,
-                            &mut self.current_track_image,
-                            &mut self.track_desc_path,
-                            &mut self.track_desc,
-                            &mut changes,
-                        ) {
-                            self.errors.extend(error.chain().map(|x| x.to_string()));
-                        }
-                    }
-
-                    ui.scope(|ui| {
-                        if self.settings.settings.recent_files().is_empty() {
-                            ui.disable();
-                        }
-                        egui::containers::menu::SubMenuButton::new("Open Recent").ui(ui, |ui| {
-                            let mut clicked_index = None;
-                            egui::ScrollArea::vertical().show(ui, |ui| {
-                                for (index, file_path) in self.settings.settings.recent_files().iter().enumerate() {
-                                    if let Some(file_name) = file_path.file_name()
-                                        && let Some(file_name) = file_name.to_str()
-                                    {
-                                        let response = ui.button(file_name);
-                                        if response.clicked() {
-                                            clicked_index = Some(index);
-                                        }
-                                        if let Some(file_path) = file_path.to_str() {
-                                            response.on_hover_text(file_path);
-                                        }
-                                    }
-                                }
-                                ui.separator();
-                                if ui.button("Clear recent files").clicked() {
-                                    self.settings.settings.clear_recent_files();
-                                }
-                            });
-                            if let Some(index) = clicked_index {
-                                let file_path = self.settings.settings.recent_files()[index].clone();
-                                self.settings.settings.add_recent_file(&file_path);
-                                if let Err(error) = load_track(
-                                    file_path,
-                                    &self.render_tx,
-                                    &mut self.current_track_image,
-                                    &mut self.track_desc_path,
-                                    &mut self.track_desc,
-                                    &mut changes,
-                                ) {
-                                    self.errors.extend(error.chain().map(|x| x.to_string()));
-                                }
-                            }
-                        });
-                    });
-
-                    if let Some(path) = &self.track_desc_path
-                        && let Some(track_desc) = &self.track_desc
-                    {
-                        if ui.button("Save").clicked()
-                            && let Err(error) = track_desc.save(path)
-                        {
-                            self.errors.extend(error.chain().map(|x| x.to_string()));
-                        }
-                    } else {
-                        ui.add_enabled(false, egui::Button::new("Save"));
-                    }
-
-                    ui.separator();
-                    if ui.button("Settings").clicked() {
-                        self.settings.window_open = true;
-                    }
-
-                    ui.separator();
-
-                    if ui.button("Exit").clicked() {
-                        ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
-                    }
-                });
-
-                egui::ComboBox::from_id_salt("Track section")
-                    .selected_text(self.track_section.name)
-                    .width(300.0)
-                    .height(500.0)
-                    .show_ui(ui, |ui| {
-                        for track_section in make_track::track_sections::TRACK_SECTIONS {
-                            ui.selectable_value(&mut self.track_section, track_section, track_section.name);
-                        }
-                    });
-                if self.track_section != previous_track_section {
-                    changes.update_model = true;
-                }
-            });
-        });
+        ui::menu_bars::menu_bar(
+            ui,
+            &self.render_tx,
+            &mut self.current_track_image,
+            &mut self.track_desc_path,
+            &mut self.track_desc,
+            &mut self.track_section,
+            &mut self.settings,
+            &mut changes,
+            &mut self.errors,
+        );
 
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
