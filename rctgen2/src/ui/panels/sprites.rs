@@ -1,5 +1,4 @@
 use crate::ui::containers;
-use crate::ui::modals;
 use crate::ui::widgets;
 use eframe::egui;
 use egui::containers::scroll_area::ScrollBarVisibility;
@@ -90,14 +89,15 @@ fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) -> b
 
 pub fn sprites_panel(
     sprites: &mut indexmap::IndexMap<String, TrackSectionSprites>,
-    track_section_selection_modal: &mut modals::TrackSectionSelectionModal,
+    current_track_section: &make_track::track_sections::TrackSection,
     ui: &mut egui::Ui,
 ) -> bool {
     let mut changed = false;
     egui::Panel::right("Sprites side panel").resizable(false).min_size(340.0).show(ui, |ui| {
         ui.vertical_centered(|ui| {
-            if ui.button("Add piece").clicked() {
-                track_section_selection_modal.open();
+            if ui.button("Add current section").clicked() {
+                add_track_section(sprites, current_track_section);
+                changed = true;
             }
         });
         ui.add(egui::Separator::default().spacing(0.0));
@@ -128,11 +128,6 @@ pub fn sprites_panel(
             changed = true;
         }
     });
-
-    if let Some(track_section) = track_section_selection_modal.draw(ui) {
-        add_track_section(sprites, track_section);
-        changed = true;
-    }
 
     changed
 }

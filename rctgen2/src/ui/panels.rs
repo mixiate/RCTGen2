@@ -6,7 +6,6 @@ pub mod sprites;
 pub mod tracks;
 
 use crate::app;
-use crate::ui;
 use eframe::egui;
 use make_track::track_sections::TrackSection;
 
@@ -60,7 +59,6 @@ pub fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab
 pub fn side_panel(
     ui: &mut egui::Ui,
     tab: SidePanelTab,
-    sprites_track_selection_modal: &mut ui::modals::TrackSectionSelectionModal,
     track_desc_path: &mut Option<std::path::PathBuf>,
     track_desc: &mut make_track::track_desc::Desc,
     current_track_section: &TrackSection,
@@ -113,7 +111,7 @@ pub fn side_panel(
             }
         }
         SidePanelTab::Sprites => {
-            let changed = sprites::sprites_panel(&mut track_desc.original_sprites, sprites_track_selection_modal, ui);
+            let changed = sprites::sprites_panel(&mut track_desc.original_sprites, current_track_section, ui);
             if changed {
                 changes.redraw = true;
             }
