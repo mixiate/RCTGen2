@@ -3,7 +3,6 @@ use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, Upd
 use crate::settings;
 use crate::sprites;
 use crate::ui;
-use crate::ui::modals;
 use crate::ui::panels;
 use crate::ui::widgets;
 use eframe::egui;
@@ -35,7 +34,6 @@ pub struct RctGen2App {
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
     rct2_sprites: Option<sprites::Sprites>,
     side_panel_tab: Option<panels::SidePanelTab>,
-    sprites_track_selection_modal: modals::TrackSectionSelectionModal,
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
@@ -99,7 +97,6 @@ impl RctGen2App {
             adjacent_track_sections,
             rct2_sprites,
             side_panel_tab: None,
-            sprites_track_selection_modal: modals::TrackSectionSelectionModal::new(),
             track_desc_path: None,
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
@@ -147,7 +144,6 @@ impl eframe::App for RctGen2App {
             panels::side_panel(
                 ui,
                 tab,
-                &mut self.sprites_track_selection_modal,
                 &mut self.track_desc_path,
                 track_desc,
                 self.track_section,
