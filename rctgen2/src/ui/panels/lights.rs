@@ -29,26 +29,42 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
                         queue_render = true;
                     }
                 });
-                egui::Grid::new("Lights grid").show(ui, |ui| {
-                    if widgets::drag_value(ui, &mut light.direction[0], "X", None) {
+                egui::Grid::new("Lights grid").min_col_width(0.0).show(ui, |ui| {
+                    ui.label("X");
+                    if ui.add(widgets::DragValueSpin::new(&mut light.direction[0], 0.01)).changed() {
                         queue_render = true;
                     }
-                    if widgets::drag_value(ui, &mut light.diffuse_strength, "Diffuse", Some(0.0..=2.0)) {
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                        ui.label("Diffuse");
+                    });
+                    if ui
+                        .add(widgets::DragValueSpin::new(&mut light.diffuse_strength, 0.01).range(0.0..=10.0))
+                        .changed()
+                    {
                         queue_render = true;
                     }
                     ui.end_row();
 
-                    if widgets::drag_value(ui, &mut light.direction[1], "Y", None) {
+                    ui.label("Y");
+                    if ui.add(widgets::DragValueSpin::new(&mut light.direction[1], 0.01)).changed() {
                         queue_render = true;
                     }
-                    if widgets::drag_value(ui, &mut light.specular_strength, "Specular", Some(0.0..=2.0)) {
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                        ui.label("Specular");
+                    });
+                    if ui
+                        .add(widgets::DragValueSpin::new(&mut light.specular_strength, 0.01).range(0.0..=10.0))
+                        .changed()
+                    {
                         queue_render = true;
                     }
                     ui.end_row();
 
-                    if widgets::drag_value(ui, &mut light.direction[2], "Z", None) {
+                    ui.label("Z");
+                    if ui.add(widgets::DragValueSpin::new(&mut light.direction[2], 0.01)).changed() {
                         queue_render = true;
                     }
+                    ui.add_visible(false, egui::Label::new(""));
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
                         if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
                             queue_render = true;
