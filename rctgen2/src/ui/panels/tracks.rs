@@ -9,7 +9,7 @@ fn length_widgets(ui: &mut egui::Ui, value: &mut Option<f32>) -> bool {
     let mut changed = false;
     let mut removed = false;
     if let Some(value) = value {
-        if ui.add(egui::DragValue::new(value).speed(0.01).range(0.1..=1.0)).changed() {
+        if ui.add(widgets::DragValueSpin::new(value, 0.01).range(0.1..=1.0)).changed() {
             changed = true;
         }
         if widgets::buttons::remove_button(ui) {
@@ -313,7 +313,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Z offset");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.z_offset).speed(0.1)).changed() {
+                        if ui.add(widgets::DragValueSpin::new(&mut track.z_offset, 1)).changed() {
                             changes.redraw = true;
                         }
                         ui.end_row();
@@ -345,7 +345,12 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Support spacing");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.model_settings.support_spacing).speed(0.01)).changed()
+                        if ui
+                            .add(widgets::DragValueSpin::new(
+                                &mut track.model_settings.support_spacing,
+                                0.01,
+                            ))
+                            .changed()
                         {
                             changes.model_settings = true;
                         }
@@ -354,7 +359,13 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Support pivot");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.model_settings.support_pivot).speed(0.01)).changed() {
+                        if ui
+                            .add(widgets::DragValueSpin::new(
+                                &mut track.model_settings.support_pivot,
+                                0.01,
+                            ))
+                            .changed()
+                        {
                             changes.model_settings = true;
                         }
                         ui.end_row();
@@ -362,7 +373,7 @@ pub fn tracks_panel(
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             ui.label("Bank angle");
                         });
-                        if ui.add(egui::DragValue::new(&mut track.model_settings.bank_angle).speed(0.1)).changed() {
+                        if ui.add(widgets::DragValueSpin::new(&mut track.model_settings.bank_angle, 0.01)).changed() {
                             changes.model_settings = true;
                         }
                         ui.end_row();
