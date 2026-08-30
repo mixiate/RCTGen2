@@ -2,9 +2,9 @@ use eframe::egui;
 
 pub mod buttons;
 pub mod colour_picker;
-mod drag_value;
+mod drag_value_spin;
 
-pub use drag_value::DragValueSpin;
+pub use drag_value_spin::DragValueSpin;
 
 pub fn tile_index_label(ui: &mut egui::Ui, tile_index: usize) {
     let tile_label = match tile_index {
