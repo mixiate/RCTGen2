@@ -3,14 +3,17 @@ use eframe::egui;
 
 fn offsets_drag_values(ui: &mut egui::Ui, offsets: &mut [[f32; 2]]) -> bool {
     let mut changed = false;
-    ui.columns_const(|[col_0, col_1]| {
+    egui::Grid::new("Offsets grid").min_col_width(0.0).show(ui, |ui| {
         for offset in offsets.iter_mut() {
-            if widgets::drag_value(col_0, &mut offset[0], "X", None) {
+            ui.label("X");
+            if ui.add(widgets::DragValueSpin::new(&mut offset[0], 0.01)).changed() {
                 changed = true;
             }
-            if widgets::drag_value(col_1, &mut offset[1], "Y", None) {
+            ui.label("Y");
+            if ui.add(widgets::DragValueSpin::new(&mut offset[1], 0.01)).changed() {
                 changed = true;
             }
+            ui.end_row();
         }
     });
     changed
