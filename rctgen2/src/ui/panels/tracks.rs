@@ -260,6 +260,146 @@ fn models_collapsible(
     changed
 }
 
+fn track_widgets(
+    ui: &mut egui::Ui,
+    index: usize,
+    track: &mut make_track::track_desc::Track,
+    directory: &std::path::Path,
+    errors: &mut Vec<String>,
+    current_track_section: &make_track::track_sections::TrackSection,
+    changes: &mut app::Changes,
+) {
+    egui::Grid::new(index).show(ui, |ui| {
+        {
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.label("Name");
+            });
+            let mut size = ui.spacing().interact_size;
+            size.x = 150.0;
+            ui.add_sized(size, egui::TextEdit::singleline(&mut track.name));
+        }
+        ui.end_row();
+
+        {
+            let mut removed = false;
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.label("Suffix");
+            });
+            if let Some(suffix) = track.suffix.as_mut() {
+                ui.add(egui::TextEdit::singleline(suffix));
+                if widgets::buttons::remove_button(ui) {
+                    removed = true;
+                }
+            } else {
+                if widgets::buttons::add_button(ui) {
+                    track.suffix = Some(String::new());
+                }
+            }
+            if removed {
+                track.suffix = None;
+            }
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Z offset");
+        });
+        if ui.add(widgets::DragValueSpin::new(&mut track.z_offset, 1)).changed() {
+            changes.redraw = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Masks");
+        });
+        if ui.add(egui::TextEdit::singleline(&mut track.masks)).lost_focus() {
+            changes.masks = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Length");
+        });
+        if length_widgets(ui, &mut track.model_settings.length) {
+            changes.model_settings = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Tie length");
+        });
+        if length_widgets(ui, &mut track.model_settings.tie_length) {
+            changes.model_settings = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Support spacing");
+        });
+        if ui
+            .add(widgets::DragValueSpin::new(
+                &mut track.model_settings.support_spacing,
+                0.01,
+            ))
+            .changed()
+        {
+            changes.model_settings = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Support pivot");
+        });
+        if ui
+            .add(widgets::DragValueSpin::new(
+                &mut track.model_settings.support_pivot,
+                0.01,
+            ))
+            .changed()
+        {
+            changes.model_settings = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Bank angle");
+        });
+        if ui.add(widgets::DragValueSpin::new(&mut track.model_settings.bank_angle, 0.01)).changed() {
+            changes.model_settings = true;
+        }
+        ui.end_row();
+
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            ui.label("Lift");
+        });
+        if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
+            changes.model_settings = true;
+        }
+        ui.end_row();
+    });
+
+    egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
+        if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
+            changes.load_models = true;
+        }
+    });
+
+    egui::CollapsingHeader::new("Sections").id_salt(index + 1024).show(ui, |ui| {
+        use strum::IntoEnumIterator as _;
+        for group in make_track::track_desc::TrackGroup::iter() {
+            let mut enabled = track.sections.contains(&group);
+            let label: &'static str = group.into();
+            if ui.checkbox(&mut enabled, label).changed() {
+                if enabled {
+                    track.sections.insert(group);
+                } else {
+                    track.sections.shift_remove(&group);
+                }
+            }
+        }
+    });
+}
+
 pub fn tracks_panel(
     tracks: &mut [make_track::track_desc::Track],
     directory: &std::path::Path,
@@ -278,135 +418,7 @@ pub fn tracks_panel(
                     if index != 0 {
                         ui.separator();
                     }
-                    egui::Grid::new(index).show(ui, |ui| {
-                        {
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                ui.label("Name");
-                            });
-                            let mut size = ui.spacing().interact_size;
-                            size.x = 150.0;
-                            ui.add_sized(size, egui::TextEdit::singleline(&mut track.name));
-                        }
-                        ui.end_row();
-
-                        {
-                            let mut removed = false;
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                ui.label("Suffix");
-                            });
-                            if let Some(suffix) = track.suffix.as_mut() {
-                                ui.add(egui::TextEdit::singleline(suffix));
-                                if widgets::buttons::remove_button(ui) {
-                                    removed = true;
-                                }
-                            } else {
-                                if widgets::buttons::add_button(ui) {
-                                    track.suffix = Some(String::new());
-                                }
-                            }
-                            if removed {
-                                track.suffix = None;
-                            }
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Z offset");
-                        });
-                        if ui.add(widgets::DragValueSpin::new(&mut track.z_offset, 1)).changed() {
-                            changes.redraw = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Masks");
-                        });
-                        if ui.add(egui::TextEdit::singleline(&mut track.masks)).lost_focus() {
-                            changes.masks = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Length");
-                        });
-                        if length_widgets(ui, &mut track.model_settings.length) {
-                            changes.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Tie length");
-                        });
-                        if length_widgets(ui, &mut track.model_settings.tie_length) {
-                            changes.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Support spacing");
-                        });
-                        if ui
-                            .add(widgets::DragValueSpin::new(
-                                &mut track.model_settings.support_spacing,
-                                0.01,
-                            ))
-                            .changed()
-                        {
-                            changes.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Support pivot");
-                        });
-                        if ui
-                            .add(widgets::DragValueSpin::new(
-                                &mut track.model_settings.support_pivot,
-                                0.01,
-                            ))
-                            .changed()
-                        {
-                            changes.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Bank angle");
-                        });
-                        if ui.add(widgets::DragValueSpin::new(&mut track.model_settings.bank_angle, 0.01)).changed() {
-                            changes.model_settings = true;
-                        }
-                        ui.end_row();
-
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Lift");
-                        });
-                        if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
-                            changes.model_settings = true;
-                        }
-                        ui.end_row();
-                    });
-
-                    egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
-                        if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
-                            changes.load_models = true;
-                        }
-                    });
-
-                    egui::CollapsingHeader::new("Sections").id_salt(index + 1024).show(ui, |ui| {
-                        use strum::IntoEnumIterator as _;
-                        for group in make_track::track_desc::TrackGroup::iter() {
-                            let mut enabled = track.sections.contains(&group);
-                            let label: &'static str = group.into();
-                            if ui.checkbox(&mut enabled, label).changed() {
-                                if enabled {
-                                    track.sections.insert(group);
-                                } else {
-                                    track.sections.shift_remove(&group);
-                                }
-                            }
-                        }
-                    });
+                    track_widgets(ui, index, track, directory, errors, current_track_section, changes);
                 }
             });
     });
