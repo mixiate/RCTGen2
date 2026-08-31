@@ -100,6 +100,19 @@ pub fn menu_bar(
                 }
                 ui.separator();
 
+                if ui.add_enabled(track_desc.is_some(), egui::Button::new("Import Lights...")).clicked()
+                    && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
+                {
+                    match make_track::track_desc::Desc::load(&file_path) {
+                        Ok(import_track_desc) => {
+                            if let Some(track_desc) = track_desc {
+                                track_desc.lights = import_track_desc.lights;
+                                changes.render = true;
+                            }
+                        }
+                        Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+                    }
+                }
                 if ui.add_enabled(track_desc.is_some(), egui::Button::new("Import Metal Supports...")).clicked()
                     && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
                 {
