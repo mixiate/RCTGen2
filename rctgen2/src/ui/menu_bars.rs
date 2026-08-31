@@ -26,12 +26,21 @@ fn load_track(
     Ok(())
 }
 
+fn track_name(track: &make_track::track_desc::Track) -> String {
+    if let Some(suffix) = &track.suffix {
+        format!("{} {suffix}", track.name)
+    } else {
+        track.name.clone()
+    }
+}
+
 #[expect(clippy::too_many_arguments)]
 pub fn menu_bar(
     ui: &mut egui::Ui,
     current_track_image: &mut Option<TrackImage>,
     track_desc_path: &mut Option<std::path::PathBuf>,
     track_desc: &mut Option<make_track::track_desc::Desc>,
+    current_track_index: &mut usize,
     current_track_section: &mut &TrackSection,
     settings: &mut settings::AppSettings,
     changes: &mut app::Changes,
@@ -138,6 +147,32 @@ pub fn menu_bar(
                 }
             });
 
+            ui.add_space(100.0);
+            ui.separator();
+
+            {
+                let previous_track_index = *current_track_index;
+                let mut combo_box = egui::ComboBox::from_id_salt("Track dropdown").width(180.0).height(500.0);
+                if let Some(track_desc) = track_desc
+                    && let Some(track) = track_desc.tracks.get(*current_track_index)
+                {
+                    combo_box = combo_box.selected_text(track_name(track));
+                }
+                combo_box.show_ui(ui, |ui| {
+                    if let Some(track_desc) = &track_desc {
+                        for (index, track) in track_desc.tracks.iter().enumerate() {
+                            ui.selectable_value(current_track_index, index, track_name(track));
+                        }
+                    }
+                });
+                if *current_track_index != previous_track_index {
+                    changes.model_settings = true;
+                    changes.load_models = true;
+                    changes.masks = true;
+                }
+            }
+            ui.separator();
+
             let previous_track_section = *current_track_section;
             egui::ComboBox::from_id_salt("Track section")
                 .selected_text(current_track_section.name)
@@ -151,6 +186,7 @@ pub fn menu_bar(
             if *current_track_section != previous_track_section {
                 changes.update_model = true;
             }
+            ui.separator();
         });
     });
 }
