@@ -37,6 +37,7 @@ pub struct RctGen2App {
     track_desc_path: Option<std::path::PathBuf>,
     track_desc: Option<make_track::track_desc::Desc>,
     track_section: &'static make_track::track_sections::TrackSection,
+    track_index: usize,
     drawing_options: crate::drawing::Options,
     rotation: usize,
     current_track_image: Option<TrackImage>,
@@ -100,6 +101,7 @@ impl RctGen2App {
             track_desc_path: None,
             track_desc: None,
             track_section: &make_track::track_sections::FLAT,
+            track_index: 0,
             drawing_options: Default::default(),
             rotation: 0,
             current_track_image: None,
@@ -130,6 +132,7 @@ impl eframe::App for RctGen2App {
             &mut self.current_track_image,
             &mut self.track_desc_path,
             &mut self.track_desc,
+            &mut self.track_index,
             &mut self.track_section,
             &mut self.settings,
             &mut changes,
@@ -243,7 +246,7 @@ impl eframe::App for RctGen2App {
             });
 
             if let Some(track_desc) = &self.track_desc
-                && let Some(track) = track_desc.tracks.first()
+                && let Some(track) = track_desc.tracks.get(self.track_index)
             {
                 if changes.directory
                     && let Some(track_desc_path) = &self.track_desc_path
@@ -296,7 +299,7 @@ impl eframe::App for RctGen2App {
 
             if changes.redraw
                 && let Some(track_desc) = &self.track_desc
-                && let Some(track) = track_desc.tracks.first()
+                && let Some(track) = track_desc.tracks.get(self.track_index)
                 && let Some(track_image) = &self.current_track_image
             {
                 let max_tile_height = track_image
