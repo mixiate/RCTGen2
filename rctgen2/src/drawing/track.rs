@@ -130,18 +130,18 @@ fn draw_with_adjacent_sprites(
 }
 
 pub fn draw(
-    track_desc: &track_desc::Desc,
+    track: &track_desc::Track,
+    metal_supports: Option<&track_desc::MetalSupports>,
     track_image: &TrackImage,
-    z_offset: i32,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
     mut sprites: Option<&mut sprites::Sprites>,
     buffer: &mut Image,
 ) {
-    let z_offset = (z_offset - 16) as i16;
+    let z_offset = (track.z_offset - 16) as i16;
     if options.supports
         && let Some(sprites) = sprites.as_mut()
-        && let Some(metal_supports) = &track_desc.metal_supports
+        && let Some(metal_supports) = metal_supports
         && let Some(supports) = metal_supports.sections.get(track_image.track_section.name)
     {
         drawing::supports_metal::draw_supports(
@@ -164,12 +164,12 @@ pub fn draw(
             options,
             adjacent_track_sections,
             sprites,
-            &track_desc.original_sprites,
+            &track.original_sprites,
             buffer,
         );
     } else if options.original_track
         && let Some(sprites) = sprites
-        && let Some(track_sprites) = track_desc.original_sprites.get(track_image.track_section.name)
+        && let Some(track_sprites) = track.original_sprites.get(track_image.track_section.name)
     {
         draw_original_track_section(
             track_image.track_section,

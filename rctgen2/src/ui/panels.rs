@@ -61,6 +61,7 @@ pub fn side_panel(
     tab: SidePanelTab,
     track_desc_path: &mut Option<std::path::PathBuf>,
     track_desc: &mut make_track::track_desc::Desc,
+    track_index: usize,
     current_track_section: &TrackSection,
     rotation: usize,
     changes: &mut app::Changes,
@@ -111,9 +112,11 @@ pub fn side_panel(
             }
         }
         SidePanelTab::Sprites => {
-            let changed = sprites::sprites_panel(&mut track_desc.original_sprites, current_track_section, ui);
-            if changed {
-                changes.redraw = true;
+            if let Some(track) = track_desc.tracks.get_mut(track_index) {
+                let changed = sprites::sprites_panel(&mut track.original_sprites, current_track_section, ui);
+                if changed {
+                    changes.redraw = true;
+                }
             }
         }
     }

@@ -149,6 +149,7 @@ impl eframe::App for RctGen2App {
                 tab,
                 &mut self.track_desc_path,
                 track_desc,
+                self.track_index,
                 self.track_section,
                 self.rotation,
                 &mut changes,
@@ -200,8 +201,10 @@ impl eframe::App for RctGen2App {
                 }
             });
             frame.show(ui, |ui| {
-                let original_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc {
-                    track_desc.original_sprites.contains_key(self.track_section.name)
+                let original_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc
+                    && let Some(track) = track_desc.tracks.get(self.track_index)
+                {
+                    track.original_sprites.contains_key(self.track_section.name)
                 } else {
                     false
                 };
@@ -214,8 +217,10 @@ impl eframe::App for RctGen2App {
                 {
                     changes.redraw = true;
                 }
-                let adjacent_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc {
-                    !track_desc.original_sprites.is_empty()
+                let adjacent_track_checkbox_enabled = if let Some(track_desc) = &self.track_desc
+                    && let Some(track) = track_desc.tracks.get(self.track_index)
+                {
+                    !track.original_sprites.is_empty()
                 } else {
                     false
                 };
@@ -313,9 +318,9 @@ impl eframe::App for RctGen2App {
 
                 self.back_buffer_image.pixels_mut().fill(0);
                 crate::drawing::draw(
-                    track_desc,
+                    track,
+                    track_desc.metal_supports.as_ref(),
                     track_image,
-                    track.z_offset,
                     &self.drawing_options,
                     &self.adjacent_track_sections,
                     self.rct2_sprites.as_mut(),
