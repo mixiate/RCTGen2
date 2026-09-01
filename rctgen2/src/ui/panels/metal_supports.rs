@@ -45,7 +45,7 @@ fn track_section_body(supports: &mut TrackSectionMetalSupports, rotation: usize,
         let mut remove_support = false;
         if let Some(support) = support.as_mut() {
             ui.horizontal(|ui| {
-                widgets::tile_index_label(ui, tile_index);
+                ui.label(format!("{tile_index}:"));
 
                 let selected_text: &'static str = support.position.rotate(rotation).into();
                 egui::ComboBox::from_id_salt(tile_index)
@@ -75,7 +75,7 @@ fn track_section_body(supports: &mut TrackSectionMetalSupports, rotation: usize,
             }
         } else {
             ui.horizontal(|ui| {
-                widgets::tile_index_label(ui, tile_index);
+                ui.label(format!("{tile_index}:"));
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
                     if widgets::buttons::add_button(ui) {
                         added_tile_index = Some(tile_index);

@@ -75,8 +75,7 @@ fn track_section_body(sprites: &mut TrackSectionSprites, ui: &mut egui::Ui) -> b
 
         for (tile_index, tiles) in sprites.iter_mut().enumerate() {
             ui.horizontal(|ui| {
-                widgets::tile_index_label(ui, tile_index);
-
+                ui.label(format!("{tile_index}:"));
                 if sprites_grid(&mut tiles[rotation], ui) {
                     changed = true;
                 }
