@@ -1,9 +1,9 @@
 use crate::ui::widgets;
 use eframe::egui;
 
-fn offsets_drag_values(ui: &mut egui::Ui, offsets: &mut [[f32; 2]]) -> bool {
+fn offsets_drag_values(ui: &mut egui::Ui, id_str: &str, offsets: &mut [[f32; 2]]) -> bool {
     let mut changed = false;
-    egui::Grid::new("Offsets grid").min_col_width(0.0).show(ui, |ui| {
+    egui::Grid::new(id_str).min_col_width(0.0).show(ui, |ui| {
         for offset in offsets.iter_mut() {
             ui.label("X");
             if ui.add(widgets::DragValueSpin::new(&mut offset[0], 0.01)).changed() {
@@ -41,28 +41,28 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
             let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
             egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
                 ui.label("Flat");
-                if offsets_drag_values(ui, &mut offsets.flat) {
+                if offsets_drag_values(ui, "Flat offset", &mut offsets.flat) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Gentle");
-                if offsets_drag_values(ui, &mut offsets.gentle) {
+                if offsets_drag_values(ui, "Gentle offset", &mut offsets.gentle) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Steep");
-                if offsets_drag_values(ui, &mut offsets.steep) {
+                if offsets_drag_values(ui, "Steep offset", &mut offsets.steep) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Flat Banked");
-                if offsets_drag_values(ui, &mut offsets.flat_banked) {
+                if offsets_drag_values(ui, "Flat Banked offset", &mut offsets.flat_banked) {
                     update_offsets = true;
                 }
                 ui.separator();
                 if let Some(gentle_banked_right) = offsets.gentle_banked_right.as_mut() {
                     ui.label("Gentle Banked Left");
-                    if offsets_drag_values(ui, &mut offsets.gentle_banked) {
+                    if offsets_drag_values(ui, "Gentle Banked Left offset", &mut offsets.gentle_banked) {
                         update_offsets = true;
                     }
                     ui.separator();
@@ -74,12 +74,12 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
                             }
                         });
                     });
-                    if offsets_drag_values(ui, gentle_banked_right) {
+                    if offsets_drag_values(ui, "Gentle Banked Right offset", gentle_banked_right) {
                         update_offsets = true;
                     }
                 } else {
                     ui.label("Gentle Banked");
-                    if offsets_drag_values(ui, &mut offsets.gentle_banked) {
+                    if offsets_drag_values(ui, "Gentle Banked offset", &mut offsets.gentle_banked) {
                         update_offsets = true;
                     }
                     ui.separator();
@@ -94,32 +94,32 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
                 }
                 ui.separator();
                 ui.label("Inverted");
-                if offsets_drag_values(ui, &mut offsets.inverted) {
+                if offsets_drag_values(ui, "Inverted offset", &mut offsets.inverted) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Diagonal");
-                if offsets_drag_values(ui, &mut offsets.diagonal) {
+                if offsets_drag_values(ui, "Diagonal offset", &mut offsets.diagonal) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Diagonal Gentle");
-                if offsets_drag_values(ui, &mut offsets.diagonal_gentle) {
+                if offsets_drag_values(ui, "Diagonal Gentle offset", &mut offsets.diagonal_gentle) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Diagonal Steep");
-                if offsets_drag_values(ui, &mut offsets.diagonal_steep) {
+                if offsets_drag_values(ui, "Diagonal Steep offset", &mut offsets.diagonal_steep) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Diagonal Banked");
-                if offsets_drag_values(ui, &mut offsets.diagonal_banked) {
+                if offsets_drag_values(ui, "Diagonal Banked offset", &mut offsets.diagonal_banked) {
                     update_offsets = true;
                 }
                 ui.separator();
                 ui.label("Vertical");
-                if offsets_drag_values(ui, &mut offsets.vertical) {
+                if offsets_drag_values(ui, "Vertical offset", &mut offsets.vertical) {
                     update_offsets = true;
                 }
             });
