@@ -29,7 +29,7 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
                         queue_render = true;
                     }
                 });
-                egui::Grid::new("Lights grid").min_col_width(0.0).show(ui, |ui| {
+                egui::Grid::new(i).min_col_width(7.0).show(ui, |ui| {
                     ui.label("X");
                     if ui.add(widgets::DragValueSpin::new(&mut light.direction[0], 0.01)).changed() {
                         queue_render = true;
