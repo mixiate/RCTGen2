@@ -9,6 +9,7 @@ fn load_track(
     current_track_image: &mut Option<TrackImage>,
     current_path: &mut Option<std::path::PathBuf>,
     current_track_desc: &mut Option<make_track::track_desc::Desc>,
+    current_track_index: &mut usize,
     changes: &mut app::Changes,
 ) -> anyhow::Result<()> {
     let track_desc = make_track::track_desc::Desc::load(&file_path)?;
@@ -22,6 +23,7 @@ fn load_track(
     *current_track_image = None;
     *current_path = Some(file_path);
     *current_track_desc = Some(track_desc);
+    *current_track_index = 0;
 
     Ok(())
 }
@@ -53,8 +55,14 @@ pub fn menu_bar(
                     && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
                 {
                     settings.settings.add_recent_file(&file_path);
-                    if let Err(error) = load_track(file_path, current_track_image, track_desc_path, track_desc, changes)
-                    {
+                    if let Err(error) = load_track(
+                        file_path,
+                        current_track_image,
+                        track_desc_path,
+                        track_desc,
+                        current_track_index,
+                        changes,
+                    ) {
                         errors.extend(error.chain().map(|x| x.to_string()));
                     }
                 }
@@ -87,9 +95,14 @@ pub fn menu_bar(
                         if let Some(index) = clicked_index {
                             let file_path = settings.settings.recent_files()[index].clone();
                             settings.settings.add_recent_file(&file_path);
-                            if let Err(error) =
-                                load_track(file_path, current_track_image, track_desc_path, track_desc, changes)
-                            {
+                            if let Err(error) = load_track(
+                                file_path,
+                                current_track_image,
+                                track_desc_path,
+                                track_desc,
+                                current_track_index,
+                                changes,
+                            ) {
                                 errors.extend(error.chain().map(|x| x.to_string()));
                             }
                         }
