@@ -1,4 +1,5 @@
 use crate::adjacent_track;
+use crate::file_watcher;
 use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
@@ -10,6 +11,7 @@ use std::sync::mpsc::{Receiver, Sender};
 
 pub enum AppMessage {
     NewFrame,
+    ModelFileChanged,
     Error(Vec<String>),
 }
 
@@ -28,6 +30,8 @@ pub struct Changes {
 pub struct RctGen2App {
     app_rx: Receiver<AppMessage>,
     render_tx: Sender<RenderMessage>,
+    file_watcher: file_watcher::FileWatcher,
+    model_file_changed_time: Option<std::time::Instant>,
     track_image: SharedTrackImage,
     errors: Vec<String>,
     settings: settings::AppSettings,
@@ -52,6 +56,7 @@ pub struct RctGen2App {
 impl RctGen2App {
     pub fn new(
         egui_context: &egui::Context,
+        app_tx: Sender<AppMessage>,
         app_rx: Receiver<AppMessage>,
         render_tx: Sender<RenderMessage>,
         track_image: SharedTrackImage,
@@ -59,6 +64,8 @@ impl RctGen2App {
         config_dir: std::path::PathBuf,
     ) -> Self {
         let mut errors = Vec::new();
+
+        let file_watcher = file_watcher::FileWatcher::try_new(app_tx, egui_context.clone()).unwrap();
 
         let settings = settings::AppSettings::new(config_dir);
 
@@ -92,6 +99,8 @@ impl RctGen2App {
         Self {
             app_rx,
             render_tx,
+            file_watcher,
+            model_file_changed_time: None,
             track_image,
             errors,
             settings,
@@ -121,11 +130,21 @@ impl eframe::App for RctGen2App {
         for message in self.app_rx.try_iter() {
             match message {
                 AppMessage::NewFrame => fetch_frame = true,
+                AppMessage::ModelFileChanged => self.model_file_changed_time = Some(std::time::Instant::now()),
                 AppMessage::Error(errors) => self.errors.extend(errors),
             }
         }
 
         let mut changes = Changes::default();
+
+        if let Some(time) = self.model_file_changed_time {
+            if let Some(time_left) = std::time::Duration::from_millis(250).checked_sub(time.elapsed()) {
+                ui.ctx().request_repaint_after(time_left);
+            } else {
+                self.model_file_changed_time = None;
+                changes.load_models = true;
+            }
+        }
 
         ui::menu_bars::menu_bar(
             ui,
@@ -257,6 +276,9 @@ impl eframe::App for RctGen2App {
                     && let Some(track_desc_path) = &self.track_desc_path
                     && let Some(directory) = track_desc_path.parent()
                 {
+                    if let Err(error) = self.file_watcher.set_directory(directory) {
+                        self.errors.push(error.to_string());
+                    }
                     let _result = self.render_tx.send(RenderMessage::SetDirectory(directory.to_path_buf()));
                 }
                 if changes.model_settings {

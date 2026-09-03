@@ -12,6 +12,7 @@ glam = "0.33.3"
 heapless = "0.9.3"
 indexmap = "2.14.0"
 make-track = { path = "../make-track" }
+notify = "8.2.0"
 openrct2 = { path = "../openrct2" }
 rct = { path = "../rct" }
 relative-path = { version = "2.0.1", features = ["serde"] }

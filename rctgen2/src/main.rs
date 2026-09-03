@@ -3,6 +3,7 @@
 mod adjacent_track;
 mod app;
 mod drawing;
+mod file_watcher;
 mod render;
 mod settings;
 mod sprites;
@@ -25,6 +26,7 @@ fn main() -> anyhow::Result<()> {
     let data_directory = data_directory.join("data");
 
     let render_thread = {
+        let app_tx = app_tx.clone();
         let track_image = track_image.clone();
         let data_directory = data_directory.clone();
         std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &track_image, &data_directory))
@@ -56,6 +58,7 @@ fn main() -> anyhow::Result<()> {
             creation_context.egui_ctx.set_theme(egui::Theme::Dark);
             Ok(Box::new(app::RctGen2App::new(
                 &creation_context.egui_ctx,
+                app_tx,
                 app_rx,
                 render_tx,
                 track_image,
