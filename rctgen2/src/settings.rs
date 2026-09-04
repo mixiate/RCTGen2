@@ -2,27 +2,35 @@ use eframe::egui;
 use std::collections::VecDeque;
 
 #[derive(Default, serde::Deserialize, serde::Serialize)]
+#[serde(transparent)]
+pub struct RecentFiles(VecDeque<std::path::PathBuf>);
+
+impl RecentFiles {
+    pub fn get(&self) -> &VecDeque<std::path::PathBuf> {
+        &self.0
+    }
+
+    pub fn add(&mut self, file_path: &std::path::Path) {
+        self.0.retain(|x| *x != file_path);
+        self.0.push_front(file_path.to_path_buf());
+        self.0.truncate(50);
+    }
+
+    pub fn clear(&mut self) {
+        self.0.clear();
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+#[derive(Default, serde::Deserialize, serde::Serialize)]
 pub struct Settings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub g1_dat_path: Option<std::path::PathBuf>,
-    #[serde(default, skip_serializing_if = "VecDeque::is_empty")]
-    recent_files: VecDeque<std::path::PathBuf>,
-}
-
-impl Settings {
-    pub fn recent_files(&self) -> &VecDeque<std::path::PathBuf> {
-        &self.recent_files
-    }
-
-    pub fn add_recent_file(&mut self, file_path: &std::path::Path) {
-        self.recent_files.retain(|x| *x != file_path);
-        self.recent_files.push_front(file_path.to_path_buf());
-        self.recent_files.truncate(50);
-    }
-
-    pub fn clear_recent_files(&mut self) {
-        self.recent_files.clear();
-    }
+    #[serde(default, skip_serializing_if = "RecentFiles::is_empty")]
+    pub recent_track_files: RecentFiles,
 }
 
 pub struct AppSettings {
