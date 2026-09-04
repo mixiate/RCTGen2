@@ -5,7 +5,7 @@ pub mod render;
 pub mod sprites;
 pub mod tracks;
 
-use crate::app;
+use crate::track_editor;
 use eframe::egui;
 use make_track::track_sections::TrackSection;
 
@@ -64,7 +64,7 @@ pub fn side_panel(
     track_index: usize,
     current_track_section: &TrackSection,
     rotation: usize,
-    changes: &mut app::Changes,
+    changes: &mut track_editor::Changes,
     errors: &mut Vec<String>,
 ) {
     match tab {

@@ -7,6 +7,7 @@ mod file_watcher;
 mod render;
 mod settings;
 mod sprites;
+mod track_editor;
 mod ui;
 
 use eframe::egui;

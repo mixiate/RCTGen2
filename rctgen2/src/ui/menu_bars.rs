@@ -1,6 +1,6 @@
-use crate::app;
 use crate::render::TrackImage;
 use crate::settings;
+use crate::track_editor;
 use eframe::egui;
 use make_track::track_sections::TrackSection;
 
@@ -10,7 +10,7 @@ fn load_track(
     current_path: &mut Option<std::path::PathBuf>,
     current_track_desc: &mut Option<make_track::track_desc::Desc>,
     current_track_index: &mut usize,
-    changes: &mut app::Changes,
+    changes: &mut track_editor::Changes,
 ) -> anyhow::Result<()> {
     let track_desc = make_track::track_desc::Desc::load(&file_path)?;
 
@@ -45,7 +45,7 @@ pub fn menu_bar(
     current_track_index: &mut usize,
     current_track_section: &mut &TrackSection,
     settings: &mut settings::AppSettings,
-    changes: &mut app::Changes,
+    changes: &mut track_editor::Changes,
     errors: &mut Vec<String>,
 ) {
     egui::Panel::top("Tracks Menu Bar").show(ui, |ui| {
