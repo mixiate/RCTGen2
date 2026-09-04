@@ -11,27 +11,15 @@ mod track_editor;
 mod ui;
 
 use eframe::egui;
-use std::sync::{Arc, Mutex};
 
 fn main() -> anyhow::Result<()> {
     use anyhow::Context as _;
-
-    let (render_tx, render_rx) = std::sync::mpsc::channel();
-    let (app_tx, app_rx) = std::sync::mpsc::channel();
-    let track_image = Arc::new(Mutex::new(None));
 
     let data_directory = std::env::current_exe()?;
     let data_directory = data_directory
         .parent()
         .with_context(|| format!("Could not get parent directory of {}", data_directory.display()))?;
     let data_directory = data_directory.join("data");
-
-    let render_thread = {
-        let app_tx = app_tx.clone();
-        let track_image = track_image.clone();
-        let data_directory = data_directory.clone();
-        std::thread::spawn(move || render::render_thread(&render_rx, &app_tx, &track_image, &data_directory))
-    };
 
     let config_dir = dirs::config_dir().context("Could not get config directory")?.join("RCTGen2");
 
@@ -59,17 +47,11 @@ fn main() -> anyhow::Result<()> {
             creation_context.egui_ctx.set_theme(egui::Theme::Dark);
             Ok(Box::new(app::RctGen2App::new(
                 &creation_context.egui_ctx,
-                app_tx,
-                app_rx,
-                render_tx,
-                track_image,
                 &data_directory,
                 config_dir,
             )))
         }),
     )?;
-
-    let _result = render_thread.join();
 
     Ok(())
 }

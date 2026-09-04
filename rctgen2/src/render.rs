@@ -1,4 +1,4 @@
-use crate::app::AppMessage;
+use crate::track_editor::TrackEditorMessage;
 use eframe::egui;
 use std::collections::HashMap;
 use std::sync::mpsc::Receiver;
@@ -169,21 +169,23 @@ fn render(scene: &Scene, args: &mut RenderArgs, views: Option<&[make_track::mask
     Images { unindexed, indexed }
 }
 
-fn report_error(tx: &Sender<AppMessage>, error: &anyhow::Error) {
+fn report_error(tx: &Sender<TrackEditorMessage>, error: &anyhow::Error) {
     let errors = error.chain().map(|x| x.to_string()).collect();
-    let _result = tx.send(AppMessage::Error(errors));
+    let _result = tx.send(TrackEditorMessage::Error(errors));
 }
 
 pub fn render_thread(
     render_rx: &Receiver<RenderMessage>,
-    app_tx: &Sender<AppMessage>,
+    app_tx: &Sender<TrackEditorMessage>,
     track_image: &SharedTrackImage,
     data_directory: &std::path::Path,
 ) {
     let render_device = match renderer::Device::try_new() {
         Ok(render_device) => render_device,
         Err(_) => {
-            let _result = app_tx.send(AppMessage::Error(vec!["Could not create render device".to_string()]));
+            let _result = app_tx.send(TrackEditorMessage::Error(vec![
+                "Could not create render device".to_string(),
+            ]));
             return;
         }
     };
@@ -292,7 +294,7 @@ pub fn render_thread(
             }
 
             args.egui_context.request_repaint();
-            let _result = app_tx.send(AppMessage::NewFrame);
+            let _result = app_tx.send(TrackEditorMessage::NewFrame);
         }
     }
 }

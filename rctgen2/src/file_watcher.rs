@@ -1,4 +1,4 @@
-use crate::app;
+use crate::track_editor::TrackEditorMessage;
 use eframe::egui;
 use std::sync::mpsc::Sender;
 
@@ -8,7 +8,7 @@ pub struct FileWatcher {
 }
 
 impl FileWatcher {
-    pub fn try_new(app_tx: Sender<app::AppMessage>, egui_context: egui::Context) -> notify::Result<FileWatcher> {
+    pub fn try_new(app_tx: Sender<TrackEditorMessage>, egui_context: egui::Context) -> notify::Result<FileWatcher> {
         let watcher = notify::recommended_watcher(move |result: notify::Result<notify::Event>| {
             if let Ok(event) = result
                 && event.kind.is_modify()
@@ -18,7 +18,7 @@ impl FileWatcher {
                         .unwrap_or(false)
                 })
             {
-                let _result = app_tx.send(app::AppMessage::ModelFileChanged);
+                let _result = app_tx.send(TrackEditorMessage::ModelFileChanged);
                 egui_context.request_repaint();
             }
         })?;
