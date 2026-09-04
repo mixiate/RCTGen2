@@ -17,7 +17,10 @@ fn support_widgets(support: &mut MetalSupport, rotation: usize, ui: &mut egui::U
         if ui.add(egui::DragValue::new(&mut support.rotation).speed(0.01).range(0..=3)).changed() {
             changed = true;
         }
-        if ui.checkbox(&mut support.alternates, "Alternates").changed() {
+        if ui.checkbox(&mut support.alternates, "Alt").changed() {
+            changed = true;
+        }
+        if ui.checkbox(&mut support.prevent_double_offset, "B").changed() {
             changed = true;
         }
     });

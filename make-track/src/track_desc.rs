@@ -229,6 +229,8 @@ pub struct MetalSupport {
     pub rotation: u8,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub alternates: bool,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub prevent_double_offset: bool,
 }
 
 pub type TrackSectionMetalSupports = heapless::Vec<Option<MetalSupport>, { crate::track_sections::MAX_TILE_COUNT }>;
