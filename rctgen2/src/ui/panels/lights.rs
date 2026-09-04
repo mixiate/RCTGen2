@@ -19,17 +19,23 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
         let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
         egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
             for (i, light) in lights.iter_mut().enumerate() {
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                    if widgets::buttons::remove_button(ui) {
-                        deleted_index = Some(i);
-                        queue_render = true;
-                    }
-
-                    if inverted_checkbox(ui, &mut light.disabled) {
-                        queue_render = true;
-                    }
-                });
                 egui::Grid::new(i).min_col_width(7.0).show(ui, |ui| {
+                    ui.allocate_space(egui::Vec2::ZERO);
+                    ui.allocate_space(egui::Vec2::ZERO);
+                    ui.allocate_space(egui::Vec2::ZERO);
+                    ui.horizontal(|ui| {
+                        if inverted_checkbox(ui, &mut light.disabled) {
+                            queue_render = true;
+                        }
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                            if widgets::buttons::remove_button(ui) {
+                                deleted_index = Some(i);
+                                queue_render = true;
+                            }
+                        });
+                    });
+                    ui.end_row();
+
                     ui.label("X");
                     if ui.add(widgets::DragValueSpin::new(&mut light.direction[0], 0.01)).changed() {
                         queue_render = true;
@@ -64,12 +70,10 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
                     if ui.add(widgets::DragValueSpin::new(&mut light.direction[2], 0.01)).changed() {
                         queue_render = true;
                     }
-                    ui.add_visible(false, egui::Label::new(""));
-                    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                        if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
-                            queue_render = true;
-                        }
-                    });
+                    ui.allocate_space(egui::Vec2::ZERO);
+                    if ui.checkbox(&mut light.shadow, "Shadow").clicked() {
+                        queue_render = true;
+                    }
                     ui.end_row();
                 });
 
