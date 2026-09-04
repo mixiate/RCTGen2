@@ -54,7 +54,7 @@ pub fn menu_bar(
                 if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
                     && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
                 {
-                    settings.settings.add_recent_file(&file_path);
+                    settings.settings.recent_track_files.add(&file_path);
                     if let Err(error) = load_track(
                         file_path,
                         current_track_image,
@@ -68,13 +68,13 @@ pub fn menu_bar(
                 }
 
                 ui.scope(|ui| {
-                    if settings.settings.recent_files().is_empty() {
+                    if settings.settings.recent_track_files.is_empty() {
                         ui.disable();
                     }
                     egui::containers::menu::SubMenuButton::new("Open Recent").ui(ui, |ui| {
                         let mut clicked_index = None;
                         egui::ScrollArea::vertical().show(ui, |ui| {
-                            for (index, file_path) in settings.settings.recent_files().iter().enumerate() {
+                            for (index, file_path) in settings.settings.recent_track_files.get().iter().enumerate() {
                                 if let Some(file_name) = file_path.file_name()
                                     && let Some(file_name) = file_name.to_str()
                                 {
@@ -89,12 +89,12 @@ pub fn menu_bar(
                             }
                             ui.separator();
                             if ui.button("Clear recent files").clicked() {
-                                settings.settings.clear_recent_files();
+                                settings.settings.recent_track_files.clear();
                             }
                         });
                         if let Some(index) = clicked_index {
-                            let file_path = settings.settings.recent_files()[index].clone();
-                            settings.settings.add_recent_file(&file_path);
+                            let file_path = settings.settings.recent_track_files.get()[index].clone();
+                            settings.settings.recent_track_files.add(&file_path);
                             if let Err(error) = load_track(
                                 file_path,
                                 current_track_image,
