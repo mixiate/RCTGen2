@@ -1,4 +1,4 @@
-use crate::app;
+use crate::track_editor;
 use crate::ui::widgets;
 use eframe::egui;
 use make_track::track_desc::AdditionalModel;
@@ -267,7 +267,7 @@ fn track_widgets(
     directory: &std::path::Path,
     errors: &mut Vec<String>,
     current_track_section: &make_track::track_sections::TrackSection,
-    changes: &mut app::Changes,
+    changes: &mut track_editor::Changes,
 ) {
     egui::Grid::new(index).show(ui, |ui| {
         {
@@ -405,7 +405,7 @@ pub fn tracks_panel(
     directory: &std::path::Path,
     errors: &mut Vec<String>,
     current_track_section: &make_track::track_sections::TrackSection,
-    changes: &mut app::Changes,
+    changes: &mut track_editor::Changes,
     ui: &mut egui::Ui,
 ) {
     egui::Panel::right("Tracks side panel").show(ui, |ui| {
