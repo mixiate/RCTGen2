@@ -110,15 +110,22 @@ pub fn sprites_panel(
             .auto_shrink(false)
             .show(ui, |ui| {
                 for (index, (track_section_name, sprites)) in sprites.iter_mut().enumerate() {
-                    let response = containers::collapsible_with_remove(ui, track_section_name, |ui| {
-                        track_section_body(sprites, ui)
+                    let frame = if current_track_section.name == track_section_name {
+                        egui::Frame::new().fill(ui.visuals().faint_bg_color)
+                    } else {
+                        egui::Frame::new()
+                    };
+                    frame.show(ui, |ui| {
+                        let response = containers::collapsible_with_remove(ui, track_section_name, |ui| {
+                            track_section_body(sprites, ui)
+                        });
+                        if response.changed {
+                            changed = true;
+                        }
+                        if response.removed {
+                            removed_track_section_index = Some(index);
+                        }
                     });
-                    if response.changed {
-                        changed = true;
-                    }
-                    if response.removed {
-                        removed_track_section_index = Some(index);
-                    }
                 }
             });
 
