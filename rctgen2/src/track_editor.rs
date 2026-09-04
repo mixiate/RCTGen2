@@ -1,6 +1,6 @@
 use crate::adjacent_track;
-use crate::app::AppMessage;
 use crate::file_watcher;
+use crate::render;
 use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprites;
@@ -9,6 +9,13 @@ use crate::ui::panels;
 use crate::ui::widgets;
 use eframe::egui;
 use std::sync::mpsc::{Receiver, Sender};
+use std::sync::{Arc, Mutex};
+
+pub enum TrackEditorMessage {
+    NewFrame,
+    ModelFileChanged,
+    Error(Vec<String>),
+}
 
 #[derive(Clone, Copy, Default)]
 pub struct Changes {
@@ -23,6 +30,9 @@ pub struct Changes {
 }
 
 pub struct TrackEditor {
+    render_thread: Option<std::thread::JoinHandle<()>>,
+    editor_rx: Receiver<TrackEditorMessage>,
+    render_tx: Sender<RenderMessage>,
     track_image: SharedTrackImage,
     current_track_image: Option<TrackImage>,
     side_panel_tab: Option<panels::SidePanelTab>,
@@ -39,16 +49,23 @@ pub struct TrackEditor {
     colour_picker_2: widgets::colour_picker::ColourPicker,
     colour_picker_3: widgets::colour_picker::ColourPicker,
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
+    file_watcher: file_watcher::FileWatcher,
     model_file_changed_time: Option<std::time::Instant>,
 }
 
 impl TrackEditor {
-    pub fn new(
-        egui_context: &egui::Context,
-        track_image: SharedTrackImage,
-        data_directory: &std::path::Path,
-        errors: &mut Vec<String>,
-    ) -> Self {
+    pub fn new(egui_context: &egui::Context, data_directory: &std::path::Path, errors: &mut Vec<String>) -> Self {
+        let (render_tx, render_rx) = std::sync::mpsc::channel();
+        let (editor_tx, editor_rx) = std::sync::mpsc::channel();
+        let track_image = Arc::new(Mutex::new(None));
+
+        let render_thread = {
+            let editor_tx = editor_tx.clone();
+            let track_image = track_image.clone();
+            let data_directory = data_directory.to_path_buf();
+            std::thread::spawn(move || render::render_thread(&render_rx, &editor_tx, &track_image, &data_directory))
+        };
+
         let adjacent_track_sections = data_directory.join("adjacent_track_sections").with_extension("json");
         let adjacent_track_sections = match adjacent_track::load_adjacent_track_sections(&adjacent_track_sections) {
             Ok(sections) => sections,
@@ -64,7 +81,12 @@ impl TrackEditor {
         let mut back_buffer_image = renderer::image::Image::new(back_buffer_size, back_buffer_size);
         back_buffer_image.offset = glam::IVec2::new(back_buffer_size as i32 / 2, back_buffer_size as i32 / 2);
 
+        let file_watcher = file_watcher::FileWatcher::try_new(editor_tx, egui_context.clone()).unwrap();
+
         TrackEditor {
+            render_thread: Some(render_thread),
+            editor_rx,
+            render_tx,
             track_image,
             current_track_image: None,
             side_panel_tab: None,
@@ -81,27 +103,24 @@ impl TrackEditor {
             colour_picker_2: widgets::colour_picker::ColourPicker::new(),
             colour_picker_3: widgets::colour_picker::ColourPicker::new(),
             adjacent_track_sections,
+            file_watcher,
             model_file_changed_time: None,
         }
     }
 
-    #[expect(clippy::too_many_arguments)]
     pub fn ui(
         &mut self,
         ui: &mut egui::Ui,
-        app_rx: &Receiver<AppMessage>,
-        render_tx: &Sender<RenderMessage>,
         settings: &mut settings::AppSettings,
         rct2_sprites: Option<&mut sprites::Sprites>,
-        file_watcher: &mut file_watcher::FileWatcher,
         errors: &mut Vec<String>,
     ) {
         let mut fetch_frame = false;
-        for message in app_rx.try_iter() {
+        for message in self.editor_rx.try_iter() {
             match message {
-                AppMessage::NewFrame => fetch_frame = true,
-                AppMessage::ModelFileChanged => self.model_file_changed_time = Some(std::time::Instant::now()),
-                AppMessage::Error(error) => errors.extend(error),
+                TrackEditorMessage::NewFrame => fetch_frame = true,
+                TrackEditorMessage::ModelFileChanged => self.model_file_changed_time = Some(std::time::Instant::now()),
+                TrackEditorMessage::Error(error) => errors.extend(error),
             }
         }
 
@@ -246,36 +265,36 @@ impl TrackEditor {
                     && let Some(track_desc_path) = &self.track_desc_path
                     && let Some(directory) = track_desc_path.parent()
                 {
-                    if let Err(error) = file_watcher.set_directory(directory) {
+                    if let Err(error) = self.file_watcher.set_directory(directory) {
                         errors.push(error.to_string());
                     }
-                    let _result = render_tx.send(RenderMessage::SetDirectory(directory.to_path_buf()));
+                    let _result = self.render_tx.send(RenderMessage::SetDirectory(directory.to_path_buf()));
                 }
                 if changes.model_settings {
-                    let _result = render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+                    let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
                     changes.update_model = true;
                 }
                 if changes.load_models {
-                    let _result = render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+                    let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
                     changes.update_model = true;
                 }
                 if changes.masks {
-                    let _result = render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
+                    let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
                     changes.update_model = true;
                 }
                 if changes.offsets {
-                    let _result = render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
+                    let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(track_desc.offsets)));
                     changes.update_model = true;
                 }
                 if changes.update_model {
-                    let _result = render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
+                    let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
                         track_section: self.track_section,
                         rotation: self.rotation,
                     }));
                     changes.render = true;
                 }
                 if changes.render {
-                    let _result = render_tx.send(RenderMessage::Render(RenderArgs {
+                    let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
                         egui_context: ui.ctx().clone(),
                         rotation: self.rotation,
                         samples: track_desc.samples.into(),
@@ -329,5 +348,10 @@ impl TrackEditor {
             let image_rect = egui::Rect::from_min_size(image_pos, texture_size);
             ui.place(image_rect, image);
         });
+    }
+
+    pub fn on_exit(&mut self) {
+        let _result = self.render_tx.send(RenderMessage::Exit);
+        self.render_thread.take().map(std::thread::JoinHandle::join);
     }
 }
