@@ -2,6 +2,11 @@
 members = ["embree", "make-track", "make-vehicle", "openrct2", "rct", "rctgen2", "renderer", "sprite-build"]
 resolver = "3"
 
+[profile.dev-opt]
+inherits = "dev"
+debug = false
+opt-level = 3
+
 [workspace.lints.rust]
 unsafe_code = "deny"
 
