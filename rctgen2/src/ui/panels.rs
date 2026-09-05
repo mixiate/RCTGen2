@@ -59,7 +59,7 @@ pub fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab
 pub fn side_panel(
     ui: &mut egui::Ui,
     tab: SidePanelTab,
-    track_desc_path: &mut Option<std::path::PathBuf>,
+    track_desc_path: &std::path::Path,
     track_desc: &mut make_track::track_desc::Desc,
     track_index: usize,
     current_track_section: &TrackSection,
@@ -69,9 +69,7 @@ pub fn side_panel(
 ) {
     match tab {
         SidePanelTab::Tracks => {
-            if let Some(path) = &track_desc_path
-                && let Some(directory) = path.parent()
-            {
+            if let Some(directory) = track_desc_path.parent() {
                 tracks::tracks_panel(
                     &mut track_desc.tracks,
                     directory,
