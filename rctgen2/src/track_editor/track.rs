@@ -27,6 +27,15 @@ pub struct Track {
 }
 
 impl Track {
+    pub fn try_new(file_path: std::path::PathBuf) -> anyhow::Result<Self> {
+        let file_path = FilePath::try_new(file_path)?;
+        Ok(Track {
+            file_path,
+            desc: Default::default(),
+            track_index: 0,
+        })
+    }
+
     pub fn load(file_path: std::path::PathBuf) -> anyhow::Result<Track> {
         let file_path = FilePath::try_new(file_path)?;
         let desc = make_track::track_desc::Desc::load(&file_path)?;
