@@ -55,13 +55,10 @@ pub fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab
     });
 }
 
-#[expect(clippy::too_many_arguments)]
 pub fn side_panel(
     ui: &mut egui::Ui,
     tab: SidePanelTab,
-    track_desc_path: &std::path::Path,
-    track_desc: &mut make_track::track_desc::Desc,
-    track_index: usize,
+    track: &mut track_editor::Track,
     current_track_section: &TrackSection,
     rotation: usize,
     changes: &mut track_editor::Changes,
@@ -69,32 +66,30 @@ pub fn side_panel(
 ) {
     match tab {
         SidePanelTab::Tracks => {
-            if let Some(directory) = track_desc_path.parent() {
-                tracks::tracks_panel(
-                    &mut track_desc.tracks,
-                    directory,
-                    errors,
-                    current_track_section,
-                    changes,
-                    ui,
-                );
-            }
+            tracks::tracks_panel(
+                &mut track.desc.tracks,
+                track.file_path.directory(),
+                errors,
+                current_track_section,
+                changes,
+                ui,
+            );
         }
         SidePanelTab::Lights => {
-            let changed = lights::lights_panel(&mut track_desc.lights, ui);
+            let changed = lights::lights_panel(&mut track.desc.lights, ui);
             if changed {
                 changes.render = true;
             }
         }
         SidePanelTab::Offsets => {
-            let changed = offsets::offsets_panel(&mut track_desc.offsets, ui);
+            let changed = offsets::offsets_panel(&mut track.desc.offsets, ui);
             if changed {
                 changes.offsets = true;
             }
         }
         SidePanelTab::MetalSupports => {
             let changed = metal_supports::metal_supports_panel(
-                &mut track_desc.metal_supports,
+                &mut track.desc.metal_supports,
                 rotation,
                 current_track_section,
                 ui,
@@ -104,13 +99,13 @@ pub fn side_panel(
             }
         }
         SidePanelTab::Render => {
-            let changed = render::render_panel(track_desc, ui);
+            let changed = render::render_panel(&mut track.desc, ui);
             if changed {
                 changes.render = true;
             }
         }
         SidePanelTab::Sprites => {
-            if let Some(track) = track_desc.tracks.get_mut(track_index) {
+            if let Some(track) = track.desc.tracks.get_mut(track.track_index) {
                 let changed = sprites::sprites_panel(&mut track.original_sprites, current_track_section, ui);
                 if changed {
                     changes.redraw = true;
