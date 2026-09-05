@@ -7,8 +7,8 @@ use make_track::track_sections::TrackSection;
 fn load_track(
     file_path: std::path::PathBuf,
     current_track_image: &mut Option<TrackImage>,
-    current_path: &mut Option<std::path::PathBuf>,
-    current_track_desc: &mut Option<make_track::track_desc::Desc>,
+    current_path: &mut std::path::PathBuf,
+    current_track_desc: &mut make_track::track_desc::Desc,
     current_track_index: &mut usize,
     changes: &mut track_editor::Changes,
 ) -> anyhow::Result<()> {
@@ -21,8 +21,8 @@ fn load_track(
     changes.offsets = true;
 
     *current_track_image = None;
-    *current_path = Some(file_path);
-    *current_track_desc = Some(track_desc);
+    *current_path = file_path;
+    *current_track_desc = track_desc;
     *current_track_index = 0;
 
     Ok(())
@@ -40,8 +40,8 @@ fn track_name(track: &make_track::track_desc::Track) -> String {
 pub fn menu_bar(
     ui: &mut egui::Ui,
     current_track_image: &mut Option<TrackImage>,
-    track_desc_path: &mut Option<std::path::PathBuf>,
-    track_desc: &mut Option<make_track::track_desc::Desc>,
+    track_desc_path: &mut std::path::PathBuf,
+    track_desc: &mut make_track::track_desc::Desc,
     current_track_index: &mut usize,
     current_track_section: &mut &TrackSection,
     settings: &mut settings::AppSettings,
@@ -109,41 +109,31 @@ pub fn menu_bar(
                     });
                 });
 
-                if let Some(path) = &track_desc_path
-                    && let Some(track_desc) = &track_desc
+                if ui.button("Save").clicked()
+                    && let Err(error) = track_desc.save(track_desc_path)
                 {
-                    if ui.button("Save").clicked()
-                        && let Err(error) = track_desc.save(path)
-                    {
-                        errors.extend(error.chain().map(|x| x.to_string()));
-                    }
-                } else {
-                    ui.add_enabled(false, egui::Button::new("Save"));
+                    errors.extend(error.chain().map(|x| x.to_string()));
                 }
                 ui.separator();
 
-                if ui.add_enabled(track_desc.is_some(), egui::Button::new("Import Lights...")).clicked()
+                if ui.button("Import Lights...").clicked()
                     && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
                 {
                     match make_track::track_desc::Desc::load(&file_path) {
                         Ok(import_track_desc) => {
-                            if let Some(track_desc) = track_desc {
-                                track_desc.lights = import_track_desc.lights;
-                                changes.render = true;
-                            }
+                            track_desc.lights = import_track_desc.lights;
+                            changes.render = true;
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }
                 }
-                if ui.add_enabled(track_desc.is_some(), egui::Button::new("Import Metal Supports...")).clicked()
+                if ui.button("Import Metal Supports...").clicked()
                     && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
                 {
                     match make_track::track_desc::Desc::load(&file_path) {
                         Ok(import_track_desc) => {
-                            if let Some(track_desc) = track_desc {
-                                track_desc.metal_supports = import_track_desc.metal_supports;
-                                changes.redraw = true;
-                            }
+                            track_desc.metal_supports = import_track_desc.metal_supports;
+                            changes.redraw = true;
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }
@@ -166,16 +156,12 @@ pub fn menu_bar(
             {
                 let previous_track_index = *current_track_index;
                 let mut combo_box = egui::ComboBox::from_id_salt("Track dropdown").width(180.0).height(500.0);
-                if let Some(track_desc) = track_desc
-                    && let Some(track) = track_desc.tracks.get(*current_track_index)
-                {
+                if let Some(track) = track_desc.tracks.get(*current_track_index) {
                     combo_box = combo_box.selected_text(track_name(track));
                 }
                 combo_box.show_ui(ui, |ui| {
-                    if let Some(track_desc) = &track_desc {
-                        for (index, track) in track_desc.tracks.iter().enumerate() {
-                            ui.selectable_value(current_track_index, index, track_name(track));
-                        }
+                    for (index, track) in track_desc.tracks.iter().enumerate() {
+                        ui.selectable_value(current_track_index, index, track_name(track));
                     }
                 });
                 if *current_track_index != previous_track_index {
