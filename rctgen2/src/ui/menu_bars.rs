@@ -1,5 +1,6 @@
 use crate::settings;
 use crate::track_editor;
+use crate::ui::widgets;
 use eframe::egui;
 use make_track::track_sections::TrackSection;
 
@@ -39,27 +40,10 @@ pub fn menu_bar(
                         ui.disable();
                     }
                     egui::containers::menu::SubMenuButton::new("Open Recent").ui(ui, |ui| {
-                        let mut clicked_index = None;
-                        egui::ScrollArea::vertical().show(ui, |ui| {
-                            for (index, file_path) in settings.settings.recent_track_files.get().iter().enumerate() {
-                                if let Some(file_name) = file_path.file_name()
-                                    && let Some(file_name) = file_name.to_str()
-                                {
-                                    let response = ui.button(file_name);
-                                    if response.clicked() {
-                                        clicked_index = Some(index);
-                                    }
-                                    if let Some(file_path) = file_path.to_str() {
-                                        response.on_hover_text(file_path);
-                                    }
-                                }
-                            }
-                            ui.separator();
-                            if ui.button("Clear recent files").clicked() {
-                                settings.settings.recent_track_files.clear();
-                            }
+                        let response = egui::ScrollArea::vertical().show(ui, |ui| {
+                            widgets::recent_files(ui, &mut settings.settings.recent_track_files)
                         });
-                        if let Some(index) = clicked_index {
+                        if let Some(index) = response.inner {
                             let file_path = settings.settings.recent_track_files.get()[index].clone();
                             match track_editor::Track::load(file_path) {
                                 Ok(new_track) => {
@@ -69,6 +53,10 @@ pub fn menu_bar(
                                 }
                                 Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                             }
+                        }
+                        ui.separator();
+                        if ui.button("Clear Recent Files").clicked() {
+                            settings.settings.recent_track_files.clear();
                         }
                     });
                 });
