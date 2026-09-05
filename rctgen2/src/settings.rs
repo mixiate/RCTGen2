@@ -16,6 +16,10 @@ impl RecentFiles {
         self.0.truncate(50);
     }
 
+    pub fn remove(&mut self, index: usize) {
+        self.0.remove(index);
+    }
+
     pub fn clear(&mut self) {
         self.0.clear();
     }

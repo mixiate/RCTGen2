@@ -77,7 +77,10 @@ pub fn ui(
                                 errors,
                             ))));
                         }
-                        Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+                        Err(error) => {
+                            settings.settings.recent_track_files.remove(index);
+                            errors.extend(error.chain().map(|x| x.to_string()));
+                        }
                     }
                 }
             });
