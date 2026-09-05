@@ -88,6 +88,7 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             if widgets::buttons::add_button(ui) {
                                 offsets.gentle_banked_right = Some(Default::default());
+                                update_offsets = true;
                             }
                         });
                     });
@@ -125,6 +126,7 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
             });
             if remove_gentle_banked_right {
                 offsets.gentle_banked_right = None;
+                update_offsets = true;
             }
         } else if !removed_offsets {
             ui.vertical_centered(|ui| {
