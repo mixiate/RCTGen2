@@ -16,6 +16,26 @@ pub fn ui(
         .movable(false)
         .show(ui, |ui| {
             ui.vertical_centered_justified(|ui| {
+                if ui.button("New Track...").clicked()
+                    && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).save_file()
+                {
+                    match track_editor::Track::try_new(file_path) {
+                        Ok(track) => {
+                            settings.settings.recent_track_files.add(&track.file_path);
+                            if let Err(error) = track.desc.save(&track.file_path) {
+                                errors.extend(error.chain().map(|x| x.to_string()));
+                            }
+                            new_state = Some(app::State::TrackEditor(Box::new(track_editor::TrackEditor::new(
+                                ui.ctx(),
+                                data_directory,
+                                track,
+                                errors,
+                            ))));
+                        }
+                        Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+                    }
+                }
+
                 if ui.button("Load Track...").clicked() {
                     match track_editor::Track::open() {
                         Ok(Some(track)) => {

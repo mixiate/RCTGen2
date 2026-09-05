@@ -290,3 +290,17 @@ impl Desc {
             .collect()
     }
 }
+
+impl Default for Desc {
+    fn default() -> Self {
+        Desc {
+            tracks: Vec::new(),
+            offsets: None,
+            lights: Vec::new(),
+            metal_supports: None,
+            samples: 4,
+            dither: true,
+            edge_distance: None,
+        }
+    }
+}
