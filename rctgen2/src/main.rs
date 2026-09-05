@@ -7,6 +7,7 @@ mod file_watcher;
 mod render;
 mod settings;
 mod sprites;
+mod start_screen;
 mod track_editor;
 mod ui;
 
@@ -45,11 +46,7 @@ fn main() -> anyhow::Result<()> {
         Box::new(|creation_context| {
             creation_context.egui_ctx.options_mut(|options| options.sync_window_theme = false);
             creation_context.egui_ctx.set_theme(egui::Theme::Dark);
-            Ok(Box::new(app::RctGen2App::new(
-                &creation_context.egui_ctx,
-                &data_directory,
-                config_dir,
-            )))
+            Ok(Box::new(app::RctGen2App::new(data_directory, config_dir)))
         }),
     )?;
 

@@ -1,20 +1,25 @@
 use crate::settings;
 use crate::sprites;
+use crate::start_screen;
 use crate::track_editor;
 use eframe::egui;
 
+pub enum State {
+    Start,
+    TrackEditor(Box<track_editor::TrackEditor>),
+}
+
 pub struct RctGen2App {
-    track_editor: track_editor::TrackEditor,
+    data_directory: std::path::PathBuf,
     errors: Vec<String>,
     settings: settings::AppSettings,
     rct2_sprites: Option<sprites::Sprites>,
+    state: State,
 }
 
 impl RctGen2App {
-    pub fn new(egui_context: &egui::Context, data_directory: &std::path::Path, config_dir: std::path::PathBuf) -> Self {
+    pub fn new(data_directory: std::path::PathBuf, config_dir: std::path::PathBuf) -> Self {
         let mut errors = Vec::new();
-
-        let track_editor = track_editor::TrackEditor::new(egui_context, data_directory, &mut errors);
 
         let settings = settings::AppSettings::new(config_dir);
 
@@ -31,17 +36,24 @@ impl RctGen2App {
         };
 
         Self {
-            track_editor,
+            data_directory,
             errors,
             settings,
             rct2_sprites,
+            state: State::Start,
         }
     }
 }
 
 impl eframe::App for RctGen2App {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        self.track_editor.ui(ui, &mut self.settings, self.rct2_sprites.as_mut(), &mut self.errors);
+        let new_state = match &mut self.state {
+            State::Start => start_screen::ui(ui, &self.data_directory, &mut self.errors),
+            State::TrackEditor(track_editor) => {
+                track_editor.ui(ui, &mut self.settings, self.rct2_sprites.as_mut(), &mut self.errors);
+                None
+            }
+        };
 
         if self.settings.window(ui) {
             if let Some(g1_dat_path) = &self.settings.settings.g1_dat_path {
@@ -73,10 +85,16 @@ impl eframe::App for RctGen2App {
                 self.errors.clear();
             }
         }
+
+        if let Some(new_state) = new_state {
+            self.state = new_state;
+        }
     }
 
     fn on_exit(&mut self) {
-        self.track_editor.on_exit();
+        if let State::TrackEditor(track_editor) = &mut self.state {
+            track_editor.on_exit();
+        }
         let _result = self.settings.save();
     }
 }
