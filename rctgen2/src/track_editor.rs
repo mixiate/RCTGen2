@@ -269,15 +269,15 @@ impl TrackEditor {
                 }
             });
 
-            if let Some(track) = self.track_desc.tracks.get(self.track_index) {
-                if self.changes.directory
-                    && let Some(directory) = self.track_desc_path.parent()
-                {
-                    if let Err(error) = self.file_watcher.set_directory(directory) {
-                        errors.push(error.to_string());
-                    }
-                    let _result = self.render_tx.send(RenderMessage::SetDirectory(directory.to_path_buf()));
+            if self.changes.directory
+                && let Some(directory) = self.track_desc_path.parent()
+            {
+                if let Err(error) = self.file_watcher.set_directory(directory) {
+                    errors.push(error.to_string());
                 }
+                let _result = self.render_tx.send(RenderMessage::SetDirectory(directory.to_path_buf()));
+            }
+            if let Some(track) = self.track_desc.tracks.get(self.track_index) {
                 if self.changes.model_settings {
                     let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
                     self.changes.update_model = true;
@@ -290,27 +290,27 @@ impl TrackEditor {
                     let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
                     self.changes.update_model = true;
                 }
-                if self.changes.offsets {
-                    let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track_desc.offsets)));
-                    self.changes.update_model = true;
-                }
-                if self.changes.update_model {
-                    let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
-                        track_section: self.track_section,
-                        rotation: self.rotation,
-                    }));
-                    self.changes.render = true;
-                }
-                if self.changes.render {
-                    let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
-                        egui_context: ui.ctx().clone(),
-                        rotation: self.rotation,
-                        samples: self.track_desc.samples.into(),
-                        dither: self.track_desc.dither,
-                        edge_distance: self.track_desc.edge_distance,
-                        lights: self.track_desc.get_lights(),
-                    }));
-                }
+            }
+            if self.changes.offsets {
+                let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track_desc.offsets)));
+                self.changes.update_model = true;
+            }
+            if self.changes.update_model {
+                let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
+                    track_section: self.track_section,
+                    rotation: self.rotation,
+                }));
+                self.changes.render = true;
+            }
+            if self.changes.render {
+                let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
+                    egui_context: ui.ctx().clone(),
+                    rotation: self.rotation,
+                    samples: self.track_desc.samples.into(),
+                    dither: self.track_desc.dither,
+                    edge_distance: self.track_desc.edge_distance,
+                    lights: self.track_desc.get_lights(),
+                }));
             }
 
             if fetch_frame
