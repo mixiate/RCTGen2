@@ -92,12 +92,16 @@ pub fn sprites_panel(
     ui: &mut egui::Ui,
 ) -> bool {
     let mut changed = false;
-    egui::Panel::right("Sprites side panel").resizable(false).min_size(340.0).show(ui, |ui| {
-        ui.vertical_centered(|ui| {
-            if ui.button("Add current section").clicked() {
-                add_track_section(sprites, current_track_section);
-                changed = true;
-            }
+    egui::Panel::right("Sprites side panel").resizable(false).min_size(342.0).show(ui, |ui| {
+        ui.horizontal(|ui| {
+            ui.label("Sprites");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                ui.allocate_space(egui::Vec2::new(ui.style().spacing.scroll.floating_width, 0.0));
+                if ui.button("Add current section").clicked() {
+                    add_track_section(sprites, current_track_section);
+                    changed = true;
+                }
+            });
         });
         ui.add(egui::Separator::default().spacing(0.0));
 
