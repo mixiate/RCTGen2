@@ -114,10 +114,11 @@ fn main_panel(
     let mut changed = false;
     ui.horizontal(|ui| {
         ui.label("Type: ");
+
         let selected_text: &'static str = metal_supports.support_type.into();
         egui::ComboBox::from_id_salt("Metal support type")
             .selected_text(selected_text)
-            .width(150.0)
+            .width(125.0)
             .height(500.0)
             .show_ui(ui, |ui| {
                 for support_type in MetalSupportType::iter() {
@@ -128,9 +129,12 @@ fn main_panel(
                 }
             });
 
-        if ui.button("Add current section").clicked() {
-            add_track_section(&mut metal_supports.sections, current_track_section);
-        }
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+            ui.allocate_space(egui::Vec2::new(ui.style().spacing.scroll.floating_width, 0.0));
+            if ui.button("Add current section").clicked() {
+                add_track_section(&mut metal_supports.sections, current_track_section);
+            }
+        });
     });
     ui.add(egui::Separator::default().spacing(0.0));
 
@@ -176,16 +180,27 @@ pub fn metal_supports_panel(
 ) -> bool {
     let mut changed = false;
     egui::Panel::right("Metal supports side panel").resizable(false).min_size(340.0).show(ui, |ui| {
-        if let Some(metal_supports) = metal_supports {
-            if main_panel(metal_supports, rotation, current_track_section, ui) {
-                changed = true;
-            }
-        } else {
-            ui.vertical_centered(|ui| {
-                if ui.button("Add metal supports").clicked() {
+        ui.horizontal(|ui| {
+            ui.label("Metal Supports");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                ui.allocate_space(egui::Vec2::new(ui.style().spacing.scroll.floating_width, 0.0));
+                if metal_supports.is_some() {
+                    if widgets::buttons::remove_button(ui) {
+                        *metal_supports = None;
+                        changed = true;
+                    }
+                } else if widgets::buttons::add_button(ui) {
                     *metal_supports = Some(Default::default());
+                    changed = true;
                 }
             });
+        });
+        ui.add(egui::Separator::default().spacing(0.0));
+
+        if let Some(metal_supports) = metal_supports
+            && main_panel(metal_supports, rotation, current_track_section, ui)
+        {
+            changed = true;
         }
     });
     changed
