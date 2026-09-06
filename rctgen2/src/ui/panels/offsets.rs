@@ -22,7 +22,7 @@ fn offsets_drag_values(ui: &mut egui::Ui, id_str: &str, offsets: &mut [[f32; 2]]
 pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: &mut egui::Ui) -> bool {
     let mut update_offsets = false;
 
-    egui::Panel::right("Offsets").resizable(false).show(ui, |ui| {
+    egui::Panel::right("Offsets").resizable(false).exact_size(271.0).show(ui, |ui| {
         ui.horizontal(|ui| {
             ui.label("Offsets");
             ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
