@@ -409,6 +409,9 @@ pub fn tracks_panel(
     ui: &mut egui::Ui,
 ) {
     egui::Panel::right("Tracks side panel").show(ui, |ui| {
+        ui.label("Tracks");
+        ui.add(egui::Separator::default().spacing(0.0));
+
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
