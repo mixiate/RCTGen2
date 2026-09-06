@@ -30,6 +30,7 @@ pub struct Changes {
     pub offsets: bool,
     pub update_model: bool,
     pub render: bool,
+    pub clear_image: bool,
     pub redraw: bool,
 }
 
@@ -40,6 +41,7 @@ impl Changes {
         self.load_models = true;
         self.masks = true;
         self.offsets = true;
+        self.clear_image = true;
     }
 }
 
@@ -315,6 +317,14 @@ impl TrackEditor {
             {
                 self.current_track_image = track_image.take();
                 self.changes.redraw = true;
+            }
+
+            if self.changes.clear_image {
+                self.current_track_image = None;
+                self.back_buffer_image.pixels_mut().fill(0);
+                let image =
+                    egui::ColorImage::from_rgba_unmultiplied(self.back_buffer.size(), self.back_buffer_image.pixels());
+                self.back_buffer.set(image, egui::TextureOptions::default());
             }
 
             if self.changes.redraw
