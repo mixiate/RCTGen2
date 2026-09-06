@@ -5,6 +5,9 @@ pub fn render_panel(track_desc: &mut make_track::track_desc::Desc, ui: &mut egui
     let mut changed = false;
 
     egui::Panel::right("Render settings panel").resizable(false).exact_size(250.0).show(ui, |ui| {
+        ui.label("Render Settings");
+        ui.add(egui::Separator::default().spacing(0.0));
+
         egui::Grid::new("Render settings grid").min_col_width(0.0).show(ui, |ui| {
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 ui.label("Samples")
