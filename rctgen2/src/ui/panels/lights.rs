@@ -13,12 +13,35 @@ fn inverted_checkbox(ui: &mut egui::Ui, value: &mut bool) -> bool {
 
 pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut egui::Ui) -> bool {
     let mut queue_render = false;
-    egui::Panel::right("Lights").resizable(false).show(ui, |ui| {
+    egui::Panel::right("Lights").resizable(false).exact_size(312.0).show(ui, |ui| {
+        let mut scroll_to_bottom = false;
+        ui.horizontal(|ui| {
+            ui.label("Lights");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                ui.allocate_space(egui::Vec2::new(ui.style().spacing.scroll.floating_width, 0.0));
+                if widgets::buttons::add_button(ui) {
+                    lights.push(make_track::track_desc::Light {
+                        direction: [1.0, 0.5, 1.0],
+                        diffuse_strength: 1.0,
+                        specular_strength: 1.0,
+                        shadow: true,
+                        disabled: false,
+                    });
+                    queue_render = true;
+                    scroll_to_bottom = true;
+                }
+            });
+        });
+        ui.add(egui::Separator::default().spacing(0.0));
+
         let mut deleted_index = None;
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         let visibility = egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible;
-        egui::ScrollArea::vertical().scroll_bar_visibility(visibility).show(ui, |ui| {
+        egui::ScrollArea::vertical().scroll_bar_visibility(visibility).auto_shrink(false).show(ui, |ui| {
             for (i, light) in lights.iter_mut().enumerate() {
+                if i != 0 {
+                    ui.separator();
+                }
                 egui::Grid::new(i).min_col_width(7.0).show(ui, |ui| {
                     ui.allocate_space(egui::Vec2::ZERO);
                     ui.allocate_space(egui::Vec2::ZERO);
@@ -76,22 +99,11 @@ pub fn lights_panel(lights: &mut Vec<make_track::track_desc::Light>, ui: &mut eg
                     }
                     ui.end_row();
                 });
-
-                ui.separator();
             }
 
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                if widgets::buttons::add_button(ui) {
-                    lights.push(make_track::track_desc::Light {
-                        direction: [1.0, 0.5, 1.0],
-                        diffuse_strength: 1.0,
-                        specular_strength: 1.0,
-                        shadow: true,
-                        disabled: false,
-                    });
-                    queue_render = true;
-                }
-            });
+            if scroll_to_bottom {
+                ui.scroll_to_cursor(Some(egui::Align::BOTTOM));
+            }
         });
         if let Some(i) = deleted_index {
             lights.remove(i);
