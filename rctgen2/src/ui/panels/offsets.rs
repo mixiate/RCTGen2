@@ -20,20 +20,25 @@ fn offsets_drag_values(ui: &mut egui::Ui, id_str: &str, offsets: &mut [[f32; 2]]
 }
 
 pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: &mut egui::Ui) -> bool {
-    let mut removed_offsets = false;
     let mut update_offsets = false;
 
     egui::Panel::right("Offsets").resizable(false).show(ui, |ui| {
-        ui.vertical_centered(|ui| {
-            if offsets.is_some() {
-                if ui.button("Remove offsets").clicked() {
-                    *offsets = None;
-                    removed_offsets = true;
-                    update_offsets = true;
+        ui.horizontal(|ui| {
+            ui.label("Offsets");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                ui.allocate_space(egui::Vec2::new(ui.style().spacing.scroll.floating_width, 0.0));
+                if offsets.is_some() {
+                    if widgets::buttons::remove_button(ui) {
+                        *offsets = None;
+                        update_offsets = true;
+                    }
+                } else if widgets::buttons::add_button(ui) {
+                    *offsets = Some(make_track::track_desc::Offsets::default());
                 }
-                ui.separator();
-            }
+            });
         });
+        ui.add(egui::Separator::default().spacing(0.0));
+
         if let Some(offsets) = offsets.as_mut() {
             let mut remove_gentle_banked_right = false;
 
@@ -128,12 +133,6 @@ pub fn offsets_panel(offsets: &mut Option<make_track::track_desc::Offsets>, ui: 
                 offsets.gentle_banked_right = None;
                 update_offsets = true;
             }
-        } else if !removed_offsets {
-            ui.vertical_centered(|ui| {
-                if ui.button("Add offsets").clicked() {
-                    *offsets = Some(make_track::track_desc::Offsets::default());
-                }
-            });
         }
     });
 
