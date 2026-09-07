@@ -1,3 +1,5 @@
+use nonempty_collections::NEVec;
+
 fn bool_true() -> bool {
     true
 }
@@ -295,7 +297,7 @@ pub struct MetalSupports {
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Desc {
-    pub tracks: Vec<Track>,
+    pub tracks: NEVec<Track>,
     pub offsets: Option<Offsets>,
     pub lights: Vec<Light>,
     pub metal_supports: Option<MetalSupports>,
@@ -307,6 +309,18 @@ pub struct Desc {
 }
 
 impl Desc {
+    pub fn new(track: Track) -> Self {
+        Desc {
+            tracks: NEVec::new(track),
+            offsets: None,
+            lights: Vec::new(),
+            metal_supports: None,
+            samples: default_samples(),
+            dither: true,
+            edge_distance: None,
+        }
+    }
+
     pub fn load(path: &std::path::Path) -> anyhow::Result<Desc> {
         use anyhow::Context as _;
         let json = std::fs::read_to_string(path).with_context(|| format!("Could not read file {}", path.display()))?;
@@ -337,19 +351,5 @@ impl Desc {
                 shadow: x.shadow,
             })
             .collect()
-    }
-}
-
-impl Default for Desc {
-    fn default() -> Self {
-        Desc {
-            tracks: Vec::new(),
-            offsets: None,
-            lights: Vec::new(),
-            metal_supports: None,
-            samples: 4,
-            dither: true,
-            edge_distance: None,
-        }
     }
 }

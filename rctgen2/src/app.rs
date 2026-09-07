@@ -5,7 +5,7 @@ use crate::track_editor;
 use eframe::egui;
 
 pub enum State {
-    Start,
+    Start(start_screen::StartScreen),
     TrackEditor(Box<track_editor::TrackEditor>),
 }
 
@@ -40,7 +40,7 @@ impl RctGen2App {
             errors,
             settings,
             rct2_sprites,
-            state: State::Start,
+            state: State::Start(start_screen::StartScreen::new()),
         }
     }
 }
@@ -48,7 +48,9 @@ impl RctGen2App {
 impl eframe::App for RctGen2App {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let new_state = match &mut self.state {
-            State::Start => start_screen::ui(ui, &self.data_directory, &mut self.settings, &mut self.errors),
+            State::Start(start_screen) => {
+                start_screen.ui(ui, &self.data_directory, &mut self.settings, &mut self.errors)
+            }
             State::TrackEditor(track_editor) => {
                 track_editor.ui(ui, &mut self.settings, self.rct2_sprites.as_mut(), &mut self.errors);
                 None
