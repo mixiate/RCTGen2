@@ -84,7 +84,7 @@ impl ColourPicker {
             self.modal.open = true;
         }
 
-        if let Some(colour) = self.modal.show(ui, textures, *selected_colour) {
+        if let Some(colour) = self.modal.show(ui, textures, *selected_colour, response.rect.left_bottom()) {
             *selected_colour = colour;
             true
         } else {
