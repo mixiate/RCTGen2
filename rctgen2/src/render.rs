@@ -232,7 +232,12 @@ pub fn render_thread(
                                 current_models = Some(models);
                                 current_model_lengths = Some(lengths);
                             }
-                            Err(error) => report_error(app_tx, &error),
+                            Err(error) => {
+                                current_scene = None;
+                                current_models = None;
+                                current_model_lengths = None;
+                                report_error(app_tx, &error);
+                            }
                         }
                     }
                 }
