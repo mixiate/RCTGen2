@@ -438,20 +438,28 @@ pub fn tracks_panel(
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
             .auto_shrink(false)
             .show(ui, |ui| {
-                for (index, track) in track.desc.tracks.iter_mut().enumerate() {
+                let track_count = track.desc.tracks.len();
+                for (index, sub_track) in track.desc.tracks.iter_mut().enumerate() {
                     if index != 0 {
                         ui.separator();
                     }
-                    ui.horizontal(|ui| {
-                        ui.label(format!("Track {index}"));
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            if widgets::buttons::remove_button(ui) {
-                                removed_index = Some(index);
-                            }
+                    let frame = if track_count > 1 && track.track_index == index {
+                        egui::Frame::new().fill(ui.visuals().faint_bg_color)
+                    } else {
+                        egui::Frame::new()
+                    };
+                    frame.show(ui, |ui| {
+                        ui.horizontal(|ui| {
+                            ui.label(format!("Track {index}"));
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                if widgets::buttons::remove_button(ui) {
+                                    removed_index = Some(index);
+                                }
+                            });
                         });
-                    });
 
-                    track_widgets(ui, index, track, directory, errors, current_track_section, changes);
+                        track_widgets(ui, index, sub_track, directory, errors, current_track_section, changes);
+                    });
                 }
             });
 
