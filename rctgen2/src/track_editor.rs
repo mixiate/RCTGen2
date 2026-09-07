@@ -224,12 +224,9 @@ impl TrackEditor {
                 }
             });
             frame.show(ui, |ui| {
-                let original_track_checkbox_enabled =
-                    if let Some(track) = self.track.desc.tracks.get(self.track.track_index) {
-                        track.original_sprites.contains_key(self.track_section.name)
-                    } else {
-                        false
-                    };
+                let original_track_checkbox_enabled = self.track.desc.tracks[self.track.track_index]
+                    .original_sprites
+                    .contains_key(self.track_section.name);
                 if ui
                     .add_enabled(
                         original_track_checkbox_enabled && rct2_sprites.is_some(),
@@ -240,11 +237,7 @@ impl TrackEditor {
                     self.changes.redraw = true;
                 }
                 let adjacent_track_checkbox_enabled =
-                    if let Some(track) = self.track.desc.tracks.get(self.track.track_index) {
-                        !track.original_sprites.is_empty()
-                    } else {
-                        false
-                    };
+                    !self.track.desc.tracks[self.track.track_index].original_sprites.is_empty();
                 if ui
                     .add_enabled(
                         adjacent_track_checkbox_enabled && rct2_sprites.is_some(),
@@ -271,6 +264,7 @@ impl TrackEditor {
                 }
             });
 
+            let track = &self.track.desc.tracks[self.track.track_index];
             if self.changes.directory {
                 if let Err(error) = self.file_watcher.set_directory(self.track.file_path.directory()) {
                     errors.push(error.to_string());
@@ -279,19 +273,17 @@ impl TrackEditor {
                     self.track.file_path.directory().to_path_buf(),
                 ));
             }
-            if let Some(track) = self.track.desc.tracks.get(self.track.track_index) {
-                if self.changes.model_settings {
-                    let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-                    self.changes.update_model = true;
-                }
-                if self.changes.load_models {
-                    let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-                    self.changes.update_model = true;
-                }
-                if self.changes.masks {
-                    let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
-                    self.changes.update_model = true;
-                }
+            if self.changes.model_settings {
+                let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+                self.changes.update_model = true;
+            }
+            if self.changes.load_models {
+                let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+                self.changes.update_model = true;
+            }
+            if self.changes.masks {
+                let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
+                self.changes.update_model = true;
             }
             if self.changes.offsets {
                 let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track.desc.offsets)));
@@ -332,7 +324,6 @@ impl TrackEditor {
             }
 
             if self.changes.redraw
-                && let Some(track) = self.track.desc.tracks.get(self.track.track_index)
                 && let Some(track_image) = &self.current_track_image
             {
                 let max_tile_height = track_image
