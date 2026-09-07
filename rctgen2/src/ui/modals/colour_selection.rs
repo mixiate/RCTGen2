@@ -79,6 +79,7 @@ impl ColourSelectionModal {
         ui: &mut egui::Ui,
         textures: &[colour_picker::ButtonTextures],
         current_colour: Colour,
+        mut position: egui::Pos2,
     ) -> Option<Colour> {
         if !self.open {
             return None;
@@ -86,9 +87,11 @@ impl ColourSelectionModal {
 
         let mut selected_colour = None;
 
-        let modal = egui::containers::modal::Modal::new(self.id).backdrop_color(egui::Color32::TRANSPARENT).show(
-            ui.ctx(),
-            |ui| {
+        position.x -= f32::from(ui.style().spacing.window_margin.left) + ui.style().visuals.window_stroke.width;
+        let modal = egui::containers::modal::Modal::new(self.id)
+            .area(egui::containers::Area::new(self.id).movable(false).current_pos(position))
+            .backdrop_color(egui::Color32::TRANSPARENT)
+            .show(ui.ctx(), |ui| {
                 let mut hovered = false;
                 egui::Grid::new("Colour selection modal grid")
                     .spacing([0.0, 0.0])
@@ -115,8 +118,7 @@ impl ColourSelectionModal {
                 if !hovered {
                     self.hovered = None;
                 }
-            },
-        );
+            });
 
         if modal.should_close() {
             self.open = false;
