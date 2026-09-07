@@ -432,6 +432,7 @@ pub fn tracks_panel(
             changes.masks = true;
         }
 
+        let mut removed_index = None;
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
@@ -441,8 +442,33 @@ pub fn tracks_panel(
                     if index != 0 {
                         ui.separator();
                     }
+                    ui.horizontal(|ui| {
+                        ui.label(format!("Track {index}"));
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            if widgets::buttons::remove_button(ui) {
+                                removed_index = Some(index);
+                            }
+                        });
+                    });
+
                     track_widgets(ui, index, track, directory, errors, current_track_section, changes);
                 }
             });
+
+        if let Some(index) = removed_index {
+            track.desc.tracks.remove(index);
+
+            if track.track_index == index {
+                track.track_index = track.track_index.saturating_sub(1);
+                changes.model_settings = true;
+                changes.load_models = true;
+                changes.masks = true;
+                if track.desc.tracks.is_empty() {
+                    changes.clear_image = true;
+                }
+            } else if track.track_index > index {
+                track.track_index = track.track_index.saturating_sub(1);
+            }
+        }
     });
 }
