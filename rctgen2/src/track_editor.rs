@@ -9,6 +9,7 @@ use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, Upd
 use crate::settings;
 use crate::sprites;
 use crate::ui;
+use crate::ui::modals;
 use crate::ui::panels;
 use crate::ui::widgets;
 use eframe::egui;
@@ -63,6 +64,7 @@ pub struct TrackEditor {
     colour_picker_1: widgets::colour_picker::ColourPicker,
     colour_picker_2: widgets::colour_picker::ColourPicker,
     colour_picker_3: widgets::colour_picker::ColourPicker,
+    new_track_modal: modals::NewTrackModal,
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
     file_watcher: file_watcher::FileWatcher,
     model_file_changed_time: Option<std::time::Instant>,
@@ -124,6 +126,7 @@ impl TrackEditor {
             colour_picker_1: widgets::colour_picker::ColourPicker::new(),
             colour_picker_2: widgets::colour_picker::ColourPicker::new(),
             colour_picker_3: widgets::colour_picker::ColourPicker::new(),
+            new_track_modal: modals::NewTrackModal::new(),
             adjacent_track_sections,
             file_watcher,
             model_file_changed_time: None,
@@ -170,6 +173,7 @@ impl TrackEditor {
             panels::side_panel(
                 ui,
                 tab,
+                &mut self.new_track_modal,
                 &mut self.track,
                 self.track_section,
                 self.rotation,

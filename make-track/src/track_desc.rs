@@ -143,6 +143,27 @@ impl Models<relative_path::RelativePathBuf> {
     }
 }
 
+impl Default for Models<relative_path::RelativePathBuf> {
+    fn default() -> Self {
+        Models {
+            track: "track.obj".into(),
+            mask: "mask.obj".into(),
+            tie: None,
+            track_alt: None,
+            track_tie: None,
+            support_base: None,
+            support_flat: None,
+            support_bank_sixth: None,
+            support_bank_third: None,
+            support_bank_half: None,
+            support_bank_two_thirds: None,
+            support_bank_five_sixths: None,
+            support_bank: None,
+            additional: indexmap::IndexMap::new(),
+        }
+    }
+}
+
 #[serde_with::skip_serializing_none]
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(deny_unknown_fields)]
@@ -157,6 +178,19 @@ pub struct ModelSettings {
     pub bank_angle: f32,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub lift: bool,
+}
+
+impl Default for ModelSettings {
+    fn default() -> Self {
+        ModelSettings {
+            length: None,
+            tie_length: None,
+            support_spacing: 1.0,
+            support_pivot: 0.0,
+            bank_angle: default_bank_angle(),
+            lift: false,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
@@ -183,6 +217,21 @@ pub struct Track {
     pub models: Models<relative_path::RelativePathBuf>,
     #[serde(default, skip_serializing_if = "indexmap::IndexMap::is_empty")]
     pub original_sprites: indexmap::IndexMap<String, TrackSectionSprites>,
+}
+
+impl Default for Track {
+    fn default() -> Self {
+        Track {
+            name: "track".into(),
+            suffix: None,
+            sections: indexmap::IndexSet::new(),
+            z_offset: 0,
+            masks: "upright".into(),
+            model_settings: Default::default(),
+            models: Default::default(),
+            original_sprites: indexmap::IndexMap::new(),
+        }
+    }
 }
 
 #[serde_with::skip_serializing_none]

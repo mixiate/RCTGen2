@@ -1,4 +1,5 @@
 use crate::track_editor;
+use crate::ui::modals;
 use crate::ui::widgets;
 use eframe::egui;
 use make_track::track_desc::AdditionalModel;
@@ -260,7 +261,7 @@ fn models_collapsible(
     changed
 }
 
-fn track_widgets(
+pub fn track_widgets(
     ui: &mut egui::Ui,
     index: usize,
     track: &mut make_track::track_desc::Track,
@@ -401,23 +402,42 @@ fn track_widgets(
 }
 
 pub fn tracks_panel(
-    tracks: &mut [make_track::track_desc::Track],
-    directory: &std::path::Path,
+    track: &mut track_editor::Track,
     errors: &mut Vec<String>,
     current_track_section: &make_track::track_sections::TrackSection,
+    new_track_modal: &mut modals::NewTrackModal,
     changes: &mut track_editor::Changes,
     ui: &mut egui::Ui,
 ) {
+    let directory = track.file_path.directory();
+
     egui::Panel::right("Tracks side panel").show(ui, |ui| {
-        ui.label("Tracks");
+        ui.horizontal(|ui| {
+            ui.label("Tracks");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.allocate_space(egui::Vec2::new(ui.style().spacing.scroll.floating_width, 0.0));
+                if widgets::buttons::add_button(ui) {
+                    new_track_modal.open(directory.to_path_buf());
+                }
+            });
+        });
         ui.add(egui::Separator::default().spacing(0.0));
+
+        if let Some(new_track) = new_track_modal.show(ui, errors) {
+            track.track_index = track.desc.tracks.len();
+            track.desc.tracks.push(*new_track);
+
+            changes.model_settings = true;
+            changes.load_models = true;
+            changes.masks = true;
+        }
 
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
             .auto_shrink(false)
             .show(ui, |ui| {
-                for (index, track) in tracks.iter_mut().enumerate() {
+                for (index, track) in track.desc.tracks.iter_mut().enumerate() {
                     if index != 0 {
                         ui.separator();
                     }
