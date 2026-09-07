@@ -101,11 +101,9 @@ pub fn side_panel(
             }
         }
         SidePanelTab::Sprites => {
-            if let Some(track) = track.desc.tracks.get_mut(track.track_index) {
-                let changed = sprites::sprites_panel(&mut track.original_sprites, current_track_section, ui);
-                if changed {
-                    changes.redraw = true;
-                }
+            let track = &mut track.desc.tracks[track.track_index];
+            if sprites::sprites_panel(&mut track.original_sprites, current_track_section, ui) {
+                changes.redraw = true;
             }
         }
     }

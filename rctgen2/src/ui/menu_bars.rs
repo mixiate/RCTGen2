@@ -110,15 +110,15 @@ pub fn menu_bar(
 
             {
                 let previous_track_index = track.track_index;
-                let mut combo_box = egui::ComboBox::from_id_salt("Track dropdown").width(180.0).height(500.0);
-                if let Some(track) = track.desc.tracks.get(track.track_index) {
-                    combo_box = combo_box.selected_text(track_name(track));
-                }
-                combo_box.show_ui(ui, |ui| {
-                    for (index, sub_track) in track.desc.tracks.iter().enumerate() {
-                        ui.selectable_value(&mut track.track_index, index, track_name(sub_track));
-                    }
-                });
+                egui::ComboBox::from_id_salt("Track dropdown")
+                    .width(180.0)
+                    .height(500.0)
+                    .selected_text(track_name(&track.desc.tracks[track.track_index]))
+                    .show_ui(ui, |ui| {
+                        for (index, sub_track) in track.desc.tracks.iter().enumerate() {
+                            ui.selectable_value(&mut track.track_index, index, track_name(sub_track));
+                        }
+                    });
                 if track.track_index != previous_track_index {
                     changes.model_settings = true;
                     changes.load_models = true;
