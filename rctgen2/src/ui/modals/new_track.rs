@@ -46,7 +46,7 @@ impl NewTrackModal {
                         &mut new_track.track,
                         &new_track.directory,
                         errors,
-                        &make_track::track_sections::FLAT,
+                        None,
                         &mut Default::default(),
                     );
                 });
