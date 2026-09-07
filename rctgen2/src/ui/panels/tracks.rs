@@ -151,7 +151,7 @@ fn models_collapsible(
     models: &mut make_track::track_desc::Models<RelativePathBuf>,
     dir: &std::path::Path,
     errors: &mut Vec<String>,
-    current_track_section: &make_track::track_sections::TrackSection,
+    current_track_section: Option<&make_track::track_sections::TrackSection>,
 ) -> bool {
     let mut changed = false;
     egui::Grid::new("Track models grid").min_col_width(0.0).show(ui, |ui| {
@@ -230,33 +230,35 @@ fn models_collapsible(
         ui.end_row();
     });
 
-    ui.separator();
+    if let Some(current_track_section) = current_track_section {
+        ui.separator();
 
-    ui.horizontal(|ui| {
-        ui.label("Additional Models");
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            if add_additional_model_button(ui, &mut models.additional, dir, errors, current_track_section) {
+        ui.horizontal(|ui| {
+            ui.label("Additional Models");
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                if add_additional_model_button(ui, &mut models.additional, dir, errors, current_track_section) {
+                    changed = true;
+                }
+            });
+        });
+        egui::Grid::new("Track additional models grid").min_col_width(0.0).show(ui, |ui| {
+            let mut removed_index = None;
+            for (index, (track_section, model)) in models.additional.iter_mut().enumerate() {
+                model_widgets(ui, track_section, &mut model.model, dir, errors, &mut changed);
+                if ui.checkbox(&mut model.mirror, "Mirror").changed() {
+                    changed = true;
+                }
+                if widgets::buttons::remove_button(ui) {
+                    removed_index = Some(index);
+                }
+                ui.end_row();
+            }
+            if let Some(index) = removed_index {
+                models.additional.shift_remove_index(index);
                 changed = true;
             }
         });
-    });
-    egui::Grid::new("Track additional models grid").min_col_width(0.0).show(ui, |ui| {
-        let mut removed_index = None;
-        for (index, (track_section, model)) in models.additional.iter_mut().enumerate() {
-            model_widgets(ui, track_section, &mut model.model, dir, errors, &mut changed);
-            if ui.checkbox(&mut model.mirror, "Mirror").changed() {
-                changed = true;
-            }
-            if widgets::buttons::remove_button(ui) {
-                removed_index = Some(index);
-            }
-            ui.end_row();
-        }
-        if let Some(index) = removed_index {
-            models.additional.shift_remove_index(index);
-            changed = true;
-        }
-    });
+    }
 
     changed
 }
@@ -267,7 +269,7 @@ pub fn track_widgets(
     track: &mut make_track::track_desc::Track,
     directory: &std::path::Path,
     errors: &mut Vec<String>,
-    current_track_section: &make_track::track_sections::TrackSection,
+    current_track_section: Option<&make_track::track_sections::TrackSection>,
     changes: &mut track_editor::Changes,
 ) {
     egui::Grid::new(index).show(ui, |ui| {
@@ -460,7 +462,15 @@ pub fn tracks_panel(
                             }
                         });
 
-                        track_widgets(ui, index, sub_track, directory, errors, current_track_section, changes);
+                        track_widgets(
+                            ui,
+                            index,
+                            sub_track,
+                            directory,
+                            errors,
+                            Some(current_track_section),
+                            changes,
+                        );
                     });
                 }
             });
