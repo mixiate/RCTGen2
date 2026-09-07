@@ -6,6 +6,7 @@ pub mod sprites;
 pub mod tracks;
 
 use crate::track_editor;
+use crate::ui::modals;
 use eframe::egui;
 use make_track::track_sections::TrackSection;
 
@@ -55,9 +56,11 @@ pub fn side_panel_tabs(ui: &mut egui::Ui, selected_tab: &mut Option<SidePanelTab
     });
 }
 
+#[expect(clippy::too_many_arguments)]
 pub fn side_panel(
     ui: &mut egui::Ui,
     tab: SidePanelTab,
+    new_track_modal: &mut modals::NewTrackModal,
     track: &mut track_editor::Track,
     current_track_section: &TrackSection,
     rotation: usize,
@@ -66,14 +69,7 @@ pub fn side_panel(
 ) {
     match tab {
         SidePanelTab::Tracks => {
-            tracks::tracks_panel(
-                &mut track.desc.tracks,
-                track.file_path.directory(),
-                errors,
-                current_track_section,
-                changes,
-                ui,
-            );
+            tracks::tracks_panel(track, errors, current_track_section, new_track_modal, changes, ui);
         }
         SidePanelTab::Lights => {
             let changed = lights::lights_panel(&mut track.desc.lights, ui);
