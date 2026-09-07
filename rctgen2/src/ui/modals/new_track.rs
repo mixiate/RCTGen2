@@ -1,14 +1,14 @@
 use crate::ui::panels::tracks::track_widgets;
 use eframe::egui;
 
-struct NewTrack {
-    directory: std::path::PathBuf,
-    track: Box<make_track::track_desc::Track>,
+pub struct NewTrack {
+    pub directory: std::path::PathBuf,
+    pub track: make_track::track_desc::Track,
 }
 
 enum State {
     Closed,
-    Open(NewTrack),
+    Open(Box<NewTrack>),
 }
 
 pub struct NewTrackModal {
@@ -25,13 +25,13 @@ impl NewTrackModal {
     }
 
     pub fn open(&mut self, directory: std::path::PathBuf) {
-        self.state = State::Open(NewTrack {
+        self.state = State::Open(Box::new(NewTrack {
             directory,
-            track: Box::default(),
-        });
+            track: Default::default(),
+        }));
     }
 
-    pub fn show(&mut self, ui: &mut egui::Ui, errors: &mut Vec<String>) -> Option<Box<make_track::track_desc::Track>> {
+    pub fn show(&mut self, ui: &mut egui::Ui, errors: &mut Vec<String>) -> Option<Box<NewTrack>> {
         let mut confirmed = false;
         let mut should_close = false;
         if let State::Open(new_track) = &mut self.state {
@@ -70,7 +70,7 @@ impl NewTrackModal {
             self.state = State::Closed;
         }
         if confirmed && let State::Open(new_track) = std::mem::replace(&mut self.state, State::Closed) {
-            Some(new_track.track)
+            Some(new_track)
         } else {
             None
         }

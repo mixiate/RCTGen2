@@ -424,8 +424,8 @@ pub fn tracks_panel(
         ui.add(egui::Separator::default().spacing(0.0));
 
         if let Some(new_track) = new_track_modal.show(ui, errors) {
-            track.track_index = track.desc.tracks.len();
-            track.desc.tracks.push(*new_track);
+            track.track_index = track.desc.tracks.len().into();
+            track.desc.tracks.push(new_track.track);
 
             changes.model_settings = true;
             changes.load_models = true;
@@ -438,7 +438,7 @@ pub fn tracks_panel(
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
             .auto_shrink(false)
             .show(ui, |ui| {
-                let track_count = track.desc.tracks.len();
+                let track_count = usize::from(track.desc.tracks.len());
                 for (index, sub_track) in track.desc.tracks.iter_mut().enumerate() {
                     if index != 0 {
                         ui.separator();
@@ -451,11 +451,13 @@ pub fn tracks_panel(
                     frame.show(ui, |ui| {
                         ui.horizontal(|ui| {
                             ui.label(format!("Track {index}"));
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                if widgets::buttons::remove_button(ui) {
-                                    removed_index = Some(index);
-                                }
-                            });
+                            if track_count > 1 {
+                                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                    if widgets::buttons::remove_button(ui) {
+                                        removed_index = Some(index);
+                                    }
+                                });
+                            }
                         });
 
                         track_widgets(ui, index, sub_track, directory, errors, current_track_section, changes);
@@ -463,19 +465,15 @@ pub fn tracks_panel(
                 }
             });
 
-        if let Some(index) = removed_index {
-            track.desc.tracks.remove(index);
-
-            if track.track_index == index {
-                track.track_index = track.track_index.saturating_sub(1);
+        if let Some(index) = removed_index
+            && track.desc.tracks.remove(index).is_some()
+            && track.track_index >= index
+        {
+            track.track_index = track.track_index.saturating_sub(1);
+            if track.track_index > index {
                 changes.model_settings = true;
                 changes.load_models = true;
                 changes.masks = true;
-                if track.desc.tracks.is_empty() {
-                    changes.clear_image = true;
-                }
-            } else if track.track_index > index {
-                track.track_index = track.track_index.saturating_sub(1);
             }
         }
     });
