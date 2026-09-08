@@ -7,7 +7,7 @@ use crate::file_watcher;
 use crate::render;
 use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
-use crate::sprites;
+use crate::sprite_cache;
 use crate::ui;
 use crate::ui::modals;
 use crate::ui::panels;
@@ -137,7 +137,7 @@ impl TrackEditor {
         &mut self,
         ui: &mut egui::Ui,
         settings: &mut settings::AppSettings,
-        rct2_sprites: Option<&mut sprites::Sprites>,
+        rct2_sprites: Option<&mut sprite_cache::SpriteCache>,
         errors: &mut Vec<String>,
     ) {
         let mut fetch_frame = false;

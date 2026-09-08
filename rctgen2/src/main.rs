@@ -6,7 +6,7 @@ mod drawing;
 mod file_watcher;
 mod render;
 mod settings;
-mod sprites;
+mod sprite_cache;
 mod start_screen;
 mod track_editor;
 mod ui;

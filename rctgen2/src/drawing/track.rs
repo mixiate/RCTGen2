@@ -4,7 +4,7 @@ use crate::drawing;
 use crate::drawing::Options;
 use crate::drawing::blit;
 use crate::render::TrackImage;
-use crate::sprites;
+use crate::sprite_cache;
 use make_track::track_desc;
 use make_track::track_desc::TrackSectionSprites;
 use renderer::image::Image;
@@ -25,7 +25,7 @@ fn compare_coords(coords: &[i16; 3], draw_order: DrawOrder) -> bool {
 fn draw_adjacent_track_section(
     track_image: &TrackImage,
     options: &Options,
-    sprites: &mut sprites::Sprites,
+    sprites: &mut sprite_cache::SpriteCache,
     adjacent_sections: &[TrackSectionWithSprites],
     draw_order: DrawOrder,
     buffer: &mut Image,
@@ -58,7 +58,7 @@ fn draw_adjacent_track_section(
 fn draw_original_track_section(
     track_section: &make_track::track_sections::TrackSection,
     rotation: usize,
-    sprites: &mut sprites::Sprites,
+    sprites: &mut sprite_cache::SpriteCache,
     track_sprites: &TrackSectionSprites,
     options: &Options,
     buffer: &mut Image,
@@ -79,7 +79,7 @@ fn draw_with_adjacent_sprites(
     z_offset: i16,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-    sprites: &mut sprites::Sprites,
+    sprites: &mut sprite_cache::SpriteCache,
     track_desc_sprites: &indexmap::IndexMap<String, TrackSectionSprites>,
     buffer: &mut Image,
 ) {
@@ -135,7 +135,7 @@ pub fn draw(
     track_image: &TrackImage,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-    mut sprites: Option<&mut sprites::Sprites>,
+    mut sprites: Option<&mut sprite_cache::SpriteCache>,
     buffer: &mut Image,
 ) {
     let z_offset = (track.z_offset - 16) as i16;

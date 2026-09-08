@@ -15,12 +15,12 @@ fn load_sprite(archive: &rct::csg::Archive, index: usize) -> anyhow::Result<Inde
     Ok(image)
 }
 
-pub struct Sprites {
+pub struct SpriteCache {
     archive: rct::csg::Archive,
     sprites: HashMap<u32, IndexedImage>,
 }
 
-impl Sprites {
+impl SpriteCache {
     pub fn try_new(path: &std::path::Path) -> anyhow::Result<Self> {
         use anyhow::Context as _;
         let archive = rct::csg::Archive::load(path).with_context(|| format!("Could not load {}", path.display()))?;

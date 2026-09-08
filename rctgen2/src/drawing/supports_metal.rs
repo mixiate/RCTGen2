@@ -1,6 +1,6 @@
 use crate::drawing;
 use crate::drawing::blit;
-use crate::sprites;
+use crate::sprite_cache;
 use make_track::track_desc::{MetalSupport, TrackSectionMetalSupports};
 use openrct2::supports::{MetalSupportType, SupportPosition};
 use renderer::image::Image;
@@ -82,7 +82,7 @@ fn draw_support_segments(
     colour: openrct2::colour::Colour,
     mut height_remaining: i16,
     sprite_index: u32,
-    sprites: &mut sprites::Sprites,
+    sprites: &mut sprite_cache::SpriteCache,
 ) {
     const MAX_SEGMENT_HEIGHT: i16 = 16;
     while height_remaining > 0 {
@@ -105,7 +105,7 @@ fn draw_support(
     rotation: usize,
     colour: openrct2::colour::Colour,
     support_type: MetalSupportType,
-    sprites: &mut sprites::Sprites,
+    sprites: &mut sprite_cache::SpriteCache,
 ) {
     const SUPPORT_START_HEIGHT: i16 = -32;
     let mut height_remaining = coords[2] + i16::from(support.height) - SUPPORT_START_HEIGHT;
@@ -153,7 +153,7 @@ pub fn draw_supports(
     rotation: usize,
     colour: openrct2::colour::Colour,
     support_type: MetalSupportType,
-    sprites: &mut sprites::Sprites,
+    sprites: &mut sprite_cache::SpriteCache,
 ) {
     let mut tile_indices: heapless::Vec<_, { make_track::track_sections::MAX_TILE_COUNT }> =
         (0..track_section.tiles.len()).collect();
