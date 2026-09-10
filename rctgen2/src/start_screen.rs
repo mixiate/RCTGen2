@@ -23,7 +23,7 @@ impl StartScreen {
         settings: &mut settings::AppSettings,
         errors: &mut Vec<String>,
     ) -> Option<app::State> {
-        let mut new_state = None;
+        let mut new_track = None;
         egui::Area::new(egui::Id::new("Start screen track area"))
             .anchor(egui::Align2::CENTER_CENTER, egui::Vec2::ZERO)
             .movable(false)
@@ -37,17 +37,8 @@ impl StartScreen {
 
                     if ui.button("Load Track...").clicked() {
                         match track_editor::Track::open() {
-                            Ok(Some(track)) => {
-                                settings.settings.recent_track_files.add(&track.file_path);
-                                new_state = Some(app::State::TrackEditor(Box::new(track_editor::TrackEditor::new(
-                                    ui.ctx(),
-                                    data_directory,
-                                    track,
-                                    errors,
-                                ))));
-                            }
+                            Ok(track) => new_track = track,
                             Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
-                            _ => {}
                         }
                     }
                 });
@@ -67,15 +58,7 @@ impl StartScreen {
                     if let Some(index) = response.inner {
                         let file_path = settings.settings.recent_track_files.get()[index].clone();
                         match track_editor::Track::load(file_path) {
-                            Ok(track) => {
-                                settings.settings.recent_track_files.add(&track.file_path);
-                                new_state = Some(app::State::TrackEditor(Box::new(track_editor::TrackEditor::new(
-                                    ui.ctx(),
-                                    data_directory,
-                                    track,
-                                    errors,
-                                ))));
-                            }
+                            Ok(track) => new_track = Some(track),
                             Err(error) => {
                                 settings.settings.recent_track_files.remove(index);
                                 errors.extend(error.chain().map(|x| x.to_string()));
@@ -94,24 +77,23 @@ impl StartScreen {
                 ui.allocate_space(egui::Vec2::new(250.0, 1.0));
             });
 
-        if let Some(new_track) = self.new_track_modal.show(ui, errors) {
-            match track_editor::Track::try_new(new_track.directory, new_track.track) {
-                Ok(track) => {
-                    settings.settings.recent_track_files.add(&track.file_path);
-                    if let Err(error) = track.desc.save(&track.file_path) {
-                        errors.extend(error.chain().map(|x| x.to_string()));
-                    }
-                    new_state = Some(app::State::TrackEditor(Box::new(track_editor::TrackEditor::new(
-                        ui.ctx(),
-                        data_directory,
-                        track,
-                        errors,
-                    ))));
-                }
+        if let Some(track) = self.new_track_modal.show(ui, errors) {
+            match track_editor::Track::try_new(track.directory, track.track) {
+                Ok(track) => new_track = Some(track),
                 Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
             }
         }
 
-        new_state
+        if let Some(track) = new_track {
+            settings.settings.recent_track_files.add(&track.file_path);
+            Some(app::State::TrackEditor(Box::new(track_editor::TrackEditor::new(
+                ui.ctx(),
+                data_directory,
+                track,
+                errors,
+            ))))
+        } else {
+            None
+        }
     }
 }
