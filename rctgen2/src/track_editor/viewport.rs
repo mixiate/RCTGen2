@@ -91,12 +91,19 @@ impl Viewport {
             ui.place(image_rect, image);
         }
 
-        let frame = egui::Frame::popup(ui.style()).outer_margin(egui::Margin::same(10)).shadow(egui::Shadow::NONE);
+        let margin = egui::Margin {
+            left: 10,
+            right: 10,
+            top: 10,
+            bottom: 5,
+        };
+        let frame = egui::Frame::popup(ui.style()).outer_margin(margin).shadow(egui::Shadow::NONE);
         frame.show(ui, |ui| {
             if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
                 changes.redraw = true;
             }
         });
+        let frame = frame.outer_margin(egui::Margin::symmetric(10, 5));
         frame.show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
