@@ -9,9 +9,7 @@ pub struct Options {
     pub adjacent_track: bool,
     pub original_track: bool,
     pub supports: bool,
-    pub colour_1: openrct2::colour::Colour,
-    pub colour_2: openrct2::colour::Colour,
-    pub colour_3: openrct2::colour::Colour,
+    pub colours: [openrct2::colour::Colour; 3],
 }
 
 impl Default for Options {
@@ -21,9 +19,11 @@ impl Default for Options {
             adjacent_track: false,
             original_track: false,
             supports: false,
-            colour_1: openrct2::colour::Colour::LightBlue,
-            colour_2: openrct2::colour::Colour::BrightPink,
-            colour_3: openrct2::colour::Colour::Yellow,
+            colours: [
+                openrct2::colour::Colour::LightBlue,
+                openrct2::colour::Colour::BrightPink,
+                openrct2::colour::Colour::Yellow,
+            ],
         }
     }
 }

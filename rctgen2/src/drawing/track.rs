@@ -48,7 +48,7 @@ fn draw_adjacent_track_section(
                     continue;
                 }
                 if let Some(sprite) = sprites.get(sprite.index) {
-                    blit::draw_indexed_image(buffer, sprite, &coords, options.colour_1, options.colour_2);
+                    blit::draw_indexed_image(buffer, sprite, &coords, options.colours[0], options.colours[1]);
                 }
             }
         }
@@ -68,7 +68,7 @@ fn draw_original_track_section(
         for sprite in &track_sprites[rotation] {
             let coords = drawing::add_coords(&coords, &sprite.offset);
             if let Some(sprite) = sprites.get(sprite.index) {
-                blit::draw_indexed_image(buffer, sprite, &coords, options.colour_1, options.colour_2);
+                blit::draw_indexed_image(buffer, sprite, &coords, options.colours[0], options.colours[1]);
             }
         }
     }
@@ -113,8 +113,8 @@ fn draw_with_adjacent_sprites(
             buffer,
             &track_image.images.indexed,
             &[0, 0, z_offset],
-            options.colour_1,
-            options.colour_2,
+            options.colours[0],
+            options.colours[1],
         );
     } else {
         blit::draw_image(buffer, &track_image.images.unindexed, &[0, 0, z_offset]);
@@ -149,7 +149,7 @@ pub fn draw(
             track_image.track_section,
             supports,
             track_image.rotation,
-            options.colour_3,
+            options.colours[2],
             metal_supports.support_type,
             sprites,
         );
@@ -184,8 +184,8 @@ pub fn draw(
             buffer,
             &track_image.images.indexed,
             &[0, 0, z_offset],
-            options.colour_1,
-            options.colour_2,
+            options.colours[0],
+            options.colours[1],
         );
     } else {
         blit::draw_image(buffer, &track_image.images.unindexed, &[0, 0, z_offset]);
