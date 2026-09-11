@@ -308,7 +308,7 @@ pub fn track_widgets(
             ui.label("Z offset");
         });
         if ui.add(widgets::DragValueSpin::new(&mut track.z_offset, 1)).changed() {
-            changes.redraw = true;
+            *changes |= track_editor::Changes::Redraw;
         }
         ui.end_row();
 
@@ -316,7 +316,7 @@ pub fn track_widgets(
             ui.label("Masks");
         });
         if ui.add(egui::TextEdit::singleline(&mut track.masks)).lost_focus() {
-            changes.masks = true;
+            *changes |= track_editor::Changes::Masks;
         }
         ui.end_row();
 
@@ -324,7 +324,7 @@ pub fn track_widgets(
             ui.label("Length");
         });
         if length_widgets(ui, &mut track.model_settings.length) {
-            changes.model_settings = true;
+            *changes |= track_editor::Changes::ModelSettings;
         }
         ui.end_row();
 
@@ -332,7 +332,7 @@ pub fn track_widgets(
             ui.label("Tie length");
         });
         if length_widgets(ui, &mut track.model_settings.tie_length) {
-            changes.model_settings = true;
+            *changes |= track_editor::Changes::ModelSettings;
         }
         ui.end_row();
 
@@ -346,7 +346,7 @@ pub fn track_widgets(
             ))
             .changed()
         {
-            changes.model_settings = true;
+            *changes |= track_editor::Changes::ModelSettings;
         }
         ui.end_row();
 
@@ -360,7 +360,7 @@ pub fn track_widgets(
             ))
             .changed()
         {
-            changes.model_settings = true;
+            *changes |= track_editor::Changes::ModelSettings;
         }
         ui.end_row();
 
@@ -368,7 +368,7 @@ pub fn track_widgets(
             ui.label("Bank angle");
         });
         if ui.add(widgets::DragValueSpin::new(&mut track.model_settings.bank_angle, 0.01)).changed() {
-            changes.model_settings = true;
+            *changes |= track_editor::Changes::ModelSettings;
         }
         ui.end_row();
 
@@ -376,14 +376,14 @@ pub fn track_widgets(
             ui.label("Lift");
         });
         if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
-            changes.model_settings = true;
+            *changes |= track_editor::Changes::ModelSettings;
         }
         ui.end_row();
     });
 
     egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
         if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
-            changes.load_models = true;
+            *changes |= track_editor::Changes::LoadModels;
         }
     });
 
@@ -428,10 +428,7 @@ pub fn tracks_panel(
         if let Some(new_track) = new_track_modal.show(ui, errors) {
             track.track_index = track.desc.tracks.len().into();
             track.desc.tracks.push(new_track.track);
-
-            changes.model_settings = true;
-            changes.load_models = true;
-            changes.masks = true;
+            *changes |= track_editor::Changes::ChangeSubTrack;
         }
 
         let mut removed_index = None;
@@ -481,9 +478,7 @@ pub fn tracks_panel(
         {
             track.track_index = track.track_index.saturating_sub(1);
             if track.track_index > index {
-                changes.model_settings = true;
-                changes.load_models = true;
-                changes.masks = true;
+                *changes |= track_editor::Changes::ChangeSubTrack;
             }
         }
     });

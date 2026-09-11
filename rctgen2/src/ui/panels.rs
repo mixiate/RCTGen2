@@ -74,13 +74,13 @@ pub fn side_panel(
         SidePanelTab::Lights => {
             let changed = lights::lights_panel(&mut track.desc.lights, ui);
             if changed {
-                changes.render = true;
+                *changes |= track_editor::Changes::Render;
             }
         }
         SidePanelTab::Offsets => {
             let changed = offsets::offsets_panel(&mut track.desc.offsets, ui);
             if changed {
-                changes.offsets = true;
+                *changes |= track_editor::Changes::Offsets;
             }
         }
         SidePanelTab::MetalSupports => {
@@ -91,19 +91,19 @@ pub fn side_panel(
                 ui,
             );
             if changed {
-                changes.redraw = true;
+                *changes |= track_editor::Changes::Redraw;
             }
         }
         SidePanelTab::Render => {
             let changed = render::render_panel(&mut track.desc, ui);
             if changed {
-                changes.render = true;
+                *changes |= track_editor::Changes::Render;
             }
         }
         SidePanelTab::Sprites => {
             let track = &mut track.desc.tracks[track.track_index];
             if sprites::sprites_panel(&mut track.original_sprites, current_track_section, ui) {
-                changes.redraw = true;
+                *changes |= track_editor::Changes::Redraw;
             }
         }
     }

@@ -23,39 +23,22 @@ pub enum TrackEditorMessage {
     Error(Vec<String>),
 }
 
-#[derive(Clone, Copy, Default)]
-pub struct Changes {
-    pub directory: bool,
-    pub model_settings: bool,
-    pub load_models: bool,
-    pub masks: bool,
-    pub offsets: bool,
-    pub update_model: bool,
-    pub render: bool,
-    pub clear_image: bool,
-    pub redraw: bool,
-}
+bitflags::bitflags! {
+    #[derive(Clone, Copy, Default)]
+    pub struct Changes: u32 {
+        const Directory = 1 << 0;
+        const ModelSettings = 1 << 1;
+        const LoadModels = 1 << 2;
+        const Masks = 1 << 3;
+        const Offsets = 1 << 4;
+        const UpdateModel = 1 << 5;
+        const Render = 1 << 6;
+        const ClearImage = 1 << 7;
+        const Redraw = 1 << 8;
 
-impl Changes {
-    pub fn load_track(&mut self) {
-        self.directory = true;
-        self.model_settings = true;
-        self.load_models = true;
-        self.masks = true;
-        self.offsets = true;
-        self.clear_image = true;
-    }
-
-    pub fn any(&self) -> bool {
-        self.directory
-            || self.model_settings
-            || self.load_models
-            || self.masks
-            || self.offsets
-            || self.update_model
-            || self.render
-            || self.clear_image
-            || self.redraw
+        const LoadTrack = Self::Directory.bits() | Self::ModelSettings.bits() | Self::LoadModels.bits()
+            | Self::Masks.bits() | Self::Offsets.bits() | Self::ClearImage.bits();
+        const ChangeSubTrack = Self::ModelSettings.bits() | Self::LoadModels.bits() | Self::Masks.bits();
     }
 }
 
@@ -87,9 +70,6 @@ impl TrackEditor {
         let (editor_tx, editor_rx) = std::sync::mpsc::channel();
         let track_image = Arc::new(Mutex::new(None));
 
-        let mut changes = Changes::default();
-        changes.load_track();
-
         let render_thread = {
             let editor_tx = editor_tx.clone();
             let track_image = track_image.clone();
@@ -113,7 +93,7 @@ impl TrackEditor {
             editor_rx,
             render_tx,
             track_image,
-            changes,
+            changes: Changes::LoadTrack,
             side_panel_tab: None,
             track,
             track_section: &make_track::track_sections::FLAT,
@@ -132,6 +112,8 @@ impl TrackEditor {
         rct2_sprites: Option<&mut sprite_cache::SpriteCache>,
         errors: &mut Vec<String>,
     ) {
+        use bitflags::Flags as _;
+
         let mut fetch_frame = false;
         for message in self.editor_rx.try_iter() {
             match message {
@@ -146,7 +128,7 @@ impl TrackEditor {
             && track_image.is_some()
         {
             self.viewport.track_image = track_image.take();
-            self.changes.redraw = true;
+            self.changes |= Changes::Redraw;
         }
 
         if let Some(time) = self.model_file_changed_time {
@@ -154,12 +136,12 @@ impl TrackEditor {
                 egui_context.request_repaint_after(time_left);
             } else {
                 self.model_file_changed_time = None;
-                self.changes.load_models = true;
+                self.changes |= Changes::LoadModels;
             }
         }
 
         let track = &self.track.desc.tracks[self.track.track_index];
-        if self.changes.directory {
+        if self.changes.contains(Changes::Directory) {
             if let Err(error) = self.file_watcher.set_directory(self.track.file_path.directory()) {
                 errors.push(error.to_string());
             }
@@ -167,30 +149,30 @@ impl TrackEditor {
                 self.track.file_path.directory().to_path_buf(),
             ));
         }
-        if self.changes.model_settings {
+        if self.changes.contains(Changes::ModelSettings) {
             let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-            self.changes.update_model = true;
+            self.changes |= Changes::UpdateModel;
         }
-        if self.changes.load_models {
+        if self.changes.contains(Changes::LoadModels) {
             let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-            self.changes.update_model = true;
+            self.changes |= Changes::UpdateModel;
         }
-        if self.changes.masks {
+        if self.changes.contains(Changes::Masks) {
             let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
-            self.changes.update_model = true;
+            self.changes |= Changes::UpdateModel;
         }
-        if self.changes.offsets {
+        if self.changes.contains(Changes::Offsets) {
             let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track.desc.offsets)));
-            self.changes.update_model = true;
+            self.changes |= Changes::UpdateModel;
         }
-        if self.changes.update_model {
+        if self.changes.contains(Changes::UpdateModel) {
             let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
                 track_section: self.track_section,
                 rotation: self.viewport.rotation,
             }));
-            self.changes.render = true;
+            self.changes |= Changes::Render;
         }
-        if self.changes.render {
+        if self.changes.contains(Changes::Render) {
             let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
                 egui_context: egui_context.clone(),
                 rotation: self.viewport.rotation,
@@ -201,10 +183,10 @@ impl TrackEditor {
             }));
         }
 
-        if self.changes.clear_image {
+        if self.changes.contains(Changes::ClearImage) {
             self.viewport.clear();
         }
-        if self.changes.redraw {
+        if self.changes.contains(Changes::Redraw) {
             self.viewport.draw(
                 track,
                 self.track.desc.metal_supports.as_ref(),
@@ -213,7 +195,7 @@ impl TrackEditor {
             );
         }
 
-        self.changes = Changes::default();
+        self.changes.clear();
     }
 
     pub fn ui(
@@ -259,7 +241,7 @@ impl TrackEditor {
             );
         });
 
-        if self.changes.any() {
+        if !self.changes.is_empty() {
             ui.ctx().request_repaint();
         }
     }

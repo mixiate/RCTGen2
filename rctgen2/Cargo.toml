@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.104"
+bitflags = "2.13.2"
 dirs = "6.0.0"
 eframe = "0.36.1"
 egui-wgpu = "0.36.1"

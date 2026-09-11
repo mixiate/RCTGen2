@@ -100,7 +100,7 @@ impl Viewport {
         let frame = egui::Frame::popup(ui.style()).outer_margin(margin).shadow(egui::Shadow::NONE);
         frame.show(ui, |ui| {
             if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
-                changes.redraw = true;
+                *changes |= track_editor::Changes::Redraw;
             }
         });
         let frame = frame.outer_margin(egui::Margin::symmetric(10, 5));
@@ -109,7 +109,7 @@ impl Viewport {
                 ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
                 for (index, button) in self.colour_buttons.iter_mut().enumerate() {
                     if button.button(ui, colour_button_textures, &mut self.drawing_options.colours[index]) {
-                        changes.redraw = true;
+                        *changes |= track_editor::Changes::Redraw;
                     }
                 }
             });
@@ -127,7 +127,7 @@ impl Viewport {
                 )
                 .changed()
             {
-                changes.redraw = true;
+                *changes |= track_editor::Changes::Redraw;
             }
         });
         frame.show(ui, |ui| {
@@ -140,7 +140,7 @@ impl Viewport {
                 )
                 .changed()
             {
-                changes.redraw = true;
+                *changes |= track_editor::Changes::Redraw;
             }
             let adjacent_track_checkbox_enabled = !track.original_sprites.is_empty();
             if ui
@@ -150,7 +150,7 @@ impl Viewport {
                 )
                 .changed()
             {
-                changes.redraw = true;
+                *changes |= track_editor::Changes::Redraw;
             }
         });
         frame.show(ui, |ui| {
@@ -162,7 +162,7 @@ impl Viewport {
                 .clicked()
             {
                 self.rotation = (self.rotation + 1) & 3;
-                changes.update_model = true;
+                *changes |= track_editor::Changes::UpdateModel;
             }
         });
     }

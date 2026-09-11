@@ -27,7 +27,7 @@ pub fn menu_bar(
                     match track_editor::Track::open() {
                         Ok(Some(new_track)) => {
                             *track = new_track;
-                            changes.load_track();
+                            *changes |= track_editor::Changes::LoadTrack;
                             settings.settings.recent_track_files.add(&track.file_path);
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
@@ -48,7 +48,7 @@ pub fn menu_bar(
                             match track_editor::Track::load(file_path) {
                                 Ok(new_track) => {
                                     *track = new_track;
-                                    changes.load_track();
+                                    *changes |= track_editor::Changes::LoadTrack;
                                     settings.settings.recent_track_files.add(&track.file_path);
                                 }
                                 Err(error) => {
@@ -77,7 +77,7 @@ pub fn menu_bar(
                     match make_track::track_desc::Desc::load(&file_path) {
                         Ok(import_track_desc) => {
                             track.desc.lights = import_track_desc.lights;
-                            changes.render = true;
+                            *changes |= track_editor::Changes::Render;
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }
@@ -88,7 +88,7 @@ pub fn menu_bar(
                     match make_track::track_desc::Desc::load(&file_path) {
                         Ok(import_track_desc) => {
                             track.desc.metal_supports = import_track_desc.metal_supports;
-                            changes.redraw = true;
+                            *changes |= track_editor::Changes::Redraw;
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }
@@ -120,9 +120,7 @@ pub fn menu_bar(
                         }
                     });
                 if track.track_index != previous_track_index {
-                    changes.model_settings = true;
-                    changes.load_models = true;
-                    changes.masks = true;
+                    *changes |= track_editor::Changes::ChangeSubTrack;
                 }
             }
             ui.separator();
@@ -138,7 +136,7 @@ pub fn menu_bar(
                     }
                 });
             if *current_track_section != previous_track_section {
-                changes.update_model = true;
+                *changes |= track_editor::Changes::UpdateModel;
             }
             ui.separator();
         });
