@@ -10,6 +10,7 @@ use make_track::track_desc;
 pub struct Viewport {
     drawing_options: crate::drawing::Options,
     pub rotation: usize,
+    pub zoom: usize,
     pub track_image: Option<track_editor::TrackImage>,
     back_buffer: egui::TextureHandle,
     back_buffer_image: renderer::image::Image,
@@ -27,6 +28,7 @@ impl Viewport {
         Viewport {
             drawing_options: Default::default(),
             rotation: 0,
+            zoom: 1,
             track_image: None,
             back_buffer,
             back_buffer_image,
@@ -47,6 +49,7 @@ impl Viewport {
         metal_supports: Option<&track_desc::MetalSupports>,
         adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
         rct2_sprites: Option<&mut sprite_cache::SpriteCache>,
+        ui_zoom_factor: f32,
     ) {
         if let Some(track_image) = &self.track_image {
             let max_tile_height = track_image
@@ -70,7 +73,12 @@ impl Viewport {
             );
             let image =
                 egui::ColorImage::from_rgba_unmultiplied(self.back_buffer.size(), self.back_buffer_image.pixels());
-            self.back_buffer.set(image, egui::TextureOptions::default());
+            let texture_options = if ui_zoom_factor.fract() == 0.0 {
+                egui::TextureOptions::NEAREST
+            } else {
+                egui::TextureOptions::default()
+            };
+            self.back_buffer.set(image, texture_options);
         }
     }
 
@@ -84,9 +92,9 @@ impl Viewport {
         changes: &mut track_editor::Changes,
     ) {
         {
-            let texture_size = self.back_buffer.size_vec2();
+            let texture_size = self.back_buffer.size_vec2() * self.zoom as f32;
             let image = egui::Image::from_texture((self.back_buffer.id(), texture_size));
-            let image_pos = ui.max_rect().center() - (texture_size / egui::Vec2::new(2.0, 2.0));
+            let image_pos = ui.max_rect().center() - (texture_size / 2.0);
             let image_rect = egui::Rect::from_min_size(image_pos, texture_size);
             ui.place(image_rect, image);
         }
@@ -164,6 +172,36 @@ impl Viewport {
                 self.rotation = (self.rotation + 1) & 3;
                 *changes |= track_editor::Changes::UpdateModel;
             }
+        });
+        frame.show(ui, |ui| {
+            ui.horizontal(|ui| {
+                let corner_radius = ui.style().visuals.widgets.active.corner_radius.ne;
+                ui.style_mut().spacing.item_spacing = egui::vec2(0.0, 0.0);
+                ui.add_enabled_ui(self.zoom > 1, |ui| {
+                    let corner_radius = egui::CornerRadius {
+                        nw: corner_radius,
+                        ne: 0,
+                        sw: corner_radius,
+                        se: 0,
+                    };
+                    let button = egui::Button::new(egui::RichText::new("➖").size(25.0)).corner_radius(corner_radius);
+                    if ui.add_sized((35.0, 35.0), button).clicked() {
+                        self.zoom -= 1;
+                    }
+                });
+                ui.add_enabled_ui(self.zoom < 4, |ui| {
+                    let corner_radius = egui::CornerRadius {
+                        nw: 0,
+                        ne: corner_radius,
+                        sw: 0,
+                        se: corner_radius,
+                    };
+                    let button = egui::Button::new(egui::RichText::new("➕").size(25.0)).corner_radius(corner_radius);
+                    if ui.add_sized((35.0, 35.0), button).clicked() {
+                        self.zoom += 1;
+                    }
+                });
+            });
         });
     }
 }

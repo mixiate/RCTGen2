@@ -192,6 +192,7 @@ impl TrackEditor {
                 self.track.desc.metal_supports.as_ref(),
                 &self.adjacent_track_sections,
                 rct2_sprites,
+                egui_context.zoom_factor(),
             );
         }
 
