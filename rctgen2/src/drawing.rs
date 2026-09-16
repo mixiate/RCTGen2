@@ -1,33 +1,9 @@
 mod blit;
 pub mod grid;
 mod supports_metal;
-mod track;
+pub mod track;
 
 pub use track::draw;
-
-pub struct Options {
-    pub indexed: bool,
-    pub adjacent_track: bool,
-    pub original_track: bool,
-    pub supports: bool,
-    pub colours: [openrct2::colour::Colour; 3],
-}
-
-impl Default for Options {
-    fn default() -> Self {
-        Options {
-            indexed: true,
-            adjacent_track: false,
-            original_track: false,
-            supports: false,
-            colours: [
-                openrct2::colour::Colour::LightBlue,
-                openrct2::colour::Colour::BrightPink,
-                openrct2::colour::Colour::Yellow,
-            ],
-        }
-    }
-}
 
 pub fn add_coords(a: &[i16; 3], b: &[i16; 3]) -> [i16; 3] {
     [a[0] + b[0], a[1] + b[1], a[2] + b[2]]

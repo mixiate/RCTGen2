@@ -8,7 +8,7 @@ use eframe::egui;
 use make_track::track_desc;
 
 pub struct Viewport {
-    drawing_options: crate::drawing::Options,
+    drawing_options: drawing::track::Options,
     pub rotation: usize,
     pub zoom: usize,
     pub grid: bool,

@@ -1,13 +1,36 @@
 use crate::adjacent_track;
 use crate::adjacent_track::TrackSectionWithSprites;
 use crate::drawing;
-use crate::drawing::Options;
 use crate::drawing::blit;
 use crate::render::TrackImage;
 use crate::sprite_cache;
 use make_track::track_desc;
 use make_track::track_desc::TrackSectionSprites;
 use renderer::image::Image;
+
+pub struct Options {
+    pub indexed: bool,
+    pub adjacent_track: bool,
+    pub original_track: bool,
+    pub supports: bool,
+    pub colours: [openrct2::colour::Colour; 3],
+}
+
+impl Default for Options {
+    fn default() -> Self {
+        Options {
+            indexed: true,
+            adjacent_track: false,
+            original_track: false,
+            supports: false,
+            colours: [
+                openrct2::colour::Colour::LightBlue,
+                openrct2::colour::Colour::BrightPink,
+                openrct2::colour::Colour::Yellow,
+            ],
+        }
+    }
+}
 
 #[derive(Clone, Copy)]
 enum DrawOrder {
