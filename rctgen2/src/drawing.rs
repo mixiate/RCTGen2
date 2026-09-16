@@ -1,4 +1,5 @@
 mod blit;
+pub mod grid;
 mod supports_metal;
 mod track;
 

@@ -11,9 +11,12 @@ pub struct Viewport {
     drawing_options: crate::drawing::Options,
     pub rotation: usize,
     pub zoom: usize,
+    pub grid: bool,
+    pub grid_highlight: bool,
     pub track_image: Option<track_editor::TrackImage>,
     back_buffer: egui::TextureHandle,
     back_buffer_image: renderer::image::Image,
+    tile_grid_image: renderer::image::IndexedImage,
     colour_buttons: [ColourPicker; 3],
 }
 
@@ -29,9 +32,12 @@ impl Viewport {
             drawing_options: Default::default(),
             rotation: 0,
             zoom: 1,
+            grid: false,
+            grid_highlight: false,
             track_image: None,
             back_buffer,
             back_buffer_image,
+            tile_grid_image: drawing::grid::new_tile_grid_image(),
             colour_buttons: [ColourPicker::new(), ColourPicker::new(), ColourPicker::new()],
         }
     }
@@ -62,6 +68,22 @@ impl Viewport {
             self.back_buffer_image.offset.y = (self.back_buffer_image.height() as i32 / 2) + (max_tile_height / 2);
 
             self.back_buffer_image.pixels_mut().fill(0);
+
+            if self.grid {
+                let highlighted_tiles = if self.grid_highlight {
+                    track_image.track_section.tiles.as_slice()
+                } else {
+                    &[]
+                };
+                drawing::grid::draw_grid(
+                    &mut self.back_buffer_image,
+                    &self.tile_grid_image,
+                    7,
+                    if self.drawing_options.supports { -32 } else { 0 },
+                    self.rotation,
+                    highlighted_tiles,
+                );
+            }
             drawing::draw(
                 track,
                 metal_supports,
@@ -158,6 +180,14 @@ impl Viewport {
                 )
                 .changed()
             {
+                *changes |= track_editor::Changes::Redraw;
+            }
+        });
+        frame.show(ui, |ui| {
+            if ui.checkbox(&mut self.grid, "Grid").clicked() {
+                *changes |= track_editor::Changes::Redraw;
+            }
+            if ui.checkbox(&mut self.grid_highlight, "Track Tiles").clicked() {
                 *changes |= track_editor::Changes::Redraw;
             }
         });
