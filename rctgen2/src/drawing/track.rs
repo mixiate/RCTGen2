@@ -152,7 +152,7 @@ fn draw_with_adjacent_sprites(
     );
 }
 
-pub fn draw(
+pub fn draw_track(
     track: &track_desc::Track,
     metal_supports: Option<&track_desc::MetalSupports>,
     track_image: &TrackImage,

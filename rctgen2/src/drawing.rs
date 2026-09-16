@@ -3,8 +3,6 @@ pub mod grid;
 mod supports_metal;
 pub mod track;
 
-pub use track::draw;
-
 pub fn add_coords(a: &[i16; 3], b: &[i16; 3]) -> [i16; 3] {
     [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
 }

@@ -84,7 +84,7 @@ impl Viewport {
                     highlighted_tiles,
                 );
             }
-            drawing::draw(
+            drawing::track::draw_track(
                 track,
                 metal_supports,
                 track_image,
