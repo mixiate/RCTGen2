@@ -44,9 +44,9 @@ jobs:
         echo "LIB=${{ github.workspace }}/embree-$env:EMBREE_VERSION.x64.windows/lib" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         echo "${{ github.workspace }}/embree-$env:EMBREE_VERSION.x64.windows/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Build
-      run: cargo build --release
+      run: cargo build --profile dev-opt
     - name: Run tests
-      run: cargo test --release
+      run: cargo test --profile dev-opt
 
   build-macos:
     needs: clippy-check
@@ -65,9 +65,9 @@ jobs:
         echo "LIBRARY_PATH=${{ github.workspace }}/embree-$EMBREE_VERSION.arm64.macosx/lib" >> $GITHUB_ENV
         echo "DYLD_FALLBACK_LIBRARY_PATH=${{ github.workspace }}/embree-$EMBREE_VERSION.arm64.macosx/lib" >> $GITHUB_ENV
     - name: Build
-      run: cargo build --release
+      run: cargo build --profile dev-opt
     - name: Run tests
-      run: cargo test --release
+      run: cargo test --profile dev-opt
 
   build-linux:
     needs: clippy-check
@@ -88,6 +88,6 @@ jobs:
         echo "LIBRARY_PATH=${{ github.workspace }}/embree-$EMBREE_VERSION.x86_64.linux/lib64" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=${{ github.workspace }}/embree-$EMBREE_VERSION.x86_64.linux/lib64" >> $GITHUB_ENV
     - name: Build
-      run: cargo build --release
+      run: cargo build --profile dev-opt
     - name: Run tests
-      run: cargo test --release
+      run: cargo test --profile dev-opt
