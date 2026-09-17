@@ -2399,7 +2399,8 @@
             "extrude_in_front": true
         },
         {
-            "mask": "upright/large_turn_left_to_diag_gentle_2.png"
+            "mask": "upright/large_turn_left_bank_to_diag_gentle_2.png",
+            "empty": [false, true, false, false, false]
         },
         {
             "mask": "upright/large_turn_left_to_diag_gentle_3.png",
@@ -2414,7 +2415,8 @@
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_to_diag_gentle_2.png"
+            "mask": "upright/large_turn_left_bank_to_diag_gentle_2.png",
+            "empty": [false, true, false, false, false]
         },
         {
             "mirror": true,
@@ -2428,7 +2430,7 @@
     ],
     "large_turn_left_bank_to_orthogonal_gentle": [
         {
-            "mask": "upright/large_turn_left_to_orthogonal_gentle_0.png",
+            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_0.png",
             "extrude_behind": true,
             "empty": [false, false, true, false, false]
         },
@@ -2437,7 +2439,7 @@
             "empty": [false, false, true, false, false]
         },
         {
-            "mask": "upright/large_turn_left_to_orthogonal_gentle_2.png",
+            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_2.png",
             "extrude_behind": true,
             "empty": [false, false, true, false, false]
         },
@@ -2448,7 +2450,7 @@
     "large_turn_right_bank_to_orthogonal_gentle": [
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_to_orthogonal_gentle_2.png",
+            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_2.png",
             "extrude_behind": true,
             "empty": [false, false, true, false, false]
         },
@@ -2459,7 +2461,7 @@
         },
         {
             "mirror": true,
-            "mask": "upright/large_turn_left_to_orthogonal_gentle_0.png",
+            "mask": "upright/large_turn_left_bank_to_orthogonal_gentle_0.png",
             "extrude_behind": true,
             "empty": [false, false, true, false, false]
         },
