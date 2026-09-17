@@ -7333,20 +7333,20 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_left_bank_to_diag_gentle_2_0.png",
-        "x": -8,
+        "x": -28,
         "y": -9,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_left_bank_to_diag_gentle_2_1.png",
-        "x": 1,
-        "y": -8,
+        "x": 0,
+        "y": 0,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_left_bank_to_diag_gentle_2_2.png",
         "x": -32,
-        "y": -4,
+        "y": -5,
         "palette": "keep"
     },
     {
@@ -7411,14 +7411,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_right_bank_to_diag_gentle_1_1.png",
-        "x": -31,
-        "y": -8,
+        "x": 0,
+        "y": 0,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_right_bank_to_diag_gentle_1_2.png",
-        "x": 10,
-        "y": -4,
+        "x": 21,
+        "y": -5,
         "palette": "keep"
     },
     {
@@ -7490,12 +7490,12 @@
     {
         "path": "track/test-track-boundary-tie/large_turn_left_bank_to_orthogonal_gentle_0_2.png",
         "x": -32,
-        "y": -14,
+        "y": -27,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_left_bank_to_orthogonal_gentle_0_3.png",
-        "x": -30,
+        "x": -12,
         "y": -20,
         "palette": "keep"
     },
@@ -7591,7 +7591,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_right_bank_to_orthogonal_gentle_0_3.png",
-        "x": -26,
+        "x": -16,
         "y": -9,
         "palette": "keep"
     },
@@ -7633,8 +7633,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_turn_right_bank_to_orthogonal_gentle_2_2.png",
-        "x": -12,
-        "y": -14,
+        "x": -30,
+        "y": -27,
         "palette": "keep"
     },
     {

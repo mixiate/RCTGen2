@@ -7333,20 +7333,20 @@
     },
     {
         "path": "track/test-track-offsets/large_turn_left_bank_to_diag_gentle_2_0.png",
-        "x": -4,
+        "x": -25,
         "y": 0,
         "palette": "keep"
     },
     {
         "path": "track/test-track-offsets/large_turn_left_bank_to_diag_gentle_2_1.png",
-        "x": 14,
+        "x": 0,
         "y": 0,
         "palette": "keep"
     },
     {
         "path": "track/test-track-offsets/large_turn_left_bank_to_diag_gentle_2_2.png",
         "x": -28,
-        "y": 2,
+        "y": 3,
         "palette": "keep"
     },
     {
@@ -7411,14 +7411,14 @@
     },
     {
         "path": "track/test-track-offsets/large_turn_right_bank_to_diag_gentle_1_1.png",
-        "x": -31,
+        "x": 0,
         "y": 0,
         "palette": "keep"
     },
     {
         "path": "track/test-track-offsets/large_turn_right_bank_to_diag_gentle_1_2.png",
-        "x": 12,
-        "y": 1,
+        "x": 22,
+        "y": 2,
         "palette": "keep"
     },
     {
@@ -7490,12 +7490,12 @@
     {
         "path": "track/test-track-offsets/large_turn_left_bank_to_orthogonal_gentle_0_2.png",
         "x": -32,
-        "y": -13,
+        "y": -26,
         "palette": "keep"
     },
     {
         "path": "track/test-track-offsets/large_turn_left_bank_to_orthogonal_gentle_0_3.png",
-        "x": -28,
+        "x": -10,
         "y": -17,
         "palette": "keep"
     },
@@ -7537,7 +7537,7 @@
     },
     {
         "path": "track/test-track-offsets/large_turn_left_bank_to_orthogonal_gentle_2_2.png",
-        "x": -13,
+        "x": -16,
         "y": 3,
         "palette": "keep"
     },
@@ -7591,7 +7591,7 @@
     },
     {
         "path": "track/test-track-offsets/large_turn_right_bank_to_orthogonal_gentle_0_3.png",
-        "x": -25,
+        "x": -16,
         "y": 0,
         "palette": "keep"
     },
@@ -7633,8 +7633,8 @@
     },
     {
         "path": "track/test-track-offsets/large_turn_right_bank_to_orthogonal_gentle_2_2.png",
-        "x": -7,
-        "y": -12,
+        "x": -24,
+        "y": -26,
         "palette": "keep"
     },
     {
