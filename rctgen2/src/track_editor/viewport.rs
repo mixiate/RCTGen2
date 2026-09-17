@@ -187,7 +187,7 @@ impl Viewport {
             if ui.checkbox(&mut self.grid, "Grid").clicked() {
                 *changes |= track_editor::Changes::Redraw;
             }
-            if ui.checkbox(&mut self.grid_highlight, "Track Tiles").clicked() {
+            if ui.add_enabled(self.grid, egui::Checkbox::new(&mut self.grid_highlight, "Track Tiles")).clicked() {
                 *changes |= track_editor::Changes::Redraw;
             }
         });
