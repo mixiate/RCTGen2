@@ -1,9 +1,8 @@
-use crate::adjacent_track;
-use crate::adjacent_track::TrackSectionWithSprites;
 use crate::drawing;
 use crate::drawing::blit;
-use crate::render::TrackImage;
 use crate::sprite_cache;
+use crate::track_editor::adjacent_track;
+use crate::track_editor::render::TrackImage;
 use make_track::track_desc;
 use make_track::track_desc::TrackSectionSprites;
 use renderer::image::Image;
@@ -49,11 +48,11 @@ fn draw_adjacent_track_section(
     track_image: &TrackImage,
     options: &Options,
     sprites: &mut sprite_cache::SpriteCache,
-    adjacent_sections: &[TrackSectionWithSprites],
+    adjacent_sections: &[adjacent_track::TrackSectionWithSprites],
     draw_order: DrawOrder,
     buffer: &mut Image,
 ) {
-    for TrackSectionWithSprites {
+    for adjacent_track::TrackSectionWithSprites {
         track_section,
         coords,
         rotation,

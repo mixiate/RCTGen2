@@ -1,7 +1,7 @@
-use crate::adjacent_track;
 use crate::drawing;
 use crate::sprite_cache;
 use crate::track_editor;
+use crate::track_editor::adjacent_track;
 use crate::ui::widgets::colour_picker;
 use crate::ui::widgets::colour_picker::ColourPicker;
 use eframe::egui;

@@ -1,12 +1,11 @@
+pub mod adjacent_track;
+mod file_watcher;
+pub mod render;
 mod track;
 mod viewport;
 
 pub use track::Track;
 
-use crate::adjacent_track;
-use crate::file_watcher;
-use crate::render;
-use crate::render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use crate::settings;
 use crate::sprite_cache;
 use crate::ui;
@@ -14,6 +13,7 @@ use crate::ui::modals;
 use crate::ui::panels;
 use crate::ui::widgets;
 use eframe::egui;
+use render::{RenderArgs, RenderMessage, SharedTrackImage, TrackImage, UpdateModelArgs};
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
 

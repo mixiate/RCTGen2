@@ -1,10 +1,7 @@
 #![windows_subsystem = "windows"]
 
-mod adjacent_track;
 mod app;
 mod drawing;
-mod file_watcher;
-mod render;
 mod settings;
 mod sprite_cache;
 mod start_screen;
