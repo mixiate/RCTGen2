@@ -19,7 +19,6 @@ use std::sync::{Arc, Mutex};
 
 pub enum TrackEditorMessage {
     NewFrame,
-    ModelFileChanged,
     Error(Vec<String>),
 }
 
@@ -56,7 +55,6 @@ pub struct TrackEditor {
     viewport: viewport::Viewport,
     adjacent_track_sections: adjacent_track::AdjacentTrackSections,
     file_watcher: file_watcher::FileWatcher,
-    model_file_changed_time: Option<std::time::Instant>,
 }
 
 impl TrackEditor {
@@ -86,7 +84,7 @@ impl TrackEditor {
             }
         };
 
-        let file_watcher = file_watcher::FileWatcher::try_new(editor_tx, egui_context.clone()).unwrap();
+        let file_watcher = file_watcher::FileWatcher::try_new(egui_context.clone()).unwrap();
 
         TrackEditor {
             render_thread: Some(render_thread),
@@ -102,7 +100,6 @@ impl TrackEditor {
             viewport: viewport::Viewport::new(egui_context),
             adjacent_track_sections,
             file_watcher,
-            model_file_changed_time: None,
         }
     }
 
@@ -118,7 +115,6 @@ impl TrackEditor {
         for message in self.editor_rx.try_iter() {
             match message {
                 TrackEditorMessage::NewFrame => fetch_frame = true,
-                TrackEditorMessage::ModelFileChanged => self.model_file_changed_time = Some(std::time::Instant::now()),
                 TrackEditorMessage::Error(error) => errors.extend(error),
             }
         }
@@ -131,13 +127,10 @@ impl TrackEditor {
             self.changes |= Changes::Redraw;
         }
 
-        if let Some(time) = self.model_file_changed_time {
-            if let Some(time_left) = std::time::Duration::from_millis(250).checked_sub(time.elapsed()) {
-                egui_context.request_repaint_after(time_left);
-            } else {
-                self.model_file_changed_time = None;
-                self.changes |= Changes::LoadModels;
-            }
+        match self.file_watcher.check() {
+            Some(file_watcher::Status::Delay(time_left)) => egui_context.request_repaint_after(time_left),
+            Some(file_watcher::Status::ReloadModels) => self.changes |= Changes::LoadModels,
+            None => {}
         }
 
         let track = &self.track.desc.tracks[self.track.track_index];

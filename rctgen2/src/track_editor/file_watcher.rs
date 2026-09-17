@@ -1,14 +1,25 @@
-use crate::track_editor::TrackEditorMessage;
 use eframe::egui;
-use std::sync::mpsc::Sender;
+
+enum Message {
+    ModelFileChanged,
+}
+
+pub enum Status {
+    Delay(std::time::Duration),
+    ReloadModels,
+}
 
 pub struct FileWatcher {
     watcher: notify::RecommendedWatcher,
     directory: Option<std::path::PathBuf>,
+    rx: std::sync::mpsc::Receiver<Message>,
+    model_file_changed_time: Option<std::time::Instant>,
 }
 
 impl FileWatcher {
-    pub fn try_new(app_tx: Sender<TrackEditorMessage>, egui_context: egui::Context) -> notify::Result<FileWatcher> {
+    pub fn try_new(egui_context: egui::Context) -> notify::Result<FileWatcher> {
+        let (tx, rx) = std::sync::mpsc::channel::<Message>();
+
         let watcher = notify::recommended_watcher(move |result: notify::Result<notify::Event>| {
             if let Ok(event) = result
                 && event.kind.is_modify()
@@ -18,13 +29,15 @@ impl FileWatcher {
                         .unwrap_or(false)
                 })
             {
-                let _result = app_tx.send(TrackEditorMessage::ModelFileChanged);
+                let _result = tx.send(Message::ModelFileChanged);
                 egui_context.request_repaint();
             }
         })?;
         Ok(FileWatcher {
             watcher,
             directory: None,
+            rx,
+            model_file_changed_time: None,
         })
     }
 
@@ -37,5 +50,24 @@ impl FileWatcher {
         self.watcher.watch(directory, notify::RecursiveMode::Recursive)?;
         self.directory = Some(directory.to_path_buf());
         Ok(())
+    }
+
+    pub fn check(&mut self) -> Option<Status> {
+        for message in self.rx.try_iter() {
+            match message {
+                Message::ModelFileChanged => self.model_file_changed_time = Some(std::time::Instant::now()),
+            }
+        }
+
+        if let Some(time) = self.model_file_changed_time {
+            if let Some(time_left) = std::time::Duration::from_millis(250).checked_sub(time.elapsed()) {
+                Some(Status::Delay(time_left))
+            } else {
+                self.model_file_changed_time = None;
+                Some(Status::ReloadModels)
+            }
+        } else {
+            None
+        }
     }
 }
