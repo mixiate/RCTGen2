@@ -31,13 +31,13 @@ fn test_archive() {
     assert_eq!(output_archive.entries().len(), 2);
 
     let entries = output_archive.entries();
-    if let rct::csg::Pixels::Uncompressed(pixels) = output_archive.get_pixels(&entries[0]).unwrap() {
+    if let rct::csg::EntryData::Uncompressed(pixels) = output_archive.get_entry_data(&entries[0]).unwrap() {
         assert_eq!(pixels, test_image.as_raw());
     } else {
         panic!();
     }
-    if let rct::csg::Pixels::Compressed(pixels) = output_archive.get_pixels(&entries[1]).unwrap() {
-        assert_eq!(pixels, test_image.as_raw());
+    if let rct::csg::EntryData::Compressed(data) = output_archive.get_entry_data(&entries[1]).unwrap() {
+        assert_eq!(data.decompress().unwrap(), test_image.as_raw());
     } else {
         panic!();
     }

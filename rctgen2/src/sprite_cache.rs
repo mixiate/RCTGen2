@@ -6,10 +6,16 @@ fn load_sprite(archive: &rct::csg::Archive, index: usize) -> anyhow::Result<Inde
     use anyhow::Context as _;
 
     let entry = archive.entries().get(index).with_context(|| format!("Sprite {index} not in archive"))?;
-    let entry_pixels = archive.get_pixels(entry).with_context(|| format!("Error loading sprite {index} in archive"))?;
+    let entry_pixels =
+        archive.get_entry_data(entry).with_context(|| format!("Error loading sprite {index} in archive"))?;
     let mut image = match entry_pixels {
-        rct::csg::Pixels::Uncompressed(pixels) => IndexedImage::with_buffer(pixels.to_vec(), entry.width, entry.height),
-        rct::csg::Pixels::Compressed(pixels) => IndexedImage::with_buffer(pixels, entry.width, entry.height),
+        rct::csg::EntryData::Uncompressed(pixels) => {
+            IndexedImage::with_buffer(pixels.to_vec(), entry.width, entry.height)
+        }
+        rct::csg::EntryData::Compressed(data) => {
+            let pixels = data.decompress().with_context(|| format!("Error decompressing sprite {index} in archive"))?;
+            IndexedImage::with_buffer(pixels, entry.width, entry.height)
+        }
     };
     image.offset = glam::IVec2::new(entry.offset_x.into(), entry.offset_y.into());
     Ok(image)

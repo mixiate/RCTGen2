@@ -81,9 +81,51 @@ impl EncodedSprite {
     }
 }
 
-pub enum Pixels<'a> {
+pub struct CompressedSpriteData<'a> {
+    entry: &'a Entry,
+    data: &'a [u8],
+}
+
+impl CompressedSpriteData<'_> {
+    pub fn decompress(&self) -> Option<Vec<u8>> {
+        use byteorder::ReadBytesExt as _;
+        use std::io::Read as _;
+
+        let width = usize::from(self.entry.width);
+        let height = usize::from(self.entry.height);
+        let mut row_offsets = self.data.get(0..(height * std::mem::size_of::<u16>()))?;
+
+        let mut pixels = vec![0; width * height];
+        for y in 0..height {
+            let row_offset = usize::from(row_offsets.read_u16::<byteorder::LittleEndian>().ok()?);
+            let mut data = self.data.get(row_offset..)?;
+
+            loop {
+                let (pixel_count, end) = {
+                    let byte = data.read_u8().ok()?;
+                    (byte & 0b0111_1111, (byte & 0b1000_0000) != 0)
+                };
+                let x = usize::from(data.read_u8().ok()?);
+
+                let pixel_buffer = {
+                    let index = (y * width) + x;
+                    pixels.get_mut(index..(index + usize::from(pixel_count)))?
+                };
+                data.read_exact(pixel_buffer).ok()?;
+
+                if end {
+                    break;
+                }
+            }
+        }
+
+        Some(pixels)
+    }
+}
+
+pub enum EntryData<'a> {
     Uncompressed(&'a [u8]),
-    Compressed(Vec<u8>),
+    Compressed(CompressedSpriteData<'a>),
 }
 
 #[binrw::binrw]
@@ -138,58 +180,19 @@ impl Archive {
         self.data.extend(&encoded_sprite.data);
     }
 
-    pub fn decode_sprite(&self, entry: &Entry) -> Option<Vec<u8>> {
-        use byteorder::ReadBytesExt as _;
-        use std::io::Read as _;
-
-        assert!(entry.flags & ENTRY_FLAG_COMPRESSED != 0);
-
-        let width = usize::from(entry.width);
-        let height = usize::from(entry.height);
-        let data_index = usize::try_from(entry.data_offset).ok()?;
-        let mut row_offsets = {
-            let size = height * std::mem::size_of::<u16>();
-            self.data.get(data_index..(data_index + size))?
-        };
-
-        let mut pixels = vec![0; width * height];
-        for y in 0..height {
-            let row_offset = usize::from(row_offsets.read_u16::<byteorder::LittleEndian>().ok()?);
-            let mut data = self.data.get(data_index + row_offset..)?;
-
-            loop {
-                let (pixel_count, end) = {
-                    let byte = data.read_u8().ok()?;
-                    (byte & 0b0111_1111, (byte & 0b1000_0000) != 0)
-                };
-                let x = usize::from(data.read_u8().ok()?);
-
-                let pixel_buffer = {
-                    let index = (y * width) + x;
-                    pixels.get_mut(index..(index + usize::from(pixel_count)))?
-                };
-                data.read_exact(pixel_buffer).ok()?;
-
-                if end {
-                    break;
-                }
-            }
-        }
-
-        Some(pixels)
-    }
-
     pub fn entries(&self) -> &[Entry] {
         &self.entries
     }
 
-    pub fn get_pixels(&'_ self, entry: &Entry) -> Option<Pixels<'_>> {
+    pub fn get_entry_data<'a>(&'a self, entry: &'a Entry) -> Option<EntryData<'a>> {
         if entry.flags & ENTRY_FLAG_COMPRESSED != 0 {
-            Some(Pixels::Compressed(self.decode_sprite(entry)?))
+            let data_index = usize::try_from(entry.data_offset).ok()?;
+            let data = self.data.get(data_index..)?;
+            Some(EntryData::Compressed(CompressedSpriteData { entry, data }))
         } else if entry.flags & ENTRY_FLAG_PALETTE == 0 {
             let index = usize::try_from(entry.data_offset).ok()?;
             let data_size = usize::from(entry.width * entry.height);
-            Some(Pixels::Uncompressed(self.data.get(index..(index + data_size))?))
+            Some(EntryData::Uncompressed(self.data.get(index..(index + data_size))?))
         } else {
             None
         }
