@@ -1,21 +1,21 @@
-use crate::drawing;
 use crate::drawing::blit;
 use crate::sprite_cache;
 use make_track::track_desc::{MetalSupport, TrackSectionMetalSupports};
 use openrct2::supports::{MetalSupportType, SupportPosition};
+use rct::world_coords::Coords;
 use renderer::image::Image;
 use strum::EnumCount as _;
 
-static POSITION_COORD_OFFSETS: [[i16; 3]; SupportPosition::COUNT] = [
-    [4, 4, 0],
-    [28, 4, 0],
-    [4, 28, 0],
-    [28, 28, 0],
-    [16, 16, 0],
-    [16, 4, 0],
-    [4, 16, 0],
-    [28, 16, 0],
-    [16, 28, 0],
+static POSITION_COORD_OFFSETS: [Coords; SupportPosition::COUNT] = [
+    Coords::new(4, 4, 0),
+    Coords::new(28, 4, 0),
+    Coords::new(4, 28, 0),
+    Coords::new(28, 28, 0),
+    Coords::new(16, 16, 0),
+    Coords::new(16, 4, 0),
+    Coords::new(4, 16, 0),
+    Coords::new(28, 16, 0),
+    Coords::new(16, 28, 0),
 ];
 
 #[derive(Clone, Copy, strum::EnumCount)]
@@ -78,13 +78,13 @@ static SUPPORT_TYPE_SPRITE_INDICES: [SpriteIndices; SupportGraphicType::COUNT] =
 
 fn draw_support_segments(
     buffer: &mut Image,
-    coords: &mut [i16; 3],
+    coords: &mut Coords,
     colour: openrct2::colour::Colour,
-    mut height_remaining: i16,
+    mut height_remaining: i32,
     sprite_index: u32,
     sprites: &mut sprite_cache::SpriteCache,
 ) {
-    const MAX_SEGMENT_HEIGHT: i16 = 16;
+    const MAX_SEGMENT_HEIGHT: i32 = 16;
     while height_remaining > 0 {
         let segment_height = std::cmp::min(height_remaining, MAX_SEGMENT_HEIGHT);
         let sprite_index = sprite_index + segment_height as u32 - 1;
@@ -94,26 +94,26 @@ fn draw_support_segments(
         }
 
         height_remaining -= segment_height;
-        coords[2] += segment_height;
+        coords.z += segment_height;
     }
 }
 
 fn draw_support(
     buffer: &mut Image,
-    coords: &[i16; 3],
+    coords: &Coords,
     support: &MetalSupport,
     rotation: usize,
     colour: openrct2::colour::Colour,
     support_type: MetalSupportType,
     sprites: &mut sprite_cache::SpriteCache,
 ) {
-    const SUPPORT_START_HEIGHT: i16 = -32;
-    let mut height_remaining = coords[2] + i16::from(support.height) - SUPPORT_START_HEIGHT;
+    const SUPPORT_START_HEIGHT: i32 = -32;
+    let mut height_remaining = coords.z + i32::from(support.height) - SUPPORT_START_HEIGHT;
 
-    let mut coords = drawing::rotate_coords(coords, rotation);
+    let mut coords = coords.rotate(rotation);
     let position = support.position.rotate(rotation);
-    coords = drawing::add_coords(&coords, &POSITION_COORD_OFFSETS[position as usize]);
-    coords[2] = SUPPORT_START_HEIGHT;
+    coords = coords + POSITION_COORD_OFFSETS[position as usize];
+    coords.z = SUPPORT_START_HEIGHT;
 
     let support_type = rotate_support_type(support_type, (rotation + usize::from(support.rotation)) % 4);
     let sprite_indices = &SUPPORT_TYPE_SPRITE_INDICES[support_type as usize];
@@ -123,7 +123,7 @@ fn draw_support(
             blit::draw_indexed_image(buffer, sprite, &coords, colour, colour);
         }
         height_remaining -= 6;
-        coords[2] += 6;
+        coords.z += 6;
     }
 
     draw_support_segments(
@@ -135,10 +135,10 @@ fn draw_support(
         sprites,
     );
 
-    height_remaining = support.extra_heights[rotation % 4];
+    height_remaining = i32::from(support.extra_heights[rotation % 4]);
     let sprite_index = if height_remaining < 0 {
         height_remaining = height_remaining.abs();
-        coords[2] -= 1;
+        coords.z -= 1;
         sprite_indices.beam_capped
     } else {
         sprite_indices.beam
@@ -158,14 +158,14 @@ pub fn draw_supports(
     let mut tile_indices: heapless::Vec<_, { make_track::track_sections::MAX_TILE_COUNT }> =
         (0..track_section.tiles.len()).collect();
     tile_indices.sort_by_key(|i| {
-        let coords = drawing::rotate_coords(&track_section.tiles[*i], rotation);
-        coords[0] + coords[1]
+        let coords = Coords::from(track_section.tiles[*i]).rotate(rotation);
+        coords.x + coords.y
     });
 
     for tile_index in tile_indices {
         if let Some(support) = &supports[tile_index] {
-            let coords = &track_section.tiles[tile_index];
-            draw_support(buffer, coords, support, rotation, colour, support_type, sprites);
+            let coords = Coords::from(track_section.tiles[tile_index]);
+            draw_support(buffer, &coords, support, rotation, colour, support_type, sprites);
         }
     }
 }

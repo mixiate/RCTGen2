@@ -1,25 +1,19 @@
 use openrct2::colour::Colour;
+use rct::screen_coords::ScreenCoords;
+use rct::world_coords::Coords;
 use renderer::image::{Image, IndexedImage};
 
-fn coords_to_screen_space(coordinates: &[i16; 3]) -> [i32; 2] {
-    let [x, y, z] = coordinates;
-    let offset_x = x - y;
-    let offset_y = (-(x + y) / 2) + z;
-    [(-offset_x).into(), (-offset_y).into()]
-}
-
 fn clip_image_to_buffer(
+    position: &ScreenCoords,
     dest_width: usize,
     dest_height: usize,
     dest_offset: glam::IVec2,
     src_width: u16,
     src_height: u16,
     src_offset: glam::IVec2,
-    coords: &[i16; 3],
 ) -> (i32, i32, i32, i32, i32, i32) {
-    let position = coords_to_screen_space(coords);
-    let dest_x = dest_offset.x + position[0] + src_offset.x;
-    let dest_y = dest_offset.y + position[1] + src_offset.y;
+    let dest_x = dest_offset.x + position.x + src_offset.x;
+    let dest_y = dest_offset.y + position.y + src_offset.y;
 
     let src_x = -std::cmp::min(dest_x, 0);
     let src_y = -std::cmp::min(dest_y, 0);
@@ -34,15 +28,15 @@ fn clip_image_to_buffer(
     (dest_x, dest_y, src_x, src_y, width, height)
 }
 
-pub fn draw_image(buffer: &mut Image, image: &Image, coords: &[i16; 3]) {
+pub fn draw_image(buffer: &mut Image, image: &Image, coords: &Coords) {
     let (dest_x, dest_y, src_x, src_y, width, height) = clip_image_to_buffer(
+        &ScreenCoords::from(coords),
         buffer.width(),
         buffer.height(),
         buffer.offset,
         image.width() as u16,
         image.height() as u16,
         image.offset,
-        coords,
     );
     for y in 0..height {
         for x in 0..width {
@@ -57,18 +51,18 @@ pub fn draw_image(buffer: &mut Image, image: &Image, coords: &[i16; 3]) {
 pub fn draw_indexed_image(
     buffer: &mut Image,
     image: &IndexedImage,
-    coords: &[i16; 3],
+    coords: &Coords,
     colour_1: Colour,
     colour_2: Colour,
 ) {
     let (dest_x, dest_y, src_x, src_y, width, height) = clip_image_to_buffer(
+        &ScreenCoords::from(coords),
         buffer.width(),
         buffer.height(),
         buffer.offset,
         image.width(),
         image.height(),
         image.offset,
-        coords,
     );
     for y in 0..height {
         for x in 0..width {

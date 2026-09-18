@@ -1,5 +1,5 @@
-use crate::drawing;
 use crate::drawing::blit;
+use rct::world_coords::Coords;
 
 pub fn new_tile_grid_image() -> renderer::image::IndexedImage {
     let tile_grid_image = include_bytes!("../../resources/tile_grid.png");
@@ -27,7 +27,7 @@ pub fn draw_grid(
             } else {
                 openrct2::colour::Colour::White
             };
-            let coords = drawing::rotate_coords(&[x, y, z], rotation);
+            let coords = Coords::new(x.into(), y.into(), z.into()).rotate(rotation);
             blit::draw_indexed_image(image, tile_grid_image, &coords, colour, colour);
         }
     }

@@ -5,6 +5,7 @@ use crate::track_editor::adjacent_track;
 use crate::track_editor::render::TrackImage;
 use make_track::track_desc;
 use make_track::track_desc::TrackSectionSprites;
+use rct::world_coords::Coords;
 use renderer::image::Image;
 
 pub struct Options {
@@ -37,10 +38,10 @@ enum DrawOrder {
     After,
 }
 
-fn compare_coords(coords: &[i16; 3], draw_order: DrawOrder) -> bool {
+fn compare_coords(coords: &Coords, draw_order: DrawOrder) -> bool {
     match draw_order {
-        DrawOrder::Before => coords[0] + coords[1] < 0 || (coords[0] + coords[1] == 0 && coords[2] <= 0),
-        DrawOrder::After => coords[0] + coords[1] > 0 || (coords[0] + coords[1] == 0 && coords[2] >= 0),
+        DrawOrder::Before => coords.x + coords.y < 0 || (coords.x + coords.y == 0 && coords.z <= 0),
+        DrawOrder::After => coords.x + coords.y > 0 || (coords.x + coords.y == 0 && coords.z >= 0),
     }
 }
 
@@ -62,10 +63,10 @@ fn draw_adjacent_track_section(
         let sprite_rotation = (track_image.rotation + usize::from(*rotation)) % 4;
 
         for (tile_coords, track_sprites) in track_section.tiles.iter().zip(track_sprites.iter()) {
-            let tile_coords = drawing::rotate_coords(tile_coords, (*rotation).into());
-            let coords = drawing::rotate_coords(&drawing::add_coords(coords, &tile_coords), track_image.rotation);
+            let tile_coords = Coords::from(tile_coords).rotate(usize::from(*rotation));
+            let coords = (Coords::from(coords) + tile_coords).rotate(track_image.rotation);
             for sprite in &track_sprites[sprite_rotation] {
-                let coords = drawing::add_coords(&coords, &sprite.offset);
+                let coords = coords + Coords::from(sprite.offset);
                 if !compare_coords(&coords, draw_order) {
                     continue;
                 }
@@ -86,9 +87,9 @@ fn draw_original_track_section(
     buffer: &mut Image,
 ) {
     for (tile_coords, track_sprites) in track_section.tiles.iter().zip(track_sprites.iter()) {
-        let coords = drawing::rotate_coords(tile_coords, rotation);
+        let coords = Coords::from(tile_coords).rotate(rotation);
         for sprite in &track_sprites[rotation] {
-            let coords = drawing::add_coords(&coords, &sprite.offset);
+            let coords = coords + Coords::from(sprite.offset);
             if let Some(sprite) = sprites.get(sprite.index) {
                 blit::draw_indexed_image(buffer, sprite, &coords, options.colours[0], options.colours[1]);
             }
@@ -134,12 +135,16 @@ fn draw_with_adjacent_sprites(
         blit::draw_indexed_image(
             buffer,
             &track_image.images.indexed,
-            &[0, 0, z_offset],
+            &Coords::new(0, 0, z_offset.into()),
             options.colours[0],
             options.colours[1],
         );
     } else {
-        blit::draw_image(buffer, &track_image.images.unindexed, &[0, 0, z_offset]);
+        blit::draw_image(
+            buffer,
+            &track_image.images.unindexed,
+            &Coords::new(0, 0, z_offset.into()),
+        );
     }
     draw_adjacent_track_section(
         track_image,
@@ -205,11 +210,15 @@ pub fn draw_track(
         blit::draw_indexed_image(
             buffer,
             &track_image.images.indexed,
-            &[0, 0, z_offset],
+            &Coords::new(0, 0, z_offset.into()),
             options.colours[0],
             options.colours[1],
         );
     } else {
-        blit::draw_image(buffer, &track_image.images.unindexed, &[0, 0, z_offset]);
+        blit::draw_image(
+            buffer,
+            &track_image.images.unindexed,
+            &Coords::new(0, 0, z_offset.into()),
+        );
     }
 }
