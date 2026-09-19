@@ -16,7 +16,7 @@ pub struct Viewport {
     pub track_image: Option<track_editor::TrackImage>,
     back_buffer: egui::TextureHandle,
     back_buffer_image: renderer::image::Image,
-    tile_grid_image: renderer::image::IndexedImage,
+    grid_images: drawing::grid::GridImages,
     colour_buttons: [ColourPicker; 3],
 }
 
@@ -37,7 +37,7 @@ impl Viewport {
             track_image: None,
             back_buffer,
             back_buffer_image,
-            tile_grid_image: drawing::grid::new_tile_grid_image(),
+            grid_images: drawing::grid::GridImages::new(),
             colour_buttons: [ColourPicker::new(), ColourPicker::new(), ColourPicker::new()],
         }
     }
@@ -77,7 +77,7 @@ impl Viewport {
                 };
                 drawing::grid::draw_grid(
                     &mut self.back_buffer_image,
-                    &self.tile_grid_image,
+                    &self.grid_images,
                     7,
                     if self.drawing_options.supports { -32 } else { 0 },
                     self.rotation,
