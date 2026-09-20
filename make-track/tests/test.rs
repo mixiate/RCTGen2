@@ -5,17 +5,13 @@ fn test_make_track(track_name: &str, pixel_diff_tolerance: usize) {
 
     let track_description_directory = test_files_directory.join("src").join(track_name);
     let track_description_file_path = track_description_directory.join("track").with_extension("json");
+    let track_directory = track_description_file_path.parent().unwrap();
+    let track = make_track::track_desc::Desc::load(&track_description_file_path).unwrap();
 
     let output_directory = tempfile::tempdir().unwrap();
     let expected_directory = test_files_directory.join("output").join(track_name);
 
-    make_track::make_track(
-        &data_directory,
-        &track_description_file_path,
-        output_directory.path(),
-        false,
-    )
-    .unwrap();
+    make_track::make_track(&data_directory, &track, track_directory, output_directory.path(), false).unwrap();
 
     let output_sprites_directory = output_directory.path().join("track").join(track_name);
     let expected_sprites_directory = expected_directory.join("track").join(track_name);

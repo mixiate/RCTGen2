@@ -24,13 +24,21 @@ fn main() -> anyhow::Result<()> {
         .track_description_file_path
         .canonicalize()
         .with_context(|| format!("Invalid file path {}", cli.track_description_file_path.display()))?;
+    let track_directory = track_description_file_path.parent().with_context(|| {
+        format!(
+            "Could not get parent directory of {}",
+            track_description_file_path.display()
+        )
+    })?;
+    let track = make_track::track_desc::Desc::load(&track_description_file_path)?;
 
     let output_directory = std::path::absolute(&cli.output_directory)
         .with_context(|| format!("Invalid file path {}", cli.output_directory.display()))?;
 
     make_track::make_track(
         &data_directory,
-        &track_description_file_path,
+        &track,
+        track_directory,
         &output_directory,
         cli.skip_empty_sprites,
     )?;

@@ -714,25 +714,15 @@ fn output_sprites_json(sprites: Vec<TrackSectionSprites>, output_directory: &std
 
 pub fn make_track(
     data_directory: &std::path::Path,
-    track_description_file_path: &std::path::Path,
+    track: &track_desc::Desc,
+    track_directory: &std::path::Path,
     output_directory: &std::path::Path,
     skip_empty_sprites: bool,
 ) -> anyhow::Result<()> {
-    use anyhow::Context as _;
-
-    let desc = track_desc::Desc::load(track_description_file_path)?;
-
-    let base_directory = track_description_file_path.parent().with_context(|| {
-        format!(
-            "Could not get parent directory of {}",
-            track_description_file_path.display()
-        )
-    })?;
-
     let sprites = render(
-        &desc,
+        track,
         data_directory,
-        base_directory,
+        track_directory,
         output_directory,
         skip_empty_sprites,
     )?;
