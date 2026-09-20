@@ -64,7 +64,7 @@ impl Viewport {
                 .max_by(|a, b| a[2].cmp(&b[2]))
                 .map(|x| i32::from(x[2]))
                 .unwrap_or(0);
-            self.back_buffer_image.offset.y = (self.back_buffer_image.height() as i32 / 2) + (max_tile_height / 2);
+            self.back_buffer_image.offset.y = (self.back_buffer_image.height() as i32 / 2) + (max_tile_height / 2) - 16;
 
             self.back_buffer_image.pixels_mut().fill(0);
 
