@@ -1,6 +1,5 @@
 use crate::drawing;
 use crate::drawing::blit;
-use crate::sprite_cache;
 use crate::track_editor::adjacent_track;
 use crate::track_editor::render::TrackImage;
 use make_track::track_desc;
@@ -48,7 +47,7 @@ fn compare_coords(coords: &Coords, draw_order: DrawOrder) -> bool {
 fn draw_adjacent_track_section(
     track_image: &TrackImage,
     options: &Options,
-    sprites: &mut sprite_cache::SpriteCache,
+    sprites: &rct::csg::Archive,
     adjacent_sections: &[adjacent_track::TrackSectionWithSprites],
     draw_order: DrawOrder,
     buffer: &mut Image,
@@ -70,9 +69,14 @@ fn draw_adjacent_track_section(
                 if !compare_coords(&coords, draw_order) {
                     continue;
                 }
-                if let Some(sprite) = sprites.get(sprite.index) {
-                    blit::draw_indexed_image(buffer, sprite, &coords, options.colours[0], options.colours[1]);
-                }
+                blit::draw_csg_sprite(
+                    buffer,
+                    sprites,
+                    sprite.index,
+                    &coords,
+                    options.colours[0],
+                    options.colours[1],
+                );
             }
         }
     }
@@ -81,7 +85,7 @@ fn draw_adjacent_track_section(
 fn draw_original_track_section(
     track_section: &make_track::track_sections::TrackSection,
     rotation: usize,
-    sprites: &mut sprite_cache::SpriteCache,
+    sprites: &rct::csg::Archive,
     track_sprites: &TrackSectionSprites,
     options: &Options,
     buffer: &mut Image,
@@ -90,9 +94,14 @@ fn draw_original_track_section(
         let coords = Coords::from(tile_coords).rotate(rotation);
         for sprite in &track_sprites[rotation] {
             let coords = coords + Coords::from(sprite.offset);
-            if let Some(sprite) = sprites.get(sprite.index) {
-                blit::draw_indexed_image(buffer, sprite, &coords, options.colours[0], options.colours[1]);
-            }
+            blit::draw_csg_sprite(
+                buffer,
+                sprites,
+                sprite.index,
+                &coords,
+                options.colours[0],
+                options.colours[1],
+            );
         }
     }
 }
@@ -102,7 +111,7 @@ fn draw_with_adjacent_sprites(
     z_offset: i16,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-    sprites: &mut sprite_cache::SpriteCache,
+    rct2_sprites: &rct::csg::Archive,
     track_desc_sprites: &indexmap::IndexMap<String, TrackSectionSprites>,
     buffer: &mut Image,
 ) {
@@ -115,7 +124,7 @@ fn draw_with_adjacent_sprites(
     draw_adjacent_track_section(
         track_image,
         options,
-        sprites,
+        rct2_sprites,
         &adjacent_sections,
         DrawOrder::Before,
         buffer,
@@ -126,7 +135,7 @@ fn draw_with_adjacent_sprites(
         draw_original_track_section(
             track_image.track_section,
             track_image.rotation,
-            sprites,
+            rct2_sprites,
             track_sprites,
             options,
             buffer,
@@ -149,7 +158,7 @@ fn draw_with_adjacent_sprites(
     draw_adjacent_track_section(
         track_image,
         options,
-        sprites,
+        rct2_sprites,
         &adjacent_sections,
         DrawOrder::After,
         buffer,
@@ -162,12 +171,12 @@ pub fn draw_track(
     track_image: &TrackImage,
     options: &Options,
     adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-    mut sprites: Option<&mut sprite_cache::SpriteCache>,
+    rct2_sprites: Option<&rct::csg::Archive>,
     buffer: &mut Image,
 ) {
     let z_offset = (track.z_offset - 16) as i16;
     if options.supports
-        && let Some(sprites) = sprites.as_mut()
+        && let Some(rct2_sprites) = rct2_sprites
         && let Some(metal_supports) = metal_supports
         && let Some(supports) = metal_supports.sections.get(track_image.track_section.name)
     {
@@ -178,30 +187,30 @@ pub fn draw_track(
             track_image.rotation,
             options.colours[2],
             metal_supports.support_type,
-            sprites,
+            rct2_sprites,
         );
     }
 
     if options.adjacent_track
-        && let Some(sprites) = sprites
+        && let Some(rct2_sprites) = rct2_sprites
     {
         draw_with_adjacent_sprites(
             track_image,
             z_offset,
             options,
             adjacent_track_sections,
-            sprites,
+            rct2_sprites,
             &track.original_sprites,
             buffer,
         );
     } else if options.original_track
-        && let Some(sprites) = sprites
+        && let Some(rct2_sprites) = rct2_sprites
         && let Some(track_sprites) = track.original_sprites.get(track_image.track_section.name)
     {
         draw_original_track_section(
             track_image.track_section,
             track_image.rotation,
-            sprites,
+            rct2_sprites,
             track_sprites,
             options,
             buffer,

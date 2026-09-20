@@ -1,5 +1,4 @@
 use crate::drawing;
-use crate::sprite_cache;
 use crate::track_editor;
 use crate::track_editor::adjacent_track;
 use crate::ui::widgets::colour_picker;
@@ -54,7 +53,7 @@ impl Viewport {
         track: &track_desc::Track,
         metal_supports: Option<&track_desc::MetalSupports>,
         adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
-        rct2_sprites: Option<&mut sprite_cache::SpriteCache>,
+        rct2_sprites: Option<&rct::csg::Archive>,
         ui_zoom_factor: f32,
     ) {
         if let Some(track_image) = &self.track_image {

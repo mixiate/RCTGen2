@@ -7,7 +7,6 @@ mod viewport;
 pub use track::Track;
 
 use crate::settings;
-use crate::sprite_cache;
 use crate::ui;
 use crate::ui::modals;
 use crate::ui::panels;
@@ -106,7 +105,7 @@ impl TrackEditor {
     pub fn logic(
         &mut self,
         egui_context: &egui::Context,
-        rct2_sprites: Option<&mut sprite_cache::SpriteCache>,
+        rct2_sprites: Option<&rct::csg::Archive>,
         errors: &mut Vec<String>,
     ) {
         use bitflags::Flags as _;

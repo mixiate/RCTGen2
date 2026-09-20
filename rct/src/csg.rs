@@ -82,24 +82,30 @@ impl EncodedSprite {
 }
 
 pub struct CompressedSpriteData<'a> {
-    entry: &'a Entry,
+    pub entry: &'a Entry,
     data: &'a [u8],
 }
 
 impl CompressedSpriteData<'_> {
+    pub fn get_row_data(&self, y: usize) -> Option<&[u8]> {
+        let row_index = {
+            let offset_size = std::mem::size_of::<u16>();
+            let index = y * offset_size;
+            u16::from_le_bytes(self.data.get(index..(index + offset_size))?.try_into().ok()?)
+        };
+        self.data.get(usize::from(row_index)..)
+    }
+
     pub fn decompress(&self) -> Option<Vec<u8>> {
         use byteorder::ReadBytesExt as _;
         use std::io::Read as _;
 
         let width = usize::from(self.entry.width);
         let height = usize::from(self.entry.height);
-        let mut row_offsets = self.data.get(0..(height * std::mem::size_of::<u16>()))?;
 
         let mut pixels = vec![0; width * height];
         for y in 0..height {
-            let row_offset = usize::from(row_offsets.read_u16::<byteorder::LittleEndian>().ok()?);
-            let mut data = self.data.get(row_offset..)?;
-
+            let mut data = self.get_row_data(y)?;
             loop {
                 let (pixel_count, end) = {
                     let byte = data.read_u8().ok()?;

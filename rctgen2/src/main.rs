@@ -3,7 +3,6 @@
 mod app;
 mod drawing;
 mod settings;
-mod sprite_cache;
 mod start_screen;
 mod track_editor;
 mod ui;

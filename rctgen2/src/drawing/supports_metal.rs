@@ -1,5 +1,4 @@
 use crate::drawing::blit;
-use crate::sprite_cache;
 use make_track::track_desc::{MetalSupport, TrackSectionMetalSupports};
 use openrct2::supports::{MetalSupportType, SupportPosition};
 use rct::world_coords::Coords;
@@ -82,16 +81,14 @@ fn draw_support_segments(
     colour: openrct2::colour::Colour,
     mut height_remaining: i32,
     sprite_index: u32,
-    sprites: &mut sprite_cache::SpriteCache,
+    sprites: &rct::csg::Archive,
 ) {
     const MAX_SEGMENT_HEIGHT: i32 = 16;
     while height_remaining > 0 {
         let segment_height = std::cmp::min(height_remaining, MAX_SEGMENT_HEIGHT);
         let sprite_index = sprite_index + segment_height as u32 - 1;
 
-        if let Some(sprite) = sprites.get(sprite_index) {
-            blit::draw_indexed_image(buffer, sprite, coords, colour, colour);
-        }
+        blit::draw_csg_sprite(buffer, sprites, sprite_index, coords, colour, colour);
 
         height_remaining -= segment_height;
         coords.z += segment_height;
@@ -105,7 +102,7 @@ fn draw_support(
     rotation: usize,
     colour: openrct2::colour::Colour,
     support_type: MetalSupportType,
-    sprites: &mut sprite_cache::SpriteCache,
+    sprites: &rct::csg::Archive,
 ) {
     const SUPPORT_START_HEIGHT: i32 = -32;
     let mut height_remaining = coords.z + i32::from(support.height) - SUPPORT_START_HEIGHT;
@@ -119,9 +116,7 @@ fn draw_support(
     let sprite_indices = &SUPPORT_TYPE_SPRITE_INDICES[support_type as usize];
 
     if let Some(base_index) = sprite_indices.base {
-        if let Some(sprite) = sprites.get(base_index) {
-            blit::draw_indexed_image(buffer, sprite, &coords, colour, colour);
-        }
+        blit::draw_csg_sprite(buffer, sprites, base_index, &coords, colour, colour);
         height_remaining -= 6;
         coords.z += 6;
     }
@@ -153,7 +148,7 @@ pub fn draw_supports(
     rotation: usize,
     colour: openrct2::colour::Colour,
     support_type: MetalSupportType,
-    sprites: &mut sprite_cache::SpriteCache,
+    sprites: &rct::csg::Archive,
 ) {
     let mut tile_indices: heapless::Vec<_, { make_track::track_sections::MAX_TILE_COUNT }> =
         (0..track_section.tiles.len()).collect();

@@ -1,5 +1,4 @@
 use crate::settings;
-use crate::sprite_cache;
 use crate::start_screen;
 use crate::track_editor;
 use eframe::egui;
@@ -13,7 +12,7 @@ pub struct RctGen2App {
     data_directory: std::path::PathBuf,
     errors: Vec<String>,
     settings: settings::AppSettings,
-    rct2_sprites: Option<sprite_cache::SpriteCache>,
+    rct2_sprites: Option<rct::csg::Archive>,
     state: State,
 }
 
@@ -24,10 +23,10 @@ impl RctGen2App {
         let settings = settings::AppSettings::new(config_dir);
 
         let rct2_sprites = if let Some(g1_dat_path) = &settings.settings.g1_dat_path {
-            match sprite_cache::SpriteCache::try_new(g1_dat_path) {
-                Ok(sprites) => Some(sprites),
+            match rct::csg::Archive::load(g1_dat_path) {
+                Ok(archive) => Some(archive),
                 Err(error) => {
-                    errors.extend(error.chain().map(|x| x.to_string()));
+                    errors.push(error.to_string());
                     None
                 }
             }
@@ -48,7 +47,7 @@ impl RctGen2App {
 impl eframe::App for RctGen2App {
     fn logic(&mut self, context: &egui::Context, _frame: &mut eframe::Frame) {
         if let State::TrackEditor(track_editor) = &mut self.state {
-            track_editor.logic(context, self.rct2_sprites.as_mut(), &mut self.errors);
+            track_editor.logic(context, self.rct2_sprites.as_ref(), &mut self.errors);
         }
     }
 
@@ -65,9 +64,9 @@ impl eframe::App for RctGen2App {
 
         if self.settings.window(ui) {
             if let Some(g1_dat_path) = &self.settings.settings.g1_dat_path {
-                match sprite_cache::SpriteCache::try_new(g1_dat_path) {
-                    Ok(sprites) => self.rct2_sprites = Some(sprites),
-                    Err(error) => self.errors.extend(error.chain().map(|x| x.to_string())),
+                match rct::csg::Archive::load(g1_dat_path) {
+                    Ok(archive) => self.rct2_sprites = Some(archive),
+                    Err(error) => self.errors.push(error.to_string()),
                 }
             }
             if let Err(error) = self.settings.save() {
