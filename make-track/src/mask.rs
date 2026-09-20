@@ -154,7 +154,6 @@ impl Sprite {
     }
 }
 
-#[derive(Default)]
 pub struct View {
     image: MaskImage,
     mirror: bool,
