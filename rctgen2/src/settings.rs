@@ -32,6 +32,8 @@ impl RecentFiles {
 #[derive(Default, serde::Deserialize, serde::Serialize)]
 pub struct Settings {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_export_directory: Option<std::path::PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub g1_dat_path: Option<std::path::PathBuf>,
     #[serde(default, skip_serializing_if = "RecentFiles::is_empty")]
     pub recent_track_files: RecentFiles,
@@ -91,8 +93,25 @@ impl AppSettings {
                 frame.inner_margin = egui::Margin::same(24);
 
                 egui::CentralPanel::default().frame(frame).show(ui, |ui| {
-                    ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| {
-                        ui.label("g1.dat path:");
+                    egui::Grid::new("Settings Grid").min_col_width(0.0).show(ui, |ui| {
+                        let path_text_size = egui::Vec2::new(450.0, ui.available_size().y);
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.label("Export Directory");
+                        });
+                        if ui.add(egui::Button::new("📁")).clicked() {
+                            let file_result = rfd::FileDialog::new().pick_folder();
+                            if let Some(file_path) = file_result {
+                                self.settings.track_export_directory = Some(file_path);
+                                changed = true;
+                            }
+                        }
+                        path_buf_text(ui, self.settings.track_export_directory.as_ref(), path_text_size);
+                        ui.end_row();
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.label("g1.dat Path");
+                        });
                         if ui.add(egui::Button::new("📁")).clicked() {
                             let file_result = rfd::FileDialog::new().add_filter("dat", &["dat"]).pick_file();
                             if let Some(file_path) = file_result {
@@ -100,15 +119,20 @@ impl AppSettings {
                                 changed = true;
                             }
                         }
-                        if let Some(g1_dat_path) = &self.settings.g1_dat_path
-                            && let Some(mut g1_dat_path) = g1_dat_path.to_str()
-                        {
-                            ui.add_sized(ui.available_size(), egui::TextEdit::singleline(&mut g1_dat_path));
-                        }
+                        path_buf_text(ui, self.settings.g1_dat_path.as_ref(), path_text_size);
+                        ui.end_row();
                     });
                 });
             });
 
         changed
+    }
+}
+
+fn path_buf_text(ui: &mut egui::Ui, path: Option<&std::path::PathBuf>, size: egui::Vec2) {
+    if let Some(path) = path
+        && let Some(mut path) = path.to_str()
+    {
+        ui.add_sized(size, egui::TextEdit::singleline(&mut path));
     }
 }
