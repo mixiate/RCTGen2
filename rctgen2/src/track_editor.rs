@@ -42,6 +42,7 @@ bitflags::bitflags! {
 
 pub enum Action {
     Open(std::path::PathBuf),
+    Save,
     Export,
 }
 
@@ -160,6 +161,11 @@ impl TrackEditor {
                 }
                 Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
             },
+            Some(Action::Save) => {
+                if let Err(error) = self.track.desc.save(&self.track.file_path) {
+                    errors.extend(error.chain().map(|x| x.to_string()));
+                }
+            }
             Some(Action::Export) => {
                 if let Some(export_directory) = &settings.track_export_directory {
                     match make_track::make_track(

@@ -50,10 +50,8 @@ pub fn menu_bar(
                     });
                 });
 
-                if ui.button("Save").clicked()
-                    && let Err(error) = track.desc.save(&track.file_path)
-                {
-                    errors.extend(error.chain().map(|x| x.to_string()));
+                if ui.button("Save").clicked() {
+                    action = Some(track_editor::Action::Save);
                 }
                 ui.separator();
 
