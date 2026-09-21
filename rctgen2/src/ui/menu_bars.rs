@@ -25,16 +25,10 @@ pub fn menu_bar(
     egui::Panel::top("Tracks Menu Bar").show(ui, |ui| {
         egui::MenuBar::new().ui(ui, |ui| {
             ui.menu_button("File", |ui| {
-                if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked() {
-                    match track_editor::Track::open() {
-                        Ok(Some(new_track)) => {
-                            *track = new_track;
-                            *changes |= track_editor::Changes::LoadTrack;
-                            settings.settings.recent_track_files.add(&track.file_path);
-                        }
-                        Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
-                        _ => {}
-                    }
+                if ui.add(egui::Button::new("Open...").min_size(egui::Vec2::new(200.0, 0.0))).clicked()
+                    && let Some(file_path) = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file()
+                {
+                    action = Some(track_editor::Action::Open(file_path));
                 }
 
                 ui.scope(|ui| {
@@ -47,17 +41,7 @@ pub fn menu_bar(
                         });
                         if let Some(index) = response.inner {
                             let file_path = settings.settings.recent_track_files.get()[index].clone();
-                            match track_editor::Track::load(file_path) {
-                                Ok(new_track) => {
-                                    *track = new_track;
-                                    *changes |= track_editor::Changes::LoadTrack;
-                                    settings.settings.recent_track_files.add(&track.file_path);
-                                }
-                                Err(error) => {
-                                    settings.settings.recent_track_files.remove(index);
-                                    errors.extend(error.chain().map(|x| x.to_string()));
-                                }
-                            }
+                            action = Some(track_editor::Action::Open(file_path));
                         }
                         ui.separator();
                         if ui.button("Clear Recent Files").clicked() {

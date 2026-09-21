@@ -41,6 +41,7 @@ bitflags::bitflags! {
 }
 
 pub enum Action {
+    Open(std::path::PathBuf),
     Export,
 }
 
@@ -122,7 +123,7 @@ impl TrackEditor {
         &mut self,
         egui_context: &egui::Context,
         data_directory: &std::path::Path,
-        settings: &settings::Settings,
+        settings: &mut settings::Settings,
         rct2_sprites: Option<&rct::csg::Archive>,
         errors: &mut Vec<String>,
     ) {
@@ -147,6 +148,40 @@ impl TrackEditor {
         match self.file_watcher.check() {
             Some(file_watcher::Status::Delay(time_left)) => egui_context.request_repaint_after(time_left),
             Some(file_watcher::Status::ReloadModels) => self.changes |= Changes::LoadModels,
+            None => {}
+        }
+
+        match self.action.take() {
+            Some(Action::Open(file_path)) => match Track::load(file_path) {
+                Ok(new_track) => {
+                    self.track = new_track;
+                    self.changes |= Changes::LoadTrack;
+                    settings.recent_track_files.add(&self.track.file_path);
+                }
+                Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+            },
+            Some(Action::Export) => {
+                if let Some(export_directory) = &settings.track_export_directory {
+                    match make_track::make_track(
+                        data_directory,
+                        &self.track.desc,
+                        self.track.file_path.directory(),
+                        export_directory,
+                        self.export_settings.skip_empty_sprites,
+                    ) {
+                        Ok(_) => {
+                            if self.export_settings.build
+                                && let Some(input_path) = &settings.track_build_input_path
+                                && let Some(output_path) = &settings.track_build_output_path
+                                && let Err(error) = sprite_build::build(input_path, output_path)
+                            {
+                                errors.extend(error.chain().map(|x| x.to_string()));
+                            }
+                        }
+                        Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+                    }
+                }
+            }
             None => {}
         }
 
@@ -206,31 +241,7 @@ impl TrackEditor {
             );
         }
 
-        if let Some(Action::Export) = self.action
-            && let Some(export_directory) = &settings.track_export_directory
-        {
-            match make_track::make_track(
-                data_directory,
-                &self.track.desc,
-                self.track.file_path.directory(),
-                export_directory,
-                self.export_settings.skip_empty_sprites,
-            ) {
-                Ok(_) => {
-                    if self.export_settings.build
-                        && let Some(input_path) = &settings.track_build_input_path
-                        && let Some(output_path) = &settings.track_build_output_path
-                        && let Err(error) = sprite_build::build(input_path, output_path)
-                    {
-                        errors.extend(error.chain().map(|x| x.to_string()));
-                    }
-                }
-                Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
-            }
-        }
-
         self.changes.clear();
-        self.action = None;
     }
 
     pub fn ui(

@@ -50,7 +50,7 @@ impl eframe::App for RctGen2App {
             track_editor.logic(
                 context,
                 &self.data_directory,
-                &self.settings.settings,
+                &mut self.settings.settings,
                 self.rct2_sprites.as_ref(),
                 &mut self.errors,
             );
