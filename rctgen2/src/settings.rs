@@ -34,6 +34,10 @@ pub struct Settings {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_export_directory: Option<std::path::PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_build_input_path: Option<std::path::PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_build_output_path: Option<std::path::PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub g1_dat_path: Option<std::path::PathBuf>,
     #[serde(default, skip_serializing_if = "RecentFiles::is_empty")]
     pub recent_track_files: RecentFiles,
@@ -94,10 +98,10 @@ impl AppSettings {
 
                 egui::CentralPanel::default().frame(frame).show(ui, |ui| {
                     egui::Grid::new("Settings Grid").min_col_width(0.0).show(ui, |ui| {
-                        let path_text_size = egui::Vec2::new(450.0, ui.available_size().y);
+                        let path_text_size = egui::Vec2::new(400.0, ui.available_size().y);
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            ui.label("Export Directory");
+                            ui.label("Track Export Directory");
                         });
                         if ui.add(egui::Button::new("📁")).clicked() {
                             let file_result = rfd::FileDialog::new().pick_folder();
@@ -107,6 +111,32 @@ impl AppSettings {
                             }
                         }
                         path_buf_text(ui, self.settings.track_export_directory.as_ref(), path_text_size);
+                        ui.end_row();
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.label("Track Build Input Path");
+                        });
+                        if ui.add(egui::Button::new("📁")).clicked() {
+                            let file_result = rfd::FileDialog::new().add_filter("json", &["json"]).pick_file();
+                            if let Some(file_path) = file_result {
+                                self.settings.track_build_input_path = Some(file_path);
+                                changed = true;
+                            }
+                        }
+                        path_buf_text(ui, self.settings.track_build_input_path.as_ref(), path_text_size);
+                        ui.end_row();
+
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            ui.label("Track Build Output Path");
+                        });
+                        if ui.add(egui::Button::new("📁")).clicked() {
+                            let file_result = rfd::FileDialog::new().add_filter("dat", &["dat"]).pick_file();
+                            if let Some(file_path) = file_result {
+                                self.settings.track_build_output_path = Some(file_path);
+                                changed = true;
+                            }
+                        }
+                        path_buf_text(ui, self.settings.track_build_output_path.as_ref(), path_text_size);
                         ui.end_row();
 
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {

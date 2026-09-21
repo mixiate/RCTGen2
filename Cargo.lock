@@ -3250,6 +3250,7 @@ dependencies = [
  "rfd",
  "serde",
  "serde_json",
+ "sprite-build",
  "strum",
  "toml",
  "winresource",

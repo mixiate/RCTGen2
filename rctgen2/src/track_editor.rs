@@ -46,8 +46,10 @@ pub enum Action {
 
 #[derive(Default)]
 pub struct ExportSettings {
-    pub enabled: bool,
+    pub export_enabled: bool,
     pub skip_empty_sprites: bool,
+    pub build_enabled: bool,
+    pub build: bool,
 }
 
 pub struct TrackEditor {
@@ -120,7 +122,7 @@ impl TrackEditor {
         &mut self,
         egui_context: &egui::Context,
         data_directory: &std::path::Path,
-        settings: &settings::AppSettings,
+        settings: &settings::Settings,
         rct2_sprites: Option<&rct::csg::Archive>,
         errors: &mut Vec<String>,
     ) {
@@ -205,16 +207,26 @@ impl TrackEditor {
         }
 
         if let Some(Action::Export) = self.action
-            && let Some(export_directory) = &settings.settings.track_export_directory
-            && let Err(error) = make_track::make_track(
+            && let Some(export_directory) = &settings.track_export_directory
+        {
+            match make_track::make_track(
                 data_directory,
                 &self.track.desc,
                 self.track.file_path.directory(),
                 export_directory,
                 self.export_settings.skip_empty_sprites,
-            )
-        {
-            errors.extend(error.chain().map(|x| x.to_string()));
+            ) {
+                Ok(_) => {
+                    if self.export_settings.build
+                        && let Some(input_path) = &settings.track_build_input_path
+                        && let Some(output_path) = &settings.track_build_output_path
+                        && let Err(error) = sprite_build::build(input_path, output_path)
+                    {
+                        errors.extend(error.chain().map(|x| x.to_string()));
+                    }
+                }
+                Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+            }
         }
 
         self.changes.clear();
@@ -228,7 +240,9 @@ impl TrackEditor {
         rct2_sprites_loaded: bool,
         errors: &mut Vec<String>,
     ) {
-        self.export_settings.enabled = settings.settings.track_export_directory.is_some();
+        self.export_settings.export_enabled = settings.settings.track_export_directory.is_some();
+        self.export_settings.build_enabled =
+            settings.settings.track_build_input_path.is_some() && settings.settings.track_build_output_path.is_some();
         self.action = ui::menu_bars::menu_bar(
             ui,
             &mut self.track,

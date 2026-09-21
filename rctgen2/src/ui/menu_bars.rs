@@ -106,8 +106,6 @@ pub fn menu_bar(
                     ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
                 }
             });
-
-            ui.add_space(50.0);
             ui.separator();
 
             {
@@ -142,13 +140,17 @@ pub fn menu_bar(
             }
             ui.separator();
 
-            if ui.add_enabled(export_settings.enabled, egui::Button::new("Export")).clicked() {
+            if ui.add_enabled(export_settings.export_enabled, egui::Button::new("Export")).clicked() {
                 action = Some(track_editor::Action::Export);
             }
             {
                 let checkbox = egui::Checkbox::new(&mut export_settings.skip_empty_sprites, "Skip Empty");
-                ui.add_enabled(export_settings.enabled, checkbox);
+                ui.add_enabled(export_settings.export_enabled, checkbox);
             }
+            ui.add_enabled(
+                export_settings.build_enabled,
+                egui::Checkbox::new(&mut export_settings.build, "Build"),
+            );
             ui.separator();
         });
     });
