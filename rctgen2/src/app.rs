@@ -47,7 +47,13 @@ impl RctGen2App {
 impl eframe::App for RctGen2App {
     fn logic(&mut self, context: &egui::Context, _frame: &mut eframe::Frame) {
         if let State::TrackEditor(track_editor) = &mut self.state {
-            track_editor.logic(context, self.rct2_sprites.as_ref(), &mut self.errors);
+            track_editor.logic(
+                context,
+                &self.data_directory,
+                &self.settings,
+                self.rct2_sprites.as_ref(),
+                &mut self.errors,
+            );
         }
     }
 

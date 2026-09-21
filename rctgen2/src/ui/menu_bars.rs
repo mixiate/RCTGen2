@@ -16,10 +16,12 @@ pub fn menu_bar(
     ui: &mut egui::Ui,
     track: &mut track_editor::Track,
     current_track_section: &mut &TrackSection,
+    export_settings: &mut track_editor::ExportSettings,
     settings: &mut settings::AppSettings,
     changes: &mut track_editor::Changes,
     errors: &mut Vec<String>,
-) {
+) -> Option<track_editor::Action> {
+    let mut action = None;
     egui::Panel::top("Tracks Menu Bar").show(ui, |ui| {
         egui::MenuBar::new().ui(ui, |ui| {
             ui.menu_button("File", |ui| {
@@ -105,7 +107,7 @@ pub fn menu_bar(
                 }
             });
 
-            ui.add_space(100.0);
+            ui.add_space(50.0);
             ui.separator();
 
             {
@@ -139,6 +141,16 @@ pub fn menu_bar(
                 *changes |= track_editor::Changes::UpdateModel;
             }
             ui.separator();
+
+            if ui.add_enabled(export_settings.enabled, egui::Button::new("Export")).clicked() {
+                action = Some(track_editor::Action::Export);
+            }
+            {
+                let checkbox = egui::Checkbox::new(&mut export_settings.skip_empty_sprites, "Skip Empty");
+                ui.add_enabled(export_settings.enabled, checkbox);
+            }
+            ui.separator();
         });
     });
+    action
 }
