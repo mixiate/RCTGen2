@@ -22,21 +22,18 @@ pub enum TrackEditorMessage {
 }
 
 bitflags::bitflags! {
-    #[derive(Clone, Copy, Default)]
-    pub struct Changes: u32 {
-        const Directory = 1 << 0;
-        const ModelSettings = 1 << 1;
-        const LoadModels = 1 << 2;
-        const Masks = 1 << 3;
-        const Offsets = 1 << 4;
-        const UpdateModel = 1 << 5;
-        const Render = 1 << 6;
-        const ClearImage = 1 << 7;
-        const Redraw = 1 << 8;
-
-        const LoadTrack = Self::Directory.bits() | Self::ModelSettings.bits() | Self::LoadModels.bits()
-            | Self::Masks.bits() | Self::Offsets.bits() | Self::ClearImage.bits();
-        const ChangeSubTrack = Self::ModelSettings.bits() | Self::LoadModels.bits() | Self::Masks.bits();
+    #[derive(Clone, Copy, Default, PartialEq)]
+    pub struct TrackChanges: u32 {
+        const TrackName = 1 << 0;
+        const ZOffset = 1 << 1;
+        const Masks = 1 << 2;
+        const ModelSettings = 1 << 3;
+        const Models = 1 << 4;
+        const OriginalSprites = 1 << 5;
+        const Offsets = 1 << 6;
+        const Lights = 1 << 7;
+        const MetalSupports = 1 << 8;
+        const RenderSettings = 1 << 9;
     }
 }
 
@@ -74,10 +71,11 @@ pub struct TrackEditor {
     render_tx: Sender<RenderMessage>,
     track_image: SharedTrackImage,
     track: Track,
-    changes: Changes,
+    changes: TrackChanges,
     action: Option<Action>,
     save_status: Option<SaveStatus>,
     export_settings: ExportSettings,
+    redraw: bool,
     side_panel_tab: Option<panels::SidePanelTab>,
     track_section: &'static make_track::track_sections::TrackSection,
     colour_button_textures: Vec<widgets::colour_picker::ButtonTextures>,
@@ -102,7 +100,10 @@ impl TrackEditor {
             let editor_tx = editor_tx.clone();
             let track_image = track_image.clone();
             let data_directory = data_directory.to_path_buf();
-            std::thread::spawn(move || render::render_thread(&render_rx, &editor_tx, &track_image, &data_directory))
+            let track_directory = track.file_path.directory().to_path_buf();
+            std::thread::spawn(move || {
+                render::render_thread(&render_rx, &editor_tx, &track_image, &data_directory, track_directory);
+            })
         };
 
         let adjacent_track_sections = data_directory.join("adjacent_track_sections").with_extension("json");
@@ -114,17 +115,19 @@ impl TrackEditor {
             }
         };
 
-        let file_watcher = file_watcher::FileWatcher::try_new(egui_context.clone()).unwrap();
+        let file_watcher =
+            file_watcher::FileWatcher::try_new(egui_context.clone(), track.file_path.directory()).unwrap();
 
         TrackEditor {
             render_thread: Some(render_thread),
             editor_rx,
             render_tx,
             track_image,
-            changes: Changes::LoadTrack,
+            changes: TrackChanges::all(),
             action: None,
             save_status: None,
             export_settings: ExportSettings::default(),
+            redraw: false,
             side_panel_tab: None,
             track,
             track_section: &make_track::track_sections::FLAT,
@@ -146,25 +149,13 @@ impl TrackEditor {
     ) {
         use bitflags::Flags as _;
 
-        let mut fetch_frame = false;
-        for message in self.editor_rx.try_iter() {
-            match message {
-                TrackEditorMessage::NewFrame => fetch_frame = true,
-                TrackEditorMessage::Error(error) => errors.extend(error),
-            }
-        }
-
-        if fetch_frame
-            && let Ok(mut track_image) = self.track_image.lock()
-            && track_image.is_some()
-        {
-            self.viewport.track_image = track_image.take();
-            self.changes |= Changes::Redraw;
-        }
+        let mut load_models = false;
+        let mut update_model = false;
+        let mut render = false;
 
         match self.file_watcher.check() {
             Some(file_watcher::Status::Delay(time_left)) => egui_context.request_repaint_after(time_left),
-            Some(file_watcher::Status::ReloadModels) => self.changes |= Changes::LoadModels,
+            Some(file_watcher::Status::ReloadModels) => load_models = true,
             None => {}
         }
 
@@ -203,24 +194,23 @@ impl TrackEditor {
             }
             Some(Action::ChangeTrack(index)) => {
                 self.track.track_index = index;
-                self.changes |= Changes::ChangeSubTrack;
+                self.changes |= TrackChanges::Masks | TrackChanges::Models | TrackChanges::ModelSettings;
             }
             Some(Action::RemoveTrack(index)) => {
                 if self.track.desc.tracks.remove(index).is_some() && self.track.track_index >= index {
                     self.track.track_index = self.track.track_index.saturating_sub(1);
                     if self.track.track_index > index {
-                        self.changes |= Changes::ChangeSubTrack;
+                        self.changes |= TrackChanges::Masks | TrackChanges::Models | TrackChanges::ModelSettings;
                     }
                 }
-                self.changes |= Changes::ChangeSubTrack;
             }
             Some(Action::ChangeSection(track_section)) => {
                 self.track_section = track_section;
-                self.changes |= Changes::UpdateModel;
+                update_model = true;
             }
             Some(Action::Rotate) => {
                 self.viewport.rotation = (self.viewport.rotation + 1) & 3;
-                self.changes |= Changes::UpdateModel;
+                update_model = true;
             }
             None => {}
         }
@@ -257,46 +247,59 @@ impl TrackEditor {
             match Track::load(file_path) {
                 Ok(new_track) => {
                     self.track = new_track;
-                    self.changes |= Changes::LoadTrack;
+                    self.changes = TrackChanges::all();
+                    self.viewport.clear();
                     settings.recent_track_files.add(&self.track.file_path);
+
+                    if let Err(error) = self.file_watcher.set_directory(self.track.file_path.directory()) {
+                        errors.push(error.to_string());
+                    }
+                    let _result = self.render_tx.send(RenderMessage::SetDirectory(
+                        self.track.file_path.directory().to_path_buf(),
+                    ));
                 }
                 Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
             }
         }
 
+        if self
+            .changes
+            .intersects(TrackChanges::ZOffset | TrackChanges::OriginalSprites | TrackChanges::MetalSupports)
+        {
+            self.redraw = true;
+        }
+        if self.changes.contains(TrackChanges::Models) {
+            load_models = true;
+        }
+        if self.changes.intersects(TrackChanges::Lights | TrackChanges::RenderSettings) {
+            render = true;
+        }
+
         let track = &self.track.desc.tracks[self.track.track_index];
-        if self.changes.contains(Changes::Directory) {
-            if let Err(error) = self.file_watcher.set_directory(self.track.file_path.directory()) {
-                errors.push(error.to_string());
-            }
-            let _result = self.render_tx.send(RenderMessage::SetDirectory(
-                self.track.file_path.directory().to_path_buf(),
-            ));
-        }
-        if self.changes.contains(Changes::ModelSettings) {
+        if self.changes.contains(TrackChanges::ModelSettings) {
             let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-            self.changes |= Changes::UpdateModel;
+            update_model = true;
         }
-        if self.changes.contains(Changes::LoadModels) {
+        if load_models {
             let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-            self.changes |= Changes::UpdateModel;
+            update_model = true;
         }
-        if self.changes.contains(Changes::Masks) {
+        if self.changes.contains(TrackChanges::Masks) {
             let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
-            self.changes |= Changes::UpdateModel;
+            update_model = true;
         }
-        if self.changes.contains(Changes::Offsets) {
+        if self.changes.contains(TrackChanges::Offsets) {
             let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track.desc.offsets)));
-            self.changes |= Changes::UpdateModel;
+            update_model = true;
         }
-        if self.changes.contains(Changes::UpdateModel) {
+        if update_model {
             let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
                 track_section: self.track_section,
                 rotation: self.viewport.rotation,
             }));
-            self.changes |= Changes::Render;
+            render = true;
         }
-        if self.changes.contains(Changes::Render) {
+        if render {
             let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
                 egui_context: egui_context.clone(),
                 rotation: self.viewport.rotation,
@@ -307,10 +310,21 @@ impl TrackEditor {
             }));
         }
 
-        if self.changes.contains(Changes::ClearImage) {
-            self.viewport.clear();
+        for message in self.editor_rx.try_iter() {
+            match message {
+                TrackEditorMessage::NewFrame => {
+                    if let Ok(mut track_image) = self.track_image.lock()
+                        && track_image.is_some()
+                    {
+                        self.viewport.track_image = track_image.take();
+                        self.redraw = true;
+                    }
+                }
+                TrackEditorMessage::Error(error) => errors.extend(error),
+            }
         }
-        if self.changes.contains(Changes::Redraw) {
+
+        if self.redraw {
             self.viewport.draw(
                 track,
                 self.track.desc.metal_supports.as_ref(),
@@ -321,6 +335,7 @@ impl TrackEditor {
         }
 
         self.changes.clear();
+        self.redraw = false;
     }
 
     pub fn ui(
@@ -362,14 +377,17 @@ impl TrackEditor {
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
-            if let Some(action) = self.viewport.show(
+            let viewport::Response { redraw, action } = self.viewport.show(
                 ui,
                 &self.track,
                 self.track_section,
                 rct2_sprites_loaded,
                 &self.colour_button_textures,
-                &mut self.changes,
-            ) {
+            );
+            if redraw {
+                self.redraw = true;
+            }
+            if let Some(action) = action {
                 self.action = Some(action);
             }
         });

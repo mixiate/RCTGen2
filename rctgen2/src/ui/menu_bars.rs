@@ -18,7 +18,7 @@ pub fn menu_bar(
     current_track_section: &TrackSection,
     export_settings: &mut track_editor::ExportSettings,
     settings: &mut settings::AppSettings,
-    changes: &mut track_editor::Changes,
+    changes: &mut track_editor::TrackChanges,
     errors: &mut Vec<String>,
 ) -> Option<track_editor::Action> {
     let mut action = None;
@@ -61,7 +61,7 @@ pub fn menu_bar(
                     match make_track::track_desc::Desc::load(&file_path) {
                         Ok(import_track_desc) => {
                             track.desc.lights = import_track_desc.lights;
-                            *changes |= track_editor::Changes::Render;
+                            *changes |= track_editor::TrackChanges::Lights;
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }
@@ -72,7 +72,7 @@ pub fn menu_bar(
                     match make_track::track_desc::Desc::load(&file_path) {
                         Ok(import_track_desc) => {
                             track.desc.metal_supports = import_track_desc.metal_supports;
-                            *changes |= track_editor::Changes::Redraw;
+                            *changes |= track_editor::TrackChanges::MetalSupports;
                         }
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }

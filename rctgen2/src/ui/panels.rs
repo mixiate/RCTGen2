@@ -64,7 +64,7 @@ pub fn side_panel(
     track: &mut track_editor::Track,
     current_track_section: &TrackSection,
     rotation: usize,
-    changes: &mut track_editor::Changes,
+    changes: &mut track_editor::TrackChanges,
     errors: &mut Vec<String>,
 ) -> Option<track_editor::Action> {
     let mut action = None;
@@ -75,13 +75,13 @@ pub fn side_panel(
         SidePanelTab::Lights => {
             let changed = lights::lights_panel(&mut track.desc.lights, ui);
             if changed {
-                *changes |= track_editor::Changes::Render;
+                *changes |= track_editor::TrackChanges::Lights;
             }
         }
         SidePanelTab::Offsets => {
             let changed = offsets::offsets_panel(&mut track.desc.offsets, ui);
             if changed {
-                *changes |= track_editor::Changes::Offsets;
+                *changes |= track_editor::TrackChanges::Offsets;
             }
         }
         SidePanelTab::MetalSupports => {
@@ -92,19 +92,19 @@ pub fn side_panel(
                 ui,
             );
             if changed {
-                *changes |= track_editor::Changes::Redraw;
+                *changes |= track_editor::TrackChanges::MetalSupports;
             }
         }
         SidePanelTab::Render => {
             let changed = render::render_panel(&mut track.desc, ui);
             if changed {
-                *changes |= track_editor::Changes::Render;
+                *changes |= track_editor::TrackChanges::RenderSettings;
             }
         }
         SidePanelTab::Sprites => {
             let track = &mut track.desc.tracks[track.track_index];
             if sprites::sprites_panel(&mut track.original_sprites, current_track_section, ui) {
-                *changes |= track_editor::Changes::Redraw;
+                *changes |= track_editor::TrackChanges::OriginalSprites;
             }
         }
     }

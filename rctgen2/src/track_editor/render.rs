@@ -179,6 +179,7 @@ pub fn render_thread(
     app_tx: &Sender<TrackEditorMessage>,
     track_image: &SharedTrackImage,
     data_directory: &std::path::Path,
+    track_directory: std::path::PathBuf,
 ) {
     let render_device = match renderer::Device::try_new() {
         Ok(render_device) => render_device,
@@ -190,7 +191,7 @@ pub fn render_thread(
         }
     };
 
-    let mut current_directory = None;
+    let mut current_directory = track_directory;
     let mut current_model_settings = None;
     let mut current_models = None;
     let mut current_model_lengths = None;
@@ -213,7 +214,7 @@ pub fn render_thread(
 
         for message in messages.drain(0..) {
             match message {
-                RenderMessage::SetDirectory(directory) => current_directory = Some(directory),
+                RenderMessage::SetDirectory(directory) => current_directory = directory,
                 RenderMessage::UpdateModelSettings(settings) => {
                     current_model_settings = Some(settings);
                     if let Some(models) = &current_models {
@@ -222,10 +223,8 @@ pub fn render_thread(
                     }
                 }
                 RenderMessage::LoadModels(models) => {
-                    if let Some(directory) = &current_directory
-                        && let Some(settings) = &current_model_settings
-                    {
-                        match models.load(directory) {
+                    if let Some(settings) = &current_model_settings {
+                        match models.load(&current_directory) {
                             Ok(models) => {
                                 let lengths = make_track::track_model::ModelLengths::calculate(settings, &models);
                                 current_scene = None;

@@ -19,6 +19,12 @@ pub struct Viewport {
     colour_buttons: [ColourPicker; 3],
 }
 
+#[derive(Default)]
+pub struct Response {
+    pub redraw: bool,
+    pub action: Option<track_editor::Action>,
+}
+
 impl Viewport {
     pub fn new(egui_context: &egui::Context) -> Self {
         let back_buffer_size = 512;
@@ -110,9 +116,8 @@ impl Viewport {
         current_track_section: &make_track::track_sections::TrackSection,
         rct2_sprites_loaded: bool,
         colour_button_textures: &[colour_picker::ButtonTextures],
-        changes: &mut track_editor::Changes,
-    ) -> Option<track_editor::Action> {
-        let mut action = None;
+    ) -> Response {
+        let mut response = Response::default();
         {
             let texture_size = self.back_buffer.size_vec2() * self.zoom as f32;
             let image = egui::Image::from_texture((self.back_buffer.id(), texture_size));
@@ -130,7 +135,7 @@ impl Viewport {
         let frame = egui::Frame::popup(ui.style()).outer_margin(margin).shadow(egui::Shadow::NONE);
         frame.show(ui, |ui| {
             if ui.checkbox(&mut self.drawing_options.indexed, "Indexed").changed() {
-                *changes |= track_editor::Changes::Redraw;
+                response.redraw = true;
             }
         });
         let frame = frame.outer_margin(egui::Margin::symmetric(10, 5));
@@ -139,7 +144,7 @@ impl Viewport {
                 ui.style_mut().spacing.item_spacing = egui::Vec2::new(0.0, 0.0);
                 for (index, button) in self.colour_buttons.iter_mut().enumerate() {
                     if button.button(ui, colour_button_textures, &mut self.drawing_options.colours[index]) {
-                        *changes |= track_editor::Changes::Redraw;
+                        response.redraw = true;
                     }
                 }
             });
@@ -157,7 +162,7 @@ impl Viewport {
                 )
                 .changed()
             {
-                *changes |= track_editor::Changes::Redraw;
+                response.redraw = true;
             }
         });
         frame.show(ui, |ui| {
@@ -170,7 +175,7 @@ impl Viewport {
                 )
                 .changed()
             {
-                *changes |= track_editor::Changes::Redraw;
+                response.redraw = true;
             }
             let adjacent_track_checkbox_enabled = !track.original_sprites.is_empty();
             if ui
@@ -180,21 +185,21 @@ impl Viewport {
                 )
                 .changed()
             {
-                *changes |= track_editor::Changes::Redraw;
+                response.redraw = true;
             }
         });
         frame.show(ui, |ui| {
             if ui.checkbox(&mut self.grid, "Grid").clicked() {
-                *changes |= track_editor::Changes::Redraw;
+                response.redraw = true;
             }
             if ui.add_enabled(self.grid, egui::Checkbox::new(&mut self.grid_highlight, "Track Tiles")).clicked() {
-                *changes |= track_editor::Changes::Redraw;
+                response.redraw = true;
             }
         });
         frame.show(ui, |ui| {
             let button = egui::Button::new(egui::RichText::new("↻").size(25.0));
             if ui.add_sized(egui::Vec2::new(35.0, 35.0), button).clicked() {
-                action = Some(track_editor::Action::Rotate);
+                response.action = Some(track_editor::Action::Rotate);
             }
         });
         frame.show(ui, |ui| {
@@ -227,6 +232,6 @@ impl Viewport {
                 });
             });
         });
-        action
+        response
     }
 }

@@ -17,7 +17,7 @@ pub struct FileWatcher {
 }
 
 impl FileWatcher {
-    pub fn try_new(egui_context: egui::Context) -> notify::Result<FileWatcher> {
+    pub fn try_new(egui_context: egui::Context, directory: &std::path::Path) -> notify::Result<FileWatcher> {
         let (tx, rx) = std::sync::mpsc::channel::<Message>();
 
         let watcher = notify::recommended_watcher(move |result: notify::Result<notify::Event>| {
@@ -33,12 +33,16 @@ impl FileWatcher {
                 egui_context.request_repaint();
             }
         })?;
-        Ok(FileWatcher {
+
+        let mut file_watcher = FileWatcher {
             watcher,
             directory: None,
             rx,
             model_file_changed_time: None,
-        })
+        };
+        file_watcher.set_directory(directory)?;
+
+        Ok(file_watcher)
     }
 
     pub fn set_directory(&mut self, directory: &std::path::Path) -> notify::Result<()> {

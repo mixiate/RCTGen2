@@ -270,7 +270,7 @@ pub fn track_widgets(
     directory: &std::path::Path,
     errors: &mut Vec<String>,
     current_track_section: Option<&make_track::track_sections::TrackSection>,
-    changes: &mut track_editor::Changes,
+    changes: &mut track_editor::TrackChanges,
 ) {
     egui::Grid::new(index).show(ui, |ui| {
         {
@@ -279,7 +279,9 @@ pub fn track_widgets(
             });
             let mut size = ui.spacing().interact_size;
             size.x = 150.0;
-            ui.add_sized(size, egui::TextEdit::singleline(&mut track.name));
+            if ui.add_sized(size, egui::TextEdit::singleline(&mut track.name)).changed() {
+                *changes |= track_editor::TrackChanges::TrackName;
+            }
         }
         ui.end_row();
 
@@ -296,10 +298,12 @@ pub fn track_widgets(
             } else {
                 if widgets::buttons::add_button(ui) {
                     track.suffix = Some(String::new());
+                    *changes |= track_editor::TrackChanges::TrackName;
                 }
             }
             if removed {
                 track.suffix = None;
+                *changes |= track_editor::TrackChanges::TrackName;
             }
         }
         ui.end_row();
@@ -308,7 +312,7 @@ pub fn track_widgets(
             ui.label("Z offset");
         });
         if ui.add(widgets::DragValueSpin::new(&mut track.z_offset, 1)).changed() {
-            *changes |= track_editor::Changes::Redraw;
+            *changes |= track_editor::TrackChanges::ZOffset;
         }
         ui.end_row();
 
@@ -316,7 +320,7 @@ pub fn track_widgets(
             ui.label("Masks");
         });
         if ui.add(egui::TextEdit::singleline(&mut track.masks)).lost_focus() {
-            *changes |= track_editor::Changes::Masks;
+            *changes |= track_editor::TrackChanges::Masks;
         }
         ui.end_row();
 
@@ -324,7 +328,7 @@ pub fn track_widgets(
             ui.label("Length");
         });
         if length_widgets(ui, &mut track.model_settings.length) {
-            *changes |= track_editor::Changes::ModelSettings;
+            *changes |= track_editor::TrackChanges::ModelSettings;
         }
         ui.end_row();
 
@@ -332,7 +336,7 @@ pub fn track_widgets(
             ui.label("Tie length");
         });
         if length_widgets(ui, &mut track.model_settings.tie_length) {
-            *changes |= track_editor::Changes::ModelSettings;
+            *changes |= track_editor::TrackChanges::ModelSettings;
         }
         ui.end_row();
 
@@ -346,7 +350,7 @@ pub fn track_widgets(
             ))
             .changed()
         {
-            *changes |= track_editor::Changes::ModelSettings;
+            *changes |= track_editor::TrackChanges::ModelSettings;
         }
         ui.end_row();
 
@@ -360,7 +364,7 @@ pub fn track_widgets(
             ))
             .changed()
         {
-            *changes |= track_editor::Changes::ModelSettings;
+            *changes |= track_editor::TrackChanges::ModelSettings;
         }
         ui.end_row();
 
@@ -368,7 +372,7 @@ pub fn track_widgets(
             ui.label("Bank angle");
         });
         if ui.add(widgets::DragValueSpin::new(&mut track.model_settings.bank_angle, 0.01)).changed() {
-            *changes |= track_editor::Changes::ModelSettings;
+            *changes |= track_editor::TrackChanges::ModelSettings;
         }
         ui.end_row();
 
@@ -376,14 +380,14 @@ pub fn track_widgets(
             ui.label("Lift");
         });
         if ui.add(egui::Checkbox::without_text(&mut track.model_settings.lift)).changed() {
-            *changes |= track_editor::Changes::ModelSettings;
+            *changes |= track_editor::TrackChanges::ModelSettings;
         }
         ui.end_row();
     });
 
     egui::CollapsingHeader::new("Models").id_salt(index + 512).show(ui, |ui| {
         if models_collapsible(ui, &mut track.models, directory, errors, current_track_section) {
-            *changes |= track_editor::Changes::LoadModels;
+            *changes |= track_editor::TrackChanges::Models;
         }
     });
 
@@ -408,7 +412,7 @@ pub fn tracks_panel(
     errors: &mut Vec<String>,
     current_track_section: &make_track::track_sections::TrackSection,
     new_track_modal: &mut modals::NewTrackModal,
-    changes: &mut track_editor::Changes,
+    changes: &mut track_editor::TrackChanges,
     ui: &mut egui::Ui,
 ) -> Option<track_editor::Action> {
     let mut action = None;
