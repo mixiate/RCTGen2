@@ -119,10 +119,10 @@ pub fn menu_bar(
             if ui.add_enabled(export_settings.export_enabled, egui::Button::new("Export")).clicked() {
                 action = Some(track_editor::Action::Export);
             }
-            {
-                let checkbox = egui::Checkbox::new(&mut export_settings.skip_empty_sprites, "Skip Empty");
-                ui.add_enabled(export_settings.export_enabled, checkbox);
-            }
+            ui.add_enabled(
+                export_settings.export_enabled,
+                egui::Checkbox::new(&mut export_settings.skip_empty_sprites, "Skip Empty"),
+            );
             ui.add_enabled(
                 export_settings.build_enabled,
                 egui::Checkbox::new(&mut export_settings.build, "Build"),
