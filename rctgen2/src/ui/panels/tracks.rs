@@ -410,7 +410,8 @@ pub fn tracks_panel(
     new_track_modal: &mut modals::NewTrackModal,
     changes: &mut track_editor::Changes,
     ui: &mut egui::Ui,
-) {
+) -> Option<track_editor::Action> {
+    let mut action = None;
     let directory = track.file_path.directory();
 
     egui::Panel::right("Tracks side panel").show(ui, |ui| {
@@ -426,12 +427,10 @@ pub fn tracks_panel(
         ui.add(egui::Separator::default().spacing(0.0));
 
         if let Some(new_track) = new_track_modal.show(ui, errors) {
-            track.track_index = track.desc.tracks.len().into();
+            action = Some(track_editor::Action::ChangeTrack(track.desc.tracks.len().into()));
             track.desc.tracks.push(new_track.track);
-            *changes |= track_editor::Changes::ChangeSubTrack;
         }
 
-        let mut removed_index = None;
         ui.style_mut().spacing.scroll = egui::style::ScrollStyle::solid();
         egui::ScrollArea::vertical()
             .scroll_bar_visibility(egui::containers::scroll_area::ScrollBarVisibility::AlwaysVisible)
@@ -453,7 +452,7 @@ pub fn tracks_panel(
                             if track_count > 1 {
                                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                                     if widgets::buttons::remove_button(ui) {
-                                        removed_index = Some(index);
+                                        action = Some(track_editor::Action::RemoveTrack(index));
                                     }
                                 });
                             }
@@ -471,15 +470,6 @@ pub fn tracks_panel(
                     });
                 }
             });
-
-        if let Some(index) = removed_index
-            && track.desc.tracks.remove(index).is_some()
-            && track.track_index >= index
-        {
-            track.track_index = track.track_index.saturating_sub(1);
-            if track.track_index > index {
-                *changes |= track_editor::Changes::ChangeSubTrack;
-            }
-        }
     });
+    action
 }

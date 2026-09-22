@@ -66,10 +66,11 @@ pub fn side_panel(
     rotation: usize,
     changes: &mut track_editor::Changes,
     errors: &mut Vec<String>,
-) {
+) -> Option<track_editor::Action> {
+    let mut action = None;
     match tab {
         SidePanelTab::Tracks => {
-            tracks::tracks_panel(track, errors, current_track_section, new_track_modal, changes, ui);
+            action = tracks::tracks_panel(track, errors, current_track_section, new_track_modal, changes, ui);
         }
         SidePanelTab::Lights => {
             let changed = lights::lights_panel(&mut track.desc.lights, ui);
@@ -107,4 +108,5 @@ pub fn side_panel(
             }
         }
     }
+    action
 }

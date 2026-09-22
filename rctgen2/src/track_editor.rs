@@ -45,6 +45,7 @@ pub enum Action {
     Save,
     Export,
     ChangeTrack(usize),
+    RemoveTrack(usize),
     ChangeSection(&'static make_track::track_sections::TrackSection),
     Rotate,
 }
@@ -204,6 +205,15 @@ impl TrackEditor {
                 self.track.track_index = index;
                 self.changes |= Changes::ChangeSubTrack;
             }
+            Some(Action::RemoveTrack(index)) => {
+                if self.track.desc.tracks.remove(index).is_some() && self.track.track_index >= index {
+                    self.track.track_index = self.track.track_index.saturating_sub(1);
+                    if self.track.track_index > index {
+                        self.changes |= Changes::ChangeSubTrack;
+                    }
+                }
+                self.changes |= Changes::ChangeSubTrack;
+            }
             Some(Action::ChangeSection(track_section)) => {
                 self.track_section = track_section;
                 self.changes |= Changes::UpdateModel;
@@ -335,8 +345,8 @@ impl TrackEditor {
 
         panels::side_panel_tabs(ui, &mut self.side_panel_tab);
 
-        if let Some(tab) = self.side_panel_tab {
-            panels::side_panel(
+        if let Some(tab) = self.side_panel_tab
+            && let Some(action) = panels::side_panel(
                 ui,
                 tab,
                 &mut self.new_track_modal,
@@ -345,7 +355,9 @@ impl TrackEditor {
                 self.viewport.rotation,
                 &mut self.changes,
                 errors,
-            );
+            )
+        {
+            self.action = Some(action);
         }
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
