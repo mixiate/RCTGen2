@@ -118,12 +118,12 @@ impl TrackEditor {
         let file_watcher =
             file_watcher::FileWatcher::try_new(egui_context.clone(), track.file_path.directory()).unwrap();
 
-        TrackEditor {
+        let track_editor = TrackEditor {
             render_thread: Some(render_thread),
             editor_rx,
             render_tx,
             track_image,
-            changes: TrackChanges::all(),
+            changes: TrackChanges::empty(),
             action: None,
             save_status: None,
             export_settings: ExportSettings::default(),
@@ -136,6 +136,59 @@ impl TrackEditor {
             viewport: viewport::Viewport::new(egui_context),
             adjacent_track_sections,
             file_watcher,
+        };
+        track_editor.update_render_thread(egui_context, true, true, TrackChanges::all());
+        track_editor
+    }
+
+    fn update_render_thread(
+        &self,
+        egui_context: &egui::Context,
+        mut load_models: bool,
+        mut update_model: bool,
+        track_changes: TrackChanges,
+    ) {
+        let mut render = true;
+        if track_changes.contains(TrackChanges::Models) {
+            load_models = true;
+        }
+        if track_changes.intersects(TrackChanges::Lights | TrackChanges::RenderSettings) {
+            render = true;
+        }
+
+        let track = &self.track.desc.tracks[self.track.track_index];
+        if track_changes.contains(TrackChanges::ModelSettings) {
+            let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
+            update_model = true;
+        }
+        if load_models {
+            let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
+            update_model = true;
+        }
+        if track_changes.contains(TrackChanges::Masks) {
+            let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
+            update_model = true;
+        }
+        if track_changes.contains(TrackChanges::Offsets) {
+            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track.desc.offsets)));
+            update_model = true;
+        }
+        if update_model {
+            let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
+                track_section: self.track_section,
+                rotation: self.viewport.rotation,
+            }));
+            render = true;
+        }
+        if render {
+            let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
+                egui_context: egui_context.clone(),
+                rotation: self.viewport.rotation,
+                samples: self.track.desc.samples.into(),
+                dither: self.track.desc.dither,
+                edge_distance: self.track.desc.edge_distance,
+                lights: self.track.desc.get_lights(),
+            }));
         }
     }
 
@@ -151,7 +204,6 @@ impl TrackEditor {
 
         let mut load_models = false;
         let mut update_model = false;
-        let mut render = false;
 
         match self.file_watcher.check() {
             Some(file_watcher::Status::Delay(time_left)) => egui_context.request_repaint_after(time_left),
@@ -268,47 +320,8 @@ impl TrackEditor {
         {
             self.redraw = true;
         }
-        if self.changes.contains(TrackChanges::Models) {
-            load_models = true;
-        }
-        if self.changes.intersects(TrackChanges::Lights | TrackChanges::RenderSettings) {
-            render = true;
-        }
 
-        let track = &self.track.desc.tracks[self.track.track_index];
-        if self.changes.contains(TrackChanges::ModelSettings) {
-            let _result = self.render_tx.send(RenderMessage::UpdateModelSettings(track.model_settings));
-            update_model = true;
-        }
-        if load_models {
-            let _result = self.render_tx.send(RenderMessage::LoadModels(Box::new(track.models.clone())));
-            update_model = true;
-        }
-        if self.changes.contains(TrackChanges::Masks) {
-            let _result = self.render_tx.send(RenderMessage::LoadMasks(track.masks.clone()));
-            update_model = true;
-        }
-        if self.changes.contains(TrackChanges::Offsets) {
-            let _result = self.render_tx.send(RenderMessage::UpdateOffsets(Box::new(self.track.desc.offsets)));
-            update_model = true;
-        }
-        if update_model {
-            let _result = self.render_tx.send(RenderMessage::UpdateModel(UpdateModelArgs {
-                track_section: self.track_section,
-                rotation: self.viewport.rotation,
-            }));
-            render = true;
-        }
-        if render {
-            let _result = self.render_tx.send(RenderMessage::Render(RenderArgs {
-                egui_context: egui_context.clone(),
-                rotation: self.viewport.rotation,
-                samples: self.track.desc.samples.into(),
-                dither: self.track.desc.dither,
-                edge_distance: self.track.desc.edge_distance,
-                lights: self.track.desc.get_lights(),
-            }));
-        }
+        self.update_render_thread(egui_context, load_models, update_model, self.changes);
 
         for message in self.editor_rx.try_iter() {
             match message {
@@ -326,7 +339,7 @@ impl TrackEditor {
 
         if self.redraw {
             self.viewport.draw(
-                track,
+                &self.track.desc.tracks[self.track.track_index],
                 self.track.desc.metal_supports.as_ref(),
                 &self.adjacent_track_sections,
                 rct2_sprites,
