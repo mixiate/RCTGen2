@@ -90,21 +90,17 @@ pub fn menu_bar(
             });
             ui.separator();
 
-            {
-                let previous_track_index = track.track_index;
-                egui::ComboBox::from_id_salt("Track dropdown")
-                    .width(180.0)
-                    .height(500.0)
-                    .selected_text(track_name(&track.desc.tracks[track.track_index]))
-                    .show_ui(ui, |ui| {
-                        for (index, sub_track) in track.desc.tracks.iter().enumerate() {
-                            ui.selectable_value(&mut track.track_index, index, track_name(sub_track));
+            egui::ComboBox::from_id_salt("Track dropdown")
+                .width(180.0)
+                .height(500.0)
+                .selected_text(track_name(&track.desc.tracks[track.track_index]))
+                .show_ui(ui, |ui| {
+                    for (index, sub_track) in track.desc.tracks.iter().enumerate() {
+                        if ui.selectable_label(index == track.track_index, track_name(sub_track)).clicked() {
+                            action = Some(track_editor::Action::ChangeTrack(index));
                         }
-                    });
-                if track.track_index != previous_track_index {
-                    *changes |= track_editor::Changes::ChangeSubTrack;
-                }
-            }
+                    }
+                });
             ui.separator();
 
             let previous_track_section = *current_track_section;

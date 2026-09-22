@@ -44,6 +44,7 @@ pub enum Action {
     Open(std::path::PathBuf),
     Save,
     Export,
+    ChangeTrack(usize),
 }
 
 enum SaveStatus {
@@ -196,6 +197,10 @@ impl TrackEditor {
                         Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
                     }
                 }
+            }
+            Some(Action::ChangeTrack(index)) => {
+                self.track.track_index = index;
+                self.changes |= Changes::ChangeSubTrack;
             }
             None => {}
         }
