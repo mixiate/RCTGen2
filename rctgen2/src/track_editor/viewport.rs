@@ -111,7 +111,8 @@ impl Viewport {
         rct2_sprites_loaded: bool,
         colour_button_textures: &[colour_picker::ButtonTextures],
         changes: &mut track_editor::Changes,
-    ) {
+    ) -> Option<track_editor::Action> {
+        let mut action = None;
         {
             let texture_size = self.back_buffer.size_vec2() * self.zoom as f32;
             let image = egui::Image::from_texture((self.back_buffer.id(), texture_size));
@@ -191,15 +192,9 @@ impl Viewport {
             }
         });
         frame.show(ui, |ui| {
-            if ui
-                .add_sized(
-                    egui::Vec2::new(35.0, 35.0),
-                    egui::Button::new(egui::RichText::new("↻").size(25.0)),
-                )
-                .clicked()
-            {
-                self.rotation = (self.rotation + 1) & 3;
-                *changes |= track_editor::Changes::UpdateModel;
+            let button = egui::Button::new(egui::RichText::new("↻").size(25.0));
+            if ui.add_sized(egui::Vec2::new(35.0, 35.0), button).clicked() {
+                action = Some(track_editor::Action::Rotate);
             }
         });
         frame.show(ui, |ui| {
@@ -232,5 +227,6 @@ impl Viewport {
                 });
             });
         });
+        action
     }
 }

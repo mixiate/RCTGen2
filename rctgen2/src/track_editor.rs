@@ -46,6 +46,7 @@ pub enum Action {
     Export,
     ChangeTrack(usize),
     ChangeSection(&'static make_track::track_sections::TrackSection),
+    Rotate,
 }
 
 enum SaveStatus {
@@ -207,6 +208,10 @@ impl TrackEditor {
                 self.track_section = track_section;
                 self.changes |= Changes::UpdateModel;
             }
+            Some(Action::Rotate) => {
+                self.viewport.rotation = (self.viewport.rotation + 1) & 3;
+                self.changes |= Changes::UpdateModel;
+            }
             None => {}
         }
 
@@ -345,14 +350,16 @@ impl TrackEditor {
 
         let frame = egui::Frame::default().fill(egui::Color32::from_rgb(23, 35, 35));
         egui::CentralPanel::default().frame(frame).show(ui, |ui| {
-            self.viewport.show(
+            if let Some(action) = self.viewport.show(
                 ui,
                 &self.track,
                 self.track_section,
                 rct2_sprites_loaded,
                 &self.colour_button_textures,
                 &mut self.changes,
-            );
+            ) {
+                self.action = Some(action);
+            }
         });
 
         if ui.input(|i| i.viewport().close_requested()) && self.save_status.is_some() {
