@@ -51,6 +51,9 @@ enum SaveStatus {
     ConfirmingOpen(std::path::PathBuf),
     SaveAndOpen(std::path::PathBuf),
     Open(std::path::PathBuf),
+    ConfirmingClose,
+    SaveAndClose,
+    Close,
 }
 
 #[derive(Default)]
@@ -209,6 +212,13 @@ impl TrackEditor {
             Some(SaveStatus::Open(file_path)) => {
                 path_to_open = Some(file_path);
             }
+            Some(SaveStatus::SaveAndClose) => {
+                egui_context.send_viewport_cmd(egui::ViewportCommand::Close);
+                save = true;
+            }
+            Some(SaveStatus::Close) => {
+                egui_context.send_viewport_cmd(egui::ViewportCommand::Close);
+            }
             status => self.save_status = status,
         }
 
@@ -335,12 +345,23 @@ impl TrackEditor {
             );
         });
 
+        if ui.input(|i| i.viewport().close_requested()) && self.save_status.is_some() {
+            self.save_status = Some(SaveStatus::ConfirmingClose);
+            ui.send_viewport_cmd(egui::ViewportCommand::CancelClose);
+        }
+
         match self.save_status.take() {
             Some(SaveStatus::ConfirmingOpen(file_path)) => match modals::save_confirm::save_confirm_modal(ui) {
                 Some(modals::save_confirm::Choice::NoSave) => self.save_status = Some(SaveStatus::Open(file_path)),
                 Some(modals::save_confirm::Choice::Save) => self.save_status = Some(SaveStatus::SaveAndOpen(file_path)),
                 Some(modals::save_confirm::Choice::Cancel) => self.save_status = Some(SaveStatus::Changed),
                 None => self.save_status = Some(SaveStatus::ConfirmingOpen(file_path)),
+            },
+            Some(SaveStatus::ConfirmingClose) => match modals::save_confirm::save_confirm_modal(ui) {
+                Some(modals::save_confirm::Choice::NoSave) => self.save_status = Some(SaveStatus::Close),
+                Some(modals::save_confirm::Choice::Save) => self.save_status = Some(SaveStatus::SaveAndClose),
+                Some(modals::save_confirm::Choice::Cancel) => self.save_status = Some(SaveStatus::Changed),
+                None => self.save_status = Some(SaveStatus::ConfirmingClose),
             },
             status => self.save_status = status,
         }
