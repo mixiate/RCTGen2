@@ -45,6 +45,7 @@ pub enum Action {
     Save,
     Export,
     ChangeTrack(usize),
+    ChangeSection(&'static make_track::track_sections::TrackSection),
 }
 
 enum SaveStatus {
@@ -202,6 +203,10 @@ impl TrackEditor {
                 self.track.track_index = index;
                 self.changes |= Changes::ChangeSubTrack;
             }
+            Some(Action::ChangeSection(track_section)) => {
+                self.track_section = track_section;
+                self.changes |= Changes::UpdateModel;
+            }
             None => {}
         }
 
@@ -316,7 +321,7 @@ impl TrackEditor {
         self.action = ui::menu_bars::menu_bar(
             ui,
             &mut self.track,
-            &mut self.track_section,
+            self.track_section,
             &mut self.export_settings,
             settings,
             &mut self.changes,

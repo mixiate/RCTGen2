@@ -15,7 +15,7 @@ fn track_name(track: &make_track::track_desc::Track) -> String {
 pub fn menu_bar(
     ui: &mut egui::Ui,
     track: &mut track_editor::Track,
-    current_track_section: &mut &TrackSection,
+    current_track_section: &TrackSection,
     export_settings: &mut track_editor::ExportSettings,
     settings: &mut settings::AppSettings,
     changes: &mut track_editor::Changes,
@@ -103,19 +103,17 @@ pub fn menu_bar(
                 });
             ui.separator();
 
-            let previous_track_section = *current_track_section;
             egui::ComboBox::from_id_salt("Track section")
                 .selected_text(current_track_section.name)
                 .width(300.0)
                 .height(500.0)
                 .show_ui(ui, |ui| {
                     for track_section in make_track::track_sections::TRACK_SECTIONS {
-                        ui.selectable_value(current_track_section, track_section, track_section.name);
+                        if ui.selectable_label(track_section == current_track_section, track_section.name).clicked() {
+                            action = Some(track_editor::Action::ChangeSection(track_section));
+                        }
                     }
                 });
-            if *current_track_section != previous_track_section {
-                *changes |= track_editor::Changes::UpdateModel;
-            }
             ui.separator();
 
             if ui.add_enabled(export_settings.export_enabled, egui::Button::new("Export")).clicked() {
