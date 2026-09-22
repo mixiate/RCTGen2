@@ -46,6 +46,13 @@ pub enum Action {
     Export,
 }
 
+enum SaveStatus {
+    Changed,
+    ConfirmingOpen(std::path::PathBuf),
+    SaveAndOpen(std::path::PathBuf),
+    Open(std::path::PathBuf),
+}
+
 #[derive(Default)]
 pub struct ExportSettings {
     pub export_enabled: bool,
@@ -62,6 +69,7 @@ pub struct TrackEditor {
     track: Track,
     changes: Changes,
     action: Option<Action>,
+    save_status: Option<SaveStatus>,
     export_settings: ExportSettings,
     side_panel_tab: Option<panels::SidePanelTab>,
     track_section: &'static make_track::track_sections::TrackSection,
@@ -108,6 +116,7 @@ impl TrackEditor {
             track_image,
             changes: Changes::LoadTrack,
             action: None,
+            save_status: None,
             export_settings: ExportSettings::default(),
             side_panel_tab: None,
             track,
@@ -152,20 +161,17 @@ impl TrackEditor {
             None => {}
         }
 
+        let mut save = false;
+        let mut path_to_open = None;
         match self.action.take() {
-            Some(Action::Open(file_path)) => match Track::load(file_path) {
-                Ok(new_track) => {
-                    self.track = new_track;
-                    self.changes |= Changes::LoadTrack;
-                    settings.recent_track_files.add(&self.track.file_path);
-                }
-                Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
-            },
-            Some(Action::Save) => {
-                if let Err(error) = self.track.desc.save(&self.track.file_path) {
-                    errors.extend(error.chain().map(|x| x.to_string()));
+            Some(Action::Open(file_path)) => {
+                if let Some(SaveStatus::Changed) = self.save_status {
+                    self.save_status = Some(SaveStatus::ConfirmingOpen(file_path));
+                } else {
+                    path_to_open = Some(file_path);
                 }
             }
+            Some(Action::Save) => save = true,
             Some(Action::Export) => {
                 if let Some(export_directory) = &settings.track_export_directory {
                     match make_track::make_track(
@@ -189,6 +195,38 @@ impl TrackEditor {
                 }
             }
             None => {}
+        }
+
+        if !self.changes.is_empty() && self.save_status.is_none() {
+            self.save_status = Some(SaveStatus::Changed);
+        }
+
+        match self.save_status.take() {
+            Some(SaveStatus::SaveAndOpen(file_path)) => {
+                save = true;
+                path_to_open = Some(file_path);
+            }
+            Some(SaveStatus::Open(file_path)) => {
+                path_to_open = Some(file_path);
+            }
+            status => self.save_status = status,
+        }
+
+        if save {
+            match self.track.desc.save(&self.track.file_path) {
+                Ok(_) => self.save_status = None,
+                Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+            }
+        }
+        if let Some(file_path) = path_to_open {
+            match Track::load(file_path) {
+                Ok(new_track) => {
+                    self.track = new_track;
+                    self.changes |= Changes::LoadTrack;
+                    settings.recent_track_files.add(&self.track.file_path);
+                }
+                Err(error) => errors.extend(error.chain().map(|x| x.to_string())),
+            }
         }
 
         let track = &self.track.desc.tracks[self.track.track_index];
@@ -296,6 +334,16 @@ impl TrackEditor {
                 &mut self.changes,
             );
         });
+
+        match self.save_status.take() {
+            Some(SaveStatus::ConfirmingOpen(file_path)) => match modals::save_confirm::save_confirm_modal(ui) {
+                Some(modals::save_confirm::Choice::NoSave) => self.save_status = Some(SaveStatus::Open(file_path)),
+                Some(modals::save_confirm::Choice::Save) => self.save_status = Some(SaveStatus::SaveAndOpen(file_path)),
+                Some(modals::save_confirm::Choice::Cancel) => self.save_status = Some(SaveStatus::Changed),
+                None => self.save_status = Some(SaveStatus::ConfirmingOpen(file_path)),
+            },
+            status => self.save_status = status,
+        }
 
         if !self.changes.is_empty() || self.action.is_some() {
             ui.ctx().request_repaint();
