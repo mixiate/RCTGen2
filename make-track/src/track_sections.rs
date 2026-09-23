@@ -100,19 +100,6 @@ pub static FLAT_TO_GENTLE: TrackSection = TrackSection {
     chain_type: Some(chain::ChainType::Flat),
 };
 
-pub static GENTLE: TrackSection = TrackSection {
-    name: "gentle",
-    curve: crate::track_curves::gentle,
-    length: crate::track_curves::GENTLE_LENGTH,
-    tiles: heapless::Vec::from_array([[0; 3]]),
-    position_offset: POSITION_OFFSET_ORTHOGONAL,
-    mask_offset_y: false,
-    prefer_odd_alt_mesh_count: false,
-    invert_alt_mesh: false,
-    has_supports: true,
-    chain_type: Some(chain::ChainType::Gentle),
-};
-
 pub static GENTLE_TO_FLAT: TrackSection = TrackSection {
     name: "gentle_to_flat",
     curve: crate::track_curves::gentle_to_flat,
@@ -124,6 +111,19 @@ pub static GENTLE_TO_FLAT: TrackSection = TrackSection {
     invert_alt_mesh: false,
     has_supports: true,
     chain_type: Some(chain::ChainType::Flat),
+};
+
+pub static GENTLE: TrackSection = TrackSection {
+    name: "gentle",
+    curve: crate::track_curves::gentle,
+    length: crate::track_curves::GENTLE_LENGTH,
+    tiles: heapless::Vec::from_array([[0; 3]]),
+    position_offset: POSITION_OFFSET_ORTHOGONAL,
+    mask_offset_y: false,
+    prefer_odd_alt_mesh_count: false,
+    invert_alt_mesh: false,
+    has_supports: true,
+    chain_type: Some(chain::ChainType::Gentle),
 };
 
 pub static GENTLE_TO_STEEP: TrackSection = TrackSection {
@@ -2215,8 +2215,8 @@ pub static BANKED_ZERO_G_ROLL_RIGHT: TrackSection = TrackSection {
 pub const TRACK_SECTIONS: [&TrackSection; 152] = [
     &FLAT,
     &FLAT_TO_GENTLE,
-    &GENTLE,
     &GENTLE_TO_FLAT,
+    &GENTLE,
     &GENTLE_TO_STEEP,
     &STEEP_TO_GENTLE,
     &STEEP,
