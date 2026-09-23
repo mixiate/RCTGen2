@@ -148,7 +148,7 @@ impl TrackEditor {
         mut update_model: bool,
         track_changes: TrackChanges,
     ) {
-        let mut render = true;
+        let mut render = false;
         if track_changes.contains(TrackChanges::Models) {
             load_models = true;
         }
