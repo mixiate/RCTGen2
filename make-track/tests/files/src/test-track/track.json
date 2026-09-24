@@ -41,7 +41,9 @@
                 "large_steep_sloped_turns",
                 "banked_barrel_rolls",
                 "banked_inline_twists",
-                "banked_zero_g_rolls"
+                "banked_zero_g_rolls",
+                "diagonal_corkscrews",
+                "large_diagonal_corkscrews"
             ],
             "z_offset": 8,
             "masks": "upright",
