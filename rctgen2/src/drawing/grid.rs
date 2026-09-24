@@ -46,7 +46,7 @@ pub fn draw_grid(
             let coords = Coords::new(x.into(), y.into(), z.into()).rotate(rotation);
             let (tile_image, colour) =
                 if let Some(index) = highlighted_tiles.iter().position(|tile| tile[0] == x && tile[1] == y) {
-                    let colour = *HIGHLIGHTED_TILE_COLOURS.get(index).unwrap_or(&openrct2::colour::Colour::White);
+                    let colour = *HIGHLIGHTED_TILE_COLOURS.get(index).unwrap_or(&openrct2::colour::Colour::Grey);
                     (&grid_images.highlighted, colour)
                 } else {
                     (&grid_images.grid, openrct2::colour::Colour::White)
