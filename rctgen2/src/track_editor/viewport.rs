@@ -27,7 +27,7 @@ pub struct Response {
 
 impl Viewport {
     pub fn new(egui_context: &egui::Context) -> Self {
-        let back_buffer_size = 512;
+        let back_buffer_size = 768;
         let back_buffer = egui::ColorImage::filled([back_buffer_size, back_buffer_size], egui::Color32::TRANSPARENT);
         let back_buffer = egui_context.load_texture("back buffer", back_buffer, egui::TextureOptions::default());
         let mut back_buffer_image = renderer::image::Image::new(back_buffer_size, back_buffer_size);
@@ -121,7 +121,7 @@ impl Viewport {
         {
             let texture_size = self.back_buffer.size_vec2() * self.zoom as f32;
             let image = egui::Image::from_texture((self.back_buffer.id(), texture_size));
-            let image_pos = ui.max_rect().center() - (texture_size / 2.0);
+            let image_pos = ui.max_rect().center().floor() - (texture_size / 2.0);
             let image_rect = egui::Rect::from_min_size(image_pos, texture_size);
             ui.place(image_rect, image);
         }
