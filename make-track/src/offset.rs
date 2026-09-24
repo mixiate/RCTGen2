@@ -87,8 +87,10 @@ fn get_offset_type(
     } else if compare_vector(&point.tangent, &DIAGONAL_TANGENT, rotation) {
         if banked {
             Some((OffsetType::DiagonalBanked, banked_right))
-        } else {
+        } else if point.normal.y > 0.0 {
             Some((OffsetType::Diagonal, false))
+        } else {
+            None
         }
     } else if compare_vector(&point.tangent, &DIAGONAL_GENTLE_TANGENT, rotation) {
         if banked {
