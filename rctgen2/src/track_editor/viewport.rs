@@ -83,7 +83,7 @@ impl Viewport {
                 drawing::grid::draw_grid(
                     &mut self.back_buffer_image,
                     &self.grid_images,
-                    7,
+                    9,
                     if self.drawing_options.supports { -32 } else { 0 },
                     self.rotation,
                     highlighted_tiles,
