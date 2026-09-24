@@ -280,7 +280,7 @@ pub fn track_widgets(
             let mut size = ui.spacing().interact_size;
             size.x = 150.0;
             if ui.add_sized(size, egui::TextEdit::singleline(&mut track.name)).changed() {
-                *changes |= track_editor::TrackChanges::TrackName;
+                *changes |= track_editor::TrackChanges::Misc;
             }
         }
         ui.end_row();
@@ -298,12 +298,12 @@ pub fn track_widgets(
             } else {
                 if widgets::buttons::add_button(ui) {
                     track.suffix = Some(String::new());
-                    *changes |= track_editor::TrackChanges::TrackName;
+                    *changes |= track_editor::TrackChanges::Misc;
                 }
             }
             if removed {
                 track.suffix = None;
-                *changes |= track_editor::TrackChanges::TrackName;
+                *changes |= track_editor::TrackChanges::Misc;
             }
         }
         ui.end_row();
@@ -399,8 +399,10 @@ pub fn track_widgets(
             if ui.checkbox(&mut enabled, label).changed() {
                 if enabled {
                     track.sections.insert(group);
+                    *changes |= track_editor::TrackChanges::Misc;
                 } else {
                     track.sections.shift_remove(&group);
+                    *changes |= track_editor::TrackChanges::Misc;
                 }
             }
         }
