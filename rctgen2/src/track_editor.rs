@@ -24,7 +24,7 @@ pub enum TrackEditorMessage {
 bitflags::bitflags! {
     #[derive(Clone, Copy, Default, PartialEq)]
     pub struct TrackChanges: u32 {
-        const TrackName = 1 << 0;
+        const Misc = 1 << 0;
         const ZOffset = 1 << 1;
         const Masks = 1 << 2;
         const ModelSettings = 1 << 3;
