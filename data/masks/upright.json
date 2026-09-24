@@ -2816,6 +2816,58 @@
             "split": [true, false, false]
         }
     ],
+    "corkscrew_left_diag": [
+        {
+            "mask": "upright/corkscrew_left_diag_0.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "tiles": [2, 3, 4, 7],
+            "transfer": [true, false, false, false]
+        },
+        {
+            "mask": "upright/corkscrew_left_diag_1.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "split": [false, false, false, true, false, false]
+        },
+        {
+            "mask": "upright/corkscrew_left_diag_2.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "split": [false, false, false, false, true]
+        },
+        {
+            "mask": "upright/corkscrew_left_diag_3.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "tiles": [0, 3, 4, 6],
+            "transfer": [false, false, true, false]
+        }
+    ],
+    "corkscrew_right_diag": [
+        {
+            "mirror": true,
+            "mask": "upright/corkscrew_left_diag_2.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "split": [false, false, false, false, true]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/corkscrew_left_diag_1.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "split": [false, false, false, true, false, false]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/corkscrew_left_diag_0.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "tiles": [2, 3, 4, 7],
+            "transfer": [true, false, false, false]
+        },
+        {
+            "mirror": true,
+            "mask": "upright/corkscrew_left_diag_3.png",
+            "offset": [[-16, -16, 0], [-16, -16, 0], [-16, -16, 0], [-16, -16, 0]],
+            "tiles": [0, 3, 4, 6],
+            "transfer": [false, false, true, false]
+        }
+    ],
     "large_corkscrew_left_diag": [
         {
             "mask": "upright/large_corkscrew_left_diag_0.png",
