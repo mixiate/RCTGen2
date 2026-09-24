@@ -88,6 +88,9 @@ pub const LARGE_ZERO_G_ROLL_LENGTH: f32 = 5.568162;
 
 pub const DIVE_LOOP_45_LENGTH: f32 = 5.335896;
 
+const CORKSCREW_DIAG_SEGMENT_LENGTH: f32 = 2.008249;
+pub const CORKSCREW_DIAG_LENGTH: f32 = CORKSCREW_DIAG_SEGMENT_LENGTH * 2.0;
+
 const LARGE_CORKSCREW_DIAG_SEGMENT_LENGTH: f32 = 2.821776;
 pub const LARGE_CORKSCREW_DIAG_LENGTH: f32 = LARGE_CORKSCREW_DIAG_SEGMENT_LENGTH * 2.0;
 
@@ -1742,6 +1745,48 @@ pub fn banked_zero_g_roll_left(distance: f32, bank_angle: f32) -> TrackPoint {
 
 pub fn banked_zero_g_roll_right(distance: f32, bank_angle: f32) -> TrackPoint {
     curves::flip_x_axis(banked_zero_g_roll_left(distance, bank_angle))
+}
+
+pub fn corkscrew_left_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    if distance < CORKSCREW_DIAG_SEGMENT_LENGTH {
+        curves::bezier3d(
+            &[-0.036035, -0.778448, 1.664999, 0.0],
+            &[-0.587208, 1.437726, -0.0, 0.0],
+            &[-0.097415, -0.067585, 1.665001, 0.0],
+            &[-1.8175331e-1, 9.5726234e-1, -1.111801, 3.3633548e-1],
+            &[
+                3.1308326e-4,
+                -2.1250746e-3,
+                7.1575665e-3,
+                -7.329933e-3,
+                -6.4776842e-3,
+                4.539932e-2,
+                4.2472205e-1,
+            ],
+            distance,
+        )
+    } else {
+        curves::bezier3d(
+            &[0.036034, -0.886552, -0.0, 0.850517],
+            &[-0.587208, 0.323899, 1.113826, 0.850517],
+            &[-0.097415, 0.359829, 1.237585, 1.5],
+            &[-1.8175331e-1, -4.1200238e-1, 2.5746366e-1, -4.3442564e-5],
+            &[
+                3.1308687e-4,
+                -2.2761982e-3,
+                8.06799e-3,
+                -2.4735302e-2,
+                5.7311334e-2,
+                -1.0500292e-1,
+                6.0060287e-1,
+            ],
+            distance - CORKSCREW_DIAG_SEGMENT_LENGTH,
+        )
+    }
+}
+
+pub fn corkscrew_right_diag(distance: f32, _bank_angle: f32) -> TrackPoint {
+    curves::flip_x_axis_diagonal(corkscrew_left_diag(distance, 0.0))
 }
 
 pub fn large_corkscrew_left_diag(distance: f32, _bank_angle: f32) -> TrackPoint {

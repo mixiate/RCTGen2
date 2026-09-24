@@ -78,6 +78,7 @@ pub enum TrackGroup {
     BankedBarrelRolls,
     BankedInlineTwists,
     BankedZeroGRolls,
+    DiagonalCorkscrews,
     LargeDiagonalCorkscrews,
 }
 
