@@ -45,7 +45,12 @@
         }
     ],
     "lights": [
-        { "direction": [ 1, 0.66666, 1 ], "diffuse_strength": 1, "specular_strength": 1, "shadow": false }
+        {
+            "direction": [1, 0.66666, 1],
+            "diffuse_strength": 1,
+            "specular_strength": 1,
+            "shadow": false
+        }
     ],
     "dither": false
 }

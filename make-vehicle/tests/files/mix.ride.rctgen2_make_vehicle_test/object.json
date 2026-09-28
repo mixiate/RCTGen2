@@ -1,9 +1,7 @@
 {
     "id": "mix.ride.rctgen2_make_vehicle_test",
     "version": "1.0",
-    "authors": [
-        "mix"
-    ],
+    "authors": ["mix"],
     "objectType": "ride",
     "properties": {
         "type": "twister_rc",
@@ -14,9 +12,7 @@
         "numEmptyCars": 0,
         "tabCar": 1,
         "defaultCar": 0,
-        "headCars": [
-            1
-        ],
+        "headCars": [1],
         "buildMenuPriority": 3,
         "maxHeight": 34,
         "ratingMultipler": {
@@ -26,25 +22,13 @@
         },
         "carColours": [
             [
-                [
-                    "black",
-                    "bright_pink",
-                    "black"
-                ]
+                ["black", "bright_pink", "black"]
             ],
             [
-                [
-                    "bordeaux_red",
-                    "black",
-                    "bordeaux_red"
-                ]
+                ["bordeaux_red", "black", "bordeaux_red"]
             ],
             [
-                [
-                    "yellow",
-                    "grey",
-                    "bright_red"
-                ]
+                ["yellow", "grey", "bright_red"]
             ]
         ],
         "cars": [
@@ -100,12 +84,7 @@
                 "hasAdditionalColour1": true,
                 "hasAdditionalColour2": true,
                 "hasScreamingRiders": true,
-                "loadingPositions": [
-                    2,
-                    4,
-                    -4,
-                    -2
-                ]
+                "loadingPositions": [2, 4, -4, -2]
             },
             {
                 "rotationFrameMask": 0,

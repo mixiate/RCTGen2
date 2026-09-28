@@ -2,9 +2,7 @@
     "tracks": [
         {
             "name": "test-track-additional-models",
-            "sections": [
-                "zero_g_rolls"
-            ],
+            "sections": ["zero_g_rolls"],
             "z_offset": 0,
             "masks": "upright",
             "models": {
@@ -30,6 +28,11 @@
         }
     ],
     "lights": [
-        { "direction": [ 1, 1, 1 ], "diffuse_strength": 1, "specular_strength": 0, "shadow": false }
+        {
+            "direction": [1, 1, 1],
+            "diffuse_strength": 1,
+            "specular_strength": 0,
+            "shadow": false
+        }
     ]
 }
