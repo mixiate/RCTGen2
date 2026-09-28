@@ -3,10 +3,7 @@
         {
             "name": "test-track-lift",
             "suffix": "lift",
-            "sections": [
-                "flat",
-                "steep_slopes"
-            ],
+            "sections": ["flat", "steep_slopes"],
             "z_offset": 8,
             "masks": "upright",
             "lift": true,
@@ -18,10 +15,7 @@
         {
             "name": "test-track-lift",
             "suffix": "lift",
-            "sections": [
-                "gentle_slopes",
-                "diagonals"
-            ],
+            "sections": ["gentle_slopes", "diagonals"],
             "z_offset": 8,
             "masks": "upright",
             "lift": true,
@@ -32,19 +26,74 @@
         }
     ],
     "lights": [
-        { "direction": [ 1, 0.575, 1 ], "diffuse_strength": 1, "specular_strength": 1, "shadow": true },
+        {
+            "direction": [1, 0.575, 1],
+            "diffuse_strength": 1,
+            "specular_strength": 1,
+            "shadow": true
+        },
 
-        { "direction": [ -1, 0.5, 0 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
-        { "direction": [ 1, 0.5, 0 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
-        { "direction": [ 0, 0.5, 1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
-        { "direction": [ 0, 0.5, -1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        {
+            "direction": [-1, 0.5, 0],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [1, 0.5, 0],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [0, 0.5, 1],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [0, 0.5, -1],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
 
-        { "direction": [ -1, 0.5, -1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
-        { "direction": [ -1, 0.5, 1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
-        { "direction": [ 1, 0.5, -1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
-        { "direction": [ 1, 0.5, 1 ], "diffuse_strength": 0.09, "specular_strength": 0, "shadow": false },
+        {
+            "direction": [-1, 0.5, -1],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [-1, 0.5, 1],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [1, 0.5, -1],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [1, 0.5, 1],
+            "diffuse_strength": 0.09,
+            "specular_strength": 0,
+            "shadow": false
+        },
 
-        { "direction": [ 0, 1, 0 ], "diffuse_strength": 0.05, "specular_strength": 0, "shadow": false },
-        { "direction": [ 0, -1, 0 ], "diffuse_strength": 0.15, "specular_strength": 0, "shadow": false }
+        {
+            "direction": [0, 1, 0],
+            "diffuse_strength": 0.05,
+            "specular_strength": 0,
+            "shadow": false
+        },
+        {
+            "direction": [0, -1, 0],
+            "diffuse_strength": 0.15,
+            "specular_strength": 0,
+            "shadow": false
+        }
     ]
 }

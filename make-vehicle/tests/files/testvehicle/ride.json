@@ -7,22 +7,9 @@
     "preview": "preview.png",
     "ride_type": "twister_rc",
     "sprites": [
-        "flat",
-        "gentle_slopes",
-        "steep_slopes",
-        "vertical_slopes",
-        "diagonals",
-        "banked_turns",
-        "inline_twists",
-        "slope_bank_transition",
-        "diagonal_bank_transition",
-        "sloped_bank_transition",
-        "banked_sloped_turns",
-        "banked_slope_transition",
-        "corkscrews",
-        "zero_g_rolls",
-        "diagonal_sloped_bank_transition",
-        "dive_loops"
+        "flat", "gentle_slopes", "steep_slopes", "vertical_slopes", "diagonals", "banked_turns", "inline_twists",
+        "slope_bank_transition", "diagonal_bank_transition", "sloped_bank_transition", "banked_sloped_turns",
+        "banked_slope_transition", "corkscrews", "zero_g_rolls", "diagonal_sloped_bank_transition", "dive_loops"
     ],
     "zero_cars": 0,
     "min_cars_per_train": 4,
@@ -39,43 +26,60 @@
     "max_height": 34,
     "limit_air_time_bonus": true,
     "default_colors": [
-        [
-            "black",
-            "bright_pink",
-            "black"
-        ],
-        [
-            "bordeaux_red",
-            "black",
-            "bordeaux_red"
-        ],
-        [
-            "yellow",
-            "grey",
-            "bright_red"
-        ]
+        ["black", "bright_pink", "black"],
+        ["bordeaux_red", "black", "bordeaux_red"],
+        ["yellow", "grey", "bright_red"]
     ],
-    "configuration": { "front": 1, "default": 0 },
-    "meshes": [
-        "car.obj",
-        "restraints.obj",
-        "guests.obj"
-    ],
+    "configuration": {
+        "front": 1,
+        "default": 0
+    },
+    "meshes": ["car.obj", "restraints.obj", "guests.obj"],
     "vehicles": [
         {
-            "flags": [ "secondary_remap", "tertiary_remap", "restraint_animation", "riders_scream" ],
+            "flags": ["secondary_remap", "tertiary_remap", "restraint_animation", "riders_scream"],
             "model": [
-                { "mesh_index": 0, "position": [0, 0, 0], "orientation": [0, 0, 0] },
-                { "mesh_index": 1, "position": [0, 0.085361, 0.2006], "orientation": [[0, 0, 0], [4, 0, 0], [8, 0, 0], [12, 0, 0]] },
-                { "mesh_index": 1, "position": [0, 0.085361, 0], "orientation": [[0, 0, 0], [4, 0, 0], [8, 0, 0], [12, 0, 0]] }
+                {
+                    "mesh_index": 0,
+                    "position": [0, 0, 0],
+                    "orientation": [0, 0, 0]
+                },
+                {
+                    "mesh_index": 1,
+                    "position": [0, 0.085361, 0.2006],
+                    "orientation": [
+                        [0, 0, 0],
+                        [4, 0, 0],
+                        [8, 0, 0],
+                        [12, 0, 0]
+                    ]
+                },
+                {
+                    "mesh_index": 1,
+                    "position": [0, 0.085361, 0],
+                    "orientation": [
+                        [0, 0, 0],
+                        [4, 0, 0],
+                        [8, 0, 0],
+                        [12, 0, 0]
+                    ]
+                }
             ],
             "mass": 710,
             "spacing": 0.6060606,
             "draw_order": 8,
-            "capacity":4,
-            "riders":[
-                { "mesh_index": 2, "position": [0, 0.0, 0.101009], "orientation": [0, 0, 0] },
-                { "mesh_index": 2, "position": [0, 0.0, -0.101009], "orientation": [0, 0, 0] }
+            "capacity": 4,
+            "riders": [
+                {
+                    "mesh_index": 2,
+                    "position": [0, 0.0, 0.101009],
+                    "orientation": [0, 0, 0]
+                },
+                {
+                    "mesh_index": 2,
+                    "position": [0, 0.0, -0.101009],
+                    "orientation": [0, 0, 0]
+                }
             ]
         },
         {
@@ -85,6 +89,11 @@
         }
     ],
     "lights": [
-        { "direction": [1.0, 1.0, 1.0], "diffuse_strength": 1.0, "specular_strength": 1.0, "shadow": false }
+        {
+            "direction": [1.0, 1.0, 1.0],
+            "diffuse_strength": 1.0,
+            "specular_strength": 1.0,
+            "shadow": false
+        }
     ]
 }

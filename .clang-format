@@ -1,0 +1,7 @@
+---
+Language: Json
+IndentWidth: 4
+ColumnLimit: 120
+BreakArrays: False
+SpacesInContainerLiterals: False
+---
