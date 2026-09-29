@@ -1,6 +1,7 @@
 use crate::drawing;
 use crate::track_editor;
 use crate::track_editor::adjacent_track;
+use crate::ui::widgets;
 use crate::ui::widgets::colour_picker;
 use crate::ui::widgets::colour_picker::ColourPicker;
 use eframe::egui;
@@ -12,6 +13,7 @@ pub struct Viewport {
     pub zoom: usize,
     pub grid: bool,
     pub grid_highlight: bool,
+    adjacent_sections_index: usize,
     pub track_image: Option<track_editor::TrackImage>,
     back_buffer: egui::TextureHandle,
     back_buffer_image: renderer::image::Image,
@@ -39,6 +41,7 @@ impl Viewport {
             zoom: 1,
             grid: false,
             grid_highlight: false,
+            adjacent_sections_index: 0,
             track_image: None,
             back_buffer,
             back_buffer_image,
@@ -58,7 +61,7 @@ impl Viewport {
         &mut self,
         track: &track_desc::Track,
         metal_supports: Option<&track_desc::MetalSupports>,
-        adjacent_track_sections: &adjacent_track::AdjacentTrackSections,
+        adjacent_track_sections: &adjacent_track::AdjacentTrackSectionsByName,
         rct2_sprites: Option<&rct::csg::Archive>,
         ui_zoom_factor: f32,
     ) {
@@ -89,6 +92,9 @@ impl Viewport {
                     highlighted_tiles,
                 );
             }
+            let adjacent_track_sections = adjacent_track_sections
+                .get(track_image.track_section.name)
+                .and_then(|x| x.get(self.adjacent_sections_index));
             drawing::track::draw_track(
                 track,
                 metal_supports,
@@ -115,6 +121,7 @@ impl Viewport {
         track: &track_editor::Track,
         current_track_section: &make_track::track_sections::TrackSection,
         rct2_sprites_loaded: bool,
+        adjacent_track_sections: &adjacent_track::AdjacentTrackSectionsByName,
         colour_button_textures: &[colour_picker::ButtonTextures],
     ) -> Response {
         let mut response = Response::default();
@@ -182,6 +189,22 @@ impl Viewport {
                 .add_enabled(
                     adjacent_track_checkbox_enabled && rct2_sprites_loaded,
                     egui::Checkbox::new(&mut self.drawing_options.adjacent_track, "Adjacent"),
+                )
+                .changed()
+            {
+                response.redraw = true;
+            }
+            let adjacent_count = if let Some(track_image) = &self.track_image
+                && let Some(adjacent_track_sections) = adjacent_track_sections.get(track_image.track_section.name)
+            {
+                usize::from(adjacent_track_sections.len())
+            } else {
+                1
+            };
+            if ui
+                .add_enabled(
+                    adjacent_track_checkbox_enabled && rct2_sprites_loaded,
+                    widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1).range(0..=(adjacent_count - 1)),
                 )
                 .changed()
             {

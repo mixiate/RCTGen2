@@ -81,7 +81,7 @@ pub struct TrackEditor {
     colour_button_textures: Vec<widgets::colour_picker::ButtonTextures>,
     new_track_modal: modals::NewTrackModal,
     viewport: viewport::Viewport,
-    adjacent_track_sections: adjacent_track::AdjacentTrackSections,
+    adjacent_track_sections: adjacent_track::AdjacentTrackSectionsByName,
     file_watcher: file_watcher::FileWatcher,
 }
 
@@ -395,6 +395,7 @@ impl TrackEditor {
                 &self.track,
                 self.track_section,
                 rct2_sprites_loaded,
+                &self.adjacent_track_sections,
                 &self.colour_button_textures,
             );
             if redraw {

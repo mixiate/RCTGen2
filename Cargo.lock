@@ -3242,6 +3242,7 @@ dependencies = [
  "heapless",
  "indexmap 2.14.0",
  "make-track",
+ "nonempty-collections",
  "notify",
  "openrct2",
  "rct",
