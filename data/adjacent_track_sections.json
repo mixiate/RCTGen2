@@ -1197,18 +1197,30 @@
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -120]
         }
     ],
     "barrel_roll_right": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -120]
         }
     ],
     "banked_barrel_roll_left": [
         {
             "name": "left_bank",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -120]
         }
     ],
     "banked_barrel_roll_right": [
@@ -1216,24 +1228,40 @@
             "name": "left_bank",
             "coords": [32, 0, 0],
             "rotation": 2
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -120]
         }
     ],
     "inline_twist_left": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -136]
         }
     ],
     "inline_twist_right": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -136]
         }
     ],
     "banked_inline_twist_left": [
         {
             "name": "left_bank",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -136]
         }
     ],
     "banked_inline_twist_right": [
@@ -1241,12 +1269,21 @@
             "name": "left_bank",
             "coords": [32, 0, 0],
             "rotation": 2
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -136]
         }
     ],
     "half_loop": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-32, 0, 0],
+            "rotation": 2
         }
     ],
     "vertical_loop_left": [
@@ -1265,102 +1302,180 @@
         {
             "name": "vertical",
             "coords": [0, 0, -32]
+        },
+        {
+            "name": "half_loop",
+            "coords": [64, 0, -24],
+            "rotation": 2
         }
     ],
     "corkscrew_left": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-32, -32, -72],
+            "rotation": 3
         }
     ],
     "corkscrew_right": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-32, 32, -72],
+            "rotation": 1
         }
     ],
     "large_corkscrew_left": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, -64, -40],
+            "rotation": 3
         }
     ],
     "large_corkscrew_right": [
         {
             "name": "flat",
             "coords": [32, 0, 0]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 64, -40],
+            "rotation": 1
         }
     ],
     "medium_half_loop_left": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-32, -32, 64],
+            "rotation": 2
         }
     ],
     "medium_half_loop_right": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-32, 32, 64],
+            "rotation": 2
         }
     ],
     "large_half_loop_left": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, -32, 128],
+            "rotation": 2
         }
     ],
     "large_half_loop_right": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 32, 128],
+            "rotation": 2
         }
     ],
     "zero_g_roll_left": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -96]
         }
     ],
     "zero_g_roll_right": [
         {
             "name": "gentle",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -96]
         }
     ],
     "large_zero_g_roll_left": [
         {
             "name": "steep",
             "coords": [32, 0, -64]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-96, 0, 0]
         }
     ],
     "large_zero_g_roll_right": [
         {
             "name": "steep",
             "coords": [32, 0, -64]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-96, 0, 0]
         }
     ],
     "banked_zero_g_roll_left": [
         {
             "name": "gentle_left_bank",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -96]
         }
     ],
     "banked_zero_g_roll_right": [
         {
             "name": "gentle_right_bank",
             "coords": [32, 0, -16]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-64, 0, -96]
         }
     ],
     "dive_loop_45_left": [
         {
             "name": "steep_diag",
             "coords": [32, -32, -64]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-96, 32, 0]
         }
     ],
     "dive_loop_45_right": [
         {
             "name": "steep_diag",
             "coords": [32, -32, -64]
+        },
+        {
+            "name": "half_loop",
+            "coords": [-32, 96, 0],
+            "rotation": 1
         }
     ],
     "corkscrew_left_diag": [
