@@ -13,6 +13,7 @@ glam = "0.33.3"
 heapless = "0.9.3"
 indexmap = "2.14.0"
 make-track = { path = "../make-track" }
+nonempty-collections = { version = "1.4.0", features = ["serde"] }
 notify = "8.2.0"
 openrct2 = { path = "../openrct2" }
 rct = { path = "../rct" }
