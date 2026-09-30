@@ -198,8 +198,9 @@ impl Viewport {
                 } else {
                     1
                 };
-                let adjacent_track_index_widget =
-                    widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1).range(0..=(adjacent_count - 1));
+                let adjacent_track_index_widget = widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1)
+                    .width(45.0)
+                    .range(0..=(adjacent_count - 1));
                 if ui.add(adjacent_track_index_widget).changed() {
                     response.redraw = true;
                 }
