@@ -44,49 +44,28 @@ fn compare_coords(coords: &Coords, draw_order: DrawOrder) -> bool {
     }
 }
 
-fn draw_adjacent_track_section(
-    rotation: usize,
-    options: &Options,
-    sprites: &rct::csg::Archive,
-    adjacent_section: &adjacent_track::AdjacentTrackSection,
-    track_sprites: &TrackSectionSprites,
-    draw_order: DrawOrder,
-    buffer: &mut Image,
-) {
-    let sprite_rotation = (rotation + usize::from(adjacent_section.rotation)) % 4;
-
-    for (tile_coords, track_sprites) in adjacent_section.track_section.tiles.iter().zip(track_sprites.iter()) {
-        let tile_coords = Coords::from(tile_coords).rotate(usize::from(adjacent_section.rotation));
-        let coords = (Coords::from(adjacent_section.coords) + tile_coords).rotate(rotation);
-        for sprite in &track_sprites[sprite_rotation] {
-            let coords = coords + Coords::from(sprite.offset);
-            if !compare_coords(&coords, draw_order) {
-                continue;
-            }
-            blit::draw_csg_sprite(
-                buffer,
-                sprites,
-                sprite.index,
-                &coords,
-                options.colours[0],
-                options.colours[1],
-            );
-        }
-    }
-}
-
+#[expect(clippy::too_many_arguments)]
 fn draw_original_track_section(
+    buffer: &mut Image,
+    options: &Options,
     track_section: &make_track::track_sections::TrackSection,
+    coords: Coords,
     rotation: usize,
+    track_rotation: usize,
     sprites: &rct::csg::Archive,
     track_sprites: &TrackSectionSprites,
-    options: &Options,
-    buffer: &mut Image,
+    draw_order: Option<DrawOrder>,
 ) {
     for (tile_coords, track_sprites) in track_section.tiles.iter().zip(track_sprites.iter()) {
-        let coords = Coords::from(tile_coords).rotate(rotation);
-        for sprite in &track_sprites[rotation] {
+        let tile_coords = Coords::from(tile_coords).rotate(track_rotation);
+        let coords = (coords + tile_coords).rotate(rotation);
+        for sprite in &track_sprites[(rotation + track_rotation) % 4] {
             let coords = coords + Coords::from(sprite.offset);
+            if let Some(draw_order) = draw_order
+                && !compare_coords(&coords, draw_order)
+            {
+                continue;
+            }
             blit::draw_csg_sprite(
                 buffer,
                 sprites,
@@ -110,14 +89,16 @@ fn draw_with_adjacent_sprites(
 ) {
     for adjacent_track_section in adjacent_track_sections {
         if let Some(track_sprites) = track_desc_sprites.get(adjacent_track_section.track_section.name) {
-            draw_adjacent_track_section(
-                track_image.rotation,
-                options,
-                rct2_sprites,
-                adjacent_track_section,
-                track_sprites,
-                DrawOrder::Before,
+            draw_original_track_section(
                 buffer,
+                options,
+                adjacent_track_section.track_section,
+                adjacent_track_section.coords.into(),
+                track_image.rotation,
+                adjacent_track_section.rotation.into(),
+                rct2_sprites,
+                track_sprites,
+                Some(DrawOrder::Before),
             );
         }
     }
@@ -126,12 +107,15 @@ fn draw_with_adjacent_sprites(
         && let Some(track_sprites) = track_desc_sprites.get(track_image.track_section.name)
     {
         draw_original_track_section(
+            buffer,
+            options,
             track_image.track_section,
+            Coords::ZERO,
             track_image.rotation,
+            0,
             rct2_sprites,
             track_sprites,
-            options,
-            buffer,
+            None,
         );
     } else if options.indexed {
         blit::draw_indexed_image(
@@ -148,17 +132,18 @@ fn draw_with_adjacent_sprites(
             &Coords::new(0, 0, z_offset.into()),
         );
     }
-
     for adjacent_track_section in adjacent_track_sections {
         if let Some(track_sprites) = track_desc_sprites.get(adjacent_track_section.track_section.name) {
-            draw_adjacent_track_section(
-                track_image.rotation,
-                options,
-                rct2_sprites,
-                adjacent_track_section,
-                track_sprites,
-                DrawOrder::After,
+            draw_original_track_section(
                 buffer,
+                options,
+                adjacent_track_section.track_section,
+                adjacent_track_section.coords.into(),
+                track_image.rotation,
+                adjacent_track_section.rotation.into(),
+                rct2_sprites,
+                track_sprites,
+                Some(DrawOrder::After),
             );
         }
     }
@@ -208,12 +193,15 @@ pub fn draw_track(
         && let Some(track_sprites) = track.original_sprites.get(track_image.track_section.name)
     {
         draw_original_track_section(
+            buffer,
+            options,
             track_image.track_section,
+            Coords::ZERO,
             track_image.rotation,
+            0,
             rct2_sprites,
             track_sprites,
-            options,
-            buffer,
+            None,
         );
     } else if options.indexed {
         blit::draw_indexed_image(

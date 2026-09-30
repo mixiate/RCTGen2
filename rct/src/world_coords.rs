@@ -6,6 +6,8 @@ pub struct Coords {
 }
 
 impl Coords {
+    pub const ZERO: Self = Self { x: 0, y: 0, z: 0 };
+
     pub const fn new(x: i32, y: i32, z: i32) -> Self {
         Coords { x, y, z }
     }
