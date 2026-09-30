@@ -191,16 +191,15 @@ impl Viewport {
                     response.redraw = true;
                 }
 
-                let adjacent_count = if let Some(track_image) = &self.track_image
-                    && let Some(adjacent_track_sections) = adjacent_track_sections.get(track_image.track_section.name)
-                {
-                    usize::from(adjacent_track_sections.len())
-                } else {
-                    1
-                };
+                let adjacent_section_count = self
+                    .track_image
+                    .as_ref()
+                    .and_then(|track_image| adjacent_track_sections.get(track_image.track_section.name))
+                    .map(|adjacent_track_sections| usize::from(adjacent_track_sections.len()))
+                    .unwrap_or(1);
                 let adjacent_track_index_widget = widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1)
                     .width(45.0)
-                    .range(0..=(adjacent_count - 1));
+                    .range(0..=(adjacent_section_count - 1));
                 if ui.add(adjacent_track_index_widget).changed() {
                     response.redraw = true;
                 }
