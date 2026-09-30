@@ -190,13 +190,15 @@ impl Viewport {
                 if ui.checkbox(&mut self.drawing_options.adjacent_track, "Adjacent").changed() {
                     response.redraw = true;
                 }
+            });
 
-                let adjacent_section_count = self
-                    .track_image
-                    .as_ref()
-                    .and_then(|track_image| adjacent_track_sections.get(track_image.track_section.name))
-                    .map(|adjacent_track_sections| usize::from(adjacent_track_sections.len()))
-                    .unwrap_or(1);
+            let adjacent_section_count = self
+                .track_image
+                .as_ref()
+                .and_then(|track_image| adjacent_track_sections.get(track_image.track_section.name))
+                .map(|adjacent_track_sections| usize::from(adjacent_track_sections.len()))
+                .unwrap_or(1);
+            ui.add_enabled_ui(adjacent_track_enabled && adjacent_section_count > 1, |ui| {
                 let adjacent_track_index_widget = widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1)
                     .width(45.0)
                     .range(0..=(adjacent_section_count - 1));
