@@ -9,6 +9,7 @@ fn set_widget_corner_radius(ui: &mut egui::Ui, corner_radius: egui::CornerRadius
 
 pub struct DragValueSpin<'a, T> {
     value: &'a mut T,
+    width: f32,
     increment: T,
     range: Option<std::ops::RangeInclusive<T>>,
 }
@@ -17,9 +18,15 @@ impl<'a, T: eframe::emath::Numeric + std::default::Default> DragValueSpin<'_, T>
     pub fn new(value: &'a mut T, increment: T) -> DragValueSpin<'a, T> {
         DragValueSpin {
             value,
+            width: 75.0,
             increment,
             range: None,
         }
+    }
+
+    pub fn width(mut self, width: f32) -> Self {
+        self.width = width;
+        self
     }
 
     pub fn range(mut self, range: std::ops::RangeInclusive<T>) -> Self {
@@ -60,7 +67,7 @@ impl<T: eframe::emath::Numeric + std::ops::SubAssign + std::ops::AddAssign> egui
             if let Some(range) = &self.range {
                 drag_value = drag_value.clamp_existing_to_range(false).range(range.clone());
             }
-            let response_b = ui.add_sized(egui::vec2(75.0, 10.0), drag_value);
+            let response_b = ui.add_sized(egui::vec2(self.width, 10.0), drag_value);
 
             set_widget_corner_radius(
                 ui,
