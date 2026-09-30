@@ -184,32 +184,26 @@ impl Viewport {
             {
                 response.redraw = true;
             }
-            let adjacent_track_checkbox_enabled = !track.original_sprites.is_empty();
-            if ui
-                .add_enabled(
-                    adjacent_track_checkbox_enabled && rct2_sprites_loaded,
-                    egui::Checkbox::new(&mut self.drawing_options.adjacent_track, "Adjacent"),
-                )
-                .changed()
-            {
-                response.redraw = true;
-            }
-            let adjacent_count = if let Some(track_image) = &self.track_image
-                && let Some(adjacent_track_sections) = adjacent_track_sections.get(track_image.track_section.name)
-            {
-                usize::from(adjacent_track_sections.len())
-            } else {
-                1
-            };
-            if ui
-                .add_enabled(
-                    adjacent_track_checkbox_enabled && rct2_sprites_loaded,
-                    widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1).range(0..=(adjacent_count - 1)),
-                )
-                .changed()
-            {
-                response.redraw = true;
-            }
+
+            let adjacent_track_enabled = !track.original_sprites.is_empty() && rct2_sprites_loaded;
+            ui.add_enabled_ui(adjacent_track_enabled, |ui| {
+                if ui.checkbox(&mut self.drawing_options.adjacent_track, "Adjacent").changed() {
+                    response.redraw = true;
+                }
+
+                let adjacent_count = if let Some(track_image) = &self.track_image
+                    && let Some(adjacent_track_sections) = adjacent_track_sections.get(track_image.track_section.name)
+                {
+                    usize::from(adjacent_track_sections.len())
+                } else {
+                    1
+                };
+                let adjacent_track_index_widget =
+                    widgets::DragValueSpin::new(&mut self.adjacent_sections_index, 1).range(0..=(adjacent_count - 1));
+                if ui.add(adjacent_track_index_widget).changed() {
+                    response.redraw = true;
+                }
+            });
         });
         frame.show(ui, |ui| {
             if ui.checkbox(&mut self.grid, "Grid").clicked() {
