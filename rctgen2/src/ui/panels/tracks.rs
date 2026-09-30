@@ -10,7 +10,7 @@ fn length_widgets(ui: &mut egui::Ui, value: &mut Option<f32>) -> bool {
     let mut changed = false;
     let mut removed = false;
     if let Some(value) = value {
-        if ui.add(widgets::DragValueSpin::new(value, 0.01).range(0.1..=1.0)).changed() {
+        if ui.add(widgets::DragValueSpin::new(value, 0.01).range(0.05..=1.0)).changed() {
             changed = true;
         }
         if widgets::buttons::remove_button(ui) {

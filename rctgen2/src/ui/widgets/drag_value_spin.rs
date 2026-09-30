@@ -65,7 +65,7 @@ impl<T: eframe::emath::Numeric + std::ops::SubAssign + std::ops::AddAssign> egui
             set_widget_corner_radius(ui, egui::CornerRadius::ZERO);
             let mut drag_value = egui::DragValue::new(self.value).speed(0.01);
             if let Some(range) = &self.range {
-                drag_value = drag_value.clamp_existing_to_range(false).range(range.clone());
+                drag_value = drag_value.range(range.clone());
             }
             let response_b = ui.add_sized(egui::vec2(self.width, 10.0), drag_value);
 
