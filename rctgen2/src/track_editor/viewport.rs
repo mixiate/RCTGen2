@@ -185,6 +185,8 @@ impl Viewport {
                 response.redraw = true;
             }
 
+            ui.add_sized(egui::Vec2::new(70.0, 0.0), egui::Separator::default().spacing(0.0));
+
             let adjacent_track_enabled = !track.original_sprites.is_empty() && rct2_sprites_loaded;
             ui.add_enabled_ui(adjacent_track_enabled, |ui| {
                 if ui.checkbox(&mut self.drawing_options.adjacent_track, "Adjacent").changed() {
