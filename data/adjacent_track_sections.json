@@ -1499,6 +1499,16 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -120]
             }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -96]
+            }
         ]
     ],
     "barrel_roll_right": [
@@ -1511,6 +1521,16 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -120]
             }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -96]
+            }
         ]
     ],
     "banked_barrel_roll_left": [
@@ -1522,6 +1542,16 @@
             {
                 "name": "half_loop",
                 "coords": [-64, 0, -120]
+            }
+        ],
+        [
+            {
+                "name": "left_bank",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -96]
             }
         ]
     ],
@@ -1536,6 +1566,17 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -120]
             }
+        ],
+        [
+            {
+                "name": "left_bank",
+                "coords": [32, 0, 0],
+                "rotation": 2
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -96]
+            }
         ]
     ],
     "inline_twist_left": [
@@ -1547,6 +1588,16 @@
             {
                 "name": "half_loop",
                 "coords": [-64, 0, -136]
+            }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -112]
             }
         ]
     ],
@@ -1560,6 +1611,16 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -136]
             }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -112]
+            }
         ]
     ],
     "banked_inline_twist_left": [
@@ -1571,6 +1632,16 @@
             {
                 "name": "half_loop",
                 "coords": [-64, 0, -136]
+            }
+        ],
+        [
+            {
+                "name": "left_bank",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -112]
             }
         ]
     ],
@@ -1585,6 +1656,17 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -136]
             }
+        ],
+        [
+            {
+                "name": "left_bank",
+                "coords": [32, 0, 0],
+                "rotation": 2
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -112]
+            }
         ]
     ],
     "half_loop": [
@@ -1596,6 +1678,17 @@
             {
                 "name": "half_loop",
                 "coords": [-32, 0, 0],
+                "rotation": 2
+            }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [64, 0, 24],
                 "rotation": 2
             }
         ]
@@ -1627,6 +1720,17 @@
                 "coords": [64, 0, -24],
                 "rotation": 2
             }
+        ],
+        [
+            {
+                "name": "vertical",
+                "coords": [0, 0, -32]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [160, 0, 0],
+                "rotation": 2
+            }
         ]
     ],
     "corkscrew_left": [
@@ -1638,6 +1742,17 @@
             {
                 "name": "half_loop",
                 "coords": [-32, -32, -72],
+                "rotation": 3
+            }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-32, -128, -48],
                 "rotation": 3
             }
         ]
@@ -1653,6 +1768,17 @@
                 "coords": [-32, 32, -72],
                 "rotation": 1
             }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-32, 128, -48],
+                "rotation": 1
+            }
         ]
     ],
     "large_corkscrew_left": [
@@ -1664,6 +1790,17 @@
             {
                 "name": "half_loop",
                 "coords": [-64, -64, -40],
+                "rotation": 3
+            }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-64, -160, -16],
                 "rotation": 3
             }
         ]
@@ -1679,6 +1816,17 @@
                 "coords": [-64, 64, -40],
                 "rotation": 1
             }
+        ],
+        [
+            {
+                "name": "flat",
+                "coords": [32, 0, 0]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-64, 160, -16],
+                "rotation": 1
+            }
         ]
     ],
     "medium_half_loop_left": [
@@ -1690,6 +1838,17 @@
             {
                 "name": "half_loop",
                 "coords": [-32, -32, 64],
+                "rotation": 2
+            }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [64, -32, 88],
                 "rotation": 2
             }
         ]
@@ -1705,6 +1864,17 @@
                 "coords": [-32, 32, 64],
                 "rotation": 2
             }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [64, 32, 88],
+                "rotation": 2
+            }
         ]
     ],
     "large_half_loop_left": [
@@ -1716,6 +1886,17 @@
             {
                 "name": "half_loop",
                 "coords": [-64, -32, 128],
+                "rotation": 2
+            }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [32, -32, 152],
                 "rotation": 2
             }
         ]
@@ -1731,6 +1912,17 @@
                 "coords": [-64, 32, 128],
                 "rotation": 2
             }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [32, 32, 152],
+                "rotation": 2
+            }
         ]
     ],
     "zero_g_roll_left": [
@@ -1742,6 +1934,16 @@
             {
                 "name": "half_loop",
                 "coords": [-64, 0, -96]
+            }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -72]
             }
         ]
     ],
@@ -1755,6 +1957,16 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -96]
             }
+        ],
+        [
+            {
+                "name": "gentle",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -72]
+            }
         ]
     ],
     "large_zero_g_roll_left": [
@@ -1766,6 +1978,16 @@
             {
                 "name": "half_loop",
                 "coords": [-96, 0, 0]
+            }
+        ],
+        [
+            {
+                "name": "steep",
+                "coords": [32, 0, -64]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-192, 0, 24]
             }
         ]
     ],
@@ -1779,6 +2001,16 @@
                 "name": "half_loop",
                 "coords": [-96, 0, 0]
             }
+        ],
+        [
+            {
+                "name": "steep",
+                "coords": [32, 0, -64]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-192, 0, 24]
+            }
         ]
     ],
     "banked_zero_g_roll_left": [
@@ -1790,6 +2022,16 @@
             {
                 "name": "half_loop",
                 "coords": [-64, 0, -96]
+            }
+        ],
+        [
+            {
+                "name": "gentle_left_bank",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -72]
             }
         ]
     ],
@@ -1803,6 +2045,16 @@
                 "name": "half_loop",
                 "coords": [-64, 0, -96]
             }
+        ],
+        [
+            {
+                "name": "gentle_right_bank",
+                "coords": [32, 0, -16]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-160, 0, -72]
+            }
         ]
     ],
     "dive_loop_45_left": [
@@ -1815,6 +2067,16 @@
                 "name": "half_loop",
                 "coords": [-96, 32, 0]
             }
+        ],
+        [
+            {
+                "name": "steep_diag",
+                "coords": [32, -32, -64]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-192, 32, 24]
+            }
         ]
     ],
     "dive_loop_45_right": [
@@ -1826,6 +2088,17 @@
             {
                 "name": "half_loop",
                 "coords": [-32, 96, 0],
+                "rotation": 1
+            }
+        ],
+        [
+            {
+                "name": "steep_diag",
+                "coords": [32, -32, -64]
+            },
+            {
+                "name": "quarter_loop",
+                "coords": [-32, 192, 24],
                 "rotation": 1
             }
         ]
