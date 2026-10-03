@@ -36,7 +36,7 @@ pub fn menu_bar(
                         ui.disable();
                     }
                     egui::containers::menu::SubMenuButton::new("Open Recent").ui(ui, |ui| {
-                        let response = egui::ScrollArea::vertical().show(ui, |ui| {
+                        let response = egui::ScrollArea::vertical().max_height(450.0).show(ui, |ui| {
                             widgets::recent_files(ui, &mut settings.settings.recent_track_files)
                         });
                         if let Some(index) = response.inner {
