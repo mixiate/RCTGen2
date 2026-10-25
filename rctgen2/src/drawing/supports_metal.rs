@@ -88,7 +88,7 @@ fn draw_support_segments(
         let segment_height = std::cmp::min(height_remaining, MAX_SEGMENT_HEIGHT);
         let sprite_index = sprite_index + segment_height as u32 - 1;
 
-        blit::draw_csg_sprite(buffer, sprites, sprite_index, coords, colour, colour);
+        blit::draw_csg_sprite(buffer, sprites, sprite_index, coords, [colour; 3]);
 
         height_remaining -= segment_height;
         coords.z += segment_height;
@@ -116,7 +116,7 @@ fn draw_support(
     let sprite_indices = &SUPPORT_TYPE_SPRITE_INDICES[support_type as usize];
 
     if let Some(base_index) = sprite_indices.base {
-        blit::draw_csg_sprite(buffer, sprites, base_index, &coords, colour, colour);
+        blit::draw_csg_sprite(buffer, sprites, base_index, &coords, [colour; 3]);
         height_remaining -= 6;
         coords.z += 6;
     }

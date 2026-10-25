@@ -51,7 +51,7 @@ pub fn draw_grid(
                 } else {
                     (&grid_images.grid, openrct2::colour::Colour::White)
                 };
-            blit::draw_indexed_image(image, tile_image, &coords, colour, colour);
+            blit::draw_indexed_image(image, tile_image, &coords, [colour; 3]);
         }
     }
 }
