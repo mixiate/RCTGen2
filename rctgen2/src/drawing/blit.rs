@@ -28,11 +28,13 @@ fn clip_image_to_buffer(
     (dest_x, dest_y, src_x, src_y, width, height)
 }
 
-fn blit_pixel(buffer: &mut Image, x: usize, y: usize, pixel: u8, colour_1: Colour, colour_2: Colour) {
+fn blit_pixel(buffer: &mut Image, x: usize, y: usize, pixel: u8, colours: [Colour; 3]) {
     let pixel = if (243..=254).contains(&pixel) {
-        openrct2::colour::COLOUR_RAMPS[colour_1 as usize][usize::from(pixel) - 243]
+        openrct2::colour::COLOUR_RAMPS[colours[0] as usize][usize::from(pixel) - 243]
     } else if (202..=213).contains(&pixel) {
-        openrct2::colour::COLOUR_RAMPS[colour_2 as usize][usize::from(pixel) - 202]
+        openrct2::colour::COLOUR_RAMPS[colours[1] as usize][usize::from(pixel) - 202]
+    } else if (46..=57).contains(&pixel) {
+        openrct2::colour::COLOUR_RAMPS[colours[2] as usize][usize::from(pixel) - 46]
     } else {
         pixel
     };
@@ -42,7 +44,6 @@ fn blit_pixel(buffer: &mut Image, x: usize, y: usize, pixel: u8, colour_1: Colou
     }
 }
 
-#[expect(clippy::too_many_arguments)]
 fn draw_sprite(
     buffer: &mut Image,
     width: u16,
@@ -50,8 +51,7 @@ fn draw_sprite(
     offset: glam::IVec2,
     pixels: &[u8],
     coords: &Coords,
-    colour_1: Colour,
-    colour_2: Colour,
+    colours: [Colour; 3],
 ) {
     let (dest_x, dest_y, src_x, src_y, clipped_width, clipped_height) = clip_image_to_buffer(
         &ScreenCoords::from(coords),
@@ -70,7 +70,7 @@ fn draw_sprite(
             };
             let x = (dest_x + x) as usize;
             let y = (dest_y + y) as usize;
-            blit_pixel(buffer, x, y, *pixel, colour_1, colour_2);
+            blit_pixel(buffer, x, y, *pixel, colours);
         }
     }
 }
@@ -79,8 +79,7 @@ fn draw_compressed_sprite(
     buffer: &mut Image,
     data: &rct::csg::CompressedSpriteData,
     coords: &Coords,
-    colour_1: Colour,
-    colour_2: Colour,
+    colours: [Colour; 3],
 ) {
     let (dest_x, dest_y, src_x, src_y, width, height) = clip_image_to_buffer(
         &ScreenCoords::from(coords),
@@ -117,7 +116,7 @@ fn draw_compressed_sprite(
                     };
                     let x = (dest_x + x - src_x) as usize;
                     let y = (dest_y + y - src_y) as usize;
-                    blit_pixel(buffer, x, y, *pixel, colour_1, colour_2);
+                    blit_pixel(buffer, x, y, *pixel, colours);
                 }
 
                 index += 1;
@@ -135,39 +134,23 @@ pub fn draw_csg_sprite(
     archive: &rct::csg::Archive,
     index: u32,
     coords: &Coords,
-    colour_1: Colour,
-    colour_2: Colour,
+    colours: [Colour; 3],
 ) {
     if let Some(entry) = archive.entries().get(index as usize) {
         match &archive.get_entry_data(entry) {
             Some(rct::csg::EntryData::Uncompressed(pixels)) => {
                 let offset = glam::IVec2::new(i32::from(entry.offset_x), i32::from(entry.offset_y));
-                draw_sprite(
-                    buffer,
-                    entry.width,
-                    entry.height,
-                    offset,
-                    pixels,
-                    coords,
-                    colour_1,
-                    colour_2,
-                );
+                draw_sprite(buffer, entry.width, entry.height, offset, pixels, coords, colours);
             }
             Some(rct::csg::EntryData::Compressed(data)) => {
-                draw_compressed_sprite(buffer, data, coords, colour_1, colour_2);
+                draw_compressed_sprite(buffer, data, coords, colours);
             }
             None => {}
         }
     }
 }
 
-pub fn draw_indexed_image(
-    buffer: &mut Image,
-    image: &IndexedImage,
-    coords: &Coords,
-    colour_1: Colour,
-    colour_2: Colour,
-) {
+pub fn draw_indexed_image(buffer: &mut Image, image: &IndexedImage, coords: &Coords, colours: [Colour; 3]) {
     draw_sprite(
         buffer,
         image.width(),
@@ -175,8 +158,7 @@ pub fn draw_indexed_image(
         image.offset,
         image.as_raw(),
         coords,
-        colour_1,
-        colour_2,
+        colours,
     );
 }
 

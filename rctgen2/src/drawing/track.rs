@@ -66,14 +66,7 @@ fn draw_original_track_section(
             {
                 continue;
             }
-            blit::draw_csg_sprite(
-                buffer,
-                sprites,
-                sprite.index,
-                &coords,
-                options.colours[0],
-                options.colours[1],
-            );
+            blit::draw_csg_sprite(buffer, sprites, sprite.index, &coords, options.colours);
         }
     }
 }
@@ -122,8 +115,7 @@ fn draw_with_adjacent_sprites(
             buffer,
             &track_image.images.indexed,
             &Coords::new(0, 0, z_offset.into()),
-            options.colours[0],
-            options.colours[1],
+            options.colours,
         );
     } else {
         blit::draw_image(
@@ -208,8 +200,7 @@ pub fn draw_track(
             buffer,
             &track_image.images.indexed,
             &Coords::new(0, 0, z_offset.into()),
-            options.colours[0],
-            options.colours[1],
+            options.colours,
         );
     } else {
         blit::draw_image(
