@@ -2,7 +2,7 @@ use crate::ui::widgets::colour_picker;
 use eframe::egui;
 use openrct2::colour::Colour;
 
-static COLOUR_SELECTION_GRID_COLOURS: [Colour; 54] = [
+static COLOUR_SELECTION_GRID_COLOURS: [Colour; 72] = [
     Colour::Black,
     Colour::SaturatedRed,
     Colour::DarkOrange,
@@ -10,8 +10,17 @@ static COLOUR_SELECTION_GRID_COLOURS: [Colour; 54] = [
     Colour::ForestGreen,
     Colour::SaturatedGreen,
     Colour::DeepWater,
-    Colour::DarkBlue,
+    Colour::DeepBlue,
     Colour::Violet,
+    Colour::Silver,
+    Colour::Ruby,
+    Colour::Amber,
+    Colour::Gold,
+    Colour::Cactus,
+    Colour::Emerald,
+    Colour::DarkerWater,
+    Colour::DarkBlue,
+    Colour::Amethyst,
     Colour::Grey,
     Colour::BrightRed,
     Colour::LightOrange,
@@ -40,6 +49,15 @@ static COLOUR_SELECTION_GRID_COLOURS: [Colour; 54] = [
     Colour::DarkPurple,
     Colour::DarkPink,
     Colour::DarkBrown,
+    Colour::Crimson,
+    Colour::Copper,
+    Colour::Caramel,
+    Colour::Pesto,
+    Colour::Asparagus,
+    Colour::PineGreen,
+    Colour::Indigo,
+    Colour::BurntPink,
+    Colour::Brown,
     Colour::BordeauxRed,
     Colour::SalmonPink,
     Colour::LightBrown,
