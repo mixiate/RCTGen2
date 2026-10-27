@@ -445,8 +445,8 @@
     },
     {
         "path": "track/test-track-tie/barrel_roll_left_2_4.png",
-        "x": -5,
-        "y": -13,
+        "x": -6,
+        "y": -14,
         "palette": "keep"
     },
     {
@@ -554,7 +554,7 @@
     {
         "path": "track/test-track-tie/barrel_roll_right_1_4.png",
         "x": -7,
-        "y": -13,
+        "y": -14,
         "palette": "keep"
     },
     {

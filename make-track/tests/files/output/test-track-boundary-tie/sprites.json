@@ -103,7 +103,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_steep_2_0.png",
-        "x": 0,
+        "x": -1,
         "y": -7,
         "palette": "keep"
     },
@@ -271,7 +271,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/small_flat_to_steep_2_0.png",
-        "x": -4,
+        "x": -5,
         "y": -5,
         "palette": "keep"
     },
@@ -1687,7 +1687,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_right_bank_diag_2_0.png",
-        "x": -4,
+        "x": -6,
         "y": -2,
         "palette": "keep"
     },
@@ -1813,7 +1813,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/medium_turn_left_bank_0_0.png",
-        "x": 0,
+        "x": -2,
         "y": 0,
         "palette": "keep"
     },
@@ -2509,8 +2509,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/very_small_turn_left_steep_3_0.png",
-        "x": -3,
-        "y": -30,
+        "x": -4,
+        "y": -31,
         "palette": "keep"
     },
     {
@@ -2522,7 +2522,7 @@
     {
         "path": "track/test-track-boundary-tie/very_small_turn_right_steep_0_0.png",
         "x": -22,
-        "y": -30,
+        "y": -31,
         "palette": "keep"
     },
     {
@@ -2683,7 +2683,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_gentle_right_bank_2_0.png",
-        "x": 6,
+        "x": 3,
         "y": -5,
         "palette": "keep"
     },
@@ -3571,7 +3571,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/small_helix_right_1_2.png",
-        "x": -5,
+        "x": -6,
         "y": -3,
         "palette": "keep"
     },
@@ -4081,7 +4081,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_2_2.png",
-        "x": -25,
+        "x": -26,
         "y": -16,
         "palette": "keep"
     },
@@ -4333,14 +4333,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_1_2.png",
-        "x": 0,
-        "y": 0,
+        "x": -28,
+        "y": -10,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_1_3.png",
         "x": -28,
-        "y": -10,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -4382,7 +4382,7 @@
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_2_4.png",
         "x": 7,
-        "y": 17,
+        "y": 16,
         "palette": "keep"
     },
     {
@@ -4490,7 +4490,7 @@
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_1_4.png",
         "x": -10,
-        "y": 17,
+        "y": 16,
         "palette": "keep"
     },
     {
@@ -4513,14 +4513,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_2_2.png",
-        "x": 0,
-        "y": 0,
+        "x": 27,
+        "y": -10,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_2_3.png",
         "x": 0,
-        "y": -10,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -4585,7 +4585,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/half_loop_0_2.png",
-        "x": -12,
+        "x": -13,
         "y": -92,
         "palette": "keep"
     },
@@ -4621,7 +4621,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/half_loop_2_0.png",
-        "x": -28,
+        "x": -29,
         "y": -11,
         "palette": "keep"
     },
@@ -4694,7 +4694,7 @@
     {
         "path": "track/test-track-boundary-tie/vertical_loop_left_1_0.png",
         "x": -15,
-        "y": -12,
+        "y": -13,
         "palette": "keep"
     },
     {
@@ -4813,8 +4813,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/vertical_loop_right_2_0.png",
-        "x": -28,
-        "y": -12,
+        "x": -31,
+        "y": -13,
         "palette": "keep"
     },
     {
@@ -4850,7 +4850,7 @@
     {
         "path": "track/test-track-boundary-tie/vertical_loop_right_3_2.png",
         "x": 1,
-        "y": -86,
+        "y": -89,
         "palette": "keep"
     },
     {
@@ -4934,7 +4934,7 @@
     {
         "path": "track/test-track-boundary-tie/corkscrew_left_0_0.png",
         "x": -22,
-        "y": -34,
+        "y": -40,
         "palette": "keep"
     },
     {
@@ -5041,7 +5041,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/corkscrew_right_2_0.png",
-        "x": -2,
+        "x": -3,
         "y": -5,
         "palette": "keep"
     },
@@ -5060,7 +5060,7 @@
     {
         "path": "track/test-track-boundary-tie/corkscrew_right_3_0.png",
         "x": -27,
-        "y": -34,
+        "y": -40,
         "palette": "keep"
     },
     {
@@ -5084,7 +5084,7 @@
     {
         "path": "track/test-track-boundary-tie/large_corkscrew_left_0_1.png",
         "x": -22,
-        "y": -51,
+        "y": -52,
         "palette": "keep"
     },
     {
@@ -5257,7 +5257,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_corkscrew_right_2_0.png",
-        "x": -17,
+        "x": -19,
         "y": -5,
         "palette": "keep"
     },
@@ -5294,7 +5294,7 @@
     {
         "path": "track/test-track-boundary-tie/large_corkscrew_right_3_1.png",
         "x": -12,
-        "y": -51,
+        "y": -52,
         "palette": "keep"
     },
     {
@@ -5348,7 +5348,7 @@
     {
         "path": "track/test-track-boundary-tie/medium_half_loop_left_1_0.png",
         "x": -22,
-        "y": -14,
+        "y": -16,
         "palette": "keep"
     },
     {
@@ -5377,8 +5377,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/medium_half_loop_left_2_0.png",
-        "x": -20,
-        "y": -8,
+        "x": -23,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -5468,7 +5468,7 @@
     {
         "path": "track/test-track-boundary-tie/medium_half_loop_right_1_0.png",
         "x": -22,
-        "y": -8,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -5497,8 +5497,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/medium_half_loop_right_2_0.png",
-        "x": -32,
-        "y": -14,
+        "x": -37,
+        "y": -16,
         "palette": "keep"
     },
     {
@@ -5953,7 +5953,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/zero_g_roll_left_2_2.png",
-        "x": 4,
+        "x": 3,
         "y": -17,
         "palette": "keep"
     },
@@ -6092,7 +6092,7 @@
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_left_0_1.png",
         "x": -24,
-        "y": -9,
+        "y": -10,
         "palette": "keep"
     },
     {
@@ -6163,7 +6163,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_left_2_4.png",
-        "x": 5,
+        "x": 3,
         "y": -11,
         "palette": "keep"
     },
@@ -6301,8 +6301,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_right_3_1.png",
-        "x": 3,
-        "y": -9,
+        "x": 2,
+        "y": -10,
         "palette": "keep"
     },
     {
@@ -6385,7 +6385,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/dive_loop_45_left_2_2.png",
-        "x": -17,
+        "x": -19,
         "y": -22,
         "palette": "keep"
     },
@@ -6404,7 +6404,7 @@
     {
         "path": "track/test-track-boundary-tie/dive_loop_45_left_3_1.png",
         "x": -25,
-        "y": -48,
+        "y": -49,
         "palette": "keep"
     },
     {
@@ -6500,7 +6500,7 @@
     {
         "path": "track/test-track-boundary-tie/dive_loop_45_right_3_1.png",
         "x": -4,
-        "y": -48,
+        "y": -49,
         "palette": "keep"
     },
     {
@@ -6943,7 +6943,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_gentle_right_bank_diag_2_0.png",
-        "x": -5,
+        "x": -6,
         "y": -5,
         "palette": "keep"
     },
@@ -6961,7 +6961,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_left_bank_to_gentle_diag_0_0.png",
-        "x": -4,
+        "x": -7,
         "y": -14,
         "palette": "keep"
     },
@@ -7166,7 +7166,7 @@
     {
         "path": "track/test-track-boundary-tie/flat_to_gentle_left_bank_diag_0_0.png",
         "x": -32,
-        "y": 2,
+        "y": 1,
         "palette": "keep"
     },
     {
@@ -7207,8 +7207,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_gentle_right_bank_diag_2_0.png",
-        "x": -3,
-        "y": 2,
+        "x": -10,
+        "y": 1,
         "palette": "keep"
     },
     {
