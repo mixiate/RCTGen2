@@ -217,8 +217,7 @@ fn sample_point(
 
     if palette_region_type.is_some() {
         fragment.palette_region_type = palette_region_type;
-
-        fragment.depth = samples.iter().fold(f32::INFINITY, |a, &b| a.min(b.depth));
+        fragment.depth = depth;
 
         if let Some(edge_type) = edge_type {
             let sample_count = samples.iter().filter(|x| !x.is_mask).count();
@@ -335,20 +334,26 @@ pub fn render_scene_depth(
     for y in 0..depth_buffer.height() {
         for x in 0..depth_buffer.width() {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
+            let depth = scene.trace_depth_ray(&ray_origin, &ray_direction);
 
-            let mut depth = f32::INFINITY;
-            for sub_x in 0..multi_samples_x {
-                for sub_y in 0..multi_samples_y {
-                    let ray_origin = glam::Vec3::new(
-                        (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
-                        (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
-                        0.0,
-                    ) + ray_origin;
-                    let ray_origin = camera_inverse.transform_vector3(ray_origin);
+            let depth = if depth == f32::INFINITY {
+                let mut depth = f32::INFINITY;
+                for sub_x in 0..multi_samples_x {
+                    for sub_y in 0..multi_samples_y {
+                        let ray_origin = glam::Vec3::new(
+                            (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
+                            (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
+                            0.0,
+                        ) + ray_origin;
+                        let ray_origin = camera_inverse.transform_vector3(ray_origin);
 
-                    depth = depth.min(scene.trace_depth_ray(&ray_origin, &ray_direction));
+                        depth = depth.min(scene.trace_depth_ray(&ray_origin, &ray_direction));
+                    }
                 }
-            }
+                depth
+            } else {
+                depth
+            };
 
             depth_buffer.set_depth(x, y, depth);
         }

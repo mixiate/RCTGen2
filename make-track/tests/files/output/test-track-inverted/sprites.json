@@ -307,7 +307,7 @@
     },
     {
         "path": "track/test-track-inverted/small_steep_to_flat_2_0.png",
-        "x": 1,
+        "x": 0,
         "y": -5,
         "palette": "keep"
     },
@@ -2444,7 +2444,7 @@
     {
         "path": "track/test-track-inverted/vertical_twist_left_1_0.png",
         "x": -8,
-        "y": -49,
+        "y": -50,
         "palette": "keep"
     },
     {
@@ -2504,7 +2504,7 @@
     {
         "path": "track/test-track-inverted/vertical_twist_right_2_0.png",
         "x": -9,
-        "y": -49,
+        "y": -50,
         "palette": "keep"
     },
     {
@@ -3865,7 +3865,7 @@
     },
     {
         "path": "track/test-track-inverted/barrel_roll_left_0_0.png",
-        "x": -1,
+        "x": -3,
         "y": 12,
         "palette": "keep"
     },
@@ -4123,7 +4123,7 @@
     },
     {
         "path": "track/test-track-inverted/barrel_roll_right_3_1.png",
-        "x": -13,
+        "x": -12,
         "y": 4,
         "palette": "keep"
     },
@@ -4651,7 +4651,7 @@
     },
     {
         "path": "track/test-track-inverted/quarter_loop_3_1.png",
-        "x": 3,
+        "x": -6,
         "y": -33,
         "palette": "keep"
     },
@@ -4825,14 +4825,14 @@
     },
     {
         "path": "track/test-track-inverted/large_corkscrew_left_0_2.png",
-        "x": -25,
+        "x": -26,
         "y": -29,
         "palette": "keep"
     },
     {
         "path": "track/test-track-inverted/large_corkscrew_left_0_3.png",
         "x": -32,
-        "y": -28,
+        "y": -27,
         "palette": "keep"
     },
     {
@@ -5072,7 +5072,7 @@
     {
         "path": "track/test-track-inverted/large_corkscrew_right_3_3.png",
         "x": 19,
-        "y": -28,
+        "y": -27,
         "palette": "keep"
     },
     {

@@ -145,7 +145,7 @@
     },
     {
         "path": "track/test-track-additional-models/zero_g_roll_right_2_0.png",
-        "x": -1,
+        "x": -7,
         "y": 1,
         "palette": "keep"
     },
@@ -206,7 +206,7 @@
     {
         "path": "track/test-track-additional-models/large_zero_g_roll_left_0_2.png",
         "x": -15,
-        "y": -44,
+        "y": -43,
         "palette": "keep"
     },
     {
@@ -416,7 +416,7 @@
     {
         "path": "track/test-track-additional-models/large_zero_g_roll_right_3_2.png",
         "x": -32,
-        "y": -44,
+        "y": -43,
         "palette": "keep"
     },
     {
