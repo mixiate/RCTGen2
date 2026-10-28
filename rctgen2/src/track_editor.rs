@@ -45,6 +45,7 @@ pub enum Action {
     RemoveTrack(usize),
     ChangeSection(&'static make_track::track_sections::TrackSection),
     Rotate,
+    ExportSceneAsObj(std::path::PathBuf),
 }
 
 enum SaveStatus {
@@ -263,6 +264,9 @@ impl TrackEditor {
             Some(Action::Rotate) => {
                 self.viewport.rotation = (self.viewport.rotation + 1) & 3;
                 update_model = true;
+            }
+            Some(Action::ExportSceneAsObj(path)) => {
+                let _result = self.render_tx.send(RenderMessage::ExportSceneAsObj(path));
             }
             None => {}
         }

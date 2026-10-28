@@ -79,6 +79,13 @@ pub fn menu_bar(
                 }
                 ui.separator();
 
+                if ui.button("Export model...").clicked()
+                    && let Some(file_path) = rfd::FileDialog::new().add_filter("obj", &["obj"]).save_file()
+                {
+                    action = Some(track_editor::Action::ExportSceneAsObj(file_path));
+                }
+                ui.separator();
+
                 if ui.button("Settings").clicked() {
                     settings.window_open = true;
                 }

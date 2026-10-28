@@ -27,6 +27,7 @@ pub enum RenderMessage {
     UpdateOffsets(Box<Option<make_track::track_desc::Offsets>>),
     UpdateModel(UpdateModelArgs),
     Render(RenderArgs),
+    ExportSceneAsObj(std::path::PathBuf),
     Exit,
 }
 
@@ -276,6 +277,16 @@ pub fn render_thread(
                     }
                 }
                 RenderMessage::Render(_) => {}
+                RenderMessage::ExportSceneAsObj(path) => {
+                    if let Some(scene) = &current_scene {
+                        if let Err(error) = scene.scene.export_as_obj(&path) {
+                            let errors = vec![error.to_string()];
+                            let _result = app_tx.send(TrackEditorMessage::Error(errors));
+                        }
+                    } else {
+                        let _result = app_tx.send(TrackEditorMessage::Error(vec!["No scene to export".to_string()]));
+                    }
+                }
                 RenderMessage::Exit => break 'main_loop,
             }
         }
