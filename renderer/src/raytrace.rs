@@ -38,9 +38,17 @@ impl<'a> SceneBuilder<'a> {
         mut mesh_ids: Option<&mut Vec<usize>>,
     ) -> anyhow::Result<()> {
         for mesh in &model.meshes {
-            let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
+            let mut geometry =
+                embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), mesh.indices.len())?;
             for (position, geom_position) in mesh.positions.iter().zip(geometry.positions_mut().iter_mut()) {
                 *geom_position = transform.transform_point3(*position).into();
+            }
+            if transform.matrix3.determinant().is_sign_negative() {
+                for (face, geom_face) in mesh.indices.iter().zip(geometry.indices_mut().iter_mut()) {
+                    *geom_face = [face[0], face[2], face[1]];
+                }
+            } else {
+                geometry.indices_mut().copy_from_slice(&mesh.indices);
             }
             let normals = mesh.normals.iter().map(|x| transform.transform_vector3(*x).normalize()).collect();
 
@@ -73,7 +81,8 @@ impl<'a> SceneBuilder<'a> {
         F: Fn(&glam::Vec3, &glam::Vec3, bool) -> (glam::Vec3, glam::Vec3),
     {
         for mesh in &model.meshes {
-            let mut geometry = embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), &mesh.indices)?;
+            let mut geometry =
+                embree::TriangleGeometry::new(self.embree_device, mesh.positions.len(), mesh.indices.len())?;
             let mut normals = Vec::with_capacity(mesh.normals.len());
             for ((position, normal), geometry_position) in
                 mesh.positions.iter().zip(mesh.normals.iter()).zip(geometry.positions_mut().iter_mut())
@@ -82,6 +91,7 @@ impl<'a> SceneBuilder<'a> {
                 *geometry_position = position.into();
                 normals.push(normal.normalize());
             }
+            geometry.indices_mut().copy_from_slice(&mesh.indices);
             self.embree_scene.add_geometry(&geometry, mesh_type == MeshType::Ghost)?;
 
             if let Some(mesh_ids) = mesh_ids.as_mut() {
@@ -162,7 +172,7 @@ impl Scene<'_> {
 
         let scene_mesh = &self.meshes[geometry_id];
 
-        let indices = &scene_mesh.mesh.indices[usize::try_from(hit.primitive_id).unwrap()];
+        let indices = &scene_mesh.geometry.indices()[usize::try_from(hit.primitive_id).unwrap()];
 
         let position = self.embree_scene.interpolate(hit.geometry_id, hit.primitive_id, hit.u, hit.v);
 
@@ -224,8 +234,8 @@ impl Scene<'_> {
 
         for (mesh_index, mesh) in self.meshes.iter().enumerate() {
             let polys = mesh
-                .mesh
-                .indices
+                .geometry
+                .indices()
                 .iter()
                 .map(|x| {
                     let index = position.len();
