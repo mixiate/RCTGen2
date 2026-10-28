@@ -214,4 +214,55 @@ impl Scene<'_> {
 
         screen_bounds
     }
+
+    pub fn export_as_obj(&self, path: &std::path::Path) -> Result<(), obj::ObjError> {
+        let mut position = Vec::new();
+        let mut texture = Vec::new();
+        let mut normal = Vec::new();
+        let mut objects = Vec::new();
+
+        for (mesh_index, mesh) in self.meshes.iter().enumerate() {
+            let polys = mesh
+                .mesh
+                .indices
+                .iter()
+                .map(|x| {
+                    let index = position.len();
+                    let index_0 = x[0] as usize + index;
+                    let index_1 = x[2] as usize + index;
+                    let index_2 = x[1] as usize + index;
+                    obj::SimplePolygon(vec![
+                        obj::IndexTuple(index_0, Some(index_0), Some(index_0)),
+                        obj::IndexTuple(index_1, Some(index_1), Some(index_1)),
+                        obj::IndexTuple(index_2, Some(index_2), Some(index_2)),
+                    ])
+                })
+                .collect();
+            let group = obj::Group {
+                name: "object".to_string(),
+                index: mesh_index,
+                material: None,
+                polys,
+            };
+            let object = obj::Object {
+                name: "object".to_string(),
+                groups: vec![group],
+            };
+            objects.push(object);
+
+            position.extend(mesh.geometry.positions().iter().map(|x| [x[0], x[1], -x[2]]));
+            texture.extend(mesh.mesh.uvs.iter().map(|x| [x.x, x.y]));
+            normal.extend(mesh.normals.iter().map(|x| [x.x, x.y, -x.z]));
+        }
+
+        let obj_data = obj::ObjData {
+            position,
+            texture,
+            normal,
+            objects,
+            material_libs: Vec::new(),
+        };
+
+        obj_data.save(path)
+    }
 }
