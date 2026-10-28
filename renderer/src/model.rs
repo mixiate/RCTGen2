@@ -26,6 +26,9 @@ pub struct Material {
     pub(crate) use_ao: bool,
     pub(crate) shadows: bool,
     pub(crate) no_bleed: bool,
+    pub(crate) name: String,
+    diffuse_texture_name: Option<String>,
+    specular_texture_name: Option<String>,
 }
 
 impl Material {
@@ -52,28 +55,28 @@ impl Material {
             }
         }
 
-        let diffuse = if let Some(file_path) = &mtl.map_kd {
-            let file_path = mtl_file_directory.join(file_path);
+        let (diffuse, diffuse_texture_name) = if let Some(texture_name) = &mtl.map_kd {
+            let file_path = mtl_file_directory.join(texture_name);
             let texture = crate::texture::Texture::load(&file_path, palette_region_type.is_diffuse_greyscale())?;
-            MaterialColour::Texture(texture)
+            (MaterialColour::Texture(texture), Some(texture_name.clone()))
         } else {
             let mut diffuse: glam::Vec3 = mtl.kd.unwrap_or_default().into();
             if palette_region_type.is_diffuse_greyscale() {
                 diffuse = crate::palette::linear_rgb_to_luminence_rgb(&diffuse);
             }
-            MaterialColour::Colour(diffuse)
+            (MaterialColour::Colour(diffuse), None)
         };
 
-        let specular = if let Some(file_path) = &mtl.map_ks {
-            let file_path = mtl_file_directory.join(file_path);
+        let (specular, specular_texture_name) = if let Some(texture_name) = &mtl.map_ks {
+            let file_path = mtl_file_directory.join(texture_name);
             let texture = crate::texture::Texture::load(&file_path, palette_region_type.is_diffuse_greyscale())?;
-            MaterialColour::Texture(texture)
+            (MaterialColour::Texture(texture), Some(texture_name.clone()))
         } else {
             let mut specular: glam::Vec3 = mtl.ks.unwrap_or_default().into();
             if palette_region_type.is_diffuse_greyscale() {
                 specular = crate::palette::linear_rgb_to_luminence_rgb(&specular);
             }
-            MaterialColour::Colour(specular)
+            (MaterialColour::Colour(specular), None)
         };
 
         Ok(Material {
@@ -85,7 +88,24 @@ impl Material {
             use_ao,
             shadows,
             no_bleed,
+            name: mtl.name.clone(),
+            diffuse_texture_name,
+            specular_texture_name,
         })
+    }
+
+    pub fn to_mtl_material(&self) -> obj::Material {
+        let mut material = obj::Material::new(self.name.clone());
+        match self.diffuse {
+            MaterialColour::Colour(colour) => material.kd = Some(colour.into()),
+            MaterialColour::Texture(_) => material.map_kd = self.diffuse_texture_name.clone(),
+        }
+        match self.specular {
+            MaterialColour::Colour(colour) => material.ks = Some(colour.into()),
+            MaterialColour::Texture(_) => material.map_ks = self.specular_texture_name.clone(),
+        }
+        material.ns = Some(self.specular_exponent);
+        material
     }
 }
 

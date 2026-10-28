@@ -220,6 +220,7 @@ impl Scene<'_> {
         let mut texture = Vec::new();
         let mut normal = Vec::new();
         let mut objects = Vec::new();
+        let mut materials: Vec<std::sync::Arc<obj::Material>> = Vec::new();
 
         for (mesh_index, mesh) in self.meshes.iter().enumerate() {
             let polys = mesh
@@ -238,10 +239,16 @@ impl Scene<'_> {
                     ])
                 })
                 .collect();
+            let material_name = &mesh.mesh.material.name;
+            let material = if material_name.is_empty() {
+                None
+            } else {
+                Some(obj::ObjMaterial::Ref(material_name.clone()))
+            };
             let group = obj::Group {
                 name: "object".to_string(),
                 index: mesh_index,
-                material: None,
+                material,
                 polys,
             };
             let object = obj::Object {
@@ -253,14 +260,27 @@ impl Scene<'_> {
             position.extend(mesh.geometry.positions().iter().map(|x| [x[0], x[1], -x[2]]));
             texture.extend(mesh.mesh.uvs.iter().map(|x| [x.x, x.y]));
             normal.extend(mesh.normals.iter().map(|x| [x.x, x.y, -x.z]));
+
+            if materials.iter().find(|x| x.name == *material_name).is_none() {
+                materials.push(std::sync::Arc::new(mesh.mesh.material.to_mtl_material()));
+            }
         }
+
+        let material_libs = if let Some(file_stem) = path.file_stem().and_then(|x| x.to_str()) {
+            vec![obj::Mtl {
+                filename: file_stem.to_owned() + ".mtl",
+                materials,
+            }]
+        } else {
+            Vec::new()
+        };
 
         let obj_data = obj::ObjData {
             position,
             texture,
             normal,
             objects,
-            material_libs: Vec::new(),
+            material_libs,
         };
 
         obj_data.save(path)
