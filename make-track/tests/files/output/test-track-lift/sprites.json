@@ -31,7 +31,7 @@
     },
     {
         "path": "track/test-track-lift/gentle_to_steep_lift_1_0.png",
-        "x": -24,
+        "x": -19,
         "y": -7,
         "palette": "keep"
     },
@@ -67,14 +67,14 @@
     },
     {
         "path": "track/test-track-lift/steep_to_gentle_lift_1_0.png",
-        "x": -8,
+        "x": -2,
         "y": -22,
         "palette": "keep"
     },
     {
         "path": "track/test-track-lift/steep_to_gentle_lift_1_1.png",
         "x": -25,
-        "y": -13,
+        "y": -14,
         "palette": "keep"
     },
     {
@@ -86,7 +86,7 @@
     {
         "path": "track/test-track-lift/steep_to_gentle_lift_2_1.png",
         "x": -12,
-        "y": -13,
+        "y": -14,
         "palette": "keep"
     },
     {

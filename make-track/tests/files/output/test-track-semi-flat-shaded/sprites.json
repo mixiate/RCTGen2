@@ -2,7 +2,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/corkscrew_left_0_0.png",
         "x": -24,
-        "y": -62,
+        "y": -40,
         "palette": "keep"
     },
     {
@@ -109,7 +109,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/corkscrew_right_2_0.png",
-        "x": -12,
+        "x": -11,
         "y": -6,
         "palette": "keep"
     },
@@ -128,7 +128,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/corkscrew_right_3_0.png",
         "x": -27,
-        "y": -62,
+        "y": -40,
         "palette": "keep"
     },
     {
@@ -152,7 +152,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/large_corkscrew_left_0_1.png",
         "x": -24,
-        "y": -72,
+        "y": -53,
         "palette": "keep"
     },
     {
@@ -253,7 +253,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/large_corkscrew_left_3_3.png",
-        "x": -34,
+        "x": -32,
         "y": -36,
         "palette": "keep"
     },
@@ -325,7 +325,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/large_corkscrew_right_2_0.png",
-        "x": -35,
+        "x": -34,
         "y": -6,
         "palette": "keep"
     },
@@ -362,7 +362,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/large_corkscrew_right_3_1.png",
         "x": -13,
-        "y": -72,
+        "y": -53,
         "palette": "keep"
     },
     {
@@ -416,7 +416,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/medium_half_loop_left_1_0.png",
         "x": -24,
-        "y": -29,
+        "y": -28,
         "palette": "keep"
     },
     {
@@ -445,8 +445,8 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/medium_half_loop_left_2_0.png",
-        "x": -32,
-        "y": -10,
+        "x": -24,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -523,7 +523,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/medium_half_loop_right_0_3.png",
-        "x": -20,
+        "x": -19,
         "y": -127,
         "palette": "keep"
     },
@@ -536,7 +536,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/medium_half_loop_right_1_0.png",
         "x": -24,
-        "y": -10,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -565,8 +565,8 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/medium_half_loop_right_2_0.png",
-        "x": -63,
-        "y": -29,
+        "x": -61,
+        "y": -28,
         "palette": "keep"
     },
     {
@@ -967,7 +967,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/zero_g_roll_left_0_1.png",
-        "x": -11,
+        "x": -12,
         "y": -16,
         "palette": "keep"
     },
@@ -1069,7 +1069,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/zero_g_roll_right_0_2.png",
-        "x": -22,
+        "x": -21,
         "y": -4,
         "palette": "keep"
     },
@@ -1160,12 +1160,12 @@
     {
         "path": "track/test-track-semi-flat-shaded/large_zero_g_roll_left_0_1.png",
         "x": -26,
-        "y": -26,
+        "y": -10,
         "palette": "keep"
     },
     {
         "path": "track/test-track-semi-flat-shaded/large_zero_g_roll_left_0_2.png",
-        "x": -16,
+        "x": -17,
         "y": -52,
         "palette": "keep"
     },
@@ -1231,8 +1231,8 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/large_zero_g_roll_left_2_4.png",
-        "x": -7,
-        "y": -11,
+        "x": -6,
+        "y": -10,
         "palette": "keep"
     },
     {
@@ -1303,7 +1303,7 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/large_zero_g_roll_right_1_0.png",
-        "x": 5,
+        "x": 6,
         "y": -33,
         "palette": "keep"
     },
@@ -1328,7 +1328,7 @@
     {
         "path": "track/test-track-semi-flat-shaded/large_zero_g_roll_right_1_4.png",
         "x": -8,
-        "y": -11,
+        "y": -10,
         "palette": "keep"
     },
     {
@@ -1369,8 +1369,8 @@
     },
     {
         "path": "track/test-track-semi-flat-shaded/large_zero_g_roll_right_3_1.png",
-        "x": -10,
-        "y": -26,
+        "x": 2,
+        "y": -10,
         "palette": "keep"
     },
     {
