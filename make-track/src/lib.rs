@@ -33,12 +33,11 @@ fn render_scene_depth(
     scene: &renderer::Scene,
     mesh_types: &[renderer::MeshType],
     camera: &glam::Mat4,
-    samples: usize,
     rotation: usize,
 ) -> renderer::DepthBuffer {
     let view_rotation = glam::Mat4::from_rotation_y(90.0_f32.to_radians() * rotation as f32);
     let camera = camera * view_rotation;
-    renderer::render_scene_depth(scene, mesh_types, &camera, samples, samples)
+    renderer::render_scene_depth(scene, mesh_types, &camera)
 }
 
 #[expect(clippy::too_many_arguments)]
@@ -85,7 +84,7 @@ fn render_track_section_view(
             offset_start,
             offset_end,
         )?;
-        Some(render_scene_depth(&scene, &mesh_types, camera, samples, rotation))
+        Some(render_scene_depth(&scene, &mesh_types, camera, rotation))
     } else {
         None
     };
@@ -156,7 +155,7 @@ fn render_track_section_views(
             .into_par_iter()
             .enumerate()
             .map(|(rotation, view)| {
-                view.requires_track_mask.then(|| render_scene_depth(&scene, &mesh_types, camera, samples, rotation))
+                view.requires_track_mask.then(|| render_scene_depth(&scene, &mesh_types, camera, rotation))
             })
             .collect::<Vec<_>>()
     } else {

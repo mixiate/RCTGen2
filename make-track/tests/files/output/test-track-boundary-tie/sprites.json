@@ -91,7 +91,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_steep_1_0.png",
-        "x": -22,
+        "x": -21,
         "y": -7,
         "palette": "keep"
     },
@@ -127,14 +127,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/steep_to_gentle_1_0.png",
-        "x": -4,
+        "x": -2,
         "y": -21,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/steep_to_gentle_1_1.png",
         "x": -22,
-        "y": -15,
+        "y": -16,
         "palette": "keep"
     },
     {
@@ -146,7 +146,7 @@
     {
         "path": "track/test-track-boundary-tie/steep_to_gentle_2_1.png",
         "x": -12,
-        "y": -15,
+        "y": -16,
         "palette": "keep"
     },
     {
@@ -1286,7 +1286,7 @@
     {
         "path": "track/test-track-boundary-tie/flat_to_left_bank_0_0.png",
         "x": -22,
-        "y": -2,
+        "y": -1,
         "palette": "keep"
     },
     {
@@ -1297,14 +1297,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_left_bank_1_0.png",
-        "x": -22,
+        "x": -21,
         "y": -5,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_left_bank_1_1.png",
-        "x": -20,
-        "y": 2,
+        "x": -22,
+        "y": 1,
         "palette": "keep"
     },
     {
@@ -1333,20 +1333,20 @@
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_right_bank_2_0.png",
-        "x": -19,
+        "x": -16,
         "y": -5,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_right_bank_2_1.png",
         "x": -20,
-        "y": 2,
+        "y": 1,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_right_bank_3_0.png",
-        "x": -14,
-        "y": -2,
+        "x": -11,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -1357,20 +1357,20 @@
     },
     {
         "path": "track/test-track-boundary-tie/left_bank_to_gentle_0_0.png",
-        "x": -19,
+        "x": -16,
         "y": -13,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/left_bank_to_gentle_0_1.png",
         "x": -20,
-        "y": -2,
+        "y": -3,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/left_bank_to_gentle_1_0.png",
-        "x": -15,
-        "y": -3,
+        "x": -10,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -1406,7 +1406,7 @@
     {
         "path": "track/test-track-boundary-tie/right_bank_to_gentle_2_0.png",
         "x": -22,
-        "y": -3,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -1424,7 +1424,7 @@
     {
         "path": "track/test-track-boundary-tie/right_bank_to_gentle_3_1.png",
         "x": -20,
-        "y": -3,
+        "y": -4,
         "palette": "keep"
     },
     {
@@ -1448,7 +1448,7 @@
     {
         "path": "track/test-track-boundary-tie/gentle_to_left_bank_1_1.png",
         "x": -16,
-        "y": -2,
+        "y": -3,
         "palette": "keep"
     },
     {
@@ -1477,14 +1477,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_right_bank_2_0.png",
-        "x": -19,
+        "x": -10,
         "y": -5,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_right_bank_2_1.png",
         "x": -20,
-        "y": -2,
+        "y": -3,
         "palette": "keep"
     },
     {
@@ -1687,7 +1687,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_right_bank_diag_2_0.png",
-        "x": -6,
+        "x": -5,
         "y": -2,
         "palette": "keep"
     },
@@ -1729,7 +1729,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/small_turn_left_bank_0_0.png",
-        "x": -17,
+        "x": -8,
         "y": -2,
         "palette": "keep"
     },
@@ -1783,7 +1783,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/small_turn_left_bank_2_2.png",
-        "x": -2,
+        "x": -1,
         "y": -2,
         "palette": "keep"
     },
@@ -2485,7 +2485,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/very_small_turn_left_steep_1_0.png",
-        "x": -7,
+        "x": -6,
         "y": -68,
         "palette": "keep"
     },
@@ -2647,7 +2647,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_to_gentle_left_bank_1_0.png",
-        "x": -15,
+        "x": -13,
         "y": -5,
         "palette": "keep"
     },
@@ -2707,7 +2707,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_left_bank_to_gentle_1_0.png",
-        "x": -7,
+        "x": -3,
         "y": -5,
         "palette": "keep"
     },
@@ -2911,14 +2911,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_gentle_left_bank_1_0.png",
-        "x": -22,
+        "x": -21,
         "y": -5,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/flat_to_gentle_left_bank_1_1.png",
-        "x": -20,
-        "y": 2,
+        "x": -22,
+        "y": 1,
         "palette": "keep"
     },
     {
@@ -2954,7 +2954,7 @@
     {
         "path": "track/test-track-boundary-tie/flat_to_gentle_right_bank_2_1.png",
         "x": -22,
-        "y": 2,
+        "y": 1,
         "palette": "keep"
     },
     {
@@ -2971,7 +2971,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_left_bank_to_flat_1_0.png",
-        "x": -10,
+        "x": -9,
         "y": -3,
         "palette": "keep"
     },
@@ -3013,7 +3013,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/gentle_right_bank_to_flat_2_1.png",
-        "x": -2,
+        "x": -4,
         "y": -6,
         "palette": "keep"
     },
@@ -3457,7 +3457,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/small_helix_left_0_0.png",
-        "x": -20,
+        "x": -16,
         "y": -2,
         "palette": "keep"
     },
@@ -3601,7 +3601,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/small_helix_right_3_0.png",
-        "x": 0,
+        "x": 1,
         "y": -2,
         "palette": "keep"
     },
@@ -3625,7 +3625,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/medium_helix_left_0_0.png",
-        "x": -17,
+        "x": -6,
         "y": 0,
         "palette": "keep"
     },
@@ -4004,13 +4004,13 @@
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_0_1.png",
         "x": -17,
-        "y": 4,
+        "y": 3,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_0_2.png",
-        "x": -22,
-        "y": 18,
+        "x": 0,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -4075,13 +4075,13 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_2_1.png",
-        "x": 9,
-        "y": 7,
+        "x": 8,
+        "y": 6,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_2_2.png",
-        "x": -26,
+        "x": -25,
         "y": -16,
         "palette": "keep"
     },
@@ -4111,8 +4111,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_3_1.png",
-        "x": 12,
-        "y": 20,
+        "x": 11,
+        "y": 19,
         "palette": "keep"
     },
     {
@@ -4129,8 +4129,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_left_3_4.png",
-        "x": 7,
-        "y": -10,
+        "x": 10,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -4159,14 +4159,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_0_3.png",
-        "x": -15,
+        "x": -16,
         "y": -31,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_0_4.png",
-        "x": -22,
-        "y": -10,
+        "x": -21,
+        "y": -9,
         "palette": "keep"
     },
     {
@@ -4183,8 +4183,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_1_1.png",
-        "x": -17,
-        "y": 6,
+        "x": -18,
+        "y": 5,
         "palette": "keep"
     },
     {
@@ -4195,7 +4195,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_1_3.png",
-        "x": 11,
+        "x": 10,
         "y": -13,
         "palette": "keep"
     },
@@ -4249,20 +4249,20 @@
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_3_0.png",
-        "x": -10,
+        "x": -9,
         "y": 3,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_3_1.png",
         "x": -24,
-        "y": 4,
+        "y": 3,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/barrel_roll_right_3_2.png",
-        "x": 21,
-        "y": 18,
+        "x": 0,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -4291,14 +4291,14 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_0_1.png",
-        "x": -17,
-        "y": 3,
+        "x": -18,
+        "y": 2,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_0_2.png",
-        "x": -24,
-        "y": 15,
+        "x": 0,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -4363,7 +4363,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_2_1.png",
-        "x": 16,
+        "x": 15,
         "y": 9,
         "palette": "keep"
     },
@@ -4399,8 +4399,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_3_1.png",
-        "x": 8,
-        "y": 18,
+        "x": 7,
+        "y": 17,
         "palette": "keep"
     },
     {
@@ -4417,8 +4417,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_left_3_4.png",
-        "x": 0,
-        "y": 21,
+        "x": 3,
+        "y": 22,
         "palette": "keep"
     },
     {
@@ -4436,7 +4436,7 @@
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_0_1.png",
         "x": -18,
-        "y": 18,
+        "y": 17,
         "palette": "keep"
     },
     {
@@ -4454,7 +4454,7 @@
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_0_4.png",
         "x": -15,
-        "y": 21,
+        "y": 22,
         "palette": "keep"
     },
     {
@@ -4483,8 +4483,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_1_3.png",
-        "x": 4,
-        "y": -2,
+        "x": 2,
+        "y": -3,
         "palette": "keep"
     },
     {
@@ -4537,20 +4537,20 @@
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_3_0.png",
-        "x": -8,
+        "x": -7,
         "y": 2,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_3_1.png",
         "x": -22,
-        "y": 3,
+        "y": 2,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/inline_twist_right_3_2.png",
-        "x": 21,
-        "y": 15,
+        "x": 0,
+        "y": 0,
         "palette": "keep"
     },
     {
@@ -4850,7 +4850,7 @@
     {
         "path": "track/test-track-boundary-tie/vertical_loop_right_3_2.png",
         "x": 1,
-        "y": -89,
+        "y": -86,
         "palette": "keep"
     },
     {
@@ -5084,7 +5084,7 @@
     {
         "path": "track/test-track-boundary-tie/large_corkscrew_left_0_1.png",
         "x": -22,
-        "y": -52,
+        "y": -50,
         "palette": "keep"
     },
     {
@@ -5294,7 +5294,7 @@
     {
         "path": "track/test-track-boundary-tie/large_corkscrew_right_3_1.png",
         "x": -12,
-        "y": -52,
+        "y": -50,
         "palette": "keep"
     },
     {
@@ -5894,7 +5894,7 @@
     {
         "path": "track/test-track-boundary-tie/zero_g_roll_left_0_0.png",
         "x": -22,
-        "y": -13,
+        "y": -12,
         "palette": "keep"
     },
     {
@@ -5977,8 +5977,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/zero_g_roll_left_3_2.png",
-        "x": 15,
-        "y": -5,
+        "x": 16,
+        "y": -4,
         "palette": "keep"
     },
     {
@@ -6001,8 +6001,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/zero_g_roll_right_0_2.png",
-        "x": -22,
-        "y": -5,
+        "x": -21,
+        "y": -4,
         "palette": "keep"
     },
     {
@@ -6061,8 +6061,8 @@
     },
     {
         "path": "track/test-track-boundary-tie/zero_g_roll_right_3_0.png",
-        "x": -17,
-        "y": -13,
+        "x": -15,
+        "y": -12,
         "palette": "keep"
     },
     {
@@ -6097,7 +6097,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_left_0_2.png",
-        "x": -16,
+        "x": -17,
         "y": -52,
         "palette": "keep"
     },
@@ -6217,13 +6217,13 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_right_0_2.png",
-        "x": -32,
+        "x": -31,
         "y": -32,
         "palette": "keep"
     },
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_right_0_3.png",
-        "x": -31,
+        "x": -32,
         "y": -42,
         "palette": "keep"
     },
@@ -6235,7 +6235,7 @@
     },
     {
         "path": "track/test-track-boundary-tie/large_zero_g_roll_right_1_0.png",
-        "x": 2,
+        "x": 5,
         "y": -34,
         "palette": "keep"
     },
@@ -7232,7 +7232,7 @@
     {
         "path": "track/test-track-boundary-tie/gentle_left_bank_to_flat_diag_0_1.png",
         "x": -32,
-        "y": 0,
+        "y": -1,
         "palette": "keep"
     },
     {
@@ -7274,7 +7274,7 @@
     {
         "path": "track/test-track-boundary-tie/gentle_right_bank_to_flat_diag_2_1.png",
         "x": -32,
-        "y": 0,
+        "y": -1,
         "palette": "keep"
     },
     {

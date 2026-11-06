@@ -314,15 +314,13 @@ pub fn render_scene_depth(
     scene: &crate::raytrace::Scene,
     mesh_types: &[crate::raytrace::MeshType],
     camera: &glam::Mat4,
-    multi_samples_x: usize,
-    multi_samples_y: usize,
 ) -> crate::DepthBuffer {
     let scene_bounds = scene.get_scene_screen_bounds(camera, mesh_types);
     let offset = glam::Vec2::new(scene_bounds[0] as f32 - 0.5, scene_bounds[1] as f32);
     let ray_origin_offset = offset.extend(0.0);
 
     let camera_inverse = camera.inverse();
-    let ray_direction = camera_inverse.transform_vector3(glam::Vec3::new(0.0, 0.0, 1.0)).normalize();
+    let ray_direction = camera_inverse.transform_vector3(glam::Vec3::Z).normalize();
 
     let mut depth_buffer = {
         let width = usize::try_from(scene_bounds[2] - scene_bounds[0]).unwrap() + 1;
@@ -334,27 +332,8 @@ pub fn render_scene_depth(
     for y in 0..depth_buffer.height() {
         for x in 0..depth_buffer.width() {
             let ray_origin = glam::Vec3::new(x as f32, y as f32, -512.0) + ray_origin_offset;
+            let ray_origin = camera_inverse.transform_vector3(ray_origin);
             let depth = scene.trace_depth_ray(&ray_origin, &ray_direction);
-
-            let depth = if depth == f32::INFINITY {
-                let mut depth = f32::INFINITY;
-                for sub_x in 0..multi_samples_x {
-                    for sub_y in 0..multi_samples_y {
-                        let ray_origin = glam::Vec3::new(
-                            (sub_x as f32 + 0.5) / multi_samples_x as f32 - 0.5,
-                            (sub_y as f32 + 0.5) / multi_samples_y as f32 - 0.5,
-                            0.0,
-                        ) + ray_origin;
-                        let ray_origin = camera_inverse.transform_vector3(ray_origin);
-
-                        depth = depth.min(scene.trace_depth_ray(&ray_origin, &ray_direction));
-                    }
-                }
-                depth
-            } else {
-                depth
-            };
-
             depth_buffer.set_depth(x, y, depth);
         }
     }
